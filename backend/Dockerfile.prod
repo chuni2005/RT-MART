@@ -1,55 +1,30 @@
 # ===== 生產環境 Dockerfile =====
-# 此檔案用於生產環境部署，包含完整的建置和優化流程
+# 此檔案用於生產環境部署
 
-# 階段1: 建置階段
 FROM node:18-alpine AS builder
 
-# 設定工作目錄
 WORKDIR /app
 
-# 複製 package.json 和 package-lock.json (利用 Docker cache layer)
 COPY package*.json ./
-
-# 安裝所有依賴 (包含 devDependencies)
 RUN npm ci --only=production=false
-
-# 安裝 NestJS CLI
 RUN npm install -g @nestjs/cli
 
-# 複製原始碼
 COPY . .
-
-# 編譯 TypeScript 到 dist 目錄
 RUN npm run build
 
-# 階段2: 生產運行階段
 FROM node:18-alpine AS production
 
-# 建立非 root 用戶以提高安全性
 RUN addgroup -g 1001 -S nodejs
 RUN adduser -S nestjs -u 1001
 
-# 設定工作目錄
 WORKDIR /app
 
-# 複製 package.json 和 package-lock.json
 COPY package*.json ./
-
-# 只安裝生產依賴
 RUN npm ci --only=production && npm cache clean --force
 
-# 從建置階段複製編譯後的程式碼
 COPY --from=builder --chown=nestjs:nodejs /app/dist ./dist
 
 # 切換到非 root 用戶
 USER nestjs
-
-# 開放 port
 EXPOSE 3000
-
-# 健康檢查
-HEALTHCHECK --interval=30s --timeout=3s --start-period=5s --retries=3 \
-  CMD curl -f http://localhost:3000/health || exit 1
-
-# 啟動應用程式
-CMD ["node", "dist/main"]
+CMD ["npm", "run", "start:prod"]

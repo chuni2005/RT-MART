@@ -1,32 +1,17 @@
 # ===== 開發環境 Dockerfile =====
 # 此檔案專用於開發環境，支援熱重載和開發工具
-
 FROM node:18-alpine
 
-# 安裝 curl 用於健康檢查
 RUN apk add --no-cache curl
 
-# 設定工作目錄
 WORKDIR /app
 
-# 複製 package.json 和 package-lock.json (利用 Docker cache layer)
 COPY package*.json ./
-
-# 安裝所有依賴 (包含 devDependencies)
 RUN npm install
-
-# 安裝全域開發工具
 RUN npm install -g @nestjs/cli nodemon
 
-# 複製原始碼 (透過 volume mount 在 docker-compose 中覆蓋)
 COPY . .
 
-# 開放 port
 EXPOSE 3000
-
-# 健康檢查
-HEALTHCHECK --interval=30s --timeout=3s --start-period=10s --retries=3 \
-  CMD curl -f http://localhost:3000/health || exit 1
-
 # 開發環境啟動指令 (支援熱重載)
 CMD ["npm", "run", "start:dev"]
