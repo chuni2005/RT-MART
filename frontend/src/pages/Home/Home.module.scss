@@ -1,0 +1,137 @@
+.home {
+  min-height: 100vh;
+}
+
+// Hero Section
+.hero {
+  background: linear-gradient(135deg, #ff6b4a 0%, #ee4d2d 100%);
+  color: white;
+  padding: $spacing-xxl * 2 $spacing-lg;
+  text-align: center;
+
+  @include mobile {
+    padding: $spacing-xxl $spacing-md;
+  }
+}
+
+.heroContent {
+  max-width: 800px;
+  margin: 0 auto;
+}
+
+.heroTitle {
+  font-size: $font-4xl;
+  font-weight: 700;
+  margin-bottom: $spacing-lg;
+
+  @include mobile {
+    font-size: $font-3xl;
+  }
+}
+
+.heroSubtitle {
+  font-size: $font-xl;
+  margin-bottom: $spacing-xl;
+  opacity: 0.95;
+
+  @include mobile {
+    font-size: $font-lg;
+  }
+}
+
+.heroButtons {
+  display: flex;
+  gap: $spacing-md;
+  justify-content: center;
+
+  @include mobile {
+    flex-direction: column;
+    align-items: stretch;
+  }
+}
+
+.container {
+  @include container($desktop);
+}
+
+
+.sectionTitle {
+  font-size: $font-3xl;
+  font-weight: 700;
+  text-align: center;
+  margin-bottom: $spacing-xxl;
+  color: var(--text-primary);
+
+  @include mobile {
+    font-size: $font-2xl;
+    margin-bottom: $spacing-xl;
+  }
+}
+
+
+.products {
+  padding: $spacing-xxl * 2 $spacing-lg;
+  background: var(--bg-primary);
+
+  @include mobile {
+    padding: $spacing-xxl $spacing-md;
+  }
+}
+
+.productGrid {
+  display: flex;
+  flex-wrap: wrap;
+  gap: $spacing-lg;
+
+  > * {
+    flex: 1 1 calc(25% - $spacing-lg);
+    min-width: 200px;
+  }
+
+  @include tablet {
+    > * {
+      flex: 1 1 calc(33.333% - $spacing-lg);
+    }
+  }
+
+  @include mobile {
+    gap: $spacing-md;
+    > * {
+      flex: 1 1 calc(50% - $spacing-md);
+      min-width: 150px;
+    }
+  }
+}
+
+// CTA Section
+.cta {
+  background: $gradient-primary;
+  color: white;
+  padding: $spacing-xxl * 2 $spacing-lg;
+  text-align: center;
+
+  @include mobile {
+    padding: $spacing-xxl $spacing-md;
+  }
+}
+
+.ctaContent {
+  max-width: 600px;
+  margin: 0 auto;
+
+  h2 {
+    font-size: $font-3xl;
+    font-weight: 700;
+    margin-bottom: $spacing-md;
+
+    @include mobile {
+      font-size: $font-2xl;
+    }
+  }
+
+  p {
+    font-size: $font-lg;
+    margin-bottom: $spacing-xl;
+    opacity: 0.95;
+  }
+}
