@@ -1,32 +1,111 @@
-version: '3.8'
-
 services:
+  mariadb:
+    image: mariadb:11.2
+    container_name: rt_mart_mariadb
+    ports:
+      - "3306:3306"
+    environment:
+      # Root password for database administration
+      - MARIADB_ROOT_PASSWORD=${DB_ROOT_PASSWORD:-rt_mart_root_password_or_something_idk123*}
+      # Application database name
+      - MARIADB_DATABASE=${DB_NAME:-rt_mart_db}
+      # Application database user
+      - MARIADB_USER=${DB_USER:-rt_mart_user}
+      # Application database password
+      - MARIADB_PASSWORD=${DB_PASSWORD:-rt_mart_and_the_user_password_yeah_very_cool123*}
+    volumes:
+      # Persist database data between container restarts
+      - mariadb_data:/var/lib/mysql
+      # Optional: Add initialization scripts
+      - ./database/init:/docker-entrypoint-initdb.d
+    healthcheck:
+      # Check if MariaDB is ready to accept connections
+      test: ["CMD", "healthcheck.sh", "--connect", "--innodb_initialized"]
+      interval: 10s
+      timeout: 5s
+      retries: 5
+      start_period: 30s
+    restart: unless-stopped
+    networks:
+      - app-network
+
+  # NestJS Backend Service
   backend:
     build:
       context: ./backend
       dockerfile: Dockerfile.dev
+    container_name: rt_mart_backend
     ports:
       - '3000:3000'
     volumes:
+      # Mount source code for hot-reloading during development
       - ./backend:/app
+      # Prevent node_modules from being overwritten
       - /app/node_modules
     environment:
       - NODE_ENV=development
+      # Database connection string
+      - DATABASE_URL=mysql://${DB_USER:-rt_mart_user}:${DB_PASSWORD:-rt_mart_and_the_user_password_yeah_very_cool123*}@mariadb:3306/${DB_NAME:-rt_mart_db}
+      - DB_HOST=mariadb
+      - DB_PORT=3306
+      - DB_USERNAME=${DB_USER:-rt_mart_user}
+      - DB_PASSWORD=${DB_PASSWORD:-rt_mart_and_the_user_password_yeah_very_cool123*}
+      - DB_DATABASE=${DB_NAME:-rt_mart_db}
+    env_file:
+      # Load additional environment variables from .env file
+      - ./backend/.env
+    depends_on:
+      mariadb:
+        # Wait for MariaDB to be healthy before starting backend
+        condition: service_healthy
+    healthcheck:
+      # Check if backend API is responding
+      test: ["CMD", "curl", "-f", "http://localhost:3000/health"]
+      interval: 30s
+      timeout: 10s
+      retries: 3
+      start_period: 40s
     restart: unless-stopped
+    networks:
+      - app-network
 
+  # React Frontend Service
   frontend:
     build:
       context: ./frontend
       dockerfile: Dockerfile.dev
       args:
         REGISTRY_PREFIX: ${REGISTRY_PREFIX:-}
+    container_name: rt_mart_frontend
     ports:
       - "5173:5173"
     volumes:
+      # Mount source code for hot-reloading during development
       - ./frontend:/app
+      # Prevent node_modules from being overwritten
       - /app/node_modules
     environment:
+      # Enable file watching for hot-reload on all platforms
       - CHOKIDAR_USEPOLLING=true
+      # Backend API URL for development
+      - VITE_API_URL=http://localhost:3000
+      # For production deployment, this will be your actual backend URL
+      # - VITE_API_URL=https://your-backend-domain.com
+    env_file:
+      # Load additional environment variables from .env file
+      - ./frontend/.env
     depends_on:
       - backend
     restart: unless-stopped
+    networks:
+      - app-network
+
+# Named volumes for data persistence
+volumes:
+  mariadb_data:
+    driver: local
+
+# Custom network for service communication
+networks:
+  app-network:
+    driver: bridge
