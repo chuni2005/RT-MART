@@ -1,6 +1,6 @@
 # ===== 開發環境 Dockerfile =====
 # 此檔案專用於開發環境，支援熱重載和開發工具
-FROM node:18-alpine
+FROM node:22-alpine
 
 RUN apk add --no-cache curl
 
