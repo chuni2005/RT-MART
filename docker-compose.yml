@@ -16,7 +16,7 @@ services:
     volumes:
       # Persist database data between container restarts
       - mariadb_data:/var/lib/mysql
-      # Optional: Add initialization scripts
+      # Add initialization scripts
       - ./database/init:/docker-entrypoint-initdb.d
     healthcheck:
       # Check if MariaDB is ready to accept connections
@@ -89,8 +89,6 @@ services:
       - CHOKIDAR_USEPOLLING=true
       # Backend API URL for development
       - VITE_API_URL=http://localhost:3000
-      # For production deployment, this will be your actual backend URL
-      # - VITE_API_URL=https://your-backend-domain.com
     env_file:
       # Load additional environment variables from .env file
       - ./frontend/.env
