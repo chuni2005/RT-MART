@@ -1,24 +1,18 @@
 import React, { useState, useEffect } from 'react';
-import { Link, useNavigate } from 'react-router-dom';
-import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
+import { Link } from 'react-router-dom';
 import {
   faSearch,
   faShoppingCart,
-  faUser,
   faBars,
   faTimes,
-  faSignOutAlt,
 } from '@fortawesome/free-solid-svg-icons';
-import { useAuth } from '../../hooks/useAuth';
 import NavigationBar from '../NavigationBar/NavigationBar';
+import Button from '../Button/Button';
 import styles from './Header.module.scss';
 
 function Header({ isFixed = true }) {
-  const navigate = useNavigate();
-  const { user, isAuthenticated, logout } = useAuth();
   const [isScrolled, setIsScrolled] = useState(false);
   const [isMobileMenuOpen, setIsMobileMenuOpen] = useState(false);
-  const [showUserMenu, setShowUserMenu] = useState(false);
 
   // Scroll effect
   useEffect(() => {
@@ -36,20 +30,10 @@ function Header({ isFixed = true }) {
     setIsMobileMenuOpen(!isMobileMenuOpen);
   };
 
-  const handleLogout = async () => {
-    try {
-      await logout();
-      setShowUserMenu(false);
-      navigate('/');
-    } catch (error) {
-      console.error('Logout failed:', error);
-    }
-  };
-
   return (
     <header
-      className={`${styles.header} ${isFixed ? styles.fixed : ''} ${
-        isScrolled ? styles.scrolled : ''
+      className={`${styles.header} ${isFixed ? styles.fixed : ""} ${
+        isScrolled ? styles.scrolled : ""
       }`}
     >
       <div className={styles.container}>
@@ -57,7 +41,7 @@ function Header({ isFixed = true }) {
           {/* Logo Section */}
           <div className={styles.logo}>
             <Link to="/">
-              <img src='/public/RT-MART_logo.png'></img>
+              <img src="/RT-Mart_logo.png" alt="RT-MART Logo"/>
             </Link>
           </div>
 
@@ -67,65 +51,35 @@ function Header({ isFixed = true }) {
           {/* Right Section */}
           <div className={styles.rightSection}>
             {/* Search Icon */}
-            <button className={styles.iconButton} aria-label="Search">
-              <FontAwesomeIcon icon={faSearch} />
-            </button>
+            <Button
+              icon={faSearch}
+              iconOnly
+              ariaLabel="Search"
+            />
 
             {/* Cart Icon */}
-            <button className={styles.iconButton} aria-label="Shopping Cart">
-              <FontAwesomeIcon icon={faShoppingCart} />
-              <span className={styles.badge}>0</span>
-            </button>
+            <Button
+              icon={faShoppingCart}
+              iconOnly
+              badge={0}
+              ariaLabel="Shopping Cart"
+            />
 
             {/* User Account / Login */}
-            {isAuthenticated ? (
-              <div className={styles.userMenu}>
-                <button
-                  className={styles.userButton}
-                  onClick={() => setShowUserMenu(!showUserMenu)}
-                  aria-label="User Menu"
-                >
-                  {user?.avatar ? (
-                    <img src={user.avatar} alt={user.name} className={styles.avatar} />
-                  ) : (
-                    <FontAwesomeIcon icon={faUser} />
-                  )}
-                </button>
-                {showUserMenu && (
-                  <div className={styles.dropdown}>
-                    <div className={styles.userInfo}>
-                      <p className={styles.userName}>{user?.name}</p>
-                      <p className={styles.userEmail}>{user?.email}</p>
-                    </div>
-                    <div className={styles.divider} />
-                    <button className={styles.dropdownItem} onClick={() => { setShowUserMenu(false); navigate('/profile'); }}>
-                      我的帳戶
-                    </button>
-                    <button className={styles.dropdownItem} onClick={() => { setShowUserMenu(false); navigate('/orders'); }}>
-                      我的訂單
-                    </button>
-                    <div className={styles.divider} />
-                    <button className={`${styles.dropdownItem} ${styles.logout}`} onClick={handleLogout}>
-                      <FontAwesomeIcon icon={faSignOutAlt} />
-                      登出
-                    </button>
-                  </div>
-                )}
-              </div>
-            ) : (
-              <Link to="/auth" className={styles.loginButton}>
+            <Link to="/auth">
+              <Button variant="login">
                 登入
-              </Link>
-            )}
+              </Button>
+            </Link>
 
             {/* Mobile Menu Toggle */}
-            <button
-              className={styles.mobileMenuToggle}
+            <Button
+              icon={isMobileMenuOpen ? faTimes : faBars}
+              iconOnly
               onClick={toggleMobileMenu}
-              aria-label="Toggle Menu"
-            >
-              <FontAwesomeIcon icon={isMobileMenuOpen ? faTimes : faBars} />
-            </button>
+              className={styles.mobileMenuToggle}
+              ariaLabel="Toggle Menu"
+            />
           </div>
         </div>
 
