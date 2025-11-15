@@ -1,0 +1,96 @@
+.btn {
+  @include button-base;
+  padding: $spacing-md $spacing-xl;
+  font-size: $font-lg;
+  font-weight: 600;
+  border-radius: $border-radius-lg;
+  transition: $transition-base;
+
+  &.fullWidth {
+    width: 100%;
+  }
+
+  &:disabled {
+    opacity: 0.5;
+    cursor: not-allowed;
+    pointer-events: none;
+  }
+}
+
+.btnPrimary {
+  background: white;
+  color: var(--primary-color);
+
+  &:hover:not(:disabled) {
+    background: rgba(255, 255, 255, 0.9);
+    transform: translateY(-2px);
+    box-shadow: $shadow-lg;
+  }
+}
+
+.btnOutline {
+  background: transparent;
+  color: white;
+  border: 2px solid white;
+
+  &:hover:not(:disabled) {
+    background: rgba(255, 255, 255, 0.1);
+    transform: translateY(-2px);
+  }
+}
+
+.iconButton {
+  @include button-base;
+  background: transparent;
+  border: none;
+  padding: $spacing-sm;
+  font-size: $font-xl;
+  color: var(--text-primary);
+  position: relative;
+  transition: $transition-base;
+
+  &:hover:not(:disabled) {
+    color: var(--primary-color);
+    transform: scale(1.1);
+  }
+
+  svg {
+    display: block;
+  }
+}
+
+.badge {
+  position: absolute;
+  top: -5px;
+  right: -5px;
+  background: var(--primary-color);
+  color: white;
+  font-size: $font-xs;
+  font-weight: bold;
+  padding: 2px 6px;
+  border-radius: 10px;
+  min-width: 18px;
+  text-align: center;
+}
+
+.btnLogin {
+  display: inline-flex;
+  align-items: center;
+  padding: $spacing-sm $spacing-lg;
+  background: var(--primary-color);
+  color: white;
+  font-size: $font-sm;
+  font-weight: 600;
+  border-radius: $border-radius-md;
+  transition: $transition-fast;
+
+  &:hover:not(:disabled) {
+    background: var(--primary-hover);
+    transform: translateY(-1px);
+  }
+
+  @include mobile {
+    padding: $spacing-xs $spacing-md;
+    font-size: $font-xs;
+  }
+}

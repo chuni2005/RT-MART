@@ -1,0 +1,189 @@
+// Common Utility Styles
+@use "./variables" as *;
+@use "./mixins" as *;
+
+// Container
+.container {
+  @include container($desktop);
+}
+
+.container-fluid {
+  width: 100%;
+  padding: 0 1rem;
+
+  @include desktop {
+    padding: 0 2rem;
+  }
+}
+
+// Section
+.section {
+  padding: $spacing-xxl 0;
+
+  @include mobile {
+    padding: $spacing-xl 0;
+  }
+}
+
+// Text Utilities
+.text-center {
+  text-align: center;
+}
+
+.text-left {
+  text-align: left;
+}
+
+.text-right {
+  text-align: right;
+}
+
+.text-primary {
+  color: var(--primary-color);
+}
+
+.text-secondary {
+  color: var(--text-secondary);
+}
+
+.text-muted {
+  color: var(--text-tertiary);
+}
+
+// Display Utilities
+.d-none {
+  display: none;
+}
+
+.d-block {
+  display: block;
+}
+
+.d-flex {
+  display: flex;
+}
+
+.d-flex-wrap {
+  display: flex;
+  flex-wrap: wrap;
+}
+
+// Spacing Utilities
+.mt-sm {
+  margin-top: $spacing-sm;
+}
+.mt-md {
+  margin-top: $spacing-md;
+}
+.mt-lg {
+  margin-top: $spacing-lg;
+}
+.mt-xl {
+  margin-top: $spacing-xl;
+}
+
+.mb-sm {
+  margin-bottom: $spacing-sm;
+}
+.mb-md {
+  margin-bottom: $spacing-md;
+}
+.mb-lg {
+  margin-bottom: $spacing-lg;
+}
+.mb-xl {
+  margin-bottom: $spacing-xl;
+}
+
+// Card Component
+.card {
+  background: var(--card-bg);
+  border-radius: $border-radius-lg;
+  box-shadow: var(--card-shadow);
+  padding: $spacing-lg;
+  transition: $transition-base;
+
+  &:hover {
+    box-shadow: $shadow-md;
+  }
+}
+
+// Button Base
+.btn {
+  @include button-base;
+}
+
+.btn-primary {
+  @include button-primary;
+}
+
+.btn-outline {
+  @include button-outline;
+}
+
+// Flex Grid System
+.flex-grid {
+  display: flex;
+  flex-wrap: wrap;
+  gap: $spacing-md;
+}
+
+.flex-grid-2 {
+  display: flex;
+  flex-wrap: wrap;
+  gap: $spacing-md;
+
+  > * {
+    flex: 1 1 calc(50% - $spacing-md);
+  }
+
+  @include mobile {
+    > * {
+      flex: 1 1 100%;
+    }
+  }
+}
+
+.flex-grid-3 {
+  display: flex;
+  flex-wrap: wrap;
+  gap: $spacing-md;
+
+  > * {
+    flex: 1 1 calc(33.333% - $spacing-md);
+  }
+
+  @include tablet {
+    > * {
+      flex: 1 1 calc(50% - $spacing-md);
+    }
+  }
+
+  @include mobile {
+    > * {
+      flex: 1 1 100%;
+    }
+  }
+}
+
+.flex-grid-4 {
+  display: flex;
+  flex-wrap: wrap;
+  gap: $spacing-md;
+
+  > * {
+    flex: 1 1 calc(25% - $spacing-md);
+  }
+
+  @include tablet {
+    > * {
+      flex: 1 1 calc(50% - $spacing-md);
+    }
+  }
+
+  @include mobile {
+    > * {
+      flex: 1 1 100%;
+    }
+  }
+}
