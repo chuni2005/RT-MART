@@ -161,29 +161,27 @@ export class UsersService {
     const limit = parseInt(queryDto.limit || '10', 10);
     const skip = (page - 1) * limit;
 
-    const where: Record<string, string | ReturnType<typeof Like>> = {};
+    const queryBuilder = this.userRepository
+      .createQueryBuilder('user')
+      .where('user.deletedAt IS NOT NULL')
+      .orderBy('user.deletedAt', 'DESC')
+      .skip(skip)
+      .take(limit)
+      .withDeleted();
 
     if (queryDto.role) {
-      where.role = queryDto.role;
+      queryBuilder.andWhere('user.role = :role', { role: queryDto.role });
     }
 
     if (queryDto.search) {
-      where.name = Like(`%${queryDto.search}%`);
+      queryBuilder.andWhere('user.name LIKE :search', {
+        search: `%${queryDto.search}%`,
+      });
     }
 
-    const [data, total] = await this.userRepository.findAndCount({
-      where,
-      skip,
-      take: limit,
-      order: { deletedAt: 'DESC' },
-      withDeleted: true,
-    });
+    const [data, total] = await queryBuilder.getManyAndCount();
 
-    // Filter only deleted users
-    const deletedData = data.filter((user) => user.deletedAt !== null);
-    const deletedTotal = deletedData.length;
-
-    return { data: deletedData, total: deletedTotal };
+    return { data, total };
   }
 
   /**
