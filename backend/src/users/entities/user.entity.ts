@@ -31,13 +31,13 @@ export enum UserRole {
 @Index(['role', 'deletedAt']) // Composite index for active users by role
 @Index(['createdAt']) // For sorting by registration date
 export class User {
-  @PrimaryGeneratedColumn({ type: 'bigint', name: 'user_id' })
+  @PrimaryGeneratedColumn({ name: 'user_id', type: 'bigint' })
   userId: string;
 
-  @Column({ type: 'varchar', length: 50, unique: true, name: 'login_id' })
+  @Column({ name: 'login_id', type: 'varchar', length: 50, unique: true })
   loginId: string;
 
-  @Column({ type: 'varchar', length: 255, name: 'password_hash' })
+  @Column({ name: 'password_hash', type: 'varchar', length: 255 })
   passwordHash: string;
 
   @Column({ type: 'varchar', length: 100 })
@@ -46,7 +46,7 @@ export class User {
   @Column({ type: 'varchar', length: 100, unique: true })
   email: string;
 
-  @Column({ type: 'varchar', length: 20, nullable: true, name: 'phone_number' })
+  @Column({ name: 'phone_number', type: 'varchar', length: 20, nullable: true })
   phoneNumber: string | null;
 
   @Column({
@@ -56,13 +56,21 @@ export class User {
   })
   role: UserRole;
 
-  @DeleteDateColumn({ type: 'timestamp', name: 'deleted_at', nullable: true })
+  @DeleteDateColumn({ name: 'deleted_at', type: 'timestamp', nullable: true })
   deletedAt: Date | null;
 
-  @CreateDateColumn({ type: 'timestamp', name: 'created_at' })
+  @CreateDateColumn({
+    name: 'created_at',
+    type: 'timestamp',
+    default: () => 'CURRENT_TIMESTAMP',
+  })
   createdAt: Date;
 
-  @UpdateDateColumn({ type: 'timestamp', name: 'updated_at' })
+  @UpdateDateColumn({
+    name: 'updated_at',
+    type: 'timestamp',
+    default: () => 'CURRENT_TIMESTAMP',
+  })
   updatedAt: Date;
 
   // Relations

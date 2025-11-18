@@ -5,10 +5,10 @@ import {
   CreateDateColumn,
   UpdateDateColumn,
   DeleteDateColumn,
-  ManyToOne,
   JoinColumn,
   OneToMany,
   Index,
+  OneToOne,
 } from 'typeorm';
 import { Seller } from '../../sellers/entities/seller.entity';
 import { Product } from '../../products/entities/product.entity';
@@ -19,50 +19,62 @@ import { Order } from '../../orders/entities/order.entity';
 @Index(['storeName'])
 @Index(['deletedAt', 'averageRating']) // for active stores ranking
 export class Store {
-  @PrimaryGeneratedColumn({ type: 'bigint', name: 'store_id' })
+  @PrimaryGeneratedColumn({ name: 'store_id', type: 'bigint' })
   storeId: string;
 
-  @Column({ type: 'bigint', name: 'seller_id' })
+  @Column({ name: 'seller_id', type: 'bigint' })
   sellerId: string;
 
-  @Column({ type: 'varchar', length: 200, name: 'store_name' })
+  @Column({ name: 'store_name', type: 'varchar', length: 200 })
   storeName: string;
 
-  @Column({ type: 'text', nullable: true, name: 'store_description' })
+  @Column({ name: 'store_description', type: 'text', nullable: true })
   storeDescription: string | null;
 
-  @Column({ type: 'text', nullable: true, name: 'store_address' })
+  @Column({ name: 'store_address', type: 'text', nullable: true })
   storeAddress: string | null;
 
-  @Column({ type: 'varchar', length: 100, nullable: true, name: 'store_email' })
+  @Column({ name: 'store_email', type: 'varchar', length: 100, nullable: true })
   storeEmail: string | null;
 
-  @Column({ type: 'varchar', length: 20, nullable: true, name: 'store_phone' })
+  @Column({ name: 'store_phone', type: 'varchar', length: 20, nullable: true })
   storePhone: string | null;
 
   @Column({
+    name: 'average_rating',
     type: 'decimal',
     precision: 2,
     scale: 1,
     default: 0,
-    name: 'average_rating',
   })
   averageRating: number;
 
-  @Column({ type: 'int', default: 0, name: 'total_ratings' })
+  @Column({ name: 'total_ratings', type: 'int', default: 0 })
   totalRatings: number;
 
-  @DeleteDateColumn({ type: 'timestamp', name: 'deleted_at', nullable: true })
+  @DeleteDateColumn({
+    name: 'deleted_at',
+    type: 'timestamp',
+    nullable: true,
+  })
   deletedAt: Date | null;
 
-  @CreateDateColumn({ type: 'timestamp', name: 'created_at' })
+  @CreateDateColumn({
+    name: 'created_at',
+    type: 'timestamp',
+    default: () => 'CURRENT_TIMESTAMP',
+  })
   createdAt: Date;
 
-  @UpdateDateColumn({ type: 'timestamp', name: 'updated_at' })
+  @UpdateDateColumn({
+    name: 'updated_at',
+    type: 'timestamp',
+    default: () => 'CURRENT_TIMESTAMP',
+  })
   updatedAt: Date;
 
   // Relations
-  @ManyToOne(() => Seller, (seller) => seller.stores, { onDelete: 'RESTRICT' })
+  @OneToOne(() => Seller, (seller) => seller.stores, { onDelete: 'RESTRICT' })
   @JoinColumn({ name: 'seller_id' })
   seller: Seller;
 

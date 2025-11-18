@@ -12,13 +12,13 @@ import { User } from '../../users/entities/user.entity';
 @Index(['userId'])
 @Index(['userId', 'isDefault'])
 export class ShippingAddress {
-  @PrimaryGeneratedColumn({ type: 'bigint', name: 'address_id' })
+  @PrimaryGeneratedColumn({ name: 'address_id', type: 'bigint' })
   addressId: string;
 
-  @Column({ type: 'bigint', name: 'user_id' })
+  @Column({ name: 'user_id', type: 'bigint' })
   userId: string;
 
-  @Column({ type: 'varchar', length: 100, name: 'recipient_name' })
+  @Column({ name: 'recipient_name', type: 'varchar', length: 100 })
   recipientName: string;
 
   @Column({ type: 'varchar', length: 20 })
@@ -30,21 +30,21 @@ export class ShippingAddress {
   @Column({ type: 'varchar', length: 50, nullable: true })
   district: string | null;
 
-  @Column({ type: 'varchar', length: 10, nullable: true, name: 'postal_code' })
+  @Column({ name: 'postal_code', type: 'varchar', length: 10, nullable: true })
   postalCode: string | null;
 
-  @Column({ type: 'varchar', length: 255, name: 'address_line1' })
+  @Column({ name: 'address_line1', type: 'varchar', length: 255 })
   addressLine1: string;
 
   @Column({
+    name: 'address_line2',
     type: 'varchar',
     length: 255,
     nullable: true,
-    name: 'address_line2',
   })
   addressLine2: string | null;
 
-  @Column({ type: 'boolean', default: false, name: 'is_default' })
+  @Column({ name: 'is_default', type: 'boolean', default: false })
   isDefault: boolean;
 
   // Relations

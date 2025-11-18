@@ -13,19 +13,19 @@ import { Product } from '../../products/entities/product.entity';
 @Index(['typeCode'])
 @Index(['parentTypeId'])
 export class ProductType {
-  @PrimaryGeneratedColumn({ type: 'bigint', name: 'product_type_id' })
+  @PrimaryGeneratedColumn({ name: 'product_type_id', type: 'bigint' })
   productTypeId: string;
 
-  @Column({ type: 'varchar', length: 50, unique: true, name: 'type_code' })
+  @Column({ name: 'type_code', type: 'varchar', length: 50, unique: true })
   typeCode: string;
 
-  @Column({ type: 'varchar', length: 100, name: 'type_name' })
+  @Column({ name: 'type_name', type: 'varchar', length: 100 })
   typeName: string;
 
-  @Column({ type: 'bigint', nullable: true, name: 'parent_type_id' })
+  @Column({ name: 'parent_type_id', type: 'bigint', nullable: true })
   parentTypeId: string | null;
 
-  @Column({ type: 'boolean', default: true, name: 'is_active' })
+  @Column({ name: 'is_active', type: 'boolean', default: true })
   isActive: boolean;
 
   // Relations

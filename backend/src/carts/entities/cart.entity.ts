@@ -13,16 +13,24 @@ import { CartItem } from './cart-item.entity';
 
 @Entity('Cart')
 export class Cart {
-  @PrimaryGeneratedColumn({ type: 'bigint', name: 'cart_id' })
+  @PrimaryGeneratedColumn({ name: 'cart_id', type: 'bigint' })
   cartId: string;
 
-  @Column({ type: 'bigint', unique: true, name: 'user_id' })
+  @Column({ name: 'user_id', type: 'bigint', unique: true })
   userId: string;
 
-  @CreateDateColumn({ type: 'timestamp', name: 'created_at' })
+  @CreateDateColumn({
+    name: 'created_at',
+    type: 'timestamp',
+    default: () => 'CURRENT_TIMESTAMP',
+  })
   createdAt: Date;
 
-  @UpdateDateColumn({ type: 'timestamp', name: 'updated_at' })
+  @UpdateDateColumn({
+    name: 'updated_at',
+    type: 'timestamp',
+    default: () => 'CURRENT_TIMESTAMP',
+  })
   updatedAt: Date;
 
   // Relations

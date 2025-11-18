@@ -13,34 +13,34 @@ import { Product } from '../../products/entities/product.entity';
 @Index('idx_order_id', ['orderId'])
 @Index('idx_product_id', ['productId'])
 export class OrderItem {
-  @PrimaryGeneratedColumn({ type: 'bigint', name: 'order_item_id' })
+  @PrimaryGeneratedColumn({ name: 'order_item_id', type: 'bigint' })
   orderItemId: string;
 
-  @Column({ type: 'bigint', name: 'order_id' })
+  @Column({ name: 'order_id', type: 'bigint' })
   orderId: string;
 
-  @Column({ type: 'bigint', nullable: true, name: 'product_id' })
+  @Column({ name: 'product_id', type: 'bigint', nullable: true })
   productId: string | null;
 
-  @Column({ type: 'json', name: 'product_snapshot' })
+  @Column({ name: 'product_snapshot', type: 'json' })
   productSnapshot: object;
 
   @Column({ type: 'int' })
   quantity: number;
 
-  @Column({ type: 'decimal', precision: 10, scale: 2, name: 'original_price' })
+  @Column({ name: 'original_price', type: 'decimal', precision: 10, scale: 2 })
   originalPrice: number;
 
   @Column({
+    name: 'item_discount',
     type: 'decimal',
     precision: 10,
     scale: 2,
     default: 0,
-    name: 'item_discount',
   })
   itemDiscount: number;
 
-  @Column({ type: 'decimal', precision: 10, scale: 2, name: 'unit_price' })
+  @Column({ name: 'unit_price', type: 'decimal', precision: 10, scale: 2 })
   unitPrice: number;
 
   @Column({ type: 'decimal', precision: 10, scale: 2 })

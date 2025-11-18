@@ -14,22 +14,26 @@ import { User } from '../../users/entities/user.entity';
 @Index(['tokenHash'])
 @Index(['userId', 'isRevoked', 'expiresAt'])
 export class UserToken {
-  @PrimaryGeneratedColumn({ type: 'bigint', name: 'token_id' })
+  @PrimaryGeneratedColumn({ name: 'token_id', type: 'bigint' })
   tokenId: string;
 
-  @Column({ type: 'bigint', name: 'user_id' })
+  @Column({ name: 'user_id', type: 'bigint' })
   userId: string;
 
-  @Column({ type: 'varchar', length: 255, unique: true, name: 'token_hash' })
+  @Column({ name: 'token_hash', type: 'varchar', length: 255, unique: true })
   tokenHash: string;
 
-  @Column({ type: 'timestamp', name: 'expires_at' })
+  @Column({ name: 'expires_at', type: 'timestamp' })
   expiresAt: Date;
 
-  @Column({ type: 'boolean', default: false, name: 'is_revoked' })
+  @Column({ name: 'is_revoked', type: 'boolean', default: false })
   isRevoked: boolean;
 
-  @CreateDateColumn({ type: 'timestamp', name: 'created_at' })
+  @CreateDateColumn({
+    name: 'created_at',
+    type: 'timestamp',
+    default: () => 'CURRENT_TIMESTAMP',
+  })
   createdAt: Date;
 
   // Relations

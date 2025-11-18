@@ -35,23 +35,23 @@ export enum OrderStatus {
 @Index('idx_user_created', ['userId', 'createdAt'])
 @Index('idx_store_created', ['storeId', 'createdAt'])
 export class Order {
-  @PrimaryGeneratedColumn({ type: 'bigint', name: 'order_id' })
+  @PrimaryGeneratedColumn({ name: 'order_id', type: 'bigint' })
   orderId: string;
 
-  @Column({ type: 'varchar', length: 50, unique: true, name: 'order_number' })
+  @Column({ name: 'order_number', type: 'varchar', length: 50, unique: true })
   orderNumber: string;
 
-  @Column({ type: 'bigint', name: 'user_id' })
+  @Column({ name: 'user_id', type: 'bigint' })
   userId: string;
 
-  @Column({ type: 'bigint', name: 'store_id' })
+  @Column({ name: 'store_id', type: 'bigint' })
   storeId: string;
 
   @Column({
+    name: 'order_status',
     type: 'enum',
     enum: OrderStatus,
     default: OrderStatus.PENDING_PAYMENT,
-    name: 'order_status',
   })
   orderStatus: OrderStatus;
 
@@ -59,76 +59,84 @@ export class Order {
   subtotal: number;
 
   @Column({
+    name: 'shipping_fee',
     type: 'decimal',
     precision: 10,
     scale: 2,
     default: 60,
-    name: 'shipping_fee',
   })
   shippingFee: number;
 
   @Column({
+    name: 'total_discount',
     type: 'decimal',
     precision: 10,
     scale: 2,
     default: 0,
-    name: 'total_discount',
   })
   totalDiscount: number;
 
-  @Column({ type: 'decimal', precision: 10, scale: 2, name: 'total_amount' })
+  @Column({ name: 'total_amount', type: 'decimal', precision: 10, scale: 2 })
   totalAmount: number;
 
   @Column({
+    name: 'payment_method',
     type: 'varchar',
     length: 50,
     nullable: true,
-    name: 'payment_method',
   })
   paymentMethod: string | null;
 
   @Column({
+    name: 'payment_reference',
     type: 'varchar',
     length: 255,
     nullable: true,
-    name: 'payment_reference',
   })
   paymentReference: string | null;
 
   @Column({
+    name: 'idempotency_key',
     type: 'varchar',
     length: 128,
     unique: true,
     nullable: true,
-    name: 'idempotency_key',
   })
   idempotencyKey: string | null;
 
-  @Column({ type: 'json', name: 'shipping_address_snapshot' })
+  @Column({ name: 'shipping_address_snapshot', type: 'json' })
   shippingAddressSnapshot: object;
 
   @Column({ type: 'text', nullable: true })
   notes: string | null;
 
-  @CreateDateColumn({ type: 'timestamp', name: 'created_at' })
+  @CreateDateColumn({
+    name: 'created_at',
+    type: 'timestamp',
+    default: () => 'CURRENT_TIMESTAMP',
+  })
   createdAt: Date;
 
-  @UpdateDateColumn({ type: 'timestamp', name: 'updated_at' })
+  @UpdateDateColumn({
+    name: 'updated_at',
+    type: 'timestamp',
+    default: () => 'CURRENT_TIMESTAMP',
+  })
   updatedAt: Date;
 
-  @Column({ type: 'timestamp', nullable: true, name: 'paid_at' })
+  @Column({ name: 'paid_at', type: 'timestamp', nullable: true })
   paidAt: Date | null;
 
-  @Column({ type: 'timestamp', nullable: true, name: 'shipped_at' })
+  @Column({ name: 'shipped_at', type: 'timestamp', nullable: true })
   shippedAt: Date | null;
 
-  @Column({ type: 'timestamp', nullable: true, name: 'delivered_at' })
+  @Column({ name: 'delivered_at', type: 'timestamp', nullable: true })
   deliveredAt: Date | null;
 
-  @Column({ type: 'timestamp', nullable: true, name: 'completed_at' })
+  @Column({ name: 'completed_at', type: 'timestamp', nullable: true })
   completedAt: Date | null;
 
-  @Column({ type: 'timestamp', nullable: true, name: 'cancelled_at' })
+  @Column({ name: 'cancelled_at', type: 'timestamp', nullable: true })
   cancelledAt: Date | null;
 
   // Relations

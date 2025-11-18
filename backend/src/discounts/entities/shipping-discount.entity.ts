@@ -9,13 +9,13 @@ import { Discount } from './discount.entity';
 
 @Entity('ShippingDiscount')
 export class ShippingDiscount {
-  @PrimaryGeneratedColumn({ type: 'bigint', name: 'shipping_discount_id' })
+  @PrimaryGeneratedColumn({ name: 'shipping_discount_id', type: 'bigint' })
   shippingDiscountId: string;
 
-  @Column({ type: 'bigint', unique: true, name: 'discount_id' })
+  @Column({ name: 'discount_id', type: 'bigint', unique: true })
   discountId: string;
 
-  @Column({ type: 'decimal', precision: 10, scale: 2, name: 'discount_amount' })
+  @Column({ name: 'discount_amount', type: 'decimal', precision: 10, scale: 2 })
   discountAmount: number;
 
   // Relations

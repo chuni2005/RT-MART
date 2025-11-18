@@ -13,22 +13,26 @@ import { User } from '../../users/entities/user.entity';
 @Index(['userId'])
 @Index(['createdAt'])
 export class CartHistory {
-  @PrimaryGeneratedColumn({ type: 'bigint', name: 'cart_history_id' })
+  @PrimaryGeneratedColumn({ name: 'cart_history_id', type: 'bigint' })
   cartHistoryId: string;
 
-  @Column({ type: 'bigint', name: 'user_id' })
+  @Column({ name: 'user_id', type: 'bigint' })
   userId: string;
 
-  @Column({ type: 'json', name: 'cart_snapshot' })
+  @Column({ name: 'cart_snapshot', type: 'json' })
   cartSnapshot: object;
 
-  @Column({ type: 'int', name: 'item_count' })
+  @Column({ name: 'item_count', type: 'int' })
   itemCount: number;
 
-  @Column({ type: 'json', nullable: true, name: 'order_ids' })
+  @Column({ name: 'order_ids', type: 'json', nullable: true })
   orderIds: string[] | null;
 
-  @CreateDateColumn({ type: 'timestamp', name: 'created_at' })
+  @CreateDateColumn({
+    name: 'created_at',
+    type: 'timestamp',
+    default: () => 'CURRENT_TIMESTAMP',
+  })
   createdAt: Date;
 
   // Relations

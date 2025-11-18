@@ -4,7 +4,6 @@ import {
   PrimaryGeneratedColumn,
   OneToOne,
   JoinColumn,
-  OneToMany,
   ManyToOne,
 } from 'typeorm';
 import { User } from '../../users/entities/user.entity';
@@ -12,27 +11,27 @@ import { Store } from '../../stores/entities/store.entity';
 
 @Entity('Seller')
 export class Seller {
-  @PrimaryGeneratedColumn({ type: 'bigint', name: 'seller_id' })
+  @PrimaryGeneratedColumn({ name: 'seller_id', type: 'bigint' })
   sellerId: string;
 
-  @Column({ type: 'bigint', unique: true, name: 'user_id' })
+  @Column({ name: 'user_id', type: 'bigint', unique: true })
   userId: string;
 
   @Column({
+    name: 'bank_account_reference',
     type: 'varchar',
     length: 255,
     nullable: true,
-    name: 'bank_account_reference',
   })
   bankAccountReference: string | null;
 
   @Column({ type: 'boolean', default: false })
   verified: boolean;
 
-  @Column({ type: 'timestamp', nullable: true, name: 'verified_at' })
+  @Column({ name: 'verified_at', type: 'timestamp', nullable: true })
   verifiedAt: Date | null;
 
-  @Column({ type: 'bigint', nullable: true, name: 'verified_by' })
+  @Column({ name: 'verified_by', type: 'bigint', nullable: true })
   verifiedBy: string | null;
 
   // Relations
@@ -44,6 +43,6 @@ export class Seller {
   @JoinColumn({ name: 'verified_by' })
   verifier?: User;
 
-  @OneToMany(() => Store, (store) => store.seller)
+  @OneToOne(() => Store, (store) => store.seller)
   stores?: Store[];
 }

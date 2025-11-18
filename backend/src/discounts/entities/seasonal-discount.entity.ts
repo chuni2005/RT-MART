@@ -9,21 +9,21 @@ import { Discount } from './discount.entity';
 
 @Entity('SeasonalDiscount')
 export class SeasonalDiscount {
-  @PrimaryGeneratedColumn({ type: 'bigint', name: 'seasonal_discount_id' })
+  @PrimaryGeneratedColumn({ name: 'seasonal_discount_id', type: 'bigint' })
   seasonalDiscountId: string;
 
-  @Column({ type: 'bigint', unique: true, name: 'discount_id' })
+  @Column({ name: 'discount_id', type: 'bigint', unique: true })
   discountId: string;
 
-  @Column({ type: 'decimal', precision: 5, scale: 4, name: 'discount_rate' })
+  @Column({ name: 'discount_rate', type: 'decimal', precision: 5, scale: 4 })
   discountRate: number;
 
   @Column({
+    name: 'max_discount_amount',
     type: 'decimal',
     precision: 10,
     scale: 2,
     nullable: true,
-    name: 'max_discount_amount',
   })
   maxDiscountAmount: number | null;
 
