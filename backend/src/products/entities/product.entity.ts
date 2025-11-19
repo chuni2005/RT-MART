@@ -25,16 +25,16 @@ import { OrderItem } from '../../orders/entities/order-item.entity';
 @Index(['storeId', 'productTypeId'])
 @Index(['price', 'deletedAt']) // for price range queries on active products
 export class Product {
-  @PrimaryGeneratedColumn({ type: 'bigint', name: 'product_id' })
+  @PrimaryGeneratedColumn({ name: 'product_id', type: 'bigint' })
   productId: string;
 
-  @Column({ type: 'bigint', name: 'store_id' })
+  @Column({ name: 'store_id', type: 'bigint' })
   storeId: string;
 
-  @Column({ type: 'bigint', name: 'product_type_id' })
+  @Column({ name: 'product_type_id', type: 'bigint' })
   productTypeId: string;
 
-  @Column({ type: 'varchar', length: 200, name: 'product_name' })
+  @Column({ name: 'product_name', type: 'varchar', length: 200 })
   productName: string;
 
   @Column({ type: 'text', nullable: true })
@@ -43,28 +43,36 @@ export class Product {
   @Column({ type: 'decimal', precision: 10, scale: 2 })
   price: number;
 
-  @Column({ type: 'bigint', default: 0, name: 'view_count' })
+  @Column({ name: 'view_count', type: 'bigint', default: 0 })
   viewCount: number;
 
   @Column({
+    name: 'average_rating',
     type: 'decimal',
     precision: 2,
     scale: 1,
     default: 0,
-    name: 'average_rating',
   })
   averageRating: number;
 
-  @Column({ type: 'int', default: 0, name: 'total_reviews' })
+  @Column({ name: 'total_reviews', type: 'int', default: 0 })
   totalReviews: number;
 
   @DeleteDateColumn({ type: 'timestamp', name: 'deleted_at', nullable: true })
   deletedAt: Date | null;
 
-  @CreateDateColumn({ type: 'timestamp', name: 'created_at' })
+  @CreateDateColumn({
+    name: 'created_at',
+    type: 'timestamp',
+    default: () => 'CURRENT_TIMESTAMP',
+  })
   createdAt: Date;
 
-  @UpdateDateColumn({ type: 'timestamp', name: 'updated_at' })
+  @UpdateDateColumn({
+    name: 'updated_at',
+    type: 'timestamp',
+    default: () => 'CURRENT_TIMESTAMP',
+  })
   updatedAt: Date;
 
   // Relations

@@ -3,7 +3,7 @@ import { MigrationInterface, QueryRunner } from 'typeorm';
 export class CreateDiscountTable20251116030015 implements MigrationInterface {
   public async up(queryRunner: QueryRunner): Promise<void> {
     await queryRunner.query(`
-      CREATE TABLE discount (
+      CREATE TABLE Discount (
         discount_id BIGINT AUTO_INCREMENT PRIMARY KEY,
         discount_code VARCHAR(50) NOT NULL UNIQUE,
         discount_type ENUM('seasonal', 'shipping', 'special') NOT NULL,
@@ -23,28 +23,28 @@ export class CreateDiscountTable20251116030015 implements MigrationInterface {
 
     // -- 單一欄位索引
     await queryRunner.query(
-      `CREATE INDEX IDX_discount_code ON discount(discount_code)`,
+      `CREATE INDEX IDX_discount_code ON Discount(discount_code)`,
     );
     await queryRunner.query(
-      `CREATE INDEX IDX_discount_type ON discount(discount_type)`,
+      `CREATE INDEX IDX_discount_type ON Discount(discount_type)`,
     );
 
     // -- 複合索引
     await queryRunner.query(
-      `CREATE INDEX IDX_discount_type_active_period ON discount(discount_type, is_active, start_datetime, end_datetime)`,
+      `CREATE INDEX IDX_discount_type_active_period ON Discount(discount_type, is_active, start_datetime, end_datetime)`,
     );
     await queryRunner.query(
-      `CREATE INDEX IDX_discount_created_by ON discount(created_by_type, created_by_id)`,
+      `CREATE INDEX IDX_discount_created_by ON Discount(created_by_type, created_by_id)`,
     );
   }
 
   public async down(queryRunner: QueryRunner): Promise<void> {
-    await queryRunner.query(`DROP INDEX IDX_discount_code ON discount`);
-    await queryRunner.query(`DROP INDEX IDX_discount_type ON discount`);
+    await queryRunner.query(`DROP INDEX IDX_discount_code ON Discount`);
+    await queryRunner.query(`DROP INDEX IDX_discount_type ON Discount`);
     await queryRunner.query(
-      `DROP INDEX IDX_discount_type_active_period ON discount`,
+      `DROP INDEX IDX_discount_type_active_period ON Discount`,
     );
-    await queryRunner.query(`DROP INDEX IDX_discount_created_by ON discount`);
-    await queryRunner.query(`DROP TABLE discount`);
+    await queryRunner.query(`DROP INDEX IDX_discount_created_by ON Discount`);
+    await queryRunner.query(`DROP TABLE Discount`);
   }
 }

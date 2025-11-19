@@ -12,10 +12,10 @@ import { Product } from '../../products/entities/product.entity';
 @Entity('Inventory')
 @Index(['productId'])
 export class Inventory {
-  @PrimaryGeneratedColumn({ type: 'bigint', name: 'inventory_id' })
+  @PrimaryGeneratedColumn({ name: 'inventory_id', type: 'bigint' })
   inventoryId: string;
 
-  @Column({ type: 'bigint', unique: true, name: 'product_id' })
+  @Column({ name: 'product_id', type: 'bigint', unique: true })
   productId: string;
 
   @Column({ type: 'int', default: 0, comment: '可用庫存' })
@@ -24,7 +24,11 @@ export class Inventory {
   @Column({ type: 'int', default: 0, comment: '已預留但未提交' })
   reserved: number;
 
-  @UpdateDateColumn({ type: 'timestamp', name: 'last_updated' })
+  @UpdateDateColumn({
+    name: 'last_updated',
+    type: 'timestamp',
+    default: () => 'CURRENT_TIMESTAMP',
+  })
   lastUpdated: Date;
 
   // Relations

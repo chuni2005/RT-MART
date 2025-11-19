@@ -4,7 +4,7 @@ export class CreateOrderTable20251116030013 implements MigrationInterface {
   public async up(queryRunner: QueryRunner): Promise<void> {
     // 建立 ENUM 型別 (MariaDB/MySQL 支援 ENUM)
     await queryRunner.query(`
-      CREATE TABLE \`order\` (
+      CREATE TABLE \`Order\` (
         order_id BIGINT AUTO_INCREMENT PRIMARY KEY,
         order_number VARCHAR(50) NOT NULL UNIQUE,
         user_id BIGINT NOT NULL,
@@ -35,55 +35,55 @@ export class CreateOrderTable20251116030013 implements MigrationInterface {
         delivered_at TIMESTAMP NULL,
         completed_at TIMESTAMP NULL,
         cancelled_at TIMESTAMP NULL,
-        CONSTRAINT FK_order_user FOREIGN KEY (user_id) REFERENCES user(user_id) ON DELETE RESTRICT,
-        CONSTRAINT FK_order_store FOREIGN KEY (store_id) REFERENCES store(store_id) ON DELETE RESTRICT
+        CONSTRAINT FK_order_user FOREIGN KEY (user_id) REFERENCES User(user_id) ON DELETE RESTRICT,
+        CONSTRAINT FK_order_store FOREIGN KEY (store_id) REFERENCES Store(store_id) ON DELETE RESTRICT
       )
     `);
 
     // -- 單一欄位索引
     await queryRunner.query(
-      `CREATE INDEX IDX_order_order_number ON \`order\`(order_number)`,
+      `CREATE INDEX IDX_order_order_number ON \`Order\`(order_number)`,
     );
     await queryRunner.query(
-      `CREATE INDEX IDX_order_user_id ON \`order\`(user_id)`,
+      `CREATE INDEX IDX_order_user_id ON \`Order\`(user_id)`,
     );
     await queryRunner.query(
-      `CREATE INDEX IDX_order_store_id ON \`order\`(store_id)`,
+      `CREATE INDEX IDX_order_store_id ON \`Order\`(store_id)`,
     );
     await queryRunner.query(
-      `CREATE INDEX IDX_order_order_status ON \`order\`(order_status)`,
+      `CREATE INDEX IDX_order_order_status ON \`Order\`(order_status)`,
     );
     await queryRunner.query(
-      `CREATE INDEX IDX_order_idempotency_key ON \`order\`(idempotency_key)`,
+      `CREATE INDEX IDX_order_idempotency_key ON \`Order\`(idempotency_key)`,
     );
     await queryRunner.query(
-      `CREATE INDEX IDX_order_created_at ON \`order\`(created_at)`,
+      `CREATE INDEX IDX_order_created_at ON \`Order\`(created_at)`,
     );
 
     // -- 複合索引
     await queryRunner.query(
-      `CREATE INDEX IDX_order_user_id_created_at ON \`order\`(user_id, created_at)`,
+      `CREATE INDEX IDX_order_user_id_created_at ON \`Order\`(user_id, created_at)`,
     );
     await queryRunner.query(
-      `CREATE INDEX IDX_order_store_id_created_at ON \`order\`(store_id, created_at)`,
+      `CREATE INDEX IDX_order_store_id_created_at ON \`Order\`(store_id, created_at)`,
     );
   }
 
   public async down(queryRunner: QueryRunner): Promise<void> {
-    await queryRunner.query(`DROP INDEX IDX_order_order_number ON \`order\``);
-    await queryRunner.query(`DROP INDEX IDX_order_user_id ON \`order\``);
-    await queryRunner.query(`DROP INDEX IDX_order_store_id ON \`order\``);
-    await queryRunner.query(`DROP INDEX IDX_order_order_status ON \`order\``);
+    await queryRunner.query(`DROP INDEX IDX_order_order_number ON \`Order\``);
+    await queryRunner.query(`DROP INDEX IDX_order_user_id ON \`Order\``);
+    await queryRunner.query(`DROP INDEX IDX_order_store_id ON \`Order\``);
+    await queryRunner.query(`DROP INDEX IDX_order_order_status ON \`Order\``);
     await queryRunner.query(
-      `DROP INDEX IDX_order_idempotency_key ON \`order\``,
+      `DROP INDEX IDX_order_idempotency_key ON \`Order\``,
     );
-    await queryRunner.query(`DROP INDEX IDX_order_created_at ON \`order\``);
+    await queryRunner.query(`DROP INDEX IDX_order_created_at ON \`Order\``);
     await queryRunner.query(
-      `DROP INDEX IDX_order_user_id_created_at ON \`order\``,
+      `DROP INDEX IDX_order_user_id_created_at ON \`Order\``,
     );
     await queryRunner.query(
-      `DROP INDEX IDX_order_store_id_created_at ON \`order\``,
+      `DROP INDEX IDX_order_store_id_created_at ON \`Order\``,
     );
-    await queryRunner.query(`DROP TABLE \`order\``);
+    await queryRunner.query(`DROP TABLE \`Order\``);
   }
 }

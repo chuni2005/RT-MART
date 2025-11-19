@@ -22,33 +22,33 @@ import { ProductType } from '../../product-types/entities/product-type.entity';
   },
 )
 export class SpecialDiscount {
-  @PrimaryGeneratedColumn({ type: 'bigint', name: 'special_discount_id' })
+  @PrimaryGeneratedColumn({ name: 'special_discount_id', type: 'bigint' })
   specialDiscountId: string;
 
-  @Column({ type: 'bigint', unique: true, name: 'discount_id' })
+  @Column({ name: 'discount_id', type: 'bigint', unique: true })
   discountId: string;
 
-  @Column({ type: 'bigint', name: 'store_id' })
+  @Column({ name: 'store_id', type: 'bigint' })
   storeId: string;
 
-  @Column({ type: 'bigint', nullable: true, name: 'product_type_id' })
+  @Column({ name: 'product_type_id', type: 'bigint', nullable: true })
   productTypeId: string | null;
 
   @Column({
+    name: 'discount_rate',
     type: 'decimal',
     precision: 5,
     scale: 4,
     nullable: true,
-    name: 'discount_rate',
   })
   discountRate: number | null;
 
   @Column({
+    name: 'max_discount_amount',
     type: 'decimal',
     precision: 10,
     scale: 2,
     nullable: true,
-    name: 'max_discount_amount',
   })
   maxDiscountAmount: number | null;
 

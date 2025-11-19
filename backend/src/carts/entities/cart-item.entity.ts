@@ -14,22 +14,30 @@ import { Product } from '../../products/entities/product.entity';
 @Entity('CartItem')
 @Index(['cartId', 'productId'], { unique: true })
 export class CartItem {
-  @PrimaryGeneratedColumn({ type: 'bigint', name: 'cart_item_id' })
+  @PrimaryGeneratedColumn({ name: 'cart_item_id', type: 'bigint' })
   cartItemId: string;
 
-  @Column({ type: 'bigint', name: 'cart_id' })
+  @Column({ name: 'cart_id', type: 'bigint' })
   cartId: string;
 
-  @Column({ type: 'bigint', name: 'product_id' })
+  @Column({ name: 'product_id', type: 'bigint' })
   productId: string;
 
   @Column({ type: 'int' })
   quantity: number;
 
-  @CreateDateColumn({ type: 'timestamp', name: 'added_at' })
+  @CreateDateColumn({
+    name: 'added_at',
+    type: 'timestamp',
+    default: () => 'CURRENT_TIMESTAMP',
+  })
   addedAt: Date;
 
-  @UpdateDateColumn({ type: 'timestamp', name: 'updated_at' })
+  @UpdateDateColumn({
+    name: 'updated_at',
+    type: 'timestamp',
+    default: () => 'CURRENT_TIMESTAMP',
+  })
   updatedAt: Date;
 
   // Relations

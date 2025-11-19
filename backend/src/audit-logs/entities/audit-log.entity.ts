@@ -17,82 +17,82 @@ import * as crypto from 'crypto';
 @Index(['eventTimestamp'])
 @Index(['requestId'])
 export class AuditLog {
-  @PrimaryGeneratedColumn({ type: 'bigint', name: 'audit_id' })
+  @PrimaryGeneratedColumn({ name: 'audit_id', type: 'bigint' })
   auditId: string;
 
-  @Column({ type: 'char', length: 36, unique: true, name: 'event_id' })
+  @Column({ name: 'event_id', type: 'char', length: 36, unique: true })
   eventId: string;
 
   @Column({
-    type: 'timestamp',
     name: 'event_timestamp',
+    type: 'timestamp',
     default: () => 'CURRENT_TIMESTAMP',
   })
   eventTimestamp: Date;
 
-  @Column({ type: 'varchar', length: 100, name: 'table_name' })
+  @Column({ name: 'table_name', type: 'varchar', length: 100 })
   tableName: string;
 
-  @Column({ type: 'bigint', name: 'record_id' })
+  @Column({ name: 'record_id', type: 'bigint' })
   recordId: string;
 
   @Column({ type: 'varchar', length: 20 })
   action: string;
 
-  @Column({ type: 'bigint', nullable: true, name: 'user_id' })
+  @Column({ name: 'user_id', type: 'bigint', nullable: true })
   userId: string | null;
 
   // Request tracking
   @Column({
+    name: 'request_id',
     type: 'varchar',
     length: 128,
     nullable: true,
-    name: 'request_id',
     comment: 'API request ID',
   })
   requestId: string | null;
 
   @Column({
+    name: 'ip_address',
     type: 'varchar',
     length: 45,
     nullable: true,
-    name: 'ip_address',
     comment: 'IP address (IPv4 or IPv6)',
   })
   ipAddress: string | null;
 
-  @Column({ type: 'text', nullable: true, name: 'user_agent' })
+  @Column({ name: 'user_agent', type: 'text', nullable: true })
   userAgent: string | null;
 
   @Column({
+    name: 'service_name',
     type: 'varchar',
     length: 50,
     nullable: true,
-    name: 'service_name',
   })
   serviceName: string | null;
 
   // Data changes
-  @Column({ type: 'json', nullable: true, name: 'old_data' })
+  @Column({ name: 'old_data', type: 'json', nullable: true })
   oldData: object | null;
 
-  @Column({ type: 'json', nullable: true, name: 'new_data' })
+  @Column({ name: 'new_data', type: 'json', nullable: true })
   newData: object | null;
 
   @Column({
+    name: 'changes',
     type: 'json',
     nullable: true,
-    name: 'changes',
     comment: '計算出的變更差異',
   })
   changes: object | null;
 
   // Tamper protection
   @Column({
+    name: 'checksum',
     type: 'varchar',
     length: 64,
     nullable: true,
-    name: 'checksum',
     comment: 'SHA-256 of concatenated fields',
   })
   checksum: string | null;

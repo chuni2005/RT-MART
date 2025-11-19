@@ -12,16 +12,16 @@ import { Product } from './product.entity';
 @Index(['productId'])
 @Index(['productId', 'displayOrder'])
 export class ProductImage {
-  @PrimaryGeneratedColumn({ type: 'bigint', name: 'image_id' })
+  @PrimaryGeneratedColumn({ name: 'image_id', type: 'bigint' })
   imageId: string;
 
-  @Column({ type: 'bigint', name: 'product_id' })
+  @Column({ name: 'product_id', type: 'bigint' })
   productId: string;
 
-  @Column({ type: 'varchar', length: 500, name: 'image_url' })
+  @Column({ name: 'image_url', type: 'varchar', length: 500 })
   imageUrl: string;
 
-  @Column({ type: 'int', default: 1, name: 'display_order' })
+  @Column({ name: 'display_order', type: 'int', default: 1 })
   displayOrder: number;
 
   // Relations

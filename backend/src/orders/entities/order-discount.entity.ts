@@ -16,22 +16,26 @@ import { DiscountType } from '../../discounts/entities/discount.entity';
 @Index('idx_discount_id', ['discountId'])
 @Index('idx_order_discount_type', ['orderId', 'discountType'], { unique: true })
 export class OrderDiscount {
-  @PrimaryGeneratedColumn({ type: 'bigint', name: 'order_discount_id' })
+  @PrimaryGeneratedColumn({ name: 'order_discount_id', type: 'bigint' })
   orderDiscountId: string;
 
-  @Column({ type: 'bigint', name: 'order_id' })
+  @Column({ name: 'order_id', type: 'bigint' })
   orderId: string;
 
-  @Column({ type: 'bigint', name: 'discount_id' })
+  @Column({ name: 'discount_id', type: 'bigint' })
   discountId: string;
 
-  @Column({ type: 'enum', enum: DiscountType, name: 'discount_type' })
+  @Column({ name: 'discount_type', type: 'enum', enum: DiscountType })
   discountType: DiscountType;
 
-  @Column({ type: 'decimal', precision: 10, scale: 2, name: 'discount_amount' })
+  @Column({ name: 'discount_amount', type: 'decimal', precision: 10, scale: 2 })
   discountAmount: number;
 
-  @CreateDateColumn({ type: 'timestamp', name: 'applied_at' })
+  @CreateDateColumn({
+    name: 'applied_at',
+    type: 'timestamp',
+    default: () => 'CURRENT_TIMESTAMP',
+  })
   appliedAt: Date;
 
   // Relations
