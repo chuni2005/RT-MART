@@ -1,7 +1,8 @@
-import React, { useState, useEffect } from 'react';
+import React from 'react';
 import { useNavigate } from 'react-router-dom';
 import styles from './Home.module.scss';
 import ProductCard from '../../shared/components/ProductCard/ProductCard';
+import Hero from '../../shared/components/Hero/Hero';
 
 // Mock banner data (TODO: Replace with API data)
 const banners = [
@@ -37,22 +38,6 @@ const mockProducts = Array.from({ length: 20 }, (_, i) => ({
 
 function Home() {
   const navigate = useNavigate();
-  const [currentBannerIndex, setCurrentBannerIndex] = useState(0);
-
-  // 每 4s 切換輪播圖
-  useEffect(() => {
-    const interval = setInterval(() => {
-      setCurrentBannerIndex((prevIndex) =>
-        prevIndex === banners.length - 1 ? 0 : prevIndex + 1
-      );
-    }, 4000);
-
-    return () => clearInterval(interval);
-  }, []);
-
-  const handleDotClick = (index) => {
-    setCurrentBannerIndex(index);
-  };
 
   const handleProductClick = (productId) => {
     navigate(`/product/${productId}`);
@@ -61,32 +46,7 @@ function Home() {
   return (
     <div className={styles.home}>
       {/* Hero Section */}
-      <section className={styles.hero}>
-        <div className={styles.carouselContainer}>
-          <div
-            className={styles.carouselTrack}
-            style={{ transform: `translateX(-${currentBannerIndex * 100}%)` }}
-          >
-            {banners.map((banner) => (
-              <div key={banner.id} className={styles.carouselSlide}>
-                <img src={banner.imageUrl} alt={banner.alt} />
-              </div>
-            ))}
-          </div>
-
-          {/* Dot Indicators */}
-          <div className={styles.carouselDots}>
-            {banners.map((_, index) => (
-              <button
-                key={index}
-                className={`${styles.dot} ${index === currentBannerIndex ? styles.dotActive : ''}`}
-                onClick={() => handleDotClick(index)}
-                aria-label={`切換到第 ${index + 1} 張輪播圖`}
-              />
-            ))}
-          </div>
-        </div>
-      </section>
+      <Hero banners={banners} autoPlayInterval={4000} height={400} />
 
       {/* Hot Products Section */}
       <section className={styles.productsSection}>
