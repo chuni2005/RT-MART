@@ -1,1 +1,11 @@
 *.env*
+
+.cursor/
+.cursorrules
+
+.references/
+package-lock.json 
+
+# Ignore all markdown files except README.md
+*.md
+!README.md

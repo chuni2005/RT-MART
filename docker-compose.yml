@@ -49,9 +49,12 @@ services:
       - DATABASE_URL=mysql://${DB_USER:-rt_mart_user}:${DB_PASSWORD:-rt_mart_and_the_user_password_yeah_very_cool123*}@mariadb:3306/${DB_NAME:-rt_mart_db}
       - DB_HOST=mariadb
       - DB_PORT=3306
-      - DB_USERNAME=${DB_USER:-rt_mart_user}
+      - DB_USER=${DB_USER:-rt_mart_user}
       - DB_PASSWORD=${DB_PASSWORD:-rt_mart_and_the_user_password_yeah_very_cool123*}
-      - DB_DATABASE=${DB_NAME:-rt_mart_db}
+      - DB_NAME=${DB_NAME:-rt_mart_db}
+      # TypeORM settings
+      - TYPEORM_SYNCHRONIZE=false
+      - TYPEORM_LOGGING=true
     env_file:
       # Load additional environment variables from .env file
       - ./backend/.env
