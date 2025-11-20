@@ -37,17 +37,17 @@ const UserMenu = () => {
 
   return (
     <div className={styles.userMenu}>
-      <button
+      <Button
+        iconOnly
+        icon={user?.avatar ? null : "user"}
         onClick={() => setShowUserMenu(!showUserMenu)}
         className={styles.userButton}
-        aria-label="用戶選單"
+        ariaLabel="用戶選單"
       >
-        {user?.avatar ? (
+        {user?.avatar && (
           <img src={user.avatar} alt={user.name} className={styles.avatar} />
-        ) : (
-          <Icon icon="user" />
         )}
-      </button>
+      </Button>
 
       {showUserMenu && (
         <div className={styles.dropdown}>
@@ -86,12 +86,12 @@ const UserMenu = () => {
           <div className={styles.divider} />
 
           {/* Logout Button */}
-          <button
+          <Button
             onClick={handleLogout}
             className={`${styles.dropdownItem} ${styles.logout}`}
           >
             登出
-          </button>
+          </Button>
         </div>
       )}
     </div>

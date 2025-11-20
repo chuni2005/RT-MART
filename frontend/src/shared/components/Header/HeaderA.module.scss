@@ -24,30 +24,6 @@
   }
 }
 
-// Logo (左側)
-.logo {
-  flex-shrink: 0;
-  display: flex;
-  align-items: center;
-  gap: $spacing-sm;
-  overflow: hidden;
-  @include transition-transform();
-
-  &:hover {
-    transform: scale(1.1);
-  }
-
-  img {
-    height: 40px;
-    width: auto;
-  }
-
-  span {
-    font-size: $font-xl;
-    font-weight: 700;
-    color: $text-primary;
-  }
-}
 
 // Right Section (右側)
 .rightSection {
@@ -105,14 +81,6 @@
   .mainBarContent {
     flex-wrap: wrap;
     justify-content: center;
-  }
-
-  .logo {
-    order: 1;
-
-    img {
-      height: 32px;
-    }
   }
 
   .rightSection {

@@ -55,21 +55,6 @@
   }
 }
 
-// Logo
-.logo {
-  flex-shrink: 0;
-  overflow: hidden;
-
-  img {
-    height: 40px;
-    width: auto;
-    @include transition-transform();
-
-    &:hover {
-      transform: scale(1.1);
-    }
-  }
-}
 
 // Spacer
 .spacer {

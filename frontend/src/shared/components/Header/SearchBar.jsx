@@ -1,6 +1,6 @@
 import React, { useState } from "react";
 import { useNavigate } from "react-router-dom";
-import Icon from "../Icon/Icon";
+import Button from "../Button/Button";
 import styles from "./SearchBar.module.scss";
 
 /**
@@ -44,13 +44,13 @@ const SearchBar = ({
         onChange={(e) => setSearchKeyword(e.target.value)}
         className={styles.searchInput}
       />
-      <button
+      <Button
         type="submit"
+        iconOnly
+        icon="search"
         className={styles.searchButton}
-        aria-label="搜尋"
-      >
-        <Icon icon="search" />
-      </button>
+        ariaLabel="搜尋"
+      />
     </form>
   );
 };
