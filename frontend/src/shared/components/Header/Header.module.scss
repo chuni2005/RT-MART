@@ -85,7 +85,7 @@
 
   &:hover {
     background: var(--bg-tertiary);
-    color: var(--primary-color);
+    color: $primary-color;
   }
 
   @include mobile {
@@ -104,7 +104,7 @@
   min-width: 16px;
   height: 16px;
   padding: 0 4px;
-  background: var(--primary-color);
+  background: $primary-color;
   color: white;
   font-size: $font-xs;
   font-weight: 600;
@@ -129,7 +129,7 @@
     transition: $transition-fast;
 
     &:hover {
-      color: var(--primary-color);
+      color: $primary-color;
     }
   }
 }
@@ -163,7 +163,7 @@
 
           &:hover {
             background: var(--bg-tertiary);
-            color: var(--primary-color);
+            color: $primary-color;
           }
         }
       }
@@ -187,7 +187,7 @@
   display: inline-flex;
   align-items: center;
   padding: $spacing-sm $spacing-lg;
-  background: var(--primary-color);
+  background: $primary-color;
   color: white;
   font-size: $font-sm;
   font-weight: 600;
@@ -196,7 +196,7 @@
   transition: $transition-fast;
 
   &:hover {
-    background: var(--primary-hover);
+    background: $primary-hover;
     transform: translateY(-1px);
   }
 
@@ -270,7 +270,7 @@
 
 .userInfo {
   padding: $spacing-md $spacing-lg;
-  border-bottom: 1px solid var(--border-color);
+  border-bottom: 1px solid var(--border);
   margin-bottom: $spacing-xs;
 
   .userName {
@@ -290,7 +290,11 @@
 
 .divider {
   height: 1px;
-  background: var(--border-color);
+  background: var(--border);
+  margin: $spacing-xs 0;
+}
+
+.dropdownItem {
   margin: $spacing-xs 0;
 }
 
@@ -310,15 +314,15 @@
 
   &:hover {
     background: var(--bg-tertiary);
-    color: var(--primary-color);
+    color: $primary-color;
   }
 
   &.logout {
-    color: var(--error-color);
+    color: $error-color;
 
     &:hover {
       background: rgba(255, 66, 79, 0.1);
-      color: var(--error-color);
+      color: $error-color;
     }
   }
 }
