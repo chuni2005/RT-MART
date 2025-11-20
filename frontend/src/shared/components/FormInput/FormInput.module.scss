@@ -1,3 +1,9 @@
+// FormInput.module.scss
+/* 隱藏 Edge 和 IE 瀏覽器中的密碼顯示圖示 (小眼睛) */
+::-ms-reveal {
+  display: none;
+}
+
 .formGroup {
   margin-bottom: $spacing-lg;
   width: 100%;

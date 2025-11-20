@@ -156,7 +156,7 @@ const SignUpForm = ({ onSubmit, isLoading }) => {
     <form className={styles.signUpForm} onSubmit={handleSubmit}>
       {/* 帳號輸入 (login_id) */}
       <FormInput
-        label="帳號" // TODO: i18n
+        label="用戶名" // TODO: i18n
         type="text"
         name="loginId"
         value={formData.loginId}

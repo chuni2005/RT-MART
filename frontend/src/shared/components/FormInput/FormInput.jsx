@@ -4,8 +4,8 @@
  */
 
 import { useState } from 'react';
-import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
 import { faEye, faEyeSlash } from '@fortawesome/free-solid-svg-icons';
+import Icon from '../Icon/Icon';
 import styles from './FormInput.module.scss';
 
 const FormInput = ({
@@ -45,16 +45,15 @@ const FormInput = ({
         </label>
       )}
 
-      {/* Input Container */}
       <div className={styles.inputContainer}>
-        {/* Icon (可選) */}
+
         {icon && (
           <div className={styles.icon}>
-            <FontAwesomeIcon icon={icon} />
+            <Icon icon={icon} />
           </div>
         )}
 
-        {/* Input Field */}
+
         <input
           type={inputType}
           id={name}
@@ -73,21 +72,25 @@ const FormInput = ({
           {...rest}
         />
 
-        {/* Password Visibility Toggle */}
         {isPasswordField && (
-          <button
-            type="button"
+          <div
             className={styles.passwordToggle}
             onClick={togglePasswordVisibility}
-            tabIndex={-1}
-            aria-label={showPassword ? '隱藏密碼' : '顯示密碼'} // TODO: i18n
+            role="button"
+            tabIndex={0}
+            aria-label={showPassword ? '隱藏密碼' : '顯示密碼'}
+            onKeyDown={(e) => {
+              if (e.key === 'Enter' || e.key === ' ') {
+                e.preventDefault();
+                togglePasswordVisibility();
+              }
+            }}
           >
-            <FontAwesomeIcon icon={showPassword ? faEyeSlash : faEye} />
-          </button>
+            <Icon icon={showPassword ? faEyeSlash : faEye} />
+          </div>
         )}
       </div>
 
-      {/* Error Message */}
       {error && (
         <div id={`${name}-error`} className={styles.errorMessage} role="alert">
           {error}
