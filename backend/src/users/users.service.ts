@@ -108,6 +108,14 @@ export class UsersService {
 
   async update(id: string, updateUserDto: UpdateUserDto): Promise<User> {
     const user = await this.findOne(id);
+    
+    // Check loginId uniqueness if being updated
+    if (updateUserDto.loginId && updateUserDto.loginId !== user.loginId) {
+      const existingUser = await this.findByLoginId(updateUserDto.loginId);
+      if (existingUser) {
+        throw new ConflictException('Login ID already exists');
+      }
+    }
 
     // Check email uniqueness if being updated
     if (updateUserDto.email && updateUserDto.email !== user.email) {

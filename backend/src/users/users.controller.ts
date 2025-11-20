@@ -22,14 +22,17 @@ import { plainToInstance } from 'class-transformer';
 export class UsersController {
   constructor(private readonly usersService: UsersService) {}
 
-  //Create a new user with loginId, name, password, email (phone, role optional)
+  //Post
+  //Create a new user (with loginId, name, password, email (phone, role optional))
   @Post()
   async create(@Body() createUserDto: CreateUserDto) {
     const user = await this.usersService.create(createUserDto);
     return plainToInstance(UserResponseDto, user);
   }
 
-  //Get all users with pagination and filtering
+  //Get
+  //Find all users with pagination and filtering:
+  //page & limit & filtering by `role` & `search` by name
   @Get()
   async findAll(@Query() queryDto: QueryUserDto) {
     const { data, total } = await this.usersService.findAll(queryDto);
@@ -41,31 +44,22 @@ export class UsersController {
     };
   }
 
-  //Get a single user by ID
+  //Find all of deleted users
+  @Get('deleted')
+  async findAllDeleted(@Query() queryDto: QueryUserDto) {
+   const { data, total } = await this.usersService.findDeleted(queryDto);
+    return {
+      data: plainToInstance(UserResponseDto, data),
+      total,
+      page: parseInt(queryDto.page || '1', 10),
+      limit: parseInt(queryDto.limit || '10', 10),
+    };
+  }
+
+  //Find a single user by ID
   @Get(':id')
   async findOne(@Param('id') id: string) {
     const user = await this.usersService.findOne(id);
-    return plainToInstance(UserResponseDto, user);
-  }
-
-  //Update a user by ID
-  @Patch(':id')
-  async update(@Param('id') id: string, @Body() updateUserDto: UpdateUserDto) {
-    const user = await this.usersService.update(id, updateUserDto);
-    return plainToInstance(UserResponseDto, user);
-  }
-
-  //Delete a user by ID
-  @Delete(':id')
-  async remove(@Param('id') id: string) {
-    await this.usersService.remove(id);
-    return { message: 'User deleted successfully' };
-  }
-
-  //Restore a soft-deleted user by ID
-  @Post(':id/restore')
-  async restore(@Param('id') id: string) {
-    const user = await this.usersService.restore(id);
     return plainToInstance(UserResponseDto, user);
   }
 
@@ -77,5 +71,36 @@ export class UsersController {
       module: 'users',
       timestamp: new Date().toISOString(),
     };
+  }
+
+  //patch
+  //Update a user by ID
+  @Patch(':id')
+  async update(@Param('id') id: string, @Body() updateUserDto: UpdateUserDto) {
+    const user = await this.usersService.update(id, updateUserDto);
+    return plainToInstance(UserResponseDto, user);
+  }
+
+  //delete
+  //Delete a user by ID
+  @Delete(':id')
+  async remove(@Param('id') id: string) {
+    await this.usersService.remove(id);
+    return { message: 'User deleted successfully' };
+  }
+ 
+  //Permanently delete user by id
+  @Delete(':id/permanent')
+  async hardRemove(@Param('id') id: string) {
+    await this.usersService.permanentlyDelete(id);
+    return { message: 'User permanently deleted successfully' };
+  }
+
+  //post
+  //Restore a soft-deleted user by ID
+  @Post(':id/restore')
+  async restore(@Param('id') id: string) {
+    const user = await this.usersService.restore(id);
+    return plainToInstance(UserResponseDto, user);
   }
 }
