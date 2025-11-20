@@ -1,0 +1,65 @@
+.loginForm {
+  width: 100%;
+}
+
+.formOptions {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: $spacing-lg;
+  font-size: $font-sm;
+
+  @include mobile {
+    flex-direction: column;
+    align-items: flex-start;
+    gap: $spacing-sm;
+  }
+}
+
+.checkbox {
+  display: flex;
+  align-items: center;
+  gap: $spacing-xs;
+  cursor: pointer;
+  user-select: none;
+
+  input[type='checkbox'] {
+    width: 16px;
+    height: 16px;
+    cursor: pointer;
+    accent-color: $primary-color;
+  }
+
+  span {
+    color: $text-secondary;
+  }
+
+  &:hover span {
+    color: $text-primary;
+  }
+}
+
+.forgotPassword {
+  color: $primary-color;
+  text-decoration: none;
+  transition: color 0.2s ease;
+
+  &:hover {
+    color: $primary-hover;
+    text-decoration: underline;
+  }
+}
+
+.submitButton {
+  @include button-primary;
+  width: 100%;
+  padding: $spacing-md;
+  font-size: $font-lg;
+  font-weight: 600;
+  margin-top: $spacing-sm;
+
+  &:disabled {
+    opacity: 0.6;
+    cursor: not-allowed;
+  }
+}

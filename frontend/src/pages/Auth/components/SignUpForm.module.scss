@@ -1,0 +1,64 @@
+.signUpForm {
+  width: 100%;
+}
+
+.termsContainer {
+  margin-bottom: $spacing-lg;
+  font-size: $font-sm;
+
+  .checkbox {
+    display: flex;
+    align-items: flex-start;
+    gap: $spacing-xs;
+    cursor: pointer;
+    user-select: none;
+
+    input[type='checkbox'] {
+      width: 16px;
+      height: 16px;
+      margin-top: 2px;
+      cursor: pointer;
+      flex-shrink: 0;
+      accent-color: $primary-color;
+    }
+
+    span {
+      color: $text-secondary;
+      line-height: 1.5;
+
+      a {
+        color: $primary-color;
+        text-decoration: none;
+
+        &:hover {
+          text-decoration: underline;
+        }
+      }
+    }
+
+    &:hover span {
+      color: $text-primary;
+    }
+  }
+
+  .error {
+    margin-top: $spacing-xs;
+    margin-left: calc(16px + $spacing-xs);
+    font-size: $font-xs;
+    color: $error-color;
+  }
+}
+
+.submitButton {
+  @include button-primary;
+  width: 100%;
+  padding: $spacing-md;
+  font-size: $font-lg;
+  font-weight: 600;
+  margin-top: $spacing-sm;
+
+  &:disabled {
+    opacity: 0.6;
+    cursor: not-allowed;
+  }
+}

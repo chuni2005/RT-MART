@@ -1,0 +1,54 @@
+// Top Bar
+.topBar {
+  background-color: $primary-color;
+  color: white;
+  padding: $spacing-sm 0;
+  font-size: $font-sm;
+}
+
+.container {
+  max-width: $desktop-lg;
+  margin: 0 auto;
+  padding: 0 $spacing-md;
+}
+
+.topBarLinks {
+  display: flex;
+  justify-content: flex-end;
+  align-items: center;
+  gap: $spacing-lg;
+}
+
+.link {
+  color: white;
+  text-decoration: none;
+  transition: $transition-fast;
+
+  &:hover {
+    font-weight: 600;
+  }
+}
+
+// Responsive
+@media (max-width: $desktop) {
+  .topBarLinks {
+    gap: $spacing-md;
+  }
+}
+
+@media (max-width: $tablet) {
+  .topBarLinks {
+    gap: $spacing-sm;
+    font-size: $font-xs;
+  }
+
+  .link {
+    display: none; // Hide seller center and FAQ on mobile
+  }
+}
+
+@media (max-width: $mobile) {
+  .topBar {
+    padding: $spacing-xs 0;
+  }
+}

@@ -1,4 +1,5 @@
 // RT-MART SCSS Mixins
+@use "./variables" as *;
 
 // ===========================
 //  Flexbox Utilities
@@ -122,11 +123,11 @@
 
 @mixin button-primary {
   @include button-base;
-  background: var(--primary-color);
+  background: $primary-color;
   color: white;
 
   &:hover:not(:disabled) {
-    background: var(--primary-hover);
+    background: $primary-hover;
     transform: translateY(-1px);
   }
 
@@ -138,12 +139,12 @@
 @mixin button-outline {
   @include button-base;
   background: transparent;
-  border: 1px solid var(--border);
-  color: var(--text-primary);
+  border: 1px solid $border-color;
+  color: $text-primary;
 
   &:hover:not(:disabled) {
-    border-color: var(--primary-color);
-    color: var(--primary-color);
+    border-color: $primary-color;
+    color: $primary-color;
   }
 }
 
@@ -155,7 +156,7 @@
 }
 
 @mixin card-shadow {
-  box-shadow: var(--card-shadow);
+  box-shadow: $card-shadow;
 }
 
 @mixin border-radius($radius: 4px) {
@@ -165,10 +166,42 @@
 // ===========================
 //  Transitions
 // ===========================
+// 基礎 transition mixin
 @mixin transition($props: all, $duration: 0.3s, $timing: ease) {
   transition: $props $duration $timing;
 }
 
+// 所有屬性的快速過渡
+@mixin transition-all($duration: 0.3s) {
+  transition: all $duration ease;
+}
+
+// 顏色相關的過渡（文字、背景色）
+@mixin transition-color($duration: 0.15s) {
+  transition: color $duration ease, background-color $duration ease, border-color $duration ease;
+}
+
+// 變形過渡（位移、縮放、旋轉）
+@mixin transition-transform($duration: 0.3s) {
+  transition: transform $duration ease;
+}
+
+// 透明度過渡
+@mixin transition-opacity($duration: 0.3s) {
+  transition: opacity $duration ease;
+}
+
+// 陰影過渡
+@mixin transition-shadow($duration: 0.3s) {
+  transition: box-shadow $duration ease;
+}
+
+// 平滑的多屬性過渡（組合常用屬性）
+@mixin transition-smooth($duration: 0.3s) {
+  transition: all $duration cubic-bezier(0.4, 0, 0.2, 1);
+}
+
+// Hover 提升效果
 @mixin hover-lift {
   transition: all 0.3s ease;
 
@@ -188,15 +221,15 @@
   }
 
   &::-webkit-scrollbar-track {
-    background: var(--bg-tertiary);
+    background: $bg-tertiary;
   }
 
   &::-webkit-scrollbar-thumb {
-    background: var(--text-tertiary);
+    background: $text-tertiary;
     border-radius: 4px;
 
     &:hover {
-      background: var(--text-secondary);
+      background: $text-secondary;
     }
   }
 }

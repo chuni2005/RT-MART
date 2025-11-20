@@ -1,0 +1,17 @@
+.headerB {
+  background-color: $bg-secondary;
+  box-shadow: $shadow-md;
+  padding: $spacing-md 0;
+
+  .container {
+    max-width: $desktop-lg;
+    margin: 0 auto;
+    padding: 0 $spacing-md;
+  }
+
+  .content {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+  }
+}

@@ -1,0 +1,146 @@
+// FormInput.module.scss
+/* 隱藏 Edge 和 IE 瀏覽器中的密碼顯示圖示 (小眼睛) */
+::-ms-reveal {
+  display: none;
+}
+
+.formGroup {
+  margin-bottom: $spacing-lg;
+  width: 100%;
+}
+
+.label {
+  display: block;
+  font-size: $font-sm;
+  font-weight: 500;
+  color: $text-primary;
+  margin-bottom: $spacing-xs;
+
+  .required {
+    color: $error-color;
+  }
+}
+
+.inputContainer {
+  position: relative;
+  display: flex;
+  align-items: center;
+}
+
+.input {
+  width: 100%;
+  padding: $spacing-md;
+  font-size: $font-md;
+  color: $text-primary;
+  background: $bg-secondary;
+  border: 1px solid $border-color;
+  border-radius: $border-radius-md;
+  transition: all 0.3s ease;
+  outline: none;
+
+  &::placeholder {
+    color: $text-tertiary;
+  }
+
+  &:focus {
+    border-color: $primary-color;
+    box-shadow: 0 0 0 3px rgba(238, 77, 45, 0.1);
+  }
+
+  &:disabled {
+    background: $bg-tertiary;
+    cursor: not-allowed;
+    opacity: 0.6;
+  }
+
+  // 有錯誤時
+  &.error {
+    border-color: $error-color;
+
+    &:focus {
+      box-shadow: 0 0 0 3px rgba(255, 66, 79, 0.1);
+    }
+  }
+
+  // 有前置圖示時，增加左側內距
+  &.hasIcon {
+    padding-left: calc($spacing-xl + $spacing-md);
+  }
+
+  // 密碼欄位，增加右側內距（給切換按鈕）
+  &.hasPasswordToggle {
+    padding-right: calc($spacing-xl + $spacing-md);
+  }
+}
+
+.icon {
+  position: absolute;
+  left: $spacing-md;
+  color: $text-tertiary;
+  pointer-events: none;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: $font-lg;
+}
+
+.passwordToggle {
+  position: absolute;
+  right: $spacing-md;
+  background: none;
+  border: none;
+  color: $text-tertiary;
+  cursor: pointer;
+  padding: $spacing-xs;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: $font-lg;
+  transition: color 0.2s ease;
+
+  &:hover {
+    color: $text-secondary;
+  }
+
+  &:focus {
+    outline: 2px solid $primary-color;
+    outline-offset: 2px;
+    border-radius: $border-radius-sm;
+  }
+}
+
+.errorMessage {
+  display: flex;
+  align-items: center;
+  gap: $spacing-xs;
+  margin-top: $spacing-xs;
+  font-size: $font-xs;
+  color: $error-color;
+  animation: shake 0.3s ease;
+}
+
+// 錯誤訊息震動動畫
+@keyframes shake {
+  0%,
+  100% {
+    transform: translateX(0);
+  }
+  25% {
+    transform: translateX(-4px);
+  }
+  75% {
+    transform: translateX(4px);
+  }
+}
+
+// Dark mode adjustments
+[data-theme="dark"] {
+  .input {
+    background: $bg-primary;
+    border-color: rgba(255, 255, 255, 0.1);
+
+    &:focus {
+      border-color: $primary-color;
+    }
+  }
+}

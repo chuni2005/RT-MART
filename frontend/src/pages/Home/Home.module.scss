@@ -1,66 +1,27 @@
 .home {
   min-height: 100vh;
+  background-color: $bg-primary;
 }
 
-// Hero Section
-.hero {
-  background: linear-gradient(135deg, #ff6b4a 0%, #ee4d2d 100%);
-  color: white;
-  padding: $spacing-xxl * 2 $spacing-lg;
-  text-align: center;
+// Products Section
+.productsSection {
+  padding: $spacing-xxl 0;
 
   @include mobile {
-    padding: $spacing-xxl $spacing-md;
-  }
-}
-
-.heroContent {
-  max-width: 800px;
-  margin: 0 auto;
-}
-
-.heroTitle {
-  font-size: $font-4xl;
-  font-weight: 700;
-  margin-bottom: $spacing-lg;
-
-  @include mobile {
-    font-size: $font-3xl;
-  }
-}
-
-.heroSubtitle {
-  font-size: $font-xl;
-  margin-bottom: $spacing-xl;
-  opacity: 0.95;
-
-  @include mobile {
-    font-size: $font-lg;
-  }
-}
-
-.heroButtons {
-  display: flex;
-  gap: $spacing-md;
-  justify-content: center;
-
-  @include mobile {
-    flex-direction: column;
-    align-items: stretch;
+    padding: $spacing-xl 0;
   }
 }
 
 .container {
-  @include container($desktop);
+  @include container($desktop-lg);
 }
-
 
 .sectionTitle {
   font-size: $font-3xl;
   font-weight: 700;
   text-align: center;
   margin-bottom: $spacing-xxl;
-  color: var(--text-primary);
+  color: $text-primary;
 
   @include mobile {
     font-size: $font-2xl;
@@ -68,70 +29,23 @@
   }
 }
 
-
-.products {
-  padding: $spacing-xxl * 2 $spacing-lg;
-  background: var(--bg-primary);
-
-  @include mobile {
-    padding: $spacing-xxl $spacing-md;
-  }
-}
-
+// Product Grid: 5 columns × 4 rows = 20 products
 .productGrid {
-  display: flex;
-  flex-wrap: wrap;
+  display: grid;
+  grid-template-columns: repeat(5, 1fr);
   gap: $spacing-lg;
 
-  > * {
-    flex: 1 1 calc(25% - $spacing-lg);
-    min-width: 200px;
+  @include max-width($desktop) {
+    grid-template-columns: repeat(4, 1fr);
   }
 
   @include tablet {
-    > * {
-      flex: 1 1 calc(33.333% - $spacing-lg);
-    }
-  }
-
-  @include mobile {
+    grid-template-columns: repeat(3, 1fr);
     gap: $spacing-md;
-    > * {
-      flex: 1 1 calc(50% - $spacing-md);
-      min-width: 150px;
-    }
   }
-}
-
-// CTA Section
-.cta {
-  background: $gradient-primary;
-  color: white;
-  padding: $spacing-xxl * 2 $spacing-lg;
-  text-align: center;
 
   @include mobile {
-    padding: $spacing-xxl $spacing-md;
-  }
-}
-
-.ctaContent {
-  max-width: 600px;
-  margin: 0 auto;
-
-  h2 {
-    font-size: $font-3xl;
-    font-weight: 700;
-    margin-bottom: $spacing-md;
-
-    @include mobile {
-      font-size: $font-2xl;
-    }
-  }
-
-  p {
-    font-size: $font-lg;
-    margin-bottom: $spacing-xl;
-    opacity: 0.95;
+    grid-template-columns: repeat(2, 1fr);
+    gap: $spacing-md;
   }
 }

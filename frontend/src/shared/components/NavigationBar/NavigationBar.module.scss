@@ -23,30 +23,30 @@
     a {
       display: block;
       padding: $spacing-sm $spacing-md;
-      color: var(--text-primary);
-      font-size: $font-base;
+      color: $text-primary;
+      font-size: $font-md;
       font-weight: 500;
       text-decoration: none;
       transition: $transition-fast;
       position: relative;
 
       &:hover {
-        color: var(--primary-color);
+        color: $primary-color;
       }
 
       &.active {
-        color: var(--primary-color);
+        color: $primary-color;
         font-weight: 600;
 
         &::after {
-          content: '';
+          content: "";
           position: absolute;
           bottom: -2px;
           left: 50%;
           transform: translateX(-50%);
           width: 24px;
           height: 2px;
-          background: var(--primary-color);
+          background: $primary-color;
           border-radius: 2px;
         }
       }

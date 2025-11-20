@@ -6,7 +6,7 @@ import PropTypes from 'prop-types';
  * Icon Component - Wrapper for FontAwesome icons
  *
  * @param {Object} props
- * @param {Object} props.icon - FontAwesome icon object
+ * @param {Object|string|Array} props.icon - FontAwesome icon object, icon name string, or array format
  * @param {string} props.size - Icon size (xs, sm, lg, xl, 2x, etc.)
  * @param {string} props.className - Additional CSS classes
  * @param {Function} props.onClick - Click handler
@@ -39,7 +39,11 @@ function Icon({
 }
 
 Icon.propTypes = {
-  icon: PropTypes.object.isRequired,
+  icon: PropTypes.oneOfType([
+    PropTypes.object,
+    PropTypes.string,
+    PropTypes.array,
+  ]).isRequired,
   size: PropTypes.string,
   className: PropTypes.string,
   onClick: PropTypes.func,
