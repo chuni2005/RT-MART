@@ -145,11 +145,22 @@ describe('UsersController (e2e)', () => {
   it('/users/:id (PATCH) → update partial user data', async () => {
     const res = await request(app.getHttpServer())
       .patch(`/users/${testUserId[1]}`)
-      .send({ role: 'buyer' })
+      .send({ role: 'buyer', password: ',newpassword123' })
       .expect(200);
-      
+
     expect(res.body).toHaveProperty('userId', testUserId[1]);
     expect(res.body.role).toBe('buyer');
+
+    // password change is correct
+    const loginRes = await request(app.getHttpServer())
+      .post('/auth/login')
+      .send({
+        loginId: testUserLoginId[1],
+        password: ',newpassword123',
+      })
+      .expect(201);
+      
+    expect(loginRes.body).toHaveProperty('accessToken');
   });
 
   it('PATCH /users/:id → update user data with conflict login id → 409', async () => {

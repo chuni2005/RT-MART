@@ -5,6 +5,7 @@ import {
   IsString,
   Length,
   Matches,
+  MinLength,
 } from 'class-validator';
 import { UserRole } from '../entities/user.entity';
 
@@ -20,6 +21,11 @@ export class UpdateUserDto {
     message: 'loginId can only contain letters, numbers, and underscores',
   })
   loginId: string;
+
+  @IsString()
+  @IsOptional()
+  @MinLength(8)
+  password: string;
 
   @IsString()
   @IsOptional()
