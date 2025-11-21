@@ -217,6 +217,25 @@ describe('UsersController (e2e)', () => {
     expect(res.body).toHaveProperty('total');
   });
 
+  it('/users/:id/permanent (DELETE) → permanently delete by id with non-permission', async () => {
+    const loginRes = await request(app.getHttpServer())
+      .post('/auth/login')
+      .send({
+        loginId: testUserLoginId[0],
+        password: '!abc12345678',
+      })
+      .expect(201);
+
+    let accessToken = loginRes.body.accessToken;
+
+    const res = await request(app.getHttpServer())
+      .delete(`/users/${testUserId[1]}/permanent`)
+      .set('Authorization', `Bearer ${accessToken}`)
+      .expect(403);
+
+    expect(res.body).toHaveProperty('message', 'Forbidden resource');
+  });
+
   it('/users/:id/permanent (DELETE) → permanently delete user by id', async () => {
     const loginRes = await request(app.getHttpServer())
       .post('/auth/login')

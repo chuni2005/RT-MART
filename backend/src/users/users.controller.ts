@@ -18,6 +18,9 @@ import { QueryUserDto } from './dto/query-user.dto';
 import { UserResponseDto } from './dto/user-response.dto';
 import { plainToInstance } from 'class-transformer';
 import { JwtAuthGuard } from './../auth/guards/jwt-auth.guard';
+import { UserRole } from './entities/user.entity';
+import { Roles } from './../auth/decorators/roles.decorator';
+import { RolesGuard } from './../auth/guards/roles.guard';
 
 @Controller('users')
 @UseInterceptors(ClassSerializerInterceptor)
@@ -92,7 +95,8 @@ export class UsersController {
   }
  
   //Permanently delete user by id
-  @UseGuards(JwtAuthGuard)
+  @Roles(UserRole.ADMIN)
+  @UseGuards(JwtAuthGuard, RolesGuard)
   @Delete(':id/permanent')
   async hardRemove(@Param('id') id: string) {
     await this.usersService.permanentlyDelete(id);
