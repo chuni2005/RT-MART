@@ -1,3 +1,4 @@
+import cookieParser from 'cookie-parser';
 import { NestFactory } from '@nestjs/core';
 import { ValidationPipe } from '@nestjs/common';
 import { AppModule } from './app.module';
@@ -8,6 +9,7 @@ async function bootstrap() {
 
   // use helmet for security headers
   app.use(helmet());
+  app.use(cookieParser());
 
   // set global API prefix (so all routes will be /api/v1/...)
   app.setGlobalPrefix(process.env.API_PREFIX || 'api');

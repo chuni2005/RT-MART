@@ -13,7 +13,7 @@ import {
   ReserveInventoryDto,
   ReleaseInventoryDto,
 } from './dto/update-inventory.dto';
-import { JwtAuthGuard } from '../auth/guards/jwt-auth.guard';
+import { JwtAccessGuard } from '../auth/guards/jwt-auth.guard';
 import { RolesGuard } from '../auth/guards/roles.guard';
 import { Roles } from '../auth/decorators/roles.decorator';
 import { UserRole } from '../users/entities/user.entity';
@@ -34,7 +34,7 @@ export class InventoryController {
   }
 
   @Patch('product/:productId')
-  @UseGuards(JwtAuthGuard, RolesGuard)
+  @UseGuards(JwtAccessGuard, RolesGuard)
   @Roles(UserRole.SELLER, UserRole.ADMIN)
   async updateQuantity(
     @Param('productId') productId: string,
@@ -44,7 +44,7 @@ export class InventoryController {
   }
 
   @Post('product/:productId/reserve')
-  @UseGuards(JwtAuthGuard)
+  @UseGuards(JwtAccessGuard)
   async reserveStock(
     @Param('productId') productId: string,
     @Body() reserveDto: ReserveInventoryDto,
@@ -53,7 +53,7 @@ export class InventoryController {
   }
 
   @Post('product/:productId/release')
-  @UseGuards(JwtAuthGuard)
+  @UseGuards(JwtAccessGuard)
   async releaseReserved(
     @Param('productId') productId: string,
     @Body() releaseDto: ReleaseInventoryDto,

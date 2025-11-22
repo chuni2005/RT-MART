@@ -12,11 +12,11 @@ import {
 import { ShippingAddressesService } from './shipping-addresses.service';
 import { CreateShippingAddressDto } from './dto/create-shipping-address.dto';
 import { UpdateShippingAddressDto } from './dto/update-shipping-address.dto';
-import { JwtAuthGuard } from '../auth/guards/jwt-auth.guard';
+import { JwtAccessGuard } from '../auth/guards/jwt-auth.guard';
 import type { AuthRequest } from '../common/types';
 
 @Controller('shipping-addresses')
-@UseGuards(JwtAuthGuard)
+@UseGuards(JwtAccessGuard)
 export class ShippingAddressesController {
   constructor(
     private readonly shippingAddressesService: ShippingAddressesService,
