@@ -7,7 +7,9 @@ import {
   Get,
   UseGuards,
   Req,
+  Res,
 } from '@nestjs/common';
+import type { Response, Request } from 'express';
 import { AuthService } from './auth.service';
 import { RegisterDto } from './dto/register.dto';
 import { LoginDto } from './dto/login.dto';
@@ -24,21 +26,43 @@ export class AuthController {
   @Post('register')
   async register(@Body() registerDto: RegisterDto) {
     const result = await this.authService.register(registerDto);
-    return plainToInstance(AuthTokenResponseDto, result);
+    return result;
   }
 
   @Post('login')
-  async login(@Body() loginDto: LoginDto) {
+  async login(@Body() loginDto: LoginDto, @Res({ passthrough: true }) res: Response) {
     const result = await this.authService.login(loginDto);
+
+    res.cookie('accessToken', result.accessToken, {
+      httpOnly: true,
+      secure: false,
+      sameSite: 'lax',
+      maxAge: 15 * 60 * 1000
+    });
+
+    res.cookie('refreshToken', result.refreshToken, {
+    httpOnly: true,
+    secure: false,
+    sameSite: 'lax',
+    path: '/',
+    maxAge: 24 * 60 * 60 * 1000,
+  });
     return plainToInstance(AuthTokenResponseDto, result);
   }
 
-  @UseGuards(JwtRefreshGuard)
   @Post('refresh')
-  async refreshToken(@Req() req: AuthRequest) {
-    const user = req.user;
-    const result = await this.authService.refreshTokens(user.userId, req.headers.authorization?.replace('Bearer ', '') || '');
-    return plainToInstance(AuthTokenResponseDto, result);
+  async refresh(@Req() req: AuthRequest, @Res({ passthrough: true }) res: Response) {
+    const refreshToken = req.cookies['refreshToken'];
+    const result = await this.authService.refreshTokens(refreshToken);
+    
+    res.cookie('accessToken', result.accessToken, {
+      httpOnly: true,
+      secure: false,
+      sameSite: 'lax',
+      path: '/',
+      maxAge: 15 * 60 * 1000
+    });
+    return this.authService.refreshTokens(refreshToken);
   }
 
   @UseGuards(JwtAccessGuard)
@@ -47,15 +71,20 @@ export class AuthController {
     return req.user;
   }
 
-  @UseGuards(JwtAccessGuard)
+  @UseGuards(JwtRefreshGuard)
   @Post('logout')
-  async logout(@Req() req: AuthRequest) {
-    const token = req.headers.authorization?.replace('Bearer ', '');
-    if (token) {
-      await this.authService.revokeToken(token);
+  async logout(@Req() req: Request, @Res({ passthrough: true }) res: Response) {
+    const refreshToken = req.cookies['refreshToken'];
+    if (refreshToken) {
+      await this.authService.logout(refreshToken);
     }
-    return { message: 'Logged out successfully' };
+
+    // 清除 cookie
+    res.clearCookie('refreshToken');
+    res.clearCookie('accessToken');
+    return { success: true };
   }
+
 
   @Get('test/health')
   getHealth(): object {
