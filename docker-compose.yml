@@ -33,7 +33,7 @@ services:
   backend:
     build:
       context: ./backend
-      dockerfile: Dockerfile.dev
+      dockerfile: ./backend/Dockerfile.dev
     container_name: rt_mart_backend
     # command: sh -c "npm run migration:run && npm run start:dev" if migrations are needed on startup
     ports:
@@ -77,7 +77,7 @@ services:
   frontend:
     build:
       context: ./frontend
-      dockerfile: Dockerfile.dev
+      dockerfile: ./frontend/Dockerfile.dev
       args:
         REGISTRY_PREFIX: ${REGISTRY_PREFIX:-}
     container_name: rt_mart_frontend
