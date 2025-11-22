@@ -31,26 +31,31 @@ export class AuthService {
       loginId: user.loginId,
       role: user.role,
     };
-    const accessToken = this.jwtService.sign(payload);
+
+    const accessToken = this.jwtService.sign(payload, {
+      expiresIn: '15m',
+      secret: process.env.ACCESS_SECRET,
+    });
+
+    const refreshToken = this.jwtService.sign(payload, {
+      expiresIn: '1d',
+      secret: process.env.REFRESH_SECRET,
+    });
 
     // Store token hash
-    await this.storeToken(user.userId, accessToken);
+    await this.storeRefreshToken(user.userId, refreshToken);
+    await this.storeAccessToken(user.userId, accessToken);
 
     return {
       accessToken,
-      user: {
-        userId: user.userId,
-        loginId: user.loginId,
-        name: user.name,
-        email: user.email,
-        role: user.role,
-      },
+      refreshToken,
     };
   }
 
   async login(loginDto: LoginDto) {
     const user = await this.usersService.findByLoginId(loginDto.loginId);
 
+    //verify user existence and password
     if (!user) {
       throw new UnauthorizedException('Invalid credentials');
     }
@@ -63,27 +68,52 @@ export class AuthService {
     if (!isPasswordValid) {
       throw new UnauthorizedException('Invalid credentials');
     }
-
+    
     const payload = {
       sub: user.userId,
       loginId: user.loginId,
       role: user.role,
     };
-    const accessToken = this.jwtService.sign(payload);
+
+    const accessToken = this.jwtService.sign(payload, {
+      expiresIn: '15m',
+      secret: process.env.ACCESS_SECRET,
+    });
+
+    const refreshToken = this.jwtService.sign(payload, {
+      expiresIn: '1d',
+      secret: process.env.REFRESH_SECRET,
+    });
 
     // Store token hash
-    await this.storeToken(user.userId, accessToken);
+    await this.storeRefreshToken(user.userId, refreshToken);
+    await this.storeAccessToken(user.userId, accessToken);
 
     return {
       accessToken,
-      user: {
-        userId: user.userId,
-        loginId: user.loginId,
-        name: user.name,
-        email: user.email,
-        role: user.role,
-      },
+      refreshToken,
     };
+  }
+
+  async refreshTokens(userId: string, refreshToken: string) {  
+    const user = await this.usersService.findOne(userId);
+    if (!user) throw new UnauthorizedException();
+    
+    const tokenEntity = await this.tokenRepository.findOne({
+      where: { userId, isRevoked: false },
+    });
+
+    if (!tokenEntity) throw new UnauthorizedException();
+    if (tokenEntity.expiresAt < new Date()) throw new UnauthorizedException();
+
+    // new access token
+    const payload = { sub: userId, role: user.role };
+    const newAccessToken = this.jwtService.sign(payload, {
+      secret: process.env.ACCESS_SECRET,
+      expiresIn: '15m',
+    });
+
+    return { accessToken: newAccessToken };
   }
 
   async validateUser(userId: string) {
@@ -109,11 +139,12 @@ export class AuthService {
     return token?.isRevoked ?? false;
   }
 
-  private async storeToken(userId: string, token: string): Promise<void> {
+  private async storeRefreshToken(userId: string, token: string): Promise<void> {
     const tokenHash = await bcrypt.hash(token, 10);
     const expiresAt = new Date();
-    expiresAt.setHours(expiresAt.getHours() + 24); // 24 hours expiry
 
+    expiresAt.setHours(expiresAt.getHours() + 24); 
+    
     const userToken = this.tokenRepository.create({
       userId,
       tokenHash,
@@ -121,6 +152,19 @@ export class AuthService {
     });
 
     await this.tokenRepository.save(userToken);
+  }
+
+  private async storeAccessToken(userId: string, token: string): Promise<void> {
+    const tokenHash = await bcrypt.hash(token, 10);
+    const expiresAt = new Date();
+
+    expiresAt.setMinutes(expiresAt.getMinutes() + 15);
+    
+    const userToken = this.tokenRepository.create({
+      userId,
+      tokenHash,
+      expiresAt,
+    });
   }
 
   /**

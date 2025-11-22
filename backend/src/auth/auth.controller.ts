@@ -11,9 +11,9 @@ import {
 import { AuthService } from './auth.service';
 import { RegisterDto } from './dto/register.dto';
 import { LoginDto } from './dto/login.dto';
-import { AuthResponseDto } from './dto/auth-response.dto';
+import { AuthResponseDto, AuthTokenResponseDto } from './dto/auth-response.dto';
 import { plainToInstance } from 'class-transformer';
-import { JwtAuthGuard } from './guards/jwt-auth.guard';
+import { JwtAccessGuard, JwtRefreshGuard } from './guards/jwt-auth.guard';
 import type { AuthRequest } from '../common/types';
 
 @Controller('auth')
@@ -24,22 +24,30 @@ export class AuthController {
   @Post('register')
   async register(@Body() registerDto: RegisterDto) {
     const result = await this.authService.register(registerDto);
-    return plainToInstance(AuthResponseDto, result);
+    return plainToInstance(AuthTokenResponseDto, result);
   }
 
   @Post('login')
   async login(@Body() loginDto: LoginDto) {
     const result = await this.authService.login(loginDto);
-    return plainToInstance(AuthResponseDto, result);
+    return plainToInstance(AuthTokenResponseDto, result);
   }
 
-  @UseGuards(JwtAuthGuard)
+  @UseGuards(JwtRefreshGuard)
+  @Post('refresh')
+  async refreshToken(@Req() req: AuthRequest) {
+    const user = req.user;
+    const result = await this.authService.refreshTokens(user.userId, req.headers.authorization?.replace('Bearer ', '') || '');
+    return plainToInstance(AuthTokenResponseDto, result);
+  }
+
+  @UseGuards(JwtAccessGuard)
   @Get('profile')
   getProfile(@Req() req: AuthRequest) {
     return req.user;
   }
 
-  @UseGuards(JwtAuthGuard)
+  @UseGuards(JwtAccessGuard)
   @Post('logout')
   async logout(@Req() req: AuthRequest) {
     const token = req.headers.authorization?.replace('Bearer ', '');

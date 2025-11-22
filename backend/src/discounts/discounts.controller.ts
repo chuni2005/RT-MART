@@ -13,7 +13,7 @@ import { DiscountsService } from './discounts.service';
 import { CreateDiscountDto } from './dto/create-discount.dto';
 import { UpdateDiscountDto } from './dto/update-discount.dto';
 import { QueryDiscountDto } from './dto/query-discount.dto';
-import { JwtAuthGuard } from '../auth/guards/jwt-auth.guard';
+import { JwtAccessGuard } from '../auth/guards/jwt-auth.guard';
 import { RolesGuard } from '../auth/guards/roles.guard';
 import { Roles } from '../auth/decorators/roles.decorator';
 import { UserRole } from '../users/entities/user.entity';
@@ -23,7 +23,7 @@ export class DiscountsController {
   constructor(private readonly discountsService: DiscountsService) {}
 
   @Post()
-  @UseGuards(JwtAuthGuard, RolesGuard)
+  @UseGuards(JwtAccessGuard, RolesGuard)
   @Roles(UserRole.ADMIN, UserRole.SELLER)
   async create(@Body() createDto: CreateDiscountDto) {
     return await this.discountsService.create(createDto);
@@ -64,14 +64,14 @@ export class DiscountsController {
   }
 
   @Patch(':id')
-  @UseGuards(JwtAuthGuard, RolesGuard)
+  @UseGuards(JwtAccessGuard, RolesGuard)
   @Roles(UserRole.ADMIN, UserRole.SELLER)
   async update(@Param('id') id: string, @Body() updateDto: UpdateDiscountDto) {
     return await this.discountsService.update(id, updateDto);
   }
 
   @Delete(':id')
-  @UseGuards(JwtAuthGuard, RolesGuard)
+  @UseGuards(JwtAccessGuard, RolesGuard)
   @Roles(UserRole.ADMIN)
   async remove(@Param('id') id: string) {
     await this.discountsService.remove(id);

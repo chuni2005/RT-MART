@@ -15,7 +15,7 @@ import { StoresService } from './stores.service';
 import { CreateStoreDto } from './dto/create-store.dto';
 import { UpdateStoreDto } from './dto/update-store.dto';
 import { QueryStoreDto } from './dto/query-store.dto';
-import { JwtAuthGuard } from '../auth/guards/jwt-auth.guard';
+import { JwtAccessGuard } from '../auth/guards/jwt-auth.guard';
 import { RolesGuard } from '../auth/guards/roles.guard';
 import { Roles } from '../auth/decorators/roles.decorator';
 import { UserRole } from '../users/entities/user.entity';
@@ -26,7 +26,7 @@ export class StoresController {
   constructor(private readonly storesService: StoresService) {}
 
   @Post()
-  @UseGuards(JwtAuthGuard, RolesGuard)
+  @UseGuards(JwtAccessGuard, RolesGuard)
   @Roles(UserRole.SELLER)
   async create(@Req() req: AuthRequest, @Body() createDto: CreateStoreDto) {
     // Get seller ID from user
@@ -61,7 +61,7 @@ export class StoresController {
   }
 
   @Patch(':id')
-  @UseGuards(JwtAuthGuard, RolesGuard)
+  @UseGuards(JwtAccessGuard, RolesGuard)
   @Roles(UserRole.SELLER)
   async update(
     @Req() req: AuthRequest,
@@ -78,7 +78,7 @@ export class StoresController {
   }
 
   @Delete(':id')
-  @UseGuards(JwtAuthGuard, RolesGuard)
+  @UseGuards(JwtAccessGuard, RolesGuard)
   @Roles(UserRole.SELLER)
   async remove(@Req() req: AuthRequest, @Param('id') id: string) {
     const seller = await this.storesService['sellersService'].findByUserId(
