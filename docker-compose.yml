@@ -6,7 +6,7 @@ services:
       - "3306:3306"
     environment:
       # Root password for database administration
-      - MARIADB_ROOT_PASSWORD=${DB_ROOT_PASSWORD:-rt_mart_root_password_or_something_idk123*}
+      - MARIADB_ROOT_PASSWORD=${DB_ROOT_PASSWORD:-c}
       # Application database name
       - MARIADB_DATABASE=${DB_NAME:-rt_mart_db}
       # Application database user
@@ -33,9 +33,9 @@ services:
   backend:
     build:
       context: ./backend
-      dockerfile: Dockerfile.dev
+      dockerfile: ./Dockerfile.dev
     container_name: rt_mart_backend
-    # command: sh -c "npm run migration:run && npm run start:dev" if migrations are needed on startup
+    # command: sh -c "npm run migration:run && npm run start:dev" #if migrations are needed on startup
     ports:
       - '3000:3000'
     volumes:
@@ -77,7 +77,7 @@ services:
   frontend:
     build:
       context: ./frontend
-      dockerfile: Dockerfile.dev
+      dockerfile: ./Dockerfile.dev
       args:
         REGISTRY_PREFIX: ${REGISTRY_PREFIX:-}
     container_name: rt_mart_frontend

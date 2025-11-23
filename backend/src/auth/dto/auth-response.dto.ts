@@ -15,3 +15,8 @@ export class AuthResponseDto {
     role: UserRole;
   };
 }
+
+export class AuthTokenResponseDto {
+  @Expose() refreshToken: string;
+  @Expose() accessToken: string;
+}
