@@ -61,7 +61,11 @@ Button.propTypes = {
   type: PropTypes.oneOf(['button', 'submit', 'reset']),
   disabled: PropTypes.bool,
   fullWidth: PropTypes.bool,
-  icon: PropTypes.object,
+  icon: PropTypes.oneOfType([
+    PropTypes.object,
+    PropTypes.string,
+    PropTypes.array,
+  ]),
   iconOnly: PropTypes.bool,
   badge: PropTypes.oneOfType([PropTypes.string, PropTypes.number]),
   className: PropTypes.string,

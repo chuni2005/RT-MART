@@ -1,0 +1,115 @@
+.alert {
+  display: flex;
+  align-items: center;
+  gap: $spacing-md;
+  padding: $spacing-md $spacing-lg;
+  border-radius: $border-radius-md;
+  font-size: $font-sm;
+  border: 1px solid transparent;
+  animation: slideDown 0.3s ease-out;
+  margin-bottom: $spacing-md;
+
+  .icon {
+    flex-shrink: 0;
+    font-size: $font-xl;
+    display: flex;
+    align-items: center;
+  }
+
+  .message {
+    flex: 1;
+    line-height: 1.5;
+  }
+
+  .closeButton {
+    flex-shrink: 0;
+    background: none;
+    border: none;
+    color: currentColor;
+    cursor: pointer;
+    padding: $spacing-xs;
+    opacity: 0.7;
+    transition: opacity 0.2s ease;
+    font-size: $font-lg;
+    display: flex;
+    align-items: center;
+
+    &:hover {
+      opacity: 1;
+    }
+
+    &:focus {
+      outline: 2px solid currentColor;
+      outline-offset: 2px;
+      border-radius: $border-radius-sm;
+    }
+  }
+}
+
+// Success 樣式
+.alert.success {
+  background-color: rgba(38, 170, 153, 0.1);
+  border-color: var(--success-color);
+  color: var(--success-color);
+
+  [data-theme='dark'] & {
+    background-color: rgba(38, 170, 153, 0.15);
+  }
+}
+
+// Error 樣式
+.alert.error {
+  background-color: rgba(255, 66, 79, 0.1);
+  border-color: var(--error-color);
+  color: var(--error-color);
+
+  [data-theme='dark'] & {
+    background-color: rgba(255, 66, 79, 0.15);
+  }
+}
+
+// Info 樣式
+.alert.info {
+  background-color: rgba(52, 152, 219, 0.1);
+  border-color: #3498db;
+  color: #3498db;
+
+  [data-theme='dark'] & {
+    background-color: rgba(52, 152, 219, 0.15);
+  }
+}
+
+// Warning 樣式
+.alert.warning {
+  background-color: rgba(255, 152, 0, 0.1);
+  border-color: #ff9800;
+  color: #ff9800;
+
+  [data-theme='dark'] & {
+    background-color: rgba(255, 152, 0, 0.15);
+  }
+}
+
+// Slide down 動畫
+@keyframes slideDown {
+  from {
+    opacity: 0;
+    transform: translateY(-10px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+// 響應式調整
+@include mobile {
+  .alert {
+    padding: $spacing-sm $spacing-md;
+    font-size: $font-xs;
+
+    .icon {
+      font-size: $font-lg;
+    }
+  }
+}
