@@ -4,20 +4,13 @@
  */
 
 import Icon from '../Icon';
-import {
-  faCheckCircle,
-  faExclamationCircle,
-  faInfoCircle,
-  faExclamationTriangle,
-  faTimes,
-} from '@fortawesome/free-solid-svg-icons';
 import styles from './Alert.module.scss';
 
 const iconMap = {
-  success: faCheckCircle,
-  error: faExclamationCircle,
-  info: faInfoCircle,
-  warning: faExclamationTriangle,
+  success: 'check-circle',
+  error: 'exclamation-circle',
+  info: 'info-circle',
+  warning: 'exclamation-triangle',
 };
 
 const Alert = ({ type = 'info', message, onClose, className }) => {
@@ -43,7 +36,7 @@ const Alert = ({ type = 'info', message, onClose, className }) => {
           onClick={onClose}
           aria-label="關閉訊息" // TODO: i18n
         >
-          <Icon icon={faTimes} />
+          <Icon icon="times" />
         </button>
       )}
     </div>

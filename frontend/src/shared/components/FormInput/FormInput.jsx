@@ -4,7 +4,6 @@
  */
 
 import { useState } from 'react';
-import { faEye, faEyeSlash } from '@fortawesome/free-solid-svg-icons';
 import Icon from '../Icon/Icon';
 import styles from './FormInput.module.scss';
 
@@ -86,7 +85,7 @@ const FormInput = ({
               }
             }}
           >
-            <Icon icon={showPassword ? faEyeSlash : faEye} />
+            <Icon icon={showPassword ? 'eye-slash' : 'eye'} />
           </div>
         )}
       </div>
