@@ -39,15 +39,15 @@
 }
 
 .text-primary {
-  color: var(--primary-color);
+  color: $primary-color;
 }
 
 .text-secondary {
-  color: var(--text-secondary);
+  color: $text-secondary;
 }
 
 .text-muted {
-  color: var(--text-tertiary);
+  color: $text-tertiary;
 }
 
 // Display Utilities
@@ -97,9 +97,9 @@
 
 // Card Component
 .card {
-  background: var(--card-bg);
+  background: $card-bg;
   border-radius: $border-radius-lg;
-  box-shadow: var(--card-shadow);
+  box-shadow: $card-shadow;
   padding: $spacing-lg;
   transition: $transition-base;
 

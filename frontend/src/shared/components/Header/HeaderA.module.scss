@@ -1,0 +1,97 @@
+.headerA {
+  background-color: $bg-secondary;
+  box-shadow: $shadow-md;
+  position: sticky;
+  top: 0;
+  z-index: $z-index-sticky;
+}
+
+// Main Bar
+.mainBar {
+  padding: $spacing-md 0;
+
+  .container {
+    max-width: $desktop-lg;
+    margin: 0 auto;
+    padding: 0 $spacing-md;
+  }
+
+  .mainBarContent {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: $spacing-lg;
+  }
+}
+
+
+// Right Section (右側)
+.rightSection {
+  display: flex;
+  align-items: center;
+  gap: $spacing-md;
+  flex-shrink: 0;
+}
+
+// Cart Button
+.cartButton {
+  position: relative;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  width: 40px;
+  height: 40px;
+  color: $text-primary;
+  text-decoration: none;
+  transition: $transition-fast;
+
+  &:hover {
+    color: $primary-color;
+  }
+
+  .badge {
+    position: absolute;
+    top: -4px;
+    right: -4px;
+    background-color: $error-color;
+    color: white;
+    font-size: $font-xs;
+    font-weight: 600;
+    padding: 2px 6px;
+    border-radius: 10px;
+    min-width: 18px;
+    text-align: center;
+  }
+}
+
+// Responsive
+@media (max-width: $desktop) {
+  .mainBar {
+    .mainBarContent {
+      gap: $spacing-md;
+    }
+  }
+}
+
+@media (max-width: $tablet) {
+  .mainBar {
+    padding: $spacing-sm 0;
+  }
+
+  .mainBarContent {
+    flex-wrap: wrap;
+    justify-content: center;
+  }
+
+  .rightSection {
+    order: 2;
+  }
+}
+
+@media (max-width: $mobile) {
+  .mainBar {
+    .container {
+      padding: 0 $spacing-sm;
+    }
+  }
+}

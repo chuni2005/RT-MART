@@ -1,0 +1,62 @@
+.headerC {
+  background-color: $bg-secondary;
+  box-shadow: $shadow-md;
+  position: sticky;
+  top: 0;
+  z-index: $z-index-sticky;
+}
+
+// Top Bar
+.topBar {
+  background-color: $primary-color;
+  color: white;
+  padding: $spacing-sm 0;
+  font-size: $font-sm;
+
+  .container {
+    max-width: $desktop-lg;
+    margin: 0 auto;
+    padding: 0 $spacing-md;
+  }
+
+  .topBarLinks {
+    display: flex;
+    justify-content: flex-end;
+    align-items: center;
+    gap: $spacing-lg;
+  }
+
+  .link {
+    color: white;
+    text-decoration: none;
+    transition: $transition-fast;
+
+    &:hover {
+      text-decoration: underline;
+      font-weight: 600;
+    }
+  }
+}
+
+// Main Bar
+.mainBar {
+  padding: $spacing-md 0;
+
+  .container {
+    max-width: $desktop-lg;
+    margin: 0 auto;
+    padding: 0 $spacing-md;
+  }
+
+  .mainBarContent {
+    display: flex;
+    align-items: center;
+    gap: $spacing-lg;
+  }
+}
+
+
+// Spacer
+.spacer {
+  flex: 1;
+}

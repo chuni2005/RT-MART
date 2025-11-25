@@ -1,8 +1,8 @@
 .productCard {
-  background: var(--card-bg);
+  background: $card-bg;
   border-radius: $border-radius-lg;
   overflow: hidden;
-  box-shadow: var(--card-shadow);
+  box-shadow: $card-shadow;
   transition: $transition-base;
   cursor: pointer;
 
@@ -16,7 +16,7 @@
   width: 100%;
   padding-top: 100%;
   position: relative;
-  background: var(--bg-tertiary);
+  background: $bg-tertiary;
   overflow: hidden;
 
   img {
@@ -29,7 +29,7 @@
 
 .placeholder {
   @include absolute-center;
-  color: var(--text-tertiary);
+  color: $text-tertiary;
   font-size: $font-sm;
 }
 
@@ -38,10 +38,10 @@
 }
 
 .productName {
-  font-size: $font-base;
+  font-size: $font-md;
   font-weight: 500;
   margin-bottom: $spacing-sm;
-  color: var(--text-primary);
+  color: $text-primary;
   @include text-ellipsis;
 }
 
@@ -55,12 +55,12 @@
 .currentPrice {
   font-size: $font-xl;
   font-weight: 600;
-  color: var(--primary-color);
+  color: $primary-color;
 }
 
 .originalPrice {
   font-size: $font-sm;
-  color: var(--text-tertiary);
+  color: $text-tertiary;
   text-decoration: line-through;
 }
 
@@ -69,9 +69,9 @@
   align-items: center;
   justify-content: space-between;
   font-size: $font-xs;
-  color: var(--text-secondary);
+  color: $text-secondary;
 }
 
 .soldCount {
-  color: var(--text-tertiary);
+  color: $text-tertiary;
 }

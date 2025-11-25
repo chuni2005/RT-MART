@@ -14,6 +14,7 @@ function Button({
   iconOnly = false,
   badge = null,
   className = '',
+  style = {},
   ariaLabel,
 }) {
   const getVariantClass = () => {
@@ -45,6 +46,7 @@ function Button({
       className={buttonClasses}
       onClick={onClick}
       disabled={disabled}
+      style={style}
       aria-label={ariaLabel}
     >
       {icon && <Icon icon={icon} />}
@@ -61,10 +63,15 @@ Button.propTypes = {
   type: PropTypes.oneOf(['button', 'submit', 'reset']),
   disabled: PropTypes.bool,
   fullWidth: PropTypes.bool,
-  icon: PropTypes.object,
+  icon: PropTypes.oneOfType([
+    PropTypes.object,
+    PropTypes.string,
+    PropTypes.array,
+  ]),
   iconOnly: PropTypes.bool,
   badge: PropTypes.oneOfType([PropTypes.string, PropTypes.number]),
   className: PropTypes.string,
+  style: PropTypes.object,
   ariaLabel: PropTypes.string,
 };
 

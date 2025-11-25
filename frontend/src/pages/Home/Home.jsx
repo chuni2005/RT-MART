@@ -1,52 +1,71 @@
 import React from 'react';
+import { useNavigate } from 'react-router-dom';
 import styles from './Home.module.scss';
-import ProductCard from '../../shared/components/ProductCard';
-import Button from '../../shared/components/Button';
+import ProductCard from '../../shared/components/ProductCard/ProductCard';
+import Hero from '../../shared/components/Hero/Hero';
+
+// Mock banner data (TODO: Replace with API data)
+const banners = [
+  {
+    id: 1,
+    imageUrl:
+      "https://i.pinimg.com/736x/ba/92/7f/ba927ff34cd961ce2c184d47e8ead9f6.jpg",
+    alt: "促銷活動 1",
+  },
+  {
+    id: 2,
+    imageUrl:
+      "https://unchainedcrypto.com/wp-content/uploads/2024/08/Untitled-design.png",
+    alt: "促銷活動 2",
+  },
+  {
+    id: 3,
+    imageUrl:
+      "https://uploads.dailydot.com/2018/10/olli-the-polite-cat.jpg?q=65&auto=format&w=1200&ar=2:1&fit=crop",
+    alt: "促銷活動 3",
+  },
+];
+
+// Mock product data (TODO: Replace with API data)
+const mockProducts = Array.from({ length: 20 }, (_, i) => ({
+  id: i + 1,
+  name: `熱門商品 ${i + 1}`,
+  currentPrice: 299 + i * 50,
+  originalPrice: i % 3 === 0 ? 399 + i * 50 : null,
+  rating: 4 + Math.random(),
+  soldCount: `${(Math.random() * 10).toFixed(1)}k`,
+}));
 
 function Home() {
+  const navigate = useNavigate();
+
+  const handleProductClick = (productId) => {
+    navigate(`/product/${productId}`);
+  };
+
   return (
     <div className={styles.home}>
       {/* Hero Section */}
-      <section className={styles.hero}>
-        <div className={styles.heroContent}>
-          <h1 className={styles.heroTitle}>歡迎來到 RT-MART</h1>
-          <p className={styles.heroSubtitle}>
-            您的一站式線上購物平台，品質保證、價格實惠
-          </p>
-          <div className={styles.heroButtons}>
-            <Button variant="primary">立即購物</Button>
-            <Button variant="outline">瞭解更多</Button>
-          </div>
-        </div>
-      </section>
+      <Hero banners={banners} autoPlayInterval={4000} height={400} />
 
-      {/* Products Section */}
-      <section className={styles.products}>
+      {/* Hot Products Section */}
+      <section className={styles.productsSection}>
         <div className={styles.container}>
           <h2 className={styles.sectionTitle}>熱門商品</h2>
           <div className={styles.productGrid}>
-            {[1, 2, 3, 4, 5, 6, 7, 8].map((item) => (
+            {mockProducts.map((product) => (
               <ProductCard
-                key={item}
-                id={item}
-                name={`商品名稱 ${item}`}
-                currentPrice={999}
-                originalPrice={1299}
-                rating={5}
-                soldCount="1.2k"
-                onClick={(id) => console.log(`點擊了商品 ${id}`)}
+                key={product.id}
+                id={product.id}
+                name={product.name}
+                currentPrice={product.currentPrice}
+                originalPrice={product.originalPrice}
+                rating={product.rating}
+                soldCount={product.soldCount}
+                onClick={handleProductClick}
               />
             ))}
           </div>
-        </div>
-      </section>
-
-      {/* CTA Section */}
-      <section className={styles.cta}>
-        <div className={styles.ctaContent}>
-          <h2>開始您的購物之旅</h2>
-          <p>註冊會員享更多優惠</p>
-          <Button variant="primary">立即註冊</Button>
         </div>
       </section>
     </div>

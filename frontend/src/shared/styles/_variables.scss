@@ -5,27 +5,20 @@ $primary-light: #ff6b4a;
 $secondary-color: #ff9800;
 $accent-color: #f53d2d;
 
-// Light Mode Colors
-$light-bg-primary: #f5f5f5; // Page background
-$light-bg-secondary: #ffffff; // Component background
-$light-bg-tertiary: #fafafa; // Section background
-$light-text-primary: #222222; // Main text
-$light-text-secondary: #555555; // Secondary text
-$light-text-tertiary: #888888; // Tertiary text
-$light-border: #e5e5e5; // Border color
-$light-card-bg: #ffffff;
-$light-card-shadow: 0 1px 2px rgba(0, 0, 0, 0.08);
+// Background Colors
+$bg-primary: #f5f5f5; // Page background
+$bg-secondary: #ffffff; // Component background
+$bg-tertiary: #fafafa; // Section background
 
-// Dark Mode Colors
-$dark-bg-primary: #1a1a1a;
-$dark-bg-secondary: #242424;
-$dark-bg-tertiary: #2d2d2d;
-$dark-text-primary: #f5f5f5;
-$dark-text-secondary: #d4d4d4;
-$dark-text-tertiary: #a3a3a3;
-$dark-border: #3d3d3d;
-$dark-card-bg: #242424;
-$dark-card-shadow: 0 1px 2px rgba(0, 0, 0, 0.3);
+// Text Colors
+$text-primary: #222222; // Main text
+$text-secondary: #555555; // Secondary text
+$text-tertiary: #888888; // Tertiary text
+
+// Border & Card
+$border-color: #e5e5e5; // Border color
+$card-bg: #ffffff;
+$card-shadow: 0 1px 2px rgba(0, 0, 0, 0.08);
 
 // Status Colors
 $success-color: #26aa99;
@@ -41,7 +34,7 @@ $gradient-secondary: linear-gradient(135deg, #ff9800 0%, #ffc107 100%);
 // Font Sizes
 $font-xs: 0.75rem; // 12px
 $font-sm: 0.875rem; // 14px
-$font-base: 1rem; // 16px
+$font-md: 1rem; // 16px
 $font-lg: 1.125rem; // 18px
 $font-xl: 1.25rem; // 20px
 $font-2xl: 1.5rem; // 24px
@@ -79,6 +72,12 @@ $shadow-lg: 0 10px 15px rgba(0, 0, 0, 0.1);
 $shadow-xl: 0 20px 25px rgba(0, 0, 0, 0.15);
 
 // ========== 過渡效果 (Transitions) ==========
+// 時間值（用於 mixin 參數）
+$duration-fast: 0.15s;
+$duration-base: 0.3s;
+$duration-slow: 0.5s;
+
+// 完整 transition 屬性值（直接使用）
 $transition-fast: all 0.15s ease;
 $transition-base: all 0.3s ease;
 $transition-slow: all 0.5s ease;

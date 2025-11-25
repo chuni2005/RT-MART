@@ -1,9 +1,13 @@
 {
   "moduleFileExtensions": ["js", "json", "ts"],
-  "rootDir": ".",
+  "rootDir": "./units",
   "testEnvironment": "node",
-  "testRegex": ".e2e-spec.ts$",
+  "testRegex": ".e2e.ts$",
   "transform": {
     "^.+\\.(t|j)s$": "ts-jest"
-  }
+  },
+  "reporters": [
+    "default",
+    ["jest-junit", { "outputDirectory": "./test/logs", "outputName": "e2e-junit.xml" }]
+  ]
 }

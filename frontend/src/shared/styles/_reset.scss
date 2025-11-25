@@ -1,5 +1,5 @@
 // Browser Reset Styles
-@use './variables' as *;
+@use "./variables" as *;
 
 * {
   margin: 0;
@@ -15,11 +15,11 @@ html {
 
 body {
   font-family: $font-family;
-  font-size: $font-base;
+  font-size: $font-md;
   font-weight: 400;
   line-height: 1.5;
-  color: var(--text-primary);
-  background: var(--bg-primary);
+  color: $text-primary;
+  background: $bg-primary;
   min-height: 100vh;
 }
 

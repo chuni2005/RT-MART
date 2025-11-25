@@ -25,32 +25,11 @@ export class AuthService {
       ...registerDto,
       role: UserRole.BUYER, // Default role for registration
     });
-
-    const payload = {
-      sub: user.userId,
-      loginId: user.loginId,
-      role: user.role,
-    };
-    const accessToken = this.jwtService.sign(payload);
-
-    // Store token hash
-    await this.storeToken(user.userId, accessToken);
-
-    return {
-      accessToken,
-      user: {
-        userId: user.userId,
-        loginId: user.loginId,
-        name: user.name,
-        email: user.email,
-        role: user.role,
-      },
-    };
+    return { success: true, userId: user.userId };
   }
 
   async login(loginDto: LoginDto) {
     const user = await this.usersService.findByLoginId(loginDto.loginId);
-
     if (!user) {
       throw new UnauthorizedException('Invalid credentials');
     }
@@ -59,68 +38,102 @@ export class AuthService {
       loginDto.password,
       user.passwordHash,
     );
-
     if (!isPasswordValid) {
       throw new UnauthorizedException('Invalid credentials');
     }
+    
+    const accessToken = this.jwtService.sign({
+        sub: user.userId,
+        loginId: user.loginId,
+        role: user.role,
+      }, {
+      expiresIn: '15m',
+      secret: process.env.ACCESS_SECRET,
+    });
 
-    const payload = {
+    const refreshToken = this.jwtService.sign({
       sub: user.userId,
       loginId: user.loginId,
       role: user.role,
-    };
-    const accessToken = this.jwtService.sign(payload);
+    }, {
+      expiresIn: '1d',
+      secret: process.env.REFRESH_SECRET,
+    });
+
+    const decoded = this.jwtService.decode(refreshToken) as any;
+    const createdAt = new Date(decoded.iat * 1000);
 
     // Store token hash
-    await this.storeToken(user.userId, accessToken);
+    await this.tokenRepository.save({
+      userId: user.userId,
+      tokenHash: await bcrypt.hash(refreshToken, 10),
+      createdAt,
+      expiresAt: new Date(decoded.exp * 1000),
+      isRevoked: false,
+    });
 
     return {
       accessToken,
-      user: {
-        userId: user.userId,
-        loginId: user.loginId,
-        name: user.name,
-        email: user.email,
-        role: user.role,
-      },
+      refreshToken,
     };
   }
 
-  async validateUser(userId: string) {
-    return await this.usersService.findOne(userId);
-  }
-
-  async revokeToken(tokenHash: string): Promise<void> {
-    const token = await this.tokenRepository.findOne({
-      where: { tokenHash },
-    });
-
-    if (token) {
-      token.isRevoked = true;
-      await this.tokenRepository.save(token);
+  async refreshTokens(refreshToken: string) {
+    let payload: any;
+    try {
+      payload = this.jwtService.verify(refreshToken, {
+        secret: process.env.REFRESH_SECRET,
+      });
+    } catch {
+      throw new UnauthorizedException('Invalid refresh token');
     }
-  }
 
-  async isTokenRevoked(tokenHash: string): Promise<boolean> {
-    const token = await this.tokenRepository.findOne({
-      where: { tokenHash },
+    const userId = payload.sub;
+    const createdAt = new Date(payload.iat * 1000);
+
+    const tokenEntity = await this.tokenRepository.findOne({
+      where: { userId, createdAt },
     });
 
-    return token?.isRevoked ?? false;
+    if (!tokenEntity) throw new UnauthorizedException('Token not found');
+    if (tokenEntity.expiresAt < new Date()) throw new UnauthorizedException('Token expired');
+    if (tokenEntity.isRevoked) throw new UnauthorizedException('Token revoked');
+
+    const isValid = await bcrypt.compare(refreshToken, tokenEntity.tokenHash);
+    if (!isValid) throw new UnauthorizedException('Token mismatch');
+
+    const newAccessToken = this.jwtService.sign(
+      { sub: userId, role: payload.role, loginId: payload.loginId },
+      { secret: process.env.ACCESS_SECRET, expiresIn: '15m' },
+    );
+
+    return { accessToken: newAccessToken };
   }
 
-  private async storeToken(userId: string, token: string): Promise<void> {
-    const tokenHash = await bcrypt.hash(token, 10);
-    const expiresAt = new Date();
-    expiresAt.setHours(expiresAt.getHours() + 24); // 24 hours expiry
+  async logout(refreshToken: string): Promise<void> {
+    await this.revokeToken(refreshToken);
+  }
 
-    const userToken = this.tokenRepository.create({
-      userId,
-      tokenHash,
-      expiresAt,
+  async revokeToken(refreshToken: string): Promise<void> {
+    let payload: any;
+    try {
+      payload = this.jwtService.verify(refreshToken, {
+        secret: process.env.REFRESH_SECRET,
+      });
+    } catch {
+      throw new UnauthorizedException('Invalid refresh token');
+    }
+
+    const userId = payload.sub;
+    const createdAt = new Date(payload.iat * 1000);
+    
+    const tokenEntity = await this.tokenRepository.findOne({
+      where: { userId, createdAt },
     });
-
-    await this.tokenRepository.save(userToken);
+    if (tokenEntity) {
+      tokenEntity.isRevoked = true;
+      await this.tokenRepository.save(tokenEntity);
+    }
   }
 
   /**
