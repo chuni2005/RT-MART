@@ -1,7 +1,11 @@
 .productDescription {
   display: flex;
   flex-direction: column;
-  gap: $spacing-lg;
+  gap: $spacing-xl;
+}
+
+// 商品規格區塊
+.specificationsSection {
   padding: $spacing-lg;
   background-color: $card-bg;
   border: 1px solid $border-color;
@@ -9,44 +13,66 @@
 }
 
 .sectionTitle {
-  font-size: $font-xl;
+  font-size: $font-lg;
   font-weight: 600;
   color: $text-primary;
-  margin: 0;
+  margin: 0 0 $spacing-md 0;
   padding-bottom: $spacing-sm;
-  border-bottom: 2px solid $primary-color;
+  border-bottom: 1px solid $border-color;
 }
 
-// 庫存區
-.stockSection {
+// 規格列表
+.specificationsList {
   display: flex;
-  align-items: center;
-  gap: $spacing-sm;
-  padding: $spacing-md;
-  background-color: $bg-secondary;
-  border-radius: $border-radius-md;
-  border: 1px solid $border-color;
+  flex-direction: column;
+  gap: $spacing-md;
 }
 
-.stockLabel {
+.specItem {
+  display: flex;
+  align-items: flex-start;
+  gap: $spacing-md;
+  padding: $spacing-sm 0;
   font-size: $font-md;
+  line-height: 1.6;
+
+  &:not(:last-child) {
+    border-bottom: 1px solid lighten($border-color, 5%);
+  }
+}
+
+.specLabel {
+  min-width: 120px;
   font-weight: 500;
   color: $text-secondary;
+  flex-shrink: 0;
 }
 
-.stockValue {
-  font-size: $font-md;
-  font-weight: 600;
-  color: $success-color;
+.specValue {
+  flex: 1;
+  color: $text-primary;
+
+  // 庫存數量顏色顯示
+  &.normalStock {
+    color: $success-color;
+    font-weight: 600;
+  }
 
   &.lowStock {
     color: $warning-color;
+    font-weight: 600;
+  }
+
+  &.outOfStockValue {
+    color: $error-color;
+    font-weight: 700;
   }
 }
 
 .lowStockWarning {
   font-size: $font-sm;
   color: $warning-color;
+  font-weight: 500;
 }
 
 .outOfStock {
@@ -57,16 +83,10 @@
 
 // 商品描述區
 .descriptionSection {
-  display: flex;
-  flex-direction: column;
-  gap: $spacing-md;
-}
-
-.descriptionTitle {
-  font-size: $font-lg;
-  font-weight: 600;
-  color: $text-primary;
-  margin: 0;
+  padding: $spacing-lg;
+  background-color: $card-bg;
+  border: 1px solid $border-color;
+  border-radius: $border-radius-md;
 }
 
 .descriptionContent {
@@ -104,6 +124,7 @@
 
 // 展開/收合按鈕
 .toggleButton {
+  margin-top: $spacing-md;
   align-self: flex-start;
   background: none;
   border: none;
@@ -131,15 +152,25 @@
 @include mobile {
   .productDescription {
     gap: $spacing-md;
+  }
+
+  .specificationsSection,
+  .descriptionSection {
     padding: $spacing-md;
   }
 
   .sectionTitle {
-    font-size: $font-lg;
+    font-size: $font-md;
   }
 
-  .stockSection {
-    padding: $spacing-sm;
+  .specItem {
+    flex-direction: column;
+    gap: $spacing-xs;
+  }
+
+  .specLabel {
+    min-width: auto;
+    font-weight: 600;
   }
 
   .descriptionContent {

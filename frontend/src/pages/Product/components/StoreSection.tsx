@@ -1,3 +1,4 @@
+import { Link } from 'react-router-dom';
 import styles from './StoreSection.module.scss';
 import Button from '../../../shared/components/Button';
 import Icon from '../../../shared/components/Icon/Icon';
@@ -8,11 +9,6 @@ interface StoreSectionProps {
 }
 
 function StoreSection({ store }: StoreSectionProps) {
-  const handleViewStore = () => {
-    // TODO: 跳轉至商店頁面 /store/{store_id}
-    console.log('查看商店:', store.id);
-  };
-
   return (
     <div className={styles.storeSection}>
       <div className={styles.storeInfo}>
@@ -34,20 +30,21 @@ function StoreSection({ store }: StoreSectionProps) {
             </span>
             <span className={styles.divider}>|</span>
             <span className={styles.statItem}>
-              評價: <Icon icon="star" className={styles.starIcon} /> <strong>{store.rating}</strong>
+              評價: <Icon icon="star" className={styles.starIcon} />{" "}
+              <strong>{store.rating}</strong>
             </span>
           </div>
-          <div className={styles.joinDate}>
-            加入時間: {store.joinDate}
-          </div>
+          <div className={styles.joinDate}>加入時間: {store.joinDate}</div>
         </div>
       </div>
 
       {/* 查看商店按鈕 */}
       <div className={styles.storeAction}>
-        <Button variant="outline" onClick={handleViewStore} className={styles.viewStoreBtn}>
-          查看商店
-        </Button>
+        <Link to={`/store/${store.id}`}>
+          <Button variant="outline" className={styles.viewStoreBtn}>
+            查看商店
+          </Button>
+        </Link>
       </div>
     </div>
   );

@@ -1,0 +1,36 @@
+.breadcrumb {
+  display: flex;
+  align-items: center;
+  flex-wrap: wrap;
+  gap: 8px;
+  font-size: 14px;
+  line-height: 1.5;
+  color: #666;
+}
+
+.breadcrumbItem {
+  color: #1890ff;
+  cursor: pointer;
+  transition: color 0.2s ease;
+
+  &:hover {
+    color: #40a9ff;
+    text-decoration: underline;
+  }
+
+  &:last-child {
+    color: #333;
+    cursor: default;
+    font-weight: 500;
+
+    &:hover {
+      text-decoration: none;
+    }
+  }
+}
+
+.separator {
+  color: #999;
+  font-size: 12px;
+  margin: 0 4px;
+}

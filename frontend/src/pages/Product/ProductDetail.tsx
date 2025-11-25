@@ -51,6 +51,34 @@ const mockProducts: Record<number, Product> = {
       rating: 4.9,
       joinDate: '2022/03',
     },
+    productType: {
+      productTypeId: '4',
+      typeCode: 'BLUETOOTH_HEADSET',
+      typeName: '藍牙耳機',
+      parentTypeId: '3',
+      isActive: true,
+      parent: {
+        productTypeId: '3',
+        typeCode: 'AUDIO_DEVICES',
+        typeName: '音響設備',
+        parentTypeId: '2',
+        isActive: true,
+        parent: {
+          productTypeId: '2',
+          typeCode: 'CONSUMER_ELECTRONICS',
+          typeName: '消費性電子產品',
+          parentTypeId: '1',
+          isActive: true,
+          parent: {
+            productTypeId: '1',
+            typeCode: 'ELECTRONICS',
+            typeName: '3C電子',
+            parentTypeId: null,
+            isActive: true,
+          },
+        },
+      },
+    },
   },
   2: {
     id: 2,
@@ -90,6 +118,34 @@ const mockProducts: Record<number, Product> = {
       productCount: 128,
       rating: 4.7,
       joinDate: '2023/06',
+    },
+    productType: {
+      productTypeId: '8',
+      typeCode: 'SPORT_BOTTLE',
+      typeName: '運動水壺',
+      parentTypeId: '7',
+      isActive: true,
+      parent: {
+        productTypeId: '7',
+        typeCode: 'SPORT_ACCESSORIES',
+        typeName: '運動配件',
+        parentTypeId: '6',
+        isActive: true,
+        parent: {
+          productTypeId: '6',
+          typeCode: 'SPORTS_FITNESS',
+          typeName: '運動/健身',
+          parentTypeId: '5',
+          isActive: true,
+          parent: {
+            productTypeId: '5',
+            typeCode: 'SPORTS_OUTDOOR',
+            typeName: '運動戶外',
+            parentTypeId: null,
+            isActive: true,
+          },
+        },
+      },
     },
   },
   3: {
@@ -133,6 +189,34 @@ const mockProducts: Record<number, Product> = {
       productCount: 89,
       rating: 4.8,
       joinDate: '2021/11',
+    },
+    productType: {
+      productTypeId: '12',
+      typeCode: 'SMART_BAND',
+      typeName: '智能手環',
+      parentTypeId: '11',
+      isActive: true,
+      parent: {
+        productTypeId: '11',
+        typeCode: 'WEARABLE_DEVICES',
+        typeName: '穿戴裝置',
+        parentTypeId: '10',
+        isActive: true,
+        parent: {
+          productTypeId: '10',
+          typeCode: 'SMART_DEVICES',
+          typeName: '智能設備',
+          parentTypeId: '1',
+          isActive: true,
+          parent: {
+            productTypeId: '1',
+            typeCode: 'ELECTRONICS',
+            typeName: '3C電子',
+            parentTypeId: null,
+            isActive: true,
+          },
+        },
+      },
     },
   },
 };
@@ -278,7 +362,13 @@ function ProductDetail() {
         <StoreSection store={product.store} />
 
         {/* 商品資訊詳細區 */}
-        <ProductDescription description={product.description} stock={product.stock} />
+        <ProductDescription
+          description={product.description}
+          stock={product.stock}
+          productType={product.productType}
+          brand="PUMA"
+          origin="桃園市大園區"
+        />
 
         {/* 商品評價區 */}
         <ReviewSection reviews={mockReviews} statistics={mockStatistics} />
