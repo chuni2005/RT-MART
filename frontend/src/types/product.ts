@@ -8,6 +8,16 @@ export interface Store {
   joinDate: string;
 }
 
+// Product type (category) related types
+export interface ProductType {
+  productTypeId: string;
+  typeCode: string;
+  typeName: string;
+  parentTypeId: string | null;
+  isActive: boolean;
+  parent?: ProductType;
+}
+
 // Product related types
 export interface Product {
   id: number;
@@ -21,4 +31,5 @@ export interface Product {
   soldCount: number;
   images: string[];
   store: Store;
+  productType?: ProductType;
 }
