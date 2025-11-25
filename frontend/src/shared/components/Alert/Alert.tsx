@@ -5,7 +5,7 @@
 
 import Icon from '../Icon';
 import styles from './Alert.module.scss';
-import { AlertType } from '@/types';
+import type { AlertType, AlertProps } from '@/types';
 
 const iconMap: Record<AlertType, string> = {
   success: 'check-circle',
@@ -13,13 +13,6 @@ const iconMap: Record<AlertType, string> = {
   info: 'info-circle',
   warning: 'exclamation-triangle',
 };
-
-interface AlertProps {
-  type?: AlertType;
-  message: string;
-  onClose?: () => void;
-  className?: string;
-}
 
 const Alert = ({ type = 'info', message, onClose, className }: AlertProps) => {
   if (!message) return null;

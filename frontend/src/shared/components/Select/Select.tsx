@@ -7,32 +7,7 @@ import { useState, useRef, useEffect, useCallback, KeyboardEvent } from 'react';
 import { IconProp } from '@fortawesome/fontawesome-svg-core';
 import Icon from '../Icon/Icon';
 import styles from './Select.module.scss';
-import { SelectOption } from '@/types';
-
-interface SelectClassNames {
-  container?: string;
-  prefixIcon?: string;
-  trigger?: string;
-  value?: string;
-  chevron?: string;
-  dropdown?: string;
-  option?: string;
-  optionActive?: string;
-  optionFocused?: string;
-}
-
-interface SelectProps {
-  options: SelectOption[];
-  value: string;
-  onChange: (value: string) => void;
-  variant?: 'default' | 'compact' | 'topbar';
-  placeholder?: string;
-  icon?: IconProp | string | null;
-  ariaLabel?: string;
-  disabled?: boolean;
-  className?: string;
-  classNames?: SelectClassNames;
-}
+import type { SelectProps } from '@/types';
 
 const Select = ({
   options = [],

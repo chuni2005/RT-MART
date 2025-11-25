@@ -1,22 +1,6 @@
-import { ReactNode, CSSProperties, MouseEvent } from 'react';
-import { IconProp } from '@fortawesome/fontawesome-svg-core';
 import Icon from '../Icon/Icon';
 import styles from './Button.module.scss';
-
-interface ButtonProps {
-  variant?: 'primary' | 'outline' | 'login';
-  onClick?: (e: MouseEvent<HTMLButtonElement>) => void;
-  children?: ReactNode;
-  type?: 'button' | 'submit' | 'reset';
-  disabled?: boolean;
-  fullWidth?: boolean;
-  icon?: IconProp | string | null;
-  iconOnly?: boolean;
-  badge?: string | number | null;
-  className?: string;
-  style?: CSSProperties;
-  ariaLabel?: string;
-}
+import type { ButtonProps } from '@/types';
 
 function Button({
   variant = 'primary',

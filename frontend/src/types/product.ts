@@ -5,7 +5,12 @@ export interface Store {
   avatar: string;
   productCount: number;
   rating: number;
+  totalRatings: number;
   joinDate: string;
+  description?: string;
+  address?: string;
+  email?: string;
+  phone?: string;
 }
 
 // Product type (category) related types
