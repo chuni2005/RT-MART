@@ -98,7 +98,7 @@ export const register = async (loginId, name, email, phone, password) => {
     name,
     email,
     phone,
-    password, // 實際應用中絕不在前端存密碼！
+    password, // 實際應用中絕不在前端存密碼
     avatar: `https://i.pravatar.cc/150?img=${mockUsers.length + 2}`,
   };
 
