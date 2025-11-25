@@ -70,7 +70,8 @@ function PurchasePanel({ stock, productId, productData }: PurchasePanelProps) {
   // 輸入框失去焦點時的處理
   const handleInputBlur = () => {
     // 如果是空值，設定為1
-    if (quantity === '' || quantity < 1) {
+    const numValue = typeof quantity === 'string' ? parseInt(quantity, 10) : quantity;
+    if (quantity === '' || isNaN(numValue) || numValue < 1) {
       setQuantity(1);
     }
   };
