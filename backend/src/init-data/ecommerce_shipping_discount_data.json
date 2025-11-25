@@ -1,0 +1,32 @@
+[
+  {
+    "shipping_discount_id": 1,
+    "discount_id": 5,
+    "discount_amount": 60.0
+  },
+  {
+    "shipping_discount_id": 2,
+    "discount_id": 8,
+    "discount_amount": 30.0
+  },
+  {
+    "shipping_discount_id": 3,
+    "discount_id": 16,
+    "discount_amount": 30.0
+  },
+  {
+    "shipping_discount_id": 4,
+    "discount_id": 19,
+    "discount_amount": 30.0
+  },
+  {
+    "shipping_discount_id": 5,
+    "discount_id": 23,
+    "discount_amount": 30.0
+  },
+  {
+    "shipping_discount_id": 6,
+    "discount_id": 31,
+    "discount_amount": 60.0
+  }
+]

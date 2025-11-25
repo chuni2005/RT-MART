@@ -1,0 +1,156 @@
+[
+  {
+    "script_store_id": 1,
+    "seller_id": 1,
+    "store_name": "MUU女神精品屋",
+    "store_description": "精選優雅女裝、質感包款與精緻飾品小物，為重視品味的您打造專屬的穿搭風格。我們以高標準挑選每一件商品，從日常時髦到出席場合，都能展現自信魅力。店內所有款式均經嚴選，特色設計、嚴選質料與細節質感皆嚴格把關，只為讓妳輕鬆擁有高級質感的生活品味。在這裡，妳能找到專屬於自己的時尚語言——低調奢華、內斂優雅、與眾而不同不張揚。歡迎加入我們，一起打造妳的質感衣著日常。",
+    "store_address": "106臺北市大安區永安街37號nan",
+    "store_email": "jianglihua1229@example.com",
+    "store_phone": "0968-465-445",
+    "average_rating": 4.2,
+    "total_ratings": 206
+  },
+  {
+    "script_store_id": 2,
+    "seller_id": 2,
+    "store_name": "淨妍美體所",
+    "store_description": "為妳嚴選高品質保養、美妝與保健商品，讓日常護理變得更輕鬆、更安心。我們以專業角度挑選每一款產品——從基礎保養、彩妝補劑，到營養補充與日常健康，皆著重成分來源、安全性與使用體驗。希望陪妳一起打造穩定、健康、亮透的肌膚狀態，同時提升日常活力。我們相信，美麗不只是一種外表，而是妳對自己的溫柔投資。歡迎加入我們，用最簡單的方式開始妳的美肌與健康旅程。",
+    "store_address": "251新北市淡水區新北投街3段56號nan",
+    "store_email": "caixiuyu1217@example.com",
+    "store_phone": "0919-654-320",
+    "average_rating": 4.1,
+    "total_ratings": 332
+  },
+  {
+    "script_store_id": 3,
+    "seller_id": 3,
+    "store_name": "DailyMan男士生活館",
+    "store_description": "專為男士打造的時尚選物商店，提供多元男裝、包款與日常配件，從休閒到運動，全面滿足你的穿搭需求。我們嚴選質感布料、實用設計與耐用材質，注重舒適度與品味兼具的實穿單品。希望讓每位男性能用最簡單的方式，展現自信、俐落又不失個性的穿搭態度。不論是日常外出、職場穿搭或旅行使用，你都能在這裡找到合適的單品，打造屬於你的型男風格。",
+    "store_address": "330桃園市桃園區劍潭巷2段9號nan",
+    "store_email": "wujunting0822@example.com",
+    "store_phone": "0958-536-447",
+    "average_rating": 4.4,
+    "total_ratings": 396
+  },
+  {
+    "script_store_id": 4,
+    "seller_id": 4,
+    "store_name": "步履良品",
+    "store_description": "從舒適穿搭到日常訓練，一站滿足男女鞋款需求。店內精選休閒鞋、平底鞋、涼鞋拖鞋、跟鞋、女靴，以及男士休閒鞋、涼拖、紳士皮鞋與靴款等全系列商品。每雙鞋都以穿感、質感與實用性為核心挑選，兼具設計感與耐用度，讓你在不同場合都能找到最合適的款式。不論是上班通勤、假日外出、正式活動或輕鬆散步，都能用一雙好鞋走出自己的步伐。歡迎參觀我們的商店，探索屬於你的舒適風格。",
+    "store_address": "708臺南市安平區太平街67號nan",
+    "store_email": "yangjiancheng0319@example.com",
+    "store_phone": "0920-753-155",
+    "average_rating": 4.0,
+    "total_ratings": 392
+  },
+  {
+    "script_store_id": 5,
+    "seller_id": 5,
+    "store_name": "肌礎進化 MuscleBase",
+    "store_description": "專為現代忙碌生活設計的居家訓練解決方案。我們精選高品質啞鈴、彈力繩等高效器材，搭配純淨、足量的蛋白粉與營養品，為您的增肌計畫奠定最堅實的肌礎。提供專業指引，讓您隨時隨地，科學、有效地達成健身目標。",
+    "store_address": "407臺中市西屯區自由路4段13號nan",
+    "store_email": "suxiulan0706@example.com",
+    "store_phone": "0906-342-763",
+    "average_rating": 3.6,
+    "total_ratings": 13
+  },
+  {
+    "script_store_id": 6,
+    "seller_id": 6,
+    "store_name": "數碼線 TechLink",
+    "store_description": "您的Apple裝置一站式服務夥伴。數碼線專營iPhone/iPad及其必備周邊，如高強度保護膜和多功能保護套。我們堅持實用性與耐用性，致力於為您的裝置提供全面、可靠的防護，讓您無憂享受數位生活。",
+    "store_address": "802高雄市苓雅區新莊巷7段34號nan",
+    "store_email": "chenjianxing0204@example.com",
+    "store_phone": "0922-518-251",
+    "average_rating": 4.4,
+    "total_ratings": 389
+  },
+  {
+    "script_store_id": 7,
+    "seller_id": 7,
+    "store_name": "萌寶巢 Nestling",
+    "store_description": "專注於提供童幼嬰童與母親所需的安心好物。我們嚴選環保玩具、透氣服飾、安全用品及產後調理補給。從育兒用品到家居防護，萌寶巢致力於為新手家庭打造一個安全、舒適、充滿愛的成長環境，讓您與寶寶享受每一個親密時刻。",
+    "store_address": "106臺北市大安區平和巷201號nan",
+    "store_email": "shenlihua0510@example.com",
+    "store_phone": "0994-013-899",
+    "average_rating": 4.7,
+    "total_ratings": 278
+  },
+  {
+    "script_store_id": 8,
+    "seller_id": 8,
+    "store_name": "毛孩心選 PetBloom",
+    "store_description": "為您的寵物夥伴精選高品質食物、零食、護理用品與服飾。我們深信寵物健康是快樂的根本，所有商品皆經過嚴格把關。無論是日常飲食用具或季節性保暖衣物，毛孩心選提供您最放心、最貼心的選擇，讓毛孩生活充滿活力與歡樂。",
+    "store_address": "330桃園市桃園區福德巷6號nan",
+    "store_email": "hanjialing1215@example.com",
+    "store_phone": "0951-998-781",
+    "average_rating": 4.2,
+    "total_ratings": 432
+  },
+  {
+    "script_store_id": 9,
+    "seller_id": 9,
+    "store_name": "次元集 Gamers Hub",
+    "store_description": "遊戲世界的無限可能，從這裡開始。次元集提供最新款遊戲主機、熱門遊戲軟體及專業週邊配件。無論是任天堂、PlayStation 或是 Xbox 的玩家，我們都提供極速、穩定的配備。讓您沉浸於高解析度的影音世界，享受無延遲、極致流暢的遊戲體驗。",
+    "store_address": "510彰化縣員林市興街609號nan",
+    "store_email": "liushuling0106@example.com",
+    "store_phone": "0973-168-530",
+    "average_rating": 4.5,
+    "total_ratings": 113
+  },
+  {
+    "script_store_id": 10,
+    "seller_id": 10,
+    "store_name": "連線實驗室 ConnectLab",
+    "store_description": "專注於智慧生活與效率提升。連線實驗室精選耳機、鍵盤滑鼠等電腦週邊，及各式智慧穿戴裝置與家電。我們致力於提供高相容性與卓越性能的產品，讓您的工作、娛樂及日常生活都能藉由科技，達到完美同步與流暢運行。",
+    "store_address": "708臺南市安平區大同巷38號nan",
+    "store_email": "tuwenhua0819@example.com",
+    "store_phone": "0904-537-590",
+    "average_rating": 4.6,
+    "total_ratings": 328
+  },
+  {
+    "script_store_id": 11,
+    "seller_id": 11,
+    "store_name": "恬靜時光 Serene Home",
+    "store_description": "打造專屬您的療癒居所。恬靜時光提供高品質的寢具、香氛、收納及衛浴用品。我們注重材質的親膚性、氣味的舒適性，並提供兼具美觀與實用的家具及佈置小物。讓您在忙碌之餘，回到家就能享受一段寧靜、舒適的居家生活。",
+    "store_address": "406臺中市北屯區和平巷8段871號nan",
+    "store_email": "cengyuling0611@example.com",
+    "store_phone": "0929-043-285",
+    "average_rating": 3.8,
+    "total_ratings": 217
+  },
+  {
+    "script_store_id": 12,
+    "seller_id": 12,
+    "store_name": "味蕾漫旅 Taste Trek",
+    "store_description": "帶您展開一場舌尖上的美味漫旅。味蕾漫旅匯集全球精選咖啡、茶葉、零食與飲品，以及各式節慶伴手禮。我們堅持食材的新鮮與原味，致力於提供高品質的美食體驗。無論是自用享受或是送禮傳情，都能傳達最真摯的心意。",
+    "store_address": "330桃園市桃園區民治巷4號nan",
+    "store_email": "yanzhiming0423@example.com",
+    "store_phone": "0976-309-755",
+    "average_rating": 4.9,
+    "total_ratings": 445
+  },
+  {
+    "script_store_id": 13,
+    "seller_id": 13,
+    "store_name": "StyleCode 品味準則",
+    "store_description": "專為現代男士設計的穿搭準則。StyleCode精選T恤、襯衫、外套、褲款及內搭等衣著。我們注重材質的舒適度、剪裁的俐落感，讓您輕鬆駕馭各種場合。無論是商務正裝或休閒日常，我們助您展現沉穩、自信、有型的個人品味。",
+    "store_address": "111臺北市士林區關渡街60號nan",
+    "store_email": "chenyuee0125@example.com",
+    "store_phone": "0960-907-333",
+    "average_rating": 4.9,
+    "total_ratings": 239
+  },
+  {
+    "script_store_id": 14,
+    "seller_id": 14,
+    "store_name": "Muse 精品配件",
+    "store_description": "捕捉您的時尚靈感。Muse精選各式名牌包、後背包、手提包等，搭配設計感項鍊、手鍊、耳飾等飾品。我們以高標準審核設計與細節，讓您輕鬆搭配出專屬風格，無論出席正式場合或日常聚會，都能成為眾人目光的焦點。",
+    "store_address": "406臺中市北屯區育英巷1段95號nan",
+    "store_email": "wuyating1104@example.com",
+    "store_phone": "0952-848-671",
+    "average_rating": 4.9,
+    "total_ratings": 147
+  }
+]

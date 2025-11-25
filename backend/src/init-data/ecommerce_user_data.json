@@ -1,0 +1,497 @@
+[
+  {
+    "script_id": 1,
+    "login_id": "liaoshuhua0210",
+    "password": "LIaOshuhuA0210Fj9#",
+    "name": "廖淑華",
+    "email": "liaoshuhua0210@gmail.com",
+    "phone_number": "0967-651-481",
+    "role": "buyer"
+  },
+  {
+    "script_id": 2,
+    "login_id": "lisuzhen1103",
+    "password": "LiSUzheN1103Ie2_",
+    "name": "李素貞",
+    "email": "lisuzhen1103@gmail.com",
+    "phone_number": "0964-767-281",
+    "role": "buyer"
+  },
+  {
+    "script_id": 3,
+    "login_id": "linyuxuan0219",
+    "password": "LinyUxuAn0219Bv8!",
+    "name": "林宇軒",
+    "email": "linyuxuan0219@gmail.com",
+    "phone_number": "0910-611-155",
+    "role": "buyer"
+  },
+  {
+    "script_id": 4,
+    "login_id": "jianglihua1229",
+    "password": "JIANGLIHUa1229Dc6_",
+    "name": "江麗華",
+    "email": "jianglihua1229@gmail.com",
+    "phone_number": "0968-465-445",
+    "role": "seller"
+  },
+  {
+    "script_id": 5,
+    "login_id": "caixiuyu1217",
+    "password": "CaiXiUyU1217Qv9_",
+    "name": "蔡秀玉",
+    "email": "caixiuyu1217@gmail.com",
+    "phone_number": "0919-654-320",
+    "role": "seller"
+  },
+  {
+    "script_id": 6,
+    "login_id": "liuyumei0507",
+    "password": "LiuyumEi0507Rd0!",
+    "name": "劉玉梅",
+    "email": "liuyumei0507@gmail.com",
+    "phone_number": "0920-377-267",
+    "role": "buyer"
+  },
+  {
+    "script_id": 7,
+    "login_id": "heliyu1024",
+    "password": "HeLiYu1024Iq2_",
+    "name": "何麗玉",
+    "email": "heliyu1024@gmail.com",
+    "phone_number": "0989-476-117",
+    "role": "buyer"
+  },
+  {
+    "script_id": 8,
+    "login_id": "wujunting0822",
+    "password": "WuJuntiNG0822Ac8_",
+    "name": "吳俊廷",
+    "email": "wujunting0822@gmail.com",
+    "phone_number": "0958-536-447",
+    "role": "seller"
+  },
+  {
+    "script_id": 9,
+    "login_id": "yangjiancheng0319",
+    "password": "YANgJiaNcHenG0319El9",
+    "name": "楊建成",
+    "email": "yangjiancheng0319@gmail.com",
+    "phone_number": null,
+    "role": "seller"
+  },
+  {
+    "script_id": 10,
+    "login_id": "wangyahui1230",
+    "password": "WaNGyaHui1230Jp9#",
+    "name": "王雅慧",
+    "email": "wangyahui1230@gmail.com",
+    "phone_number": null,
+    "role": "buyer"
+  },
+  {
+    "script_id": 11,
+    "login_id": "suxiulan0706",
+    "password": "SuXiUlAn0706Il4@",
+    "name": "蘇秀蘭",
+    "email": "suxiulan0706@gmail.com",
+    "phone_number": "0906-342-763",
+    "role": "seller"
+  },
+  {
+    "script_id": 12,
+    "login_id": "chenjianxing0204",
+    "password": "ChENjiAnxInG0204Rk1@",
+    "name": "陳建興",
+    "email": "chenjianxing0204@gmail.com",
+    "phone_number": "0922-518-251",
+    "role": "seller"
+  },
+  {
+    "script_id": 13,
+    "login_id": "liuwenbin0227",
+    "password": "LiuweNBin0227Mj8@",
+    "name": "劉文彬",
+    "email": "liuwenbin0227@gmail.com",
+    "phone_number": "0930-091-801",
+    "role": "buyer"
+  },
+  {
+    "script_id": 14,
+    "login_id": "wuyanting0709",
+    "password": "WuYantInG0709Qq8@",
+    "name": "吳彥廷",
+    "email": "wuyanting0709@gmail.com",
+    "phone_number": "0996-821-216",
+    "role": "buyer"
+  },
+  {
+    "script_id": 15,
+    "login_id": "lizhihao0510",
+    "password": "LizHIhAo0510Ql0$",
+    "name": "李志豪",
+    "email": "lizhihao0510@gmail.com",
+    "phone_number": "0996-227-871",
+    "role": "buyer"
+  },
+  {
+    "script_id": 16,
+    "login_id": "xuzhihao1109",
+    "password": "XuzHIhAO1109Eg6@",
+    "name": "許志豪",
+    "email": "xuzhihao1109@gmail.com",
+    "phone_number": "0987-009-408",
+    "role": "buyer"
+  },
+  {
+    "script_id": 17,
+    "login_id": "zhangsuzhen0813",
+    "password": "ZhAnGsUZhEN0813Ct4_",
+    "name": "張素貞",
+    "email": "zhangsuzhen0813@gmail.com",
+    "phone_number": "0954-410-691",
+    "role": "buyer"
+  },
+  {
+    "script_id": 18,
+    "login_id": "kezhewei0620",
+    "password": "KEZheWeI0620Bb9_",
+    "name": "柯哲維",
+    "email": "kezhewei0620@gmail.com",
+    "phone_number": "0922-921-409",
+    "role": "buyer"
+  },
+  {
+    "script_id": 19,
+    "login_id": "huangzhixian1216",
+    "password": "HUangzHIxIaN1216Gr6#",
+    "name": "黃志賢",
+    "email": "huangzhixian1216@gmail.com",
+    "phone_number": "0951-080-188",
+    "role": "buyer"
+  },
+  {
+    "script_id": 20,
+    "login_id": "shenlihua0510",
+    "password": "SheNlihua0510Su2#",
+    "name": "沈麗華",
+    "email": "shenlihua0510@gmail.com",
+    "phone_number": "0994-013-899",
+    "role": "seller"
+  },
+  {
+    "script_id": 21,
+    "login_id": "hanjialing1215",
+    "password": "HaNjIalINg1215Uc3!",
+    "name": "韓佳玲",
+    "email": "hanjialing1215@gmail.com",
+    "phone_number": "0951-998-781",
+    "role": "seller"
+  },
+  {
+    "script_id": 22,
+    "login_id": "guoliyu1023",
+    "password": "GUoliYu1023Vn2$",
+    "name": "郭麗玉",
+    "email": "guoliyu1023@gmail.com",
+    "phone_number": null,
+    "role": "buyer"
+  },
+  {
+    "script_id": 23,
+    "login_id": "liushuling0106",
+    "password": "LIushULinG0106Ck3@",
+    "name": "劉淑玲",
+    "email": "liushuling0106@gmail.com",
+    "phone_number": "0973-168-530",
+    "role": "seller"
+  },
+  {
+    "script_id": 24,
+    "login_id": "liyaling0628",
+    "password": "LiYaLiNg0628Sl1$",
+    "name": "李雅玲",
+    "email": "liyaling0628@gmail.com",
+    "phone_number": "0989-894-540",
+    "role": "buyer"
+  },
+  {
+    "script_id": 25,
+    "login_id": "chenchenghan0613",
+    "password": "ChENcHenGHAn0613Wp6!",
+    "name": "陳承翰",
+    "email": "chenchenghan0613@gmail.com",
+    "phone_number": null,
+    "role": "buyer"
+  },
+  {
+    "script_id": 26,
+    "login_id": "shiyuxiang0909",
+    "password": "SHiyuxiaNg0909Cb2_",
+    "name": "石宇翔",
+    "email": "shiyuxiang0909@gmail.com",
+    "phone_number": "0997-040-262",
+    "role": "buyer"
+  },
+  {
+    "script_id": 27,
+    "login_id": "chenchengen0208",
+    "password": "CheNChEnGen0208Gm6_",
+    "name": "陳承恩",
+    "email": "chenchengen0208@gmail.com",
+    "phone_number": "0902-294-129",
+    "role": "buyer"
+  },
+  {
+    "script_id": 28,
+    "login_id": "tuwenhua0819",
+    "password": "TuwENhua0819Nm9$",
+    "name": "涂文華",
+    "email": "tuwenhua0819@gmail.com",
+    "phone_number": "0904-537-590",
+    "role": "seller"
+  },
+  {
+    "script_id": 29,
+    "login_id": "cengyuling0611",
+    "password": "CeNGyUlINg0611Cg8!",
+    "name": "曾玉玲",
+    "email": "cengyuling0611@gmail.com",
+    "phone_number": "0929-043-285",
+    "role": "seller"
+  },
+  {
+    "script_id": 30,
+    "login_id": "huangjialing0513",
+    "password": "HuAngjiAling0513Cl9@",
+    "name": "黃佳玲",
+    "email": "huangjialing0513@gmail.com",
+    "phone_number": "0951-618-722",
+    "role": "buyer"
+  },
+  {
+    "script_id": 31,
+    "login_id": "linbizhu0504",
+    "password": "LinBIZHu0504Tc1#",
+    "name": "林碧珠",
+    "email": "linbizhu0504@gmail.com",
+    "phone_number": "0989-383-940",
+    "role": "buyer"
+  },
+  {
+    "script_id": 32,
+    "login_id": "daishuhui0925",
+    "password": "DaIShUhUi0925Jq1!",
+    "name": "戴淑惠",
+    "email": "daishuhui0925@gmail.com",
+    "phone_number": "0958-618-307",
+    "role": "buyer"
+  },
+  {
+    "script_id": 33,
+    "login_id": "wulihua0308",
+    "password": "WULihUa0308Rs7!",
+    "name": "吳麗華",
+    "email": "wulihua0308@gmail.com",
+    "phone_number": "0926-219-999",
+    "role": "buyer"
+  },
+  {
+    "script_id": 34,
+    "login_id": "hongwenzhang0126",
+    "password": "HonGwenzhaNg0126Cl8@",
+    "name": "洪文章",
+    "email": "hongwenzhang0126@gmail.com",
+    "phone_number": "0932-429-686",
+    "role": "buyer"
+  },
+  {
+    "script_id": 35,
+    "login_id": "chenhuiling0416",
+    "password": "ChenhUILIng0416Tu2#",
+    "name": "陳慧玲",
+    "email": "chenhuiling0416@gmail.com",
+    "phone_number": "0980-006-885",
+    "role": "buyer"
+  },
+  {
+    "script_id": 36,
+    "login_id": "yanzhiming0423",
+    "password": "YanzhiMiNG0423Ub4#",
+    "name": "顏志明",
+    "email": "yanzhiming0423@gmail.com",
+    "phone_number": "0976-309-755",
+    "role": "seller"
+  },
+  {
+    "script_id": 37,
+    "login_id": "wushuhui0822",
+    "password": "WushUhuI0822Vk4_",
+    "name": "吳淑慧",
+    "email": "wushuhui0822@gmail.com",
+    "phone_number": "0995-808-498",
+    "role": "buyer"
+  },
+  {
+    "script_id": 38,
+    "login_id": "lvronghua0410",
+    "password": "LvroNgHUa0410Ia5$",
+    "name": "呂榮華",
+    "email": "lvronghua0410@gmail.com",
+    "phone_number": null,
+    "role": "buyer"
+  },
+  {
+    "script_id": 39,
+    "login_id": "chenyuee0125",
+    "password": "ChenyueE0125Wu9@",
+    "name": "陳月娥",
+    "email": "chenyuee0125@gmail.com",
+    "phone_number": "0960-907-333",
+    "role": "seller"
+  },
+  {
+    "script_id": 40,
+    "login_id": "linyuting1119",
+    "password": "LinyuTINg1119Eg7@",
+    "name": "林鈺婷",
+    "email": "linyuting1119@gmail.com",
+    "phone_number": "0972-835-433",
+    "role": "buyer"
+  },
+  {
+    "script_id": 41,
+    "login_id": "daimeihui0810",
+    "password": "DaiMeihUi0810Nq8#",
+    "name": "戴美慧",
+    "email": "daimeihui0810@gmail.com",
+    "phone_number": "0952-692-229",
+    "role": "buyer"
+  },
+  {
+    "script_id": 42,
+    "login_id": "chenmeifeng0317",
+    "password": "CHEnMeiFeNg0317Iu1!",
+    "name": "陳美鳳",
+    "email": "chenmeifeng0317@gmail.com",
+    "phone_number": "0985-731-818",
+    "role": "buyer"
+  },
+  {
+    "script_id": 43,
+    "login_id": "tangbiyun0502",
+    "password": "TAngbIyUN0502Rv3@",
+    "name": "唐碧雲",
+    "email": "tangbiyun0502@gmail.com",
+    "phone_number": "0906-001-578",
+    "role": "buyer"
+  },
+  {
+    "script_id": 44,
+    "login_id": "qianshumei0807",
+    "password": "QiaNSHumei0807Ie2$",
+    "name": "錢淑美",
+    "email": "qianshumei0807@gmail.com",
+    "phone_number": "0937-667-646",
+    "role": "buyer"
+  },
+  {
+    "script_id": 45,
+    "login_id": "chenminghui0125",
+    "password": "ChEnmingHuI0125Ic4#",
+    "name": "陳明輝",
+    "email": "chenminghui0125@gmail.com",
+    "phone_number": "0982-708-296",
+    "role": "buyer"
+  },
+  {
+    "script_id": 46,
+    "login_id": "huangxiufeng0112",
+    "password": "HuAngxIUfenG0112Mc7$",
+    "name": "黃秀鳳",
+    "email": "huangxiufeng0112@gmail.com",
+    "phone_number": "0960-563-434",
+    "role": "buyer"
+  },
+  {
+    "script_id": 47,
+    "login_id": "wuyating1104",
+    "password": "WuYaTiNG1104Ms1$",
+    "name": "吳雅婷",
+    "email": "wuyating1104@gmail.com",
+    "phone_number": "0952-848-671",
+    "role": "seller"
+  },
+  {
+    "script_id": 48,
+    "login_id": "wushichang1216",
+    "password": "WuSHiChaNG1216Iw5@",
+    "name": "吳世昌",
+    "email": "wushichang1216@gmail.com",
+    "phone_number": "0975-636-295",
+    "role": "buyer"
+  },
+  {
+    "script_id": 49,
+    "login_id": "shimeiyu0123",
+    "password": "ShImEIyU0123He3!",
+    "name": "施美玉",
+    "email": "shimeiyu0123@gmail.com",
+    "phone_number": "0930-675-780",
+    "role": "buyer"
+  },
+  {
+    "script_id": 50,
+    "login_id": "huangrenjie0806",
+    "password": "HUAngrenjiE0806Bl1_",
+    "name": "黃仁傑",
+    "email": "huangrenjie0806@gmail.com",
+    "phone_number": "0901-587-569",
+    "role": "buyer"
+  },
+  {
+    "script_id": 51,
+    "login_id": "chunichenmao8",
+    "password": "admin123456",
+    "name": "貓貓君",
+    "email": "chunichen2005@gmail.com",
+    "phone_number": null,
+    "role": "admin"
+  },
+  {
+    "script_id": 52,
+    "login_id": "jin_xin0816",
+    "password": "admin123456",
+    "name": "三金哥",
+    "email": "jin_xin0816@gmail.com",
+    "phone_number": null,
+    "role": "admin"
+  },
+  {
+    "script_id": 53,
+    "login_id": "huyujun0529",
+    "password": "admin123456",
+    "name": "浴巾",
+    "email": "huyujun0529@gmail.com",
+    "phone_number": null,
+    "role": "admin"
+  },
+  {
+    "script_id": 54,
+    "login_id": "tataowo",
+    "password": "admin123456",
+    "name": "TataOwO",
+    "email": "tataowo@gmail.com",
+    "phone_number": null,
+    "role": "admin"
+  },
+  {
+    "script_id": 55,
+    "login_id": "chillKai1006",
+    "password": "admin123456",
+    "name": "Quzz",
+    "email": "chillKai1006@gmail.com",
+    "phone_number": null,
+    "role": "admin"
+  }
+]

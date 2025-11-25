@@ -1,0 +1,130 @@
+[
+  {
+    "special_discount_id": 1,
+    "discount_id": 1,
+    "store_id": 2,
+    "product_type_id": 96,
+    "discount_rate": 0.0952,
+    "max_discount_amount": 300.0
+  },
+  {
+    "special_discount_id": 2,
+    "discount_id": 2,
+    "store_id": 14,
+    "product_type_id": 46,
+    "discount_rate": 0.3359,
+    "max_discount_amount": 100.0
+  },
+  {
+    "special_discount_id": 3,
+    "discount_id": 6,
+    "store_id": 1,
+    "product_type_id": 31,
+    "discount_rate": 0.4693,
+    "max_discount_amount": 100.0
+  },
+  {
+    "special_discount_id": 4,
+    "discount_id": 7,
+    "store_id": 12,
+    "product_type_id": 86,
+    "discount_rate": 0.4841,
+    "max_discount_amount": 300.0
+  },
+  {
+    "special_discount_id": 5,
+    "discount_id": 11,
+    "store_id": 6,
+    "product_type_id": 30,
+    "discount_rate": 0.1346,
+    "max_discount_amount": 100.0
+  },
+  {
+    "special_discount_id": 6,
+    "discount_id": 12,
+    "store_id": 13,
+    "product_type_id": 36,
+    "discount_rate": 0.4104,
+    "max_discount_amount": 300.0
+  },
+  {
+    "special_discount_id": 7,
+    "discount_id": 20,
+    "store_id": 11,
+    "product_type_id": 88,
+    "discount_rate": 0.2366,
+    "max_discount_amount": 100.0
+  },
+  {
+    "special_discount_id": 8,
+    "discount_id": 24,
+    "store_id": 9,
+    "product_type_id": 42,
+    "discount_rate": 0.398,
+    "max_discount_amount": 100.0
+  },
+  {
+    "special_discount_id": 9,
+    "discount_id": 27,
+    "store_id": 3,
+    "product_type_id": 72,
+    "discount_rate": 0.1801,
+    "max_discount_amount": null
+  },
+  {
+    "special_discount_id": 10,
+    "discount_id": 28,
+    "store_id": 9,
+    "product_type_id": 21,
+    "discount_rate": 0.4804,
+    "max_discount_amount": 300.0
+  },
+  {
+    "special_discount_id": 11,
+    "discount_id": 29,
+    "store_id": 5,
+    "product_type_id": 45,
+    "discount_rate": 0.2675,
+    "max_discount_amount": null
+  },
+  {
+    "special_discount_id": 12,
+    "discount_id": 33,
+    "store_id": 2,
+    "product_type_id": 45,
+    "discount_rate": 0.3174,
+    "max_discount_amount": 300.0
+  },
+  {
+    "special_discount_id": 13,
+    "discount_id": 34,
+    "store_id": 1,
+    "product_type_id": 172,
+    "discount_rate": 0.4811,
+    "max_discount_amount": null
+  },
+  {
+    "special_discount_id": 14,
+    "discount_id": 38,
+    "store_id": 10,
+    "product_type_id": 99,
+    "discount_rate": 0.351,
+    "max_discount_amount": 300.0
+  },
+  {
+    "special_discount_id": 15,
+    "discount_id": 39,
+    "store_id": 6,
+    "product_type_id": 172,
+    "discount_rate": 0.1171,
+    "max_discount_amount": 300.0
+  },
+  {
+    "special_discount_id": 16,
+    "discount_id": 40,
+    "store_id": 4,
+    "product_type_id": 168,
+    "discount_rate": 0.1889,
+    "max_discount_amount": 100.0
+  }
+]

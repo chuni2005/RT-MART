@@ -1,0 +1,106 @@
+[
+  {
+    "script_seller_id": 1,
+    "user_id": 4,
+    "bank_account_reference": "908-624118366053",
+    "verified": true,
+    "verified_at": "2024-11-15T14:23:45.000Z",
+    "verified_by": 51
+  },
+  {
+    "script_seller_id": 2,
+    "user_id": 5,
+    "bank_account_reference": "096-022189338871",
+    "verified": true,
+    "verified_at": "2024-10-28T09:12:33.000Z",
+    "verified_by": 52
+  },
+  {
+    "script_seller_id": 3,
+    "user_id": 8,
+    "bank_account_reference": "081-122578372799",
+    "verified": true,
+    "verified_at": "2024-12-03T16:45:12.000Z",
+    "verified_by": 53
+  },
+  {
+    "script_seller_id": 4,
+    "user_id": 9,
+    "bank_account_reference": "326-950256673217",
+    "verified": false
+  },
+  {
+    "script_seller_id": 5,
+    "user_id": 11,
+    "bank_account_reference": "476-635477968735",
+    "verified": true,
+    "verified_at": "2024-11-22T11:30:18.000Z",
+    "verified_by": 54
+  },
+  {
+    "script_seller_id": 6,
+    "user_id": 12,
+    "bank_account_reference": "330-684909137155",
+    "verified": true,
+    "verified_at": "2024-10-19T13:55:27.000Z",
+    "verified_by": 55
+  },
+  {
+    "script_seller_id": 7,
+    "user_id": 20,
+    "bank_account_reference": "973-954801859794",
+    "verified": true,
+    "verified_at": "2024-12-08T10:18:42.000Z",
+    "verified_by": 51
+  },
+  {
+    "script_seller_id": 8,
+    "user_id": 21,
+    "bank_account_reference": "566-217141163654",
+    "verified": false
+  },
+  {
+    "script_seller_id": 9,
+    "user_id": 23,
+    "bank_account_reference": "193-993460199702",
+    "verified": true,
+    "verified_at": "2024-11-05T15:42:09.000Z",
+    "verified_by": 52
+  },
+  {
+    "script_seller_id": 10,
+    "user_id": 28,
+    "bank_account_reference": "594-286479037154",
+    "verified": true,
+    "verified_at": "2024-10-12T08:27:56.000Z",
+    "verified_by": 53
+  },
+  {
+    "script_seller_id": 11,
+    "user_id": 29,
+    "bank_account_reference": "983-926218659633",
+    "verified": true,
+    "verified_at": "2024-11-30T12:14:33.000Z",
+    "verified_by": 54
+  },
+  {
+    "script_seller_id": 12,
+    "user_id": 36,
+    "bank_account_reference": "554-423683669974",
+    "verified": false
+  },
+  {
+    "script_seller_id": 13,
+    "user_id": 39,
+    "bank_account_reference": "172-102346210753",
+    "verified": true,
+    "verified_at": "2024-12-15T14:36:21.000Z",
+    "verified_by": 55
+  },
+  {
+    "script_seller_id": 14,
+    "user_id": 47,
+    "bank_account_reference": "467-668839048387",
+    "verified": false
+  }
+]

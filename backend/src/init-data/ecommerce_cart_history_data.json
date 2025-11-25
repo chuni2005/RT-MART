@@ -1,0 +1,162 @@
+[
+  {
+    "cart_history_id": 1,
+    "user_id": 35,
+    "cart_snapshot": "{\"items\": [{\"product_id\": 194, \"quantity\": 1, \"unit_price\": 779.86}]}",
+    "item_count": 1,
+    "order_ids": "[4]",
+    "created_at": "2025-09-08T04:00:13.881227"
+  },
+  {
+    "cart_history_id": 2,
+    "user_id": 42,
+    "cart_snapshot": "{\"items\": [{\"product_id\": 18, \"quantity\": 3, \"unit_price\": 1272.37}, {\"product_id\": 20, \"quantity\": 5, \"unit_price\": 1599.13}, {\"product_id\": 23, \"quantity\": 4, \"unit_price\": 1737.93}, {\"product_id\": 19, \"quantity\": 5, \"unit_price\": 750.03}]}",
+    "item_count": 4,
+    "order_ids": "[6]",
+    "created_at": "2025-07-23T04:00:13.881326"
+  },
+  {
+    "cart_history_id": 3,
+    "user_id": 25,
+    "cart_snapshot": "{\"items\": [{\"product_id\": 69, \"quantity\": 5, \"unit_price\": 434.01}, {\"product_id\": 67, \"quantity\": 4, \"unit_price\": 1456.64}]}",
+    "item_count": 2,
+    "order_ids": "[9]",
+    "created_at": "2025-07-08T04:00:13.881547"
+  },
+  {
+    "cart_history_id": 4,
+    "user_id": 7,
+    "cart_snapshot": "{\"items\": [{\"product_id\": 165, \"quantity\": 5, \"unit_price\": 303.89}, {\"product_id\": 163, \"quantity\": 4, \"unit_price\": 737.24}, {\"product_id\": 159, \"quantity\": 5, \"unit_price\": 373.76}, {\"product_id\": 161, \"quantity\": 5, \"unit_price\": 888.88}, {\"product_id\": 158, \"quantity\": 4, \"unit_price\": 260.77}]}",
+    "item_count": 5,
+    "order_ids": "[10]",
+    "created_at": "2024-11-26T04:00:13.881619"
+  },
+  {
+    "cart_history_id": 5,
+    "user_id": 46,
+    "cart_snapshot": "{\"items\": [{\"product_id\": 162, \"quantity\": 5, \"unit_price\": 449.43}]}",
+    "item_count": 1,
+    "order_ids": "[11]",
+    "created_at": "2025-04-01T04:00:13.881660"
+  },
+  {
+    "cart_history_id": 6,
+    "user_id": 33,
+    "cart_snapshot": "{\"items\": [{\"product_id\": 3, \"quantity\": 3, \"unit_price\": 920.19}, {\"product_id\": 14, \"quantity\": 3, \"unit_price\": 1796.01}, {\"product_id\": 12, \"quantity\": 3, \"unit_price\": 4435.59}, {\"product_id\": 9, \"quantity\": 5, \"unit_price\": 2425.14}, {\"product_id\": 2, \"quantity\": 2, \"unit_price\": 1593.21}]}",
+    "item_count": 5,
+    "order_ids": "[14]",
+    "created_at": "2025-01-25T04:00:13.881806"
+  },
+  {
+    "cart_history_id": 7,
+    "user_id": 10,
+    "cart_snapshot": "{\"items\": [{\"product_id\": 3, \"quantity\": 4, \"unit_price\": 888.65}, {\"product_id\": 9, \"quantity\": 2, \"unit_price\": 2327.76}, {\"product_id\": 10, \"quantity\": 3, \"unit_price\": 25522.12}, {\"product_id\": 7, \"quantity\": 3, \"unit_price\": 1504.61}]}",
+    "item_count": 4,
+    "order_ids": "[15]",
+    "created_at": "2024-12-10T04:00:13.881868"
+  },
+  {
+    "cart_history_id": 8,
+    "user_id": 24,
+    "cart_snapshot": "{\"items\": [{\"product_id\": 3, \"quantity\": 2, \"unit_price\": 816.5}, {\"product_id\": 4, \"quantity\": 4, \"unit_price\": 1400.9}]}",
+    "item_count": 2,
+    "order_ids": "[18]",
+    "created_at": "2024-11-26T04:00:13.882016"
+  },
+  {
+    "cart_history_id": 9,
+    "user_id": 35,
+    "cart_snapshot": "{\"items\": [{\"product_id\": 37, \"quantity\": 3, \"unit_price\": 619.81}, {\"product_id\": 26, \"quantity\": 1, \"unit_price\": 567.36}, {\"product_id\": 32, \"quantity\": 4, \"unit_price\": 2171.53}, {\"product_id\": 41, \"quantity\": 4, \"unit_price\": 1042.24}]}",
+    "item_count": 4,
+    "order_ids": "[20]",
+    "created_at": "2025-03-02T04:00:13.882111"
+  },
+  {
+    "cart_history_id": 10,
+    "user_id": 14,
+    "cart_snapshot": "{\"items\": [{\"product_id\": 59, \"quantity\": 1, \"unit_price\": 1358.96}]}",
+    "item_count": 1,
+    "order_ids": "[22]",
+    "created_at": "2025-10-06T04:00:13.882222"
+  },
+  {
+    "cart_history_id": 11,
+    "user_id": 7,
+    "cart_snapshot": "{\"items\": [{\"product_id\": 158, \"quantity\": 1, \"unit_price\": 287.91}, {\"product_id\": 159, \"quantity\": 2, \"unit_price\": 313.0}, {\"product_id\": 160, \"quantity\": 1, \"unit_price\": 1317.35}]}",
+    "item_count": 3,
+    "order_ids": "[23]",
+    "created_at": "2025-02-01T04:00:13.882275"
+  },
+  {
+    "cart_history_id": 12,
+    "user_id": 34,
+    "cart_snapshot": "{\"items\": [{\"product_id\": 18, \"quantity\": 3, \"unit_price\": 1355.09}, {\"product_id\": 22, \"quantity\": 2, \"unit_price\": 477.17}]}",
+    "item_count": 2,
+    "order_ids": "[24]",
+    "created_at": "2025-03-19T04:00:13.882327"
+  },
+  {
+    "cart_history_id": 13,
+    "user_id": 13,
+    "cart_snapshot": "{\"items\": [{\"product_id\": 45, \"quantity\": 4, \"unit_price\": 1853.43}, {\"product_id\": 48, \"quantity\": 5, \"unit_price\": 478.15}, {\"product_id\": 60, \"quantity\": 2, \"unit_price\": 1476.03}, {\"product_id\": 64, \"quantity\": 1, \"unit_price\": 3798.22}, {\"product_id\": 46, \"quantity\": 3, \"unit_price\": 804.01}]}",
+    "item_count": 5,
+    "order_ids": "[26]",
+    "created_at": "2024-11-24T04:00:13.882457"
+  },
+  {
+    "cart_history_id": 14,
+    "user_id": 24,
+    "cart_snapshot": "{\"items\": [{\"product_id\": 49, \"quantity\": 2, \"unit_price\": 1923.98}, {\"product_id\": 62, \"quantity\": 2, \"unit_price\": 3902.3}, {\"product_id\": 48, \"quantity\": 5, \"unit_price\": 493.91}, {\"product_id\": 61, \"quantity\": 5, \"unit_price\": 681.52}, {\"product_id\": 45, \"quantity\": 2, \"unit_price\": 1843.69}]}",
+    "item_count": 5,
+    "order_ids": "[29]",
+    "created_at": "2025-03-09T04:00:13.882624"
+  },
+  {
+    "cart_history_id": 15,
+    "user_id": 17,
+    "cart_snapshot": "{\"items\": [{\"product_id\": 100, \"quantity\": 3, \"unit_price\": 339.82}]}",
+    "item_count": 1,
+    "order_ids": "[33]",
+    "created_at": "2025-08-10T04:00:13.882794"
+  },
+  {
+    "cart_history_id": 16,
+    "user_id": 44,
+    "cart_snapshot": "{\"items\": [{\"product_id\": 193, \"quantity\": 2, \"unit_price\": 1515.64}, {\"product_id\": 195, \"quantity\": 4, \"unit_price\": 495.95}, {\"product_id\": 188, \"quantity\": 2, \"unit_price\": 21009.24}, {\"product_id\": 192, \"quantity\": 2, \"unit_price\": 2831.14}]}",
+    "item_count": 4,
+    "order_ids": "[38]",
+    "created_at": "2025-04-26T04:00:13.883163"
+  },
+  {
+    "cart_history_id": 17,
+    "user_id": 7,
+    "cart_snapshot": "{\"items\": [{\"product_id\": 184, \"quantity\": 1, \"unit_price\": 1505.46}, {\"product_id\": 186, \"quantity\": 2, \"unit_price\": 1138.63}, {\"product_id\": 185, \"quantity\": 1, \"unit_price\": 1237.93}, {\"product_id\": 180, \"quantity\": 2, \"unit_price\": 938.28}]}",
+    "item_count": 4,
+    "order_ids": "[42]",
+    "created_at": "2025-06-16T04:00:13.883388"
+  },
+  {
+    "cart_history_id": 18,
+    "user_id": 40,
+    "cart_snapshot": "{\"items\": [{\"product_id\": 132, \"quantity\": 3, \"unit_price\": 759.52}, {\"product_id\": 130, \"quantity\": 2, \"unit_price\": 1152.12}, {\"product_id\": 133, \"quantity\": 1, \"unit_price\": 354.0}, {\"product_id\": 122, \"quantity\": 1, \"unit_price\": 14556.76}]}",
+    "item_count": 4,
+    "order_ids": "[43]",
+    "created_at": "2024-12-05T04:00:13.883466"
+  },
+  {
+    "cart_history_id": 19,
+    "user_id": 31,
+    "cart_snapshot": "{\"items\": [{\"product_id\": 85, \"quantity\": 2, \"unit_price\": 316.02}, {\"product_id\": 88, \"quantity\": 4, \"unit_price\": 355.6}, {\"product_id\": 89, \"quantity\": 3, \"unit_price\": 721.09}, {\"product_id\": 80, \"quantity\": 2, \"unit_price\": 428.27}]}",
+    "item_count": 4,
+    "order_ids": "[45]",
+    "created_at": "2025-05-13T04:00:13.883561"
+  },
+  {
+    "cart_history_id": 20,
+    "user_id": 17,
+    "cart_snapshot": "{\"items\": [{\"product_id\": 165, \"quantity\": 3, \"unit_price\": 317.98}, {\"product_id\": 157, \"quantity\": 3, \"unit_price\": 1135.12}, {\"product_id\": 156, \"quantity\": 2, \"unit_price\": 551.74}, {\"product_id\": 158, \"quantity\": 5, \"unit_price\": 294.27}, {\"product_id\": 163, \"quantity\": 3, \"unit_price\": 746.33}]}",
+    "item_count": 5,
+    "order_ids": "[48]",
+    "created_at": "2025-05-17T04:00:13.883705"
+  }
+]

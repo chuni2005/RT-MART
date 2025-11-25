@@ -1,0 +1,42 @@
+[
+  {
+    "order_discount_id": 1,
+    "order_id": 3,
+    "discount_id": 13,
+    "discount_type": "seasonal",
+    "discount_amount": 50.0,
+    "applied_at": "2025-04-05T04:00:13.881189"
+  },
+  {
+    "order_discount_id": 2,
+    "order_id": 6,
+    "discount_id": 13,
+    "discount_type": "seasonal",
+    "discount_amount": 50.0,
+    "applied_at": "2025-07-23T04:00:13.881326"
+  },
+  {
+    "order_discount_id": 3,
+    "order_id": 9,
+    "discount_id": 21,
+    "discount_type": "seasonal",
+    "discount_amount": 50.0,
+    "applied_at": "2025-07-08T04:00:13.881547"
+  },
+  {
+    "order_discount_id": 4,
+    "order_id": 42,
+    "discount_id": 22,
+    "discount_type": "seasonal",
+    "discount_amount": 50.0,
+    "applied_at": "2025-06-16T04:00:13.883388"
+  },
+  {
+    "order_discount_id": 5,
+    "order_id": 45,
+    "discount_id": 21,
+    "discount_type": "seasonal",
+    "discount_amount": 50.0,
+    "applied_at": "2025-05-13T04:00:13.883561"
+  }
+]

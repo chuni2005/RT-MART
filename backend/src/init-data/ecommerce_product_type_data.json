@@ -1,0 +1,1213 @@
+[
+  {
+    "product_type_id": 1,
+    "type_code": "W_CLTH",
+    "type_name": "女生衣著",
+    "parent_type_id": null,
+    "is_active": true
+  },
+  {
+    "product_type_id": 2,
+    "type_code": "W_BAG",
+    "type_name": "女生包包/精品",
+    "parent_type_id": null,
+    "is_active": true
+  },
+  {
+    "product_type_id": 3,
+    "type_code": "BEAUTY",
+    "type_name": "美妝保健",
+    "parent_type_id": null,
+    "is_active": true
+  },
+  {
+    "product_type_id": 4,
+    "type_code": "M_CLTH",
+    "type_name": "男生衣著",
+    "parent_type_id": null,
+    "is_active": true
+  },
+  {
+    "product_type_id": 5,
+    "type_code": "M_ACC",
+    "type_name": "男生包包與配件",
+    "parent_type_id": null,
+    "is_active": true
+  },
+  {
+    "product_type_id": 6,
+    "type_code": "SHOES",
+    "type_name": "男女鞋",
+    "parent_type_id": null,
+    "is_active": true
+  },
+  {
+    "product_type_id": 7,
+    "type_code": "BABY_MOM",
+    "type_name": "嬰幼童與母親",
+    "parent_type_id": null,
+    "is_active": true
+  },
+  {
+    "product_type_id": 8,
+    "type_code": "SPORT",
+    "type_name": "運動/健身",
+    "parent_type_id": null,
+    "is_active": true
+  },
+  {
+    "product_type_id": 9,
+    "type_code": "PET",
+    "type_name": "寵物",
+    "parent_type_id": null,
+    "is_active": true
+  },
+  {
+    "product_type_id": 10,
+    "type_code": "GAME",
+    "type_name": "電玩遊戲",
+    "parent_type_id": null,
+    "is_active": true
+  },
+  {
+    "product_type_id": 11,
+    "type_code": "COMP_3C",
+    "type_name": "3C與筆電",
+    "parent_type_id": null,
+    "is_active": true
+  },
+  {
+    "product_type_id": 12,
+    "type_code": "MOBILE",
+    "type_name": "手機平板與周邊",
+    "parent_type_id": null,
+    "is_active": true
+  },
+  {
+    "product_type_id": 13,
+    "type_code": "HOME",
+    "type_name": "居家生活",
+    "parent_type_id": null,
+    "is_active": true
+  },
+  {
+    "product_type_id": 14,
+    "type_code": "FOOD",
+    "type_name": "美食、伴手禮",
+    "parent_type_id": null,
+    "is_active": true
+  },
+  {
+    "product_type_id": 15,
+    "type_code": "W_T_SHIRT",
+    "type_name": "T恤",
+    "parent_type_id": 1,
+    "is_active": true
+  },
+  {
+    "product_type_id": 16,
+    "type_code": "PANTS",
+    "type_name": "長褲",
+    "parent_type_id": 1,
+    "is_active": true
+  },
+  {
+    "product_type_id": 17,
+    "type_code": "PJ",
+    "type_name": "內睡衣",
+    "parent_type_id": 1,
+    "is_active": true
+  },
+  {
+    "product_type_id": 18,
+    "type_code": "JCKT",
+    "type_name": "外套",
+    "parent_type_id": 1,
+    "is_active": true
+  },
+  {
+    "product_type_id": 19,
+    "type_code": "SWEATER",
+    "type_name": "毛衣",
+    "parent_type_id": 1,
+    "is_active": true
+  },
+  {
+    "product_type_id": 20,
+    "type_code": "SUIT",
+    "type_name": "多件式套裝",
+    "parent_type_id": 1,
+    "is_active": true
+  },
+  {
+    "product_type_id": 21,
+    "type_code": "VEST",
+    "type_name": "背心",
+    "parent_type_id": 1,
+    "is_active": true
+  },
+  {
+    "product_type_id": 22,
+    "type_code": "HOODIE",
+    "type_name": "帽T",
+    "parent_type_id": 1,
+    "is_active": true
+  },
+  {
+    "product_type_id": 23,
+    "type_code": "SWIM",
+    "type_name": "泳裝",
+    "parent_type_id": 1,
+    "is_active": true
+  },
+  {
+    "product_type_id": 24,
+    "type_code": "SHORTS",
+    "type_name": "短褲",
+    "parent_type_id": 1,
+    "is_active": true
+  },
+  {
+    "product_type_id": 25,
+    "type_code": "DRESS",
+    "type_name": "洋裝",
+    "parent_type_id": 1,
+    "is_active": true
+  },
+  {
+    "product_type_id": 26,
+    "type_code": "SKIRT",
+    "type_name": "裙子",
+    "parent_type_id": 1,
+    "is_active": true
+  },
+  {
+    "product_type_id": 27,
+    "type_code": "TOP",
+    "type_name": "上衣類",
+    "parent_type_id": 1,
+    "is_active": true
+  },
+  {
+    "product_type_id": 28,
+    "type_code": "SHIRT",
+    "type_name": "襯衫",
+    "parent_type_id": 1,
+    "is_active": true
+  },
+  {
+    "product_type_id": 29,
+    "type_code": "LUXURY",
+    "type_name": "名牌精品包",
+    "parent_type_id": 2,
+    "is_active": true
+  },
+  {
+    "product_type_id": 30,
+    "type_code": "BPACK",
+    "type_name": "後背包",
+    "parent_type_id": 2,
+    "is_active": true
+  },
+  {
+    "product_type_id": 31,
+    "type_code": "HANDBAG",
+    "type_name": "手提包",
+    "parent_type_id": 2,
+    "is_active": true
+  },
+  {
+    "product_type_id": 32,
+    "type_code": "WALLET",
+    "type_name": "皮夾",
+    "parent_type_id": 2,
+    "is_active": true
+  },
+  {
+    "product_type_id": 33,
+    "type_code": "CROSS",
+    "type_name": "側背包",
+    "parent_type_id": 2,
+    "is_active": true
+  },
+  {
+    "product_type_id": 34,
+    "type_code": "W_LAPTOP_BAG",
+    "type_name": "電腦包",
+    "parent_type_id": 2,
+    "is_active": true
+  },
+  {
+    "product_type_id": 35,
+    "type_code": "MKUP",
+    "type_name": "彩妝",
+    "parent_type_id": 3,
+    "is_active": true
+  },
+  {
+    "product_type_id": 36,
+    "type_code": "SKIN",
+    "type_name": "清潔保養",
+    "parent_type_id": 3,
+    "is_active": true
+  },
+  {
+    "product_type_id": 37,
+    "type_code": "NAIL",
+    "type_name": "美甲",
+    "parent_type_id": 3,
+    "is_active": true
+  },
+  {
+    "product_type_id": 38,
+    "type_code": "M_SKIN",
+    "type_name": "男士保養",
+    "parent_type_id": 3,
+    "is_active": true
+  },
+  {
+    "product_type_id": 39,
+    "type_code": "TOOL",
+    "type_name": "美容工具",
+    "parent_type_id": 3,
+    "is_active": true
+  },
+  {
+    "product_type_id": 40,
+    "type_code": "HAIR",
+    "type_name": "美髮護理",
+    "parent_type_id": 3,
+    "is_active": true
+  },
+  {
+    "product_type_id": 41,
+    "type_code": "PRFM",
+    "type_name": "香水",
+    "parent_type_id": 3,
+    "is_active": true
+  },
+  {
+    "product_type_id": 42,
+    "type_code": "M_T_SHIRT",
+    "type_name": "T恤",
+    "parent_type_id": 4,
+    "is_active": true
+  },
+  {
+    "product_type_id": 43,
+    "type_code": "M_VEST",
+    "type_name": "背心",
+    "parent_type_id": 4,
+    "is_active": true
+  },
+  {
+    "product_type_id": 44,
+    "type_code": "M_SHORTS",
+    "type_name": "短褲",
+    "parent_type_id": 4,
+    "is_active": true
+  },
+  {
+    "product_type_id": 45,
+    "type_code": "M_JCKT",
+    "type_name": "外套",
+    "parent_type_id": 4,
+    "is_active": true
+  },
+  {
+    "product_type_id": 46,
+    "type_code": "M_PANTS",
+    "type_name": "長褲",
+    "parent_type_id": 4,
+    "is_active": true
+  },
+  {
+    "product_type_id": 47,
+    "type_code": "POLO",
+    "type_name": "Polo衫",
+    "parent_type_id": 4,
+    "is_active": true
+  },
+  {
+    "product_type_id": 48,
+    "type_code": "DENIM",
+    "type_name": "丹寧牛仔",
+    "parent_type_id": 4,
+    "is_active": true
+  },
+  {
+    "product_type_id": 49,
+    "type_code": "M_HOODIE",
+    "type_name": "帽T",
+    "parent_type_id": 4,
+    "is_active": true
+  },
+  {
+    "product_type_id": 50,
+    "type_code": "M_SWEATER",
+    "type_name": "毛衣",
+    "parent_type_id": 4,
+    "is_active": true
+  },
+  {
+    "product_type_id": 51,
+    "type_code": "M_SHIRT",
+    "type_name": "襯衫",
+    "parent_type_id": 4,
+    "is_active": true
+  },
+  {
+    "product_type_id": 52,
+    "type_code": "M_UW",
+    "type_name": "男性內著",
+    "parent_type_id": 4,
+    "is_active": true
+  },
+  {
+    "product_type_id": 53,
+    "type_code": "WATCH",
+    "type_name": "手錶",
+    "parent_type_id": 5,
+    "is_active": true
+  },
+  {
+    "product_type_id": 54,
+    "type_code": "LUX_ACC",
+    "type_name": "男仕精品包包配件",
+    "parent_type_id": 5,
+    "is_active": true
+  },
+  {
+    "product_type_id": 55,
+    "type_code": "JEWEL",
+    "type_name": "飾品",
+    "parent_type_id": 5,
+    "is_active": true
+  },
+  {
+    "product_type_id": 56,
+    "type_code": "SCARF",
+    "type_name": "圍巾",
+    "parent_type_id": 5,
+    "is_active": true
+  },
+  {
+    "product_type_id": 57,
+    "type_code": "GLOVE",
+    "type_name": "手套",
+    "parent_type_id": 5,
+    "is_active": true
+  },
+  {
+    "product_type_id": 58,
+    "type_code": "HAT",
+    "type_name": "帽子",
+    "parent_type_id": 5,
+    "is_active": true
+  },
+  {
+    "product_type_id": 59,
+    "type_code": "GLASS",
+    "type_name": "眼鏡",
+    "parent_type_id": 5,
+    "is_active": true
+  },
+  {
+    "product_type_id": 60,
+    "type_code": "BELT",
+    "type_name": "皮帶",
+    "parent_type_id": 5,
+    "is_active": true
+  },
+  {
+    "product_type_id": 61,
+    "type_code": "TIE",
+    "type_name": "領帶",
+    "parent_type_id": 5,
+    "is_active": true
+  },
+  {
+    "product_type_id": 62,
+    "type_code": "M_CROSS",
+    "type_name": "側背包",
+    "parent_type_id": 5,
+    "is_active": true
+  },
+  {
+    "product_type_id": 63,
+    "type_code": "BRIEF",
+    "type_name": "公事包",
+    "parent_type_id": 5,
+    "is_active": true
+  },
+  {
+    "product_type_id": 64,
+    "type_code": "M_BPACK",
+    "type_name": "後背包",
+    "parent_type_id": 5,
+    "is_active": true
+  },
+  {
+    "product_type_id": 65,
+    "type_code": "M_LAPTOP_BAG",
+    "type_name": "電腦包",
+    "parent_type_id": 5,
+    "is_active": true
+  },
+  {
+    "product_type_id": 66,
+    "type_code": "M_HANDBAG",
+    "type_name": "手提包",
+    "parent_type_id": 5,
+    "is_active": true
+  },
+  {
+    "product_type_id": 67,
+    "type_code": "PURSE",
+    "type_name": "錢包",
+    "parent_type_id": 5,
+    "is_active": true
+  },
+  {
+    "product_type_id": 68,
+    "type_code": "M_WALLET",
+    "type_name": "皮夾",
+    "parent_type_id": 5,
+    "is_active": true
+  },
+  {
+    "product_type_id": 69,
+    "type_code": "SOCKS",
+    "type_name": "襪子",
+    "parent_type_id": 5,
+    "is_active": true
+  },
+  {
+    "product_type_id": 70,
+    "type_code": "W_CASUAL",
+    "type_name": "女休閒鞋",
+    "parent_type_id": 6,
+    "is_active": true
+  },
+  {
+    "product_type_id": 71,
+    "type_code": "W_SLIPPER",
+    "type_name": "女涼拖鞋",
+    "parent_type_id": 6,
+    "is_active": true
+  },
+  {
+    "product_type_id": 72,
+    "type_code": "HEEL",
+    "type_name": "跟鞋",
+    "parent_type_id": 6,
+    "is_active": true
+  },
+  {
+    "product_type_id": 73,
+    "type_code": "WEDGE",
+    "type_name": "楔型鞋",
+    "parent_type_id": 6,
+    "is_active": true
+  },
+  {
+    "product_type_id": 74,
+    "type_code": "W_BOOT",
+    "type_name": "女靴",
+    "parent_type_id": 6,
+    "is_active": true
+  },
+  {
+    "product_type_id": 75,
+    "type_code": "SHOE_ACC",
+    "type_name": "鞋材用品",
+    "parent_type_id": 6,
+    "is_active": true
+  },
+  {
+    "product_type_id": 76,
+    "type_code": "M_CASUAL",
+    "type_name": "男休閒鞋",
+    "parent_type_id": 6,
+    "is_active": true
+  },
+  {
+    "product_type_id": 77,
+    "type_code": "M_SLIPPER",
+    "type_name": "男涼拖鞋",
+    "parent_type_id": 6,
+    "is_active": true
+  },
+  {
+    "product_type_id": 78,
+    "type_code": "LEATHER",
+    "type_name": "皮鞋",
+    "parent_type_id": 6,
+    "is_active": true
+  },
+  {
+    "product_type_id": 79,
+    "type_code": "M_BOOT",
+    "type_name": "男靴",
+    "parent_type_id": 6,
+    "is_active": true
+  },
+  {
+    "product_type_id": 80,
+    "type_code": "CLEAN",
+    "type_name": "清潔與護膚用品",
+    "parent_type_id": 7,
+    "is_active": true
+  },
+  {
+    "product_type_id": 81,
+    "type_code": "WIPE",
+    "type_name": "濕紙巾",
+    "parent_type_id": 7,
+    "is_active": true
+  },
+  {
+    "product_type_id": 82,
+    "type_code": "FEED",
+    "type_name": "哺育用品",
+    "parent_type_id": 7,
+    "is_active": true
+  },
+  {
+    "product_type_id": 83,
+    "type_code": "FOOD_SUP",
+    "type_name": "嬰幼童食品與保健",
+    "parent_type_id": 7,
+    "is_active": true
+  },
+  {
+    "product_type_id": 84,
+    "type_code": "TOY",
+    "type_name": "兒童玩具",
+    "parent_type_id": 7,
+    "is_active": true
+  },
+  {
+    "product_type_id": 85,
+    "type_code": "BOOK",
+    "type_name": "嬰幼童教具與童書",
+    "parent_type_id": 7,
+    "is_active": true
+  },
+  {
+    "product_type_id": 86,
+    "type_code": "FURN_BED",
+    "type_name": "嬰幼童傢俱/寢具",
+    "parent_type_id": 7,
+    "is_active": true
+  },
+  {
+    "product_type_id": 87,
+    "type_code": "SAFETY",
+    "type_name": "嬰幼兒居家防護",
+    "parent_type_id": 7,
+    "is_active": true
+  },
+  {
+    "product_type_id": 88,
+    "type_code": "KID_CLTH",
+    "type_name": "童裝",
+    "parent_type_id": 7,
+    "is_active": true
+  },
+  {
+    "product_type_id": 89,
+    "type_code": "KID_SHOE",
+    "type_name": "童鞋",
+    "parent_type_id": 7,
+    "is_active": true
+  },
+  {
+    "product_type_id": 90,
+    "type_code": "DIAPER",
+    "type_name": "嬰幼童紙尿褲",
+    "parent_type_id": 7,
+    "is_active": true
+  },
+  {
+    "product_type_id": 91,
+    "type_code": "MOM_CARE",
+    "type_name": "孕婦裝及用品",
+    "parent_type_id": 7,
+    "is_active": true
+  },
+  {
+    "product_type_id": 92,
+    "type_code": "BABY_CLTH",
+    "type_name": "嬰幼兒裝與配件",
+    "parent_type_id": 7,
+    "is_active": true
+  },
+  {
+    "product_type_id": 93,
+    "type_code": "ADULT_DP",
+    "type_name": "成人紙尿褲",
+    "parent_type_id": 7,
+    "is_active": true
+  },
+  {
+    "product_type_id": 94,
+    "type_code": "GEAR",
+    "type_name": "健身運動器材",
+    "parent_type_id": 8,
+    "is_active": true
+  },
+  {
+    "product_type_id": 95,
+    "type_code": "BALL",
+    "type_name": "球類運動",
+    "parent_type_id": 8,
+    "is_active": true
+  },
+  {
+    "product_type_id": 96,
+    "type_code": "APPAREL",
+    "type_name": "運動服飾",
+    "parent_type_id": 8,
+    "is_active": true
+  },
+  {
+    "product_type_id": 97,
+    "type_code": "SPORT_ACC",
+    "type_name": "運動配件",
+    "parent_type_id": 8,
+    "is_active": true
+  },
+  {
+    "product_type_id": 98,
+    "type_code": "EQUIP",
+    "type_name": "運動用品",
+    "parent_type_id": 8,
+    "is_active": true
+  },
+  {
+    "product_type_id": 99,
+    "type_code": "SUPP",
+    "type_name": "運動健身能量補給",
+    "parent_type_id": 8,
+    "is_active": true
+  },
+  {
+    "product_type_id": 100,
+    "type_code": "ATHLETIC",
+    "type_name": "運動鞋款",
+    "parent_type_id": 8,
+    "is_active": true
+  },
+  {
+    "product_type_id": 101,
+    "type_code": "SNEAKER",
+    "type_name": "運動休閒鞋款",
+    "parent_type_id": 8,
+    "is_active": true
+  },
+  {
+    "product_type_id": 102,
+    "type_code": "AQUA",
+    "type_name": "游泳及水類運動",
+    "parent_type_id": 8,
+    "is_active": true
+  },
+  {
+    "product_type_id": 103,
+    "type_code": "PET_FOOD",
+    "type_name": "其他寵物食品",
+    "parent_type_id": 9,
+    "is_active": true
+  },
+  {
+    "product_type_id": 104,
+    "type_code": "OUT",
+    "type_name": "外出用品",
+    "parent_type_id": 9,
+    "is_active": true
+  },
+  {
+    "product_type_id": 105,
+    "type_code": "PET_CLTH",
+    "type_name": "寵物服飾",
+    "parent_type_id": 9,
+    "is_active": true
+  },
+  {
+    "product_type_id": 106,
+    "type_code": "PET_SUP",
+    "type_name": "寵物營養保健品",
+    "parent_type_id": 9,
+    "is_active": true
+  },
+  {
+    "product_type_id": 107,
+    "type_code": "PET_TOY",
+    "type_name": "寵物玩具",
+    "parent_type_id": 9,
+    "is_active": true
+  },
+  {
+    "product_type_id": 108,
+    "type_code": "PET_SUPP",
+    "type_name": "寵物用品",
+    "parent_type_id": 9,
+    "is_active": true
+  },
+  {
+    "product_type_id": 109,
+    "type_code": "TREAT",
+    "type_name": "寵物零食",
+    "parent_type_id": 9,
+    "is_active": true
+  },
+  {
+    "product_type_id": 110,
+    "type_code": "AQUATIC",
+    "type_name": "水族相關",
+    "parent_type_id": 9,
+    "is_active": true
+  },
+  {
+    "product_type_id": 111,
+    "type_code": "DOG_FOOD",
+    "type_name": "狗飼料",
+    "parent_type_id": 9,
+    "is_active": true
+  },
+  {
+    "product_type_id": 112,
+    "type_code": "CAT_FOOD",
+    "type_name": "貓飼料",
+    "parent_type_id": 9,
+    "is_active": true
+  },
+  {
+    "product_type_id": 113,
+    "type_code": "BIRD",
+    "type_name": "鳥類相關",
+    "parent_type_id": 9,
+    "is_active": true
+  },
+  {
+    "product_type_id": 114,
+    "type_code": "RODENT",
+    "type_name": "鼠兔相關",
+    "parent_type_id": 9,
+    "is_active": true
+  },
+  {
+    "product_type_id": 115,
+    "type_code": "OTH_CON",
+    "type_name": "其他遊戲主機",
+    "parent_type_id": 10,
+    "is_active": true
+  },
+  {
+    "product_type_id": 116,
+    "type_code": "OTH_SW",
+    "type_name": "其他遊戲軟體",
+    "parent_type_id": 10,
+    "is_active": true
+  },
+  {
+    "product_type_id": 117,
+    "type_code": "NIN",
+    "type_name": "Nintendo (任天堂)",
+    "parent_type_id": 10,
+    "is_active": true
+  },
+  {
+    "product_type_id": 118,
+    "type_code": "PS",
+    "type_name": "PlayStation (索尼)",
+    "parent_type_id": 10,
+    "is_active": true
+  },
+  {
+    "product_type_id": 119,
+    "type_code": "XBOX",
+    "type_name": "XBOX (微軟)",
+    "parent_type_id": 10,
+    "is_active": true
+  },
+  {
+    "product_type_id": 120,
+    "type_code": "PC_GAME",
+    "type_name": "電腦遊戲",
+    "parent_type_id": 10,
+    "is_active": true
+  },
+  {
+    "product_type_id": 121,
+    "type_code": "GAME_ACC",
+    "type_name": "遊戲機周邊配件",
+    "parent_type_id": 10,
+    "is_active": true
+  },
+  {
+    "product_type_id": 122,
+    "type_code": "VIRTUAL",
+    "type_name": "虛擬點數",
+    "parent_type_id": 10,
+    "is_active": true
+  },
+  {
+    "product_type_id": 123,
+    "type_code": "LAPTOP_PC",
+    "type_name": "筆記型電腦",
+    "parent_type_id": 11,
+    "is_active": true
+  },
+  {
+    "product_type_id": 124,
+    "type_code": "HEADSET",
+    "type_name": "耳機",
+    "parent_type_id": 11,
+    "is_active": true
+  },
+  {
+    "product_type_id": 125,
+    "type_code": "SPEAKER",
+    "type_name": "喇叭",
+    "parent_type_id": 11,
+    "is_active": true
+  },
+  {
+    "product_type_id": 126,
+    "type_code": "MIC",
+    "type_name": "麥克風",
+    "parent_type_id": 11,
+    "is_active": true
+  },
+  {
+    "product_type_id": 127,
+    "type_code": "MONITOR",
+    "type_name": "螢幕顯示器",
+    "parent_type_id": 11,
+    "is_active": true
+  },
+  {
+    "product_type_id": 128,
+    "type_code": "KB_MOUSE",
+    "type_name": "鍵盤滑鼠",
+    "parent_type_id": 11,
+    "is_active": true
+  },
+  {
+    "product_type_id": 129,
+    "type_code": "LENS",
+    "type_name": "鏡頭",
+    "parent_type_id": 11,
+    "is_active": true
+  },
+  {
+    "product_type_id": 130,
+    "type_code": "PC_ACC",
+    "type_name": "電腦周邊配件",
+    "parent_type_id": 11,
+    "is_active": true
+  },
+  {
+    "product_type_id": 131,
+    "type_code": "PC_PART",
+    "type_name": "電腦零組件",
+    "parent_type_id": 11,
+    "is_active": true
+  },
+  {
+    "product_type_id": 132,
+    "type_code": "DESKTOP",
+    "type_name": "桌上型電腦",
+    "parent_type_id": 11,
+    "is_active": true
+  },
+  {
+    "product_type_id": 133,
+    "type_code": "STORAGE",
+    "type_name": "儲存裝置",
+    "parent_type_id": 11,
+    "is_active": true
+  },
+  {
+    "product_type_id": 134,
+    "type_code": "CAMERA",
+    "type_name": "相機",
+    "parent_type_id": 11,
+    "is_active": true
+  },
+  {
+    "product_type_id": 135,
+    "type_code": "CAM_ACC",
+    "type_name": "相機周邊配件",
+    "parent_type_id": 11,
+    "is_active": true
+  },
+  {
+    "product_type_id": 136,
+    "type_code": "AND_CASE",
+    "type_name": "Android保護殼",
+    "parent_type_id": 12,
+    "is_active": true
+  },
+  {
+    "product_type_id": 137,
+    "type_code": "AND_PRO",
+    "type_name": "Android保護貼",
+    "parent_type_id": 12,
+    "is_active": true
+  },
+  {
+    "product_type_id": 138,
+    "type_code": "CABLE",
+    "type_name": "充電傳輸與轉接相關設備",
+    "parent_type_id": 12,
+    "is_active": true
+  },
+  {
+    "product_type_id": 139,
+    "type_code": "AND_DEV",
+    "type_name": "Android空機",
+    "parent_type_id": 12,
+    "is_active": true
+  },
+  {
+    "product_type_id": 140,
+    "type_code": "APPLE_DEV",
+    "type_name": "Apple空機",
+    "parent_type_id": 12,
+    "is_active": true
+  },
+  {
+    "product_type_id": 141,
+    "type_code": "IPH_CASE",
+    "type_name": "iPhone保護殼",
+    "parent_type_id": 12,
+    "is_active": true
+  },
+  {
+    "product_type_id": 142,
+    "type_code": "TAB_ACC",
+    "type_name": "平板周邊",
+    "parent_type_id": 12,
+    "is_active": true
+  },
+  {
+    "product_type_id": 143,
+    "type_code": "TABLET",
+    "type_name": "平板電腦",
+    "parent_type_id": 12,
+    "is_active": true
+  },
+  {
+    "product_type_id": 144,
+    "type_code": "PHOTO_ACC",
+    "type_name": "拍照周邊",
+    "parent_type_id": 12,
+    "is_active": true
+  },
+  {
+    "product_type_id": 145,
+    "type_code": "WEARABLE",
+    "type_name": "穿戴裝置",
+    "parent_type_id": 12,
+    "is_active": true
+  },
+  {
+    "product_type_id": 146,
+    "type_code": "POWERBANK",
+    "type_name": "行動電源",
+    "parent_type_id": 12,
+    "is_active": true
+  },
+  {
+    "product_type_id": 147,
+    "type_code": "SPKR",
+    "type_name": "手機喇叭",
+    "parent_type_id": 12,
+    "is_active": true
+  },
+  {
+    "product_type_id": 148,
+    "type_code": "MBL_ACC",
+    "type_name": "手機周邊配件",
+    "parent_type_id": 12,
+    "is_active": true
+  },
+  {
+    "product_type_id": 149,
+    "type_code": "IPH_PRO",
+    "type_name": "iPhone保護貼",
+    "parent_type_id": 12,
+    "is_active": true
+  },
+  {
+    "product_type_id": 150,
+    "type_code": "AROMA",
+    "type_name": "居家香氛",
+    "parent_type_id": 13,
+    "is_active": true
+  },
+  {
+    "product_type_id": 151,
+    "type_code": "KETTLE_CUP",
+    "type_name": "水壺/杯子",
+    "parent_type_id": 13,
+    "is_active": true
+  },
+  {
+    "product_type_id": 152,
+    "type_code": "ORG",
+    "type_name": "收納",
+    "parent_type_id": 13,
+    "is_active": true
+  },
+  {
+    "product_type_id": 153,
+    "type_code": "KITCHEN",
+    "type_name": "餐廚",
+    "parent_type_id": 13,
+    "is_active": true
+  },
+  {
+    "product_type_id": 154,
+    "type_code": "BATH",
+    "type_name": "浴室",
+    "parent_type_id": 13,
+    "is_active": true
+  },
+  {
+    "product_type_id": 155,
+    "type_code": "LIGHT",
+    "type_name": "燈具",
+    "parent_type_id": 13,
+    "is_active": true
+  },
+  {
+    "product_type_id": 156,
+    "type_code": "HOLIDAY_PARTY",
+    "type_name": "節慶/派對用品",
+    "parent_type_id": 13,
+    "is_active": true
+  },
+  {
+    "product_type_id": 157,
+    "type_code": "STATION",
+    "type_name": "文具",
+    "parent_type_id": 13,
+    "is_active": true
+  },
+  {
+    "product_type_id": 158,
+    "type_code": "HARDW",
+    "type_name": "五金修繕",
+    "parent_type_id": 13,
+    "is_active": true
+  },
+  {
+    "product_type_id": 159,
+    "type_code": "POWER_T",
+    "type_name": "電動工具",
+    "parent_type_id": 13,
+    "is_active": true
+  },
+  {
+    "product_type_id": 160,
+    "type_code": "SOFA_BED",
+    "type_name": "沙發/沙發床",
+    "parent_type_id": 13,
+    "is_active": true
+  },
+  {
+    "product_type_id": 161,
+    "type_code": "FURN",
+    "type_name": "傢俱",
+    "parent_type_id": 13,
+    "is_active": true
+  },
+  {
+    "product_type_id": 162,
+    "type_code": "GARDEN",
+    "type_name": "園藝植作",
+    "parent_type_id": 13,
+    "is_active": true
+  },
+  {
+    "product_type_id": 163,
+    "type_code": "BEDDING",
+    "type_name": "寢具",
+    "parent_type_id": 13,
+    "is_active": true
+  },
+  {
+    "product_type_id": 164,
+    "type_code": "HOME_SAFETY",
+    "type_name": "居家防護",
+    "parent_type_id": 13,
+    "is_active": true
+  },
+  {
+    "product_type_id": 165,
+    "type_code": "DAILY",
+    "type_name": "日用品",
+    "parent_type_id": 13,
+    "is_active": true
+  },
+  {
+    "product_type_id": 166,
+    "type_code": "DECOR",
+    "type_name": "居家裝飾",
+    "parent_type_id": 13,
+    "is_active": true
+  },
+  {
+    "product_type_id": 167,
+    "type_code": "PRO_FOOD",
+    "type_name": "食品",
+    "parent_type_id": 14,
+    "is_active": true
+  },
+  {
+    "product_type_id": 168,
+    "type_code": "INSTANT",
+    "type_name": "沖泡品",
+    "parent_type_id": 14,
+    "is_active": true
+  },
+  {
+    "product_type_id": 169,
+    "type_code": "DELIVERY",
+    "type_name": "美食外送",
+    "parent_type_id": 14,
+    "is_active": true
+  },
+  {
+    "product_type_id": 170,
+    "type_code": "SNACK",
+    "type_name": "休閒零食",
+    "parent_type_id": 14,
+    "is_active": true
+  },
+  {
+    "product_type_id": 171,
+    "type_code": "IMP_SNACK",
+    "type_name": "進口零食",
+    "parent_type_id": 14,
+    "is_active": true
+  },
+  {
+    "product_type_id": 172,
+    "type_code": "STREET",
+    "type_name": "小吃",
+    "parent_type_id": 14,
+    "is_active": true
+  },
+  {
+    "product_type_id": 173,
+    "type_code": "FRESH",
+    "type_name": "生鮮食品",
+    "parent_type_id": 14,
+    "is_active": true
+  }
+]
