@@ -13,10 +13,10 @@ import type { Response, Request } from 'express';
 import { AuthService } from './auth.service';
 import { RegisterDto } from './dto/register.dto';
 import { LoginDto } from './dto/login.dto';
-import { AuthResponseDto, AuthTokenResponseDto } from './dto/auth-response.dto';
+import { AuthTokenResponseDto } from './dto/auth-response.dto';
 import { plainToInstance } from 'class-transformer';
 import { JwtAccessGuard, JwtRefreshGuard } from './guards/jwt-auth.guard';
-import type { AuthRequest } from '../common/types';
+import type { AuthRequest, CookieRequest } from '../common/types/request.types';
 
 @Controller('auth')
 @UseInterceptors(ClassSerializerInterceptor)
@@ -55,10 +55,13 @@ export class AuthController {
 
   @Post('refresh')
   async refresh(
-    @Req() req: AuthRequest,
+    @Req() req: CookieRequest,
     @Res({ passthrough: true }) res: Response,
   ) {
     const refreshToken = req.cookies['refreshToken'];
+    if (!refreshToken) {
+      throw new Error('Refresh token not found');
+    }
     const result = await this.authService.refreshTokens(refreshToken);
 
     res.cookie('accessToken', result.accessToken, {
@@ -79,7 +82,10 @@ export class AuthController {
 
   @UseGuards(JwtRefreshGuard)
   @Post('logout')
-  async logout(@Req() req: Request, @Res({ passthrough: true }) res: Response) {
+  async logout(
+    @Req() req: CookieRequest,
+    @Res({ passthrough: true }) res: Response,
+  ) {
     const refreshToken = req.cookies['refreshToken'];
     if (refreshToken) {
       await this.authService.logout(refreshToken);

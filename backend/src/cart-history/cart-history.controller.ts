@@ -1,7 +1,7 @@
 import { Controller, Get, Param, Query, UseGuards, Req } from '@nestjs/common';
 import { CartHistoryService } from './cart-history.service';
 import { JwtAccessGuard } from '../auth/guards/jwt-auth.guard';
-import type { AuthRequest } from '../common/types';
+import type { AuthRequest } from '../common/types/request.types';
 
 @Controller('cart-history')
 @UseGuards(JwtAccessGuard)

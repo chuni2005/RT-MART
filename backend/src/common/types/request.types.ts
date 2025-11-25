@@ -2,11 +2,17 @@ import { Request } from 'express';
 import { UserRole } from '../../users/entities/user.entity';
 
 export interface AuthenticatedUser {
-  id: string;
+  userId: string;
   loginId: string;
   role: UserRole;
 }
 
-export interface AuthRequest extends Request {
+export interface CookieRequest extends Request {
+  cookies: {
+    [key: string]: string;
+  };
+}
+
+export interface AuthRequest extends CookieRequest {
   user: AuthenticatedUser;
 }
