@@ -1,7 +1,7 @@
 import { useNavigate } from 'react-router-dom';
 import styles from './Home.module.scss';
 import ProductCard from '../../shared/components/ProductCard/ProductCard';
-import Hero from '../../shared/components/Hero/Hero';
+import Hero from './components/Hero/Hero';
 
 interface Banner {
   id: number;

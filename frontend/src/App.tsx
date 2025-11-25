@@ -1,9 +1,9 @@
 import { BrowserRouter as Router, Routes, Route, useLocation } from "react-router-dom";
 import { AuthProvider } from "./shared/contexts/AuthContext";
 import Header from "./shared/components/Header";
-import Home from "./pages/Home/Home";
-import Auth from "./pages/Auth/Auth";
-import ProductDetail from "./pages/Product/ProductDetail";
+import Home from "./pages/Home";
+import Auth from "./pages/Auth";
+import ProductDetail from "./pages/Product";
 import "./shared/lib/iconLibrary";
 
 // Header Wrapper Component to handle conditional rendering
