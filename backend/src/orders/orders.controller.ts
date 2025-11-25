@@ -23,13 +23,13 @@ export class OrdersController {
 
   @Post()
   async create(@Req() req: AuthRequest, @Body() createDto: CreateOrderDto) {
-    const userId = req.user.userId as string;
+    const userId = req.user.userId;
     return await this.ordersService.create(userId, createDto);
   }
 
   @Get()
   async findAll(@Req() req: AuthRequest, @Query() queryDto: QueryOrderDto) {
-    const userId = req.user.userId as string;
+    const userId = req.user.userId;
     const { data, total } = await this.ordersService.findAll(userId, queryDto);
     return {
       data,
@@ -41,7 +41,7 @@ export class OrdersController {
 
   @Get(':id')
   async findOne(@Req() req: AuthRequest, @Param('id') id: string) {
-    const userId = req.user.userId as string;
+    const userId = req.user.userId;
     return await this.ordersService.findOne(id, userId);
   }
 
@@ -51,13 +51,13 @@ export class OrdersController {
     @Param('id') id: string,
     @Body() updateDto: UpdateOrderStatusDto,
   ) {
-    const userId = req.user.userId as string;
+    const userId = req.user.userId;
     return await this.ordersService.updateStatus(id, userId, updateDto);
   }
 
   @Post(':id/cancel')
   async cancelOrder(@Req() req: AuthRequest, @Param('id') id: string) {
-    const userId = req.user.userId as string;
+    const userId = req.user.userId;
     return await this.ordersService.cancelOrder(id, userId);
   }
 
