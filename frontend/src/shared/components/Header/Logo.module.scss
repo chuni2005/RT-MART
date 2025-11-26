@@ -22,5 +22,35 @@
     font-weight: 700;
     color: $primary-color;
     letter-spacing: 0.05em;
+    white-space: nowrap;
+  }
+}
+
+// Responsive
+@media (max-width: $tablet) {
+  .logo {
+    order: 0;
+
+    img {
+      height: 2rem;
+    }
+
+    .text {
+      font-size: 1.25rem;
+    }
+  }
+}
+
+@media (max-width: $mobile) {
+  .logo {
+    gap: $spacing-xs;
+
+    img {
+      height: 1.75rem;
+    }
+
+    .text {
+      display: none;
+    }
   }
 }

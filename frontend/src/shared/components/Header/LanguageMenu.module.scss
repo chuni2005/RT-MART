@@ -1,42 +1,21 @@
-// Language Menu (自訂下拉選單)
+// Language Menu - LanguageMenu 組件的自訂樣式
+// 透過 classNames prop 傳遞給 Select 組件
 @use "sass:color";
 
-.languageMenu {
-  display: flex;
-  align-items: center;
-  gap: $spacing-xs;
-  position: relative;
-}
-
+// Prefix Icon - globe 圖標
 .icon {
   font-size: $font-md;
   color: inherit;
-  pointer-events: none;
-  flex-shrink: 0;
 }
 
-.selectWrapper {
-  position: relative;
-  display: flex;
-  align-items: center;
-}
-
-.select {
+// Trigger Button - 觸發按鈕
+.trigger {
   background: transparent;
   border: none;
   color: inherit;
-  cursor: pointer;
-  font-size: $font-sm;
-  font-family: inherit;
   padding: $spacing-xs $spacing-md $spacing-xs $spacing-xs;
-  outline: none;
-  border-radius: $border-radius-md;
-  transition: $transition-fast;
   min-width: 100px;
-  display: flex;
-  align-items: center;
-  justify-content: space-between;
-  gap: $spacing-xs;
+  font-size: $font-xs;
 
   &:hover {
     background-color: rgba(0, 0, 0, 0.05);
@@ -49,65 +28,22 @@
 }
 
 .chevron {
-  font-size: $font-sm;
+  font-size: $font-xs;
   color: inherit;
-  transition: transform $duration-fast ease;
-  flex-shrink: 0;
 }
 
-.chevronOpen {
-  transform: rotate(180deg);
-}
-
-// Dropdown 下拉選單
 .dropdown {
-  position: absolute;
-  top: calc(100% + $spacing-xs);
   right: 0;
-  background-color: $bg-secondary;
-  border: 1px solid $border-color;
-  border-radius: $border-radius-md;
-  box-shadow: $shadow-lg;
   min-width: 140px;
   max-width: 200px;
-  z-index: $z-index-dropdown;
-  overflow: hidden;
-  list-style: none;
-  padding: 0;
-  margin: 0;
-  animation: fadeIn $duration-fast ease;
 }
 
-@keyframes fadeIn {
-  from {
-    opacity: 0;
-    transform: translateY(-4px);
-  }
-  to {
-    opacity: 1;
-    transform: translateY(0);
-  }
-}
-
-// Option 選項
+// Option - 選項
 .option {
-  display: block;
-  width: 100%;
   padding: $spacing-sm $spacing-md;
-  text-align: left;
-  background: transparent;
-  color: $text-primary;
-  cursor: pointer;
-  transition: $transition-fast;
-  font-size: $font-sm;
-  border: none;
+  font-size: $font-xs;
 
   &:hover {
-    background-color: $bg-tertiary;
-  }
-
-  &:focus {
-    outline: none;
     background-color: $bg-tertiary;
   }
 
@@ -116,6 +52,7 @@
   }
 }
 
+// Active Option - 已選中的選項
 .optionActive {
   background-color: $bg-tertiary;
   color: $primary-color;
@@ -126,38 +63,40 @@
   }
 }
 
-// TopBar 變體（白色文字）
-.topbar {
-  .icon {
-    color: white;
+// Responsive
+@media (max-width: $tablet) {
+  .trigger {
+    min-width: 80px;
+    font-size: $font-xs;
+    padding: $spacing-xs $spacing-sm $spacing-xs $spacing-xs;
   }
 
-  .select {
-    color: white;
-    border-radius: $border-radius-md;
-
-    &:hover {
-      background-color: rgba(255, 255, 255, 0.1);
-    }
-
-    &:focus {
-      outline-color: white;
-    }
+  .dropdown {
+    min-width: 120px;
   }
 
-  .chevron {
-    color: white;
+  .option {
+    padding: $spacing-xs $spacing-sm;
+    font-size: $font-xs;
   }
 }
 
-// Default 變體（一般文字顏色）
-.default {
-  .select {
-    padding: $spacing-xs $spacing-md $spacing-xs $spacing-xs;
-    border-radius: $border-radius-md;
+@media (max-width: $mobile) {
+  .icon {
+    font-size: $font-sm;
+  }
 
-    &:hover {
-      background-color: $bg-tertiary;
-    }
+  .trigger {
+    min-width: 70px;
+    padding: 2px $spacing-xs;
+  }
+
+  .chevron {
+    font-size: $font-xs;
+  }
+
+  .dropdown {
+    min-width: 100px;
+    max-width: 140px;
   }
 }

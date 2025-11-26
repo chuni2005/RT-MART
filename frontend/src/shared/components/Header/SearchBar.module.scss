@@ -48,5 +48,30 @@
   .searchForm {
     width: 100%;
     max-width: none;
+    order: 2;
+    flex-basis: 100%;
+  }
+
+  .searchInput {
+    padding: 8px $spacing-sm;
+  }
+
+  .searchButton {
+    padding: 0 $spacing-md;
+  }
+}
+
+@media (max-width: $mobile) {
+  .searchForm {
+    flex-basis: 100%;
+  }
+
+  .searchInput {
+    font-size: $font-xs;
+    padding: 8px $spacing-sm;
+  }
+
+  .searchButton {
+    padding: 0 12px;
   }
 }

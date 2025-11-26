@@ -1,0 +1,120 @@
+.productInfo {
+  display: flex;
+  flex-direction: column;
+  gap: $spacing-xs;
+  width: 100%;
+}
+
+// 商品名稱
+.productName {
+  font-size: $font-2xl;
+  font-weight: 600;
+  color: $text-primary;
+  line-height: 1.4;
+  margin: 0;
+
+  @include mobile {
+    font-size: $font-xl;
+  }
+}
+
+// 評價統計列
+.statsRow {
+  display: flex;
+  align-items: center;
+  gap: $spacing-md;
+  flex-wrap: wrap;
+}
+
+.statItem {
+  display: flex;
+  align-items: center;
+  gap: $spacing-xs;
+}
+
+.statValue {
+  font-size: $font-md;
+  font-weight: 600;
+  color: $primary-color;
+}
+
+.statLabel {
+  font-size: $font-sm;
+  color: $text-secondary;
+  text-decoration: underline;
+}
+
+.stars {
+  display: flex;
+  gap: 2px;
+}
+
+.starFilled {
+  color: $primary-color;
+  font-size: $font-sm;
+}
+
+.starEmpty {
+  color: $border-color;
+  font-size: $font-sm;
+}
+
+.divider {
+  color: $border-color;
+  font-size: $font-sm;
+}
+
+// 價格區
+.priceSection {
+  padding: $spacing-md;
+  background-color: $bg-secondary;
+  border-radius: $border-radius-md;
+}
+
+.priceContainer {
+  display: flex;
+  align-items: center;
+  gap: $spacing-md;
+  flex-wrap: wrap;
+}
+
+.currentPrice {
+  font-size: $font-3xl;
+  font-weight: 700;
+  color: $primary-color;
+
+  @include mobile {
+    font-size: $font-2xl;
+  }
+}
+
+.originalPrice {
+  font-size: $font-lg;
+  color: $text-secondary;
+  text-decoration: line-through;
+
+  @include mobile {
+    font-size: $font-md;
+  }
+}
+
+.discountBadge {
+  display: inline-block;
+  background-color: $primary-color;
+  color: $text-white;
+  padding: $spacing-xs $spacing-sm;
+  border-radius: $border-radius-sm;
+  font-size: $font-sm;
+  font-weight: 600;
+}
+
+// 響應式調整
+@include mobile {
+  .productInfo {
+    gap: $spacing-md;
+  }
+
+  .priceSection {
+    padding: $spacing-md;
+  }
+}

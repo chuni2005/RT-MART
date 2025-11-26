@@ -1,0 +1,326 @@
+// Select Component Styles
+@use "sass:color";
+
+.select {
+  display: flex;
+  align-items: center;
+  position: relative;
+  gap: $spacing-xs;
+}
+
+// 前置圖示
+.prefixIcon {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  color: inherit;
+  pointer-events: none;
+  flex-shrink: 0;
+
+  .icon {
+    font-size: $font-md;
+  }
+}
+
+// 選擇按鈕
+.trigger {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: $spacing-sm;
+  background: $bg-secondary;
+  border: 1px solid $border-color;
+  border-radius: $border-radius-md;
+  color: $text-primary;
+  cursor: pointer;
+  font-size: $font-md;
+  font-family: inherit;
+  padding: $spacing-sm $spacing-md;
+  min-width: 120px;
+  outline: none;
+  transition: $transition-fast;
+
+  &:hover:not(:disabled) {
+    border-color: $text-tertiary;
+  }
+
+  &:focus {
+    border-color: $primary-color;
+    box-shadow: 0 0 0 3px rgba(238, 77, 45, 0.1);
+  }
+
+  &:disabled {
+    background: $bg-tertiary;
+    cursor: not-allowed;
+    opacity: 0.6;
+  }
+}
+
+.value {
+  flex: 1;
+  text-align: left;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+
+// Chevron 箭頭
+.chevron {
+  font-size: $font-sm;
+  color: $text-tertiary;
+  transition: transform $duration-fast ease;
+  flex-shrink: 0;
+}
+
+.chevronOpen {
+  transform: rotate(180deg);
+}
+
+// 下拉選單
+.dropdown {
+  position: absolute;
+  top: calc(100% + $spacing-xs);
+  left: 0;
+  right: 0;
+  background-color: $bg-secondary;
+  border: 1px solid $border-color;
+  border-radius: $border-radius-md;
+  box-shadow: $shadow-lg;
+  min-width: 100%;
+  max-height: 240px;
+  overflow-y: auto;
+  z-index: $z-index-dropdown;
+  list-style: none;
+  padding: $spacing-xs 0;
+  margin: 0;
+  animation: fadeIn $duration-fast ease;
+}
+
+@keyframes fadeIn {
+  from {
+    opacity: 0;
+    transform: translateY(-4px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+// 選項
+.option {
+  display: block;
+  width: 100%;
+  padding: $spacing-sm $spacing-md;
+  text-align: left;
+  background: transparent;
+  color: $text-primary;
+  cursor: pointer;
+  transition: $transition-fast;
+  font-size: $font-md;
+  border: none;
+
+  &:hover {
+    background-color: $bg-tertiary;
+  }
+}
+
+.optionFocused {
+  background-color: $bg-tertiary;
+}
+
+.optionActive {
+  background-color: rgba(238, 77, 45, 0.08);
+  color: $primary-color;
+  font-weight: 600;
+
+  &:hover,
+  &.optionFocused {
+    background-color: rgba(238, 77, 45, 0.12);
+  }
+}
+
+// ==================
+// Variant: default
+// ==================
+.default {
+  .trigger {
+    padding: $spacing-sm $spacing-md;
+    min-width: 140px;
+  }
+}
+
+// ==================
+// Variant: compact
+// ==================
+.compact {
+  .trigger {
+    padding: $spacing-xs $spacing-sm;
+    min-width: 100px;
+    font-size: $font-sm;
+  }
+
+  .dropdown {
+    font-size: $font-sm;
+    max-height: none;
+  }
+
+  .option {
+    padding: $spacing-xs $spacing-sm;
+    font-size: $font-sm;
+  }
+}
+
+// ==================
+// Variant: topbar (白色文字)
+// ==================
+.topbar {
+  .prefixIcon {
+    color: white;
+
+    .icon {
+      color: white;
+    }
+  }
+
+  .trigger {
+    background: transparent;
+    border: none;
+    color: white;
+    min-width: 100px;
+    padding: $spacing-xs $spacing-sm;
+
+    &:hover:not(:disabled) {
+      background-color: rgba(255, 255, 255, 0.1);
+    }
+
+    &:focus {
+      outline: 2px solid white;
+      outline-offset: 2px;
+      box-shadow: none;
+    }
+  }
+
+  .chevron {
+    color: white;
+  }
+
+  .dropdown {
+    background-color: $bg-secondary;
+    color: $text-primary;
+    min-width: 140px;
+  }
+}
+
+// ==================
+// Disabled 狀態
+// ==================
+.disabled {
+  opacity: 0.6;
+  cursor: not-allowed;
+
+  .trigger {
+    pointer-events: none;
+  }
+}
+
+// ==================
+// Open 狀態
+// ==================
+.open {
+  .trigger {
+    border-color: $primary-color;
+  }
+
+  &.topbar .trigger {
+    border-color: transparent;
+    background-color: rgba(255, 255, 255, 0.1);
+  }
+}
+
+// ==================
+// Responsive
+// ==================
+@media (max-width: $tablet) {
+  .trigger {
+    min-width: 100px;
+    font-size: $font-sm;
+    padding: $spacing-xs $spacing-sm;
+  }
+
+  .dropdown {
+    max-height: 200px;
+  }
+
+  .option {
+    padding: $spacing-xs $spacing-sm;
+    font-size: $font-sm;
+  }
+}
+
+@media (max-width: $mobile) {
+  .select {
+    gap: 2px;
+  }
+
+  .prefixIcon .icon {
+    font-size: $font-sm;
+  }
+
+  .trigger {
+    min-width: 80px;
+    padding: 2px $spacing-xs;
+    font-size: $font-xs;
+  }
+
+  .chevron {
+    font-size: $font-xs;
+  }
+
+  .dropdown {
+    max-height: 180px;
+  }
+
+  .option {
+    padding: 2px $spacing-xs;
+    font-size: $font-xs;
+  }
+}
+
+// ==================
+// Dark mode
+// ==================
+[data-theme="dark"] {
+  .trigger {
+    background: $bg-primary;
+    border-color: rgba(255, 255, 255, 0.1);
+
+    &:focus {
+      border-color: $primary-color;
+    }
+  }
+
+  .dropdown {
+    background-color: $bg-primary;
+    border-color: rgba(255, 255, 255, 0.1);
+  }
+
+  .option {
+    &:hover {
+      background-color: rgba(255, 255, 255, 0.05);
+    }
+  }
+
+  .optionFocused {
+    background-color: rgba(255, 255, 255, 0.05);
+  }
+
+  .optionActive {
+    background-color: rgba(238, 77, 45, 0.15);
+
+    &:hover,
+    &.optionFocused {
+      background-color: rgba(238, 77, 45, 0.2);
+    }
+  }
+}

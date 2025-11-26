@@ -15,3 +15,20 @@
     justify-content: space-between;
   }
 }
+
+// Responsive
+@media (max-width: $tablet) {
+  .headerB {
+    padding: $spacing-sm 0;
+  }
+}
+
+@media (max-width: $mobile) {
+  .headerB {
+    padding: $spacing-sm 0;
+
+    .container {
+      padding: 0 $spacing-sm;
+    }
+  }
+}

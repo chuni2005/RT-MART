@@ -76,15 +76,17 @@
 @media (max-width: $tablet) {
   .mainBar {
     padding: $spacing-sm 0;
-  }
 
-  .mainBarContent {
-    flex-wrap: wrap;
-    justify-content: center;
+    .mainBarContent {
+      flex-wrap: wrap;
+      gap: $spacing-sm;
+    }
   }
 
   .rightSection {
-    order: 2;
+    gap: $spacing-sm;
+    order: 1;
+    margin-left: auto;
   }
 }
 
@@ -92,6 +94,28 @@
   .mainBar {
     .container {
       padding: 0 $spacing-sm;
+    }
+
+    .mainBarContent {
+      flex-wrap: wrap;
+      gap: $spacing-sm;
+    }
+  }
+
+  .rightSection {
+    order: 1;
+    gap: $spacing-xs;
+    margin-left: auto;
+  }
+
+  .cartButton {
+    width: 36px;
+    height: 36px;
+
+    .badge {
+      font-size: 10px;
+      padding: 1px 4px;
+      min-width: 16px;
     }
   }
 }

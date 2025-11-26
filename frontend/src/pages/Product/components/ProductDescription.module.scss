@@ -1,0 +1,181 @@
+@use "sass:color";
+
+.productDescription {
+  display: flex;
+  flex-direction: column;
+  gap: $spacing-xl;
+}
+
+// 商品規格區塊
+.specificationsSection {
+  padding: $spacing-lg;
+  background-color: $card-bg;
+  border: 1px solid $border-color;
+  border-radius: $border-radius-md;
+}
+
+.sectionTitle {
+  font-size: $font-lg;
+  font-weight: 600;
+  color: $text-primary;
+  margin: 0 0 $spacing-md 0;
+  padding-bottom: $spacing-sm;
+  border-bottom: 1px solid $border-color;
+}
+
+// 規格列表
+.specificationsList {
+  display: flex;
+  flex-direction: column;
+  gap: $spacing-md;
+}
+
+.specItem {
+  display: flex;
+  align-items: flex-start;
+  gap: $spacing-md;
+  padding: $spacing-sm 0;
+  font-size: $font-md;
+  line-height: 1.6;
+
+  &:not(:last-child) {
+    border-bottom: 1px solid color.adjust($border-color, $lightness: 5%);
+  }
+}
+
+.specLabel {
+  min-width: 120px;
+  font-weight: 500;
+  color: $text-secondary;
+  flex-shrink: 0;
+}
+
+.specValue {
+  flex: 1;
+  color: $text-primary;
+
+  // 庫存數量顏色顯示
+  &.normalStock {
+    color: $success-color;
+    font-weight: 600;
+  }
+
+  &.lowStock {
+    color: $warning-color;
+    font-weight: 600;
+  }
+
+  &.outOfStockValue {
+    color: $error-color;
+    font-weight: 700;
+  }
+}
+
+.lowStockWarning {
+  font-size: $font-sm;
+  color: $warning-color;
+  font-weight: 500;
+}
+
+.outOfStock {
+  font-size: $font-sm;
+  color: $error-color;
+  font-weight: 700;
+}
+
+// 商品描述區
+.descriptionSection {
+  padding: $spacing-lg;
+  background-color: $card-bg;
+  border: 1px solid $border-color;
+  border-radius: $border-radius-md;
+}
+
+.descriptionContent {
+  font-size: $font-md;
+  line-height: 1.8;
+  color: $text-secondary;
+  transition: max-height 0.3s ease;
+  overflow: hidden;
+
+  p {
+    margin: 0;
+    white-space: pre-wrap;
+    word-wrap: break-word;
+  }
+
+  &.collapsed {
+    max-height: 4.5em;
+    position: relative;
+
+    &::after {
+      content: '';
+      position: absolute;
+      bottom: 0;
+      left: 0;
+      right: 0;
+      height: 2em;
+      background: linear-gradient(to bottom, transparent, $card-bg);
+    }
+  }
+
+  &.expanded {
+    max-height: none;
+  }
+}
+
+// 展開/收合按鈕
+.toggleButton {
+  margin-top: $spacing-md;
+  align-self: flex-start;
+  background: none;
+  border: none;
+  color: $primary-color;
+  font-size: $font-md;
+  font-weight: 500;
+  cursor: pointer;
+  padding: $spacing-sm 0;
+  display: flex;
+  align-items: center;
+  gap: $spacing-xs;
+  @include transition;
+
+  &:hover {
+    color: $primary-hover;
+    transform: translateX(4px);
+  }
+
+  svg {
+    font-size: $font-sm;
+  }
+}
+
+// 響應式調整
+@include mobile {
+  .productDescription {
+    gap: $spacing-md;
+  }
+
+  .specificationsSection,
+  .descriptionSection {
+    padding: $spacing-md;
+  }
+
+  .sectionTitle {
+    font-size: $font-md;
+  }
+
+  .specItem {
+    flex-direction: column;
+    gap: $spacing-xs;
+  }
+
+  .specLabel {
+    min-width: auto;
+    font-weight: 600;
+  }
+
+  .descriptionContent {
+    font-size: $font-sm;
+  }
+}

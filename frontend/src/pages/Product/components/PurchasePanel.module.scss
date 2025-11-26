@@ -1,0 +1,155 @@
+.purchasePanel {
+  display: flex;
+  flex-direction: column;
+  gap: $spacing-lg;
+  padding: $spacing-xl;
+  background-color: $bg-secondary;
+  border: 1px solid $border-color;
+  border-radius: $border-radius-lg;
+  box-shadow: $box-shadow-sm;
+  position: sticky;
+  top: $spacing-lg;
+
+  @include mobile {
+    position: static;
+    padding: $spacing-lg;
+    gap: $spacing-md;
+  }
+}
+
+.alertContainer {
+}
+
+// 數量選擇區
+.quantitySection {
+  display: flex;
+  flex-direction: column;
+  gap: $spacing-sm;
+}
+
+.quantityLabel {
+  font-size: $font-md;
+  font-weight: 600;
+  color: $text-primary;
+}
+
+.quantitySelector {
+  display: flex;
+  align-items: center;
+  gap: 0;
+  width: fit-content;
+  border: 1px solid $border-color;
+  border-radius: $border-radius-md;
+  overflow: hidden;
+}
+
+.quantityButton {
+  width: 40px;
+  height: 40px;
+  @include flex-center;
+  background-color: $bg-secondary;
+  border: none;
+  cursor: pointer;
+  transition: all 0.3s ease;
+  color: $text-secondary;
+
+  &:hover:not(:disabled) {
+    background-color: $bg-primary;
+    color: $primary-color;
+  }
+
+  &:disabled {
+    cursor: not-allowed;
+    opacity: 0.5;
+  }
+
+  svg {
+    font-size: $font-sm;
+  }
+}
+
+.quantityInput {
+  width: 60px;
+  height: 40px;
+  text-align: center;
+  border: none;
+  border-left: 1px solid $border-color;
+  border-right: 1px solid $border-color;
+  font-size: $font-md;
+  font-weight: 500;
+  color: $text-primary;
+  outline: none;
+
+  // 移除數字輸入框的上下箭頭
+  &::-webkit-inner-spin-button,
+  &::-webkit-outer-spin-button {
+    -webkit-appearance: none;
+    margin: 0;
+  }
+
+  &[type="number"] {
+    -moz-appearance: textfield;
+  }
+}
+
+.stockHint {
+  font-size: $font-sm;
+  color: $text-secondary;
+}
+
+// 操作按鈕區
+.actionButtons {
+  display: flex;
+  flex-direction: row;
+  gap: $spacing-md;
+
+  @include mobile {
+    flex-direction: column;
+  }
+}
+
+.addToCartButton {
+  flex: 1;
+  font-weight: 600;
+
+  @include mobile {
+    order: 2;
+  }
+}
+
+.buyNowButton {
+  flex: 1;
+  font-weight: 600;
+
+  @include mobile {
+    order: 1;
+  }
+}
+
+// 庫存不足提示
+.outOfStockNotice {
+  padding: $spacing-md;
+  background-color: rgba($error-color, 0.1);
+  border: 1px solid $error-color;
+  border-radius: $border-radius-md;
+  text-align: center;
+  font-size: $font-md;
+  font-weight: 600;
+  color: $error-color;
+}
+
+// 響應式調整
+@include mobile {
+  .quantitySelector {
+    width: 100%;
+  }
+
+  .quantityButton {
+    flex: 0 0 40px;
+  }
+
+  .quantityInput {
+    flex: 1;
+    width: auto;
+  }
+}

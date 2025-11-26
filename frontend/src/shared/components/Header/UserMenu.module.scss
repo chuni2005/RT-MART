@@ -89,3 +89,44 @@
     }
   }
 }
+
+// Responsive
+@media (max-width: $tablet) {
+  .userButton {
+    width: 36px;
+    height: 36px;
+  }
+
+  .dropdown {
+    min-width: 200px;
+  }
+}
+
+@media (max-width: $mobile) {
+  .userButton {
+    width: 32px;
+    height: 32px;
+  }
+
+  .dropdown {
+    position: fixed;
+    top: auto;
+    right: $spacing-sm;
+    left: $spacing-sm;
+    min-width: auto;
+    max-width: none;
+  }
+
+  .userInfo {
+    padding: $spacing-sm;
+  }
+
+  .userInfoRow {
+    font-size: $font-xs;
+  }
+
+  .dropdownItem {
+    padding: 10px $spacing-sm;
+    font-size: $font-xs;
+  }
+}

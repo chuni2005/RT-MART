@@ -60,3 +60,59 @@
 .spacer {
   flex: 1;
 }
+
+// Responsive
+@media (max-width: $desktop) {
+  .topBar {
+    .topBarLinks {
+      gap: $spacing-md;
+    }
+  }
+
+  .mainBar {
+    .mainBarContent {
+      gap: $spacing-md;
+    }
+  }
+}
+
+@media (max-width: $tablet) {
+  .topBar {
+    .topBarLinks {
+      gap: $spacing-sm;
+      font-size: $font-xs;
+    }
+  }
+
+  .mainBar {
+    padding: $spacing-sm 0;
+
+    .mainBarContent {
+      gap: $spacing-sm;
+    }
+  }
+}
+
+@media (max-width: $mobile) {
+  .topBar {
+    padding: $spacing-xs 0;
+
+    .container {
+      padding: 0 $spacing-sm;
+    }
+
+    .topBarLinks {
+      gap: $spacing-xs;
+    }
+  }
+
+  .mainBar {
+    .container {
+      padding: 0 $spacing-sm;
+    }
+
+    .mainBarContent {
+      gap: $spacing-xs;
+    }
+  }
+}

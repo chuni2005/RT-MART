@@ -1,0 +1,130 @@
+.storeSection {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: $spacing-lg;
+  background-color: $card-bg;
+  border: 1px solid $border-color;
+  border-radius: $border-radius-md;
+  gap: $spacing-lg;
+
+  @include mobile {
+    flex-direction: column;
+    align-items: flex-start;
+    gap: $spacing-md;
+  }
+}
+
+.storeInfo {
+  display: flex;
+  align-items: center;
+  gap: $spacing-lg;
+
+  @include mobile {
+    width: 100%;
+  }
+}
+
+.storeAvatar {
+  width: 80px;
+  height: 80px;
+  border-radius: 50%;
+  overflow: hidden;
+  background-color: $bg-secondary;
+  @include flex-center;
+  flex-shrink: 0;
+  border: 2px solid $border-color;
+
+  img {
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+  }
+
+  svg {
+    font-size: $font-3xl;
+    color: $text-secondary;
+  }
+
+  @include mobile {
+    width: 60px;
+    height: 60px;
+
+    svg {
+      font-size: $font-2xl;
+    }
+  }
+}
+
+.storeDetails {
+  display: flex;
+  flex-direction: column;
+  gap: $spacing-xs;
+}
+
+.storeName {
+  font-size: $font-lg;
+  font-weight: 600;
+  color: $text-primary;
+  margin: 0;
+
+  @include mobile {
+    font-size: $font-md;
+  }
+}
+
+.storeStats {
+  display: flex;
+  align-items: center;
+  gap: $spacing-sm;
+  font-size: $font-sm;
+  color: $text-secondary;
+
+  @include mobile {
+    font-size: $font-xs;
+  }
+}
+
+.statItem {
+  display: flex;
+  align-items: center;
+  gap: $spacing-xs;
+
+  strong {
+    color: $text-primary;
+    font-weight: 600;
+  }
+}
+
+.starIcon {
+  color: $warning-color;
+  font-size: $font-xs;
+}
+
+.divider {
+  color: $border-color;
+}
+
+.joinDate {
+  font-size: $font-sm;
+  color: $text-tertiary;
+
+  @include mobile {
+    font-size: $font-xs;
+  }
+}
+
+.storeAction {
+  flex-shrink: 0;
+
+  @include mobile {
+    width: 100%;
+  }
+}
+
+// 覆蓋 Button 樣式
+.viewStoreBtn {
+  @include mobile {
+    width: 100%;
+  }
+}

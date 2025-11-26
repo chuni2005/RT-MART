@@ -1,0 +1,399 @@
+.reviewSection {
+  display: flex;
+  flex-direction: column;
+  gap: $spacing-lg;
+  padding: $spacing-lg;
+  background-color: $card-bg;
+  border: 1px solid $border-color;
+  border-radius: $border-radius-md;
+}
+
+.sectionTitle {
+  font-size: $font-xl;
+  font-weight: 600;
+  color: $text-primary;
+  margin: 0;
+  padding-bottom: $spacing-sm;
+  border-bottom: 2px solid $primary-color;
+}
+
+// 評價統計區
+.statisticsSection {
+  display: flex;
+  gap: $spacing-xl;
+  padding: $spacing-lg;
+  background-color: $bg-secondary;
+  border-radius: $border-radius-md;
+
+  @include mobile {
+    flex-direction: column;
+    gap: $spacing-lg;
+  }
+}
+
+.averageRating {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  min-width: 120px;
+}
+
+.averageValue {
+  font-size: $font-4xl;
+  font-weight: 700;
+  color: $primary-color;
+}
+
+.averageMax {
+  font-size: $font-md;
+  color: $text-secondary;
+}
+
+.averageStars {
+  display: flex;
+  gap: 2px;
+  margin-top: $spacing-xs;
+}
+
+.starFilled {
+  color: $warning-color;
+  font-size: $font-md;
+}
+
+.starEmpty {
+  color: $border-color;
+  font-size: $font-md;
+}
+
+.ratingDistribution {
+  flex: 1;
+  display: flex;
+  flex-direction: column;
+  gap: $spacing-sm;
+}
+
+.distributionRow {
+  display: flex;
+  align-items: center;
+  gap: $spacing-sm;
+}
+
+.starLabel {
+  width: 40px;
+  font-size: $font-sm;
+  color: $text-secondary;
+}
+
+.progressBar {
+  flex: 1;
+  height: 8px;
+  background-color: $border-color;
+  border-radius: 4px;
+  overflow: hidden;
+}
+
+.progressFill {
+  height: 100%;
+  background-color: $primary-color;
+  border-radius: 4px;
+  transition: width 0.3s ease;
+}
+
+.countLabel {
+  width: 30px;
+  font-size: $font-sm;
+  color: $text-secondary;
+  text-align: right;
+}
+
+// 篩選區
+.filterSection {
+  display: flex;
+  gap: $spacing-lg;
+  flex-wrap: wrap;
+}
+
+.filterGroup {
+  display: flex;
+  align-items: center;
+  gap: $spacing-sm;
+
+  label {
+    font-size: $font-sm;
+    color: $text-secondary;
+  }
+
+  select {
+    padding: $spacing-xs $spacing-sm;
+    border: 1px solid $border-color;
+    border-radius: $border-radius-sm;
+    font-size: $font-sm;
+    color: $text-primary;
+    background-color: $card-bg;
+    cursor: pointer;
+    @include transition;
+
+    &:focus {
+      outline: none;
+      border-color: $primary-color;
+    }
+
+    &:hover {
+      border-color: $primary-color;
+    }
+  }
+}
+
+// 評價列表
+.reviewList {
+  display: flex;
+  flex-direction: column;
+  gap: $spacing-md;
+}
+
+.emptyReview {
+  text-align: center;
+  padding: $spacing-xl;
+  color: $text-secondary;
+  font-size: $font-md;
+}
+
+.reviewCard {
+  padding: $spacing-lg;
+  border: 1px solid $border-color;
+  border-radius: $border-radius-md;
+  background-color: $bg-primary;
+
+  @include mobile {
+    padding: $spacing-md;
+  }
+}
+
+.reviewHeader {
+  display: flex;
+  gap: $spacing-md;
+  margin-bottom: $spacing-md;
+}
+
+.userAvatar {
+  width: 48px;
+  height: 48px;
+  border-radius: 50%;
+  overflow: hidden;
+  background-color: $bg-secondary;
+  @include flex-center;
+  flex-shrink: 0;
+
+  img {
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+  }
+
+  svg {
+    font-size: $font-xl;
+    color: $text-secondary;
+  }
+
+  @include mobile {
+    width: 40px;
+    height: 40px;
+
+    svg {
+      font-size: $font-lg;
+    }
+  }
+}
+
+.userInfo {
+  display: flex;
+  flex-direction: column;
+  gap: $spacing-xs;
+}
+
+.userName {
+  font-size: $font-md;
+  font-weight: 600;
+  color: $text-primary;
+}
+
+.reviewMeta {
+  display: flex;
+  align-items: center;
+  gap: $spacing-md;
+}
+
+.reviewStars {
+  display: flex;
+  gap: 2px;
+
+  svg {
+    font-size: $font-sm;
+  }
+}
+
+.reviewDate {
+  font-size: $font-sm;
+  color: $text-tertiary;
+}
+
+.reviewContent {
+  font-size: $font-md;
+  line-height: 1.6;
+  color: $text-secondary;
+  margin: 0 0 $spacing-md;
+  white-space: pre-wrap;
+  word-wrap: break-word;
+}
+
+// 評論圖片
+.reviewImages {
+  display: flex;
+  gap: $spacing-sm;
+  flex-wrap: wrap;
+}
+
+.reviewImageThumb {
+  width: 80px;
+  height: 80px;
+  border-radius: $border-radius-sm;
+  overflow: hidden;
+  cursor: pointer;
+  border: 1px solid $border-color;
+  @include transition;
+
+  &:hover {
+    border-color: $primary-color;
+    transform: scale(1.05);
+  }
+
+  img {
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+  }
+
+  @include mobile {
+    width: 60px;
+    height: 60px;
+  }
+}
+
+// 載入更多
+.loadMore {
+  display: flex;
+  justify-content: center;
+  padding-top: $spacing-md;
+}
+
+// Lightbox
+.lightbox {
+  position: fixed;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  background-color: rgba(0, 0, 0, 0.9);
+  z-index: $z-index-modal;
+  @include flex-center;
+  cursor: pointer;
+}
+
+.closeButton {
+  position: absolute;
+  top: $spacing-lg;
+  right: $spacing-lg;
+  background-color: rgba(255, 255, 255, 0.1) !important;
+  color: $text-white !important;
+  border: none !important;
+  width: 48px;
+  height: 48px;
+  border-radius: 50%;
+  @include flex-center;
+  cursor: pointer;
+  @include transition;
+
+  &:hover {
+    background-color: rgba(255, 255, 255, 0.2) !important;
+  }
+
+  svg {
+    font-size: $font-xl;
+  }
+}
+
+.lightboxNavButton {
+  position: absolute;
+  top: 50%;
+  transform: translateY(-50%);
+  background-color: rgba(255, 255, 255, 0.1) !important;
+  color: $text-white !important;
+  border: none !important;
+  width: 48px;
+  height: 48px;
+  border-radius: 50%;
+  @include flex-center;
+  cursor: pointer;
+  @include transition;
+
+  &:hover {
+    background-color: rgba(255, 255, 255, 0.2) !important;
+  }
+
+  svg {
+    font-size: $font-xl;
+  }
+}
+
+.lightboxNavButtonLeft {
+  left: $spacing-lg;
+}
+
+.lightboxNavButtonRight {
+  right: $spacing-lg;
+}
+
+.lightboxImage {
+  max-width: 90%;
+  max-height: 90%;
+
+  img {
+    max-width: 100%;
+    max-height: 90vh;
+    object-fit: contain;
+    border-radius: $border-radius-md;
+  }
+}
+
+.lightboxCounter {
+  position: absolute;
+  bottom: $spacing-lg;
+  left: 50%;
+  transform: translateX(-50%);
+  color: $text-white;
+  font-size: $font-md;
+  background-color: rgba(0, 0, 0, 0.5);
+  padding: $spacing-xs $spacing-md;
+  border-radius: $border-radius-sm;
+}
+
+// 響應式
+@include mobile {
+  .reviewSection {
+    padding: $spacing-md;
+    gap: $spacing-md;
+  }
+
+  .sectionTitle {
+    font-size: $font-lg;
+  }
+
+  .statisticsSection {
+    padding: $spacing-md;
+  }
+
+  .averageValue {
+    font-size: $font-3xl;
+  }
+}
