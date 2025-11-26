@@ -1,11 +1,11 @@
-import { useState } from 'react';
-import { useNavigate } from 'react-router-dom';
-import styles from './PurchasePanel.module.scss';
-import Button from '../../../shared/components/Button/Button';
-import Alert from '../../../shared/components/Alert/Alert';
-import Icon from '../../../shared/components/Icon/Icon';
-import { useAuth } from '../../../shared/hooks/useAuth';
-import { Product } from '@/types';
+import { useState } from "react";
+import { useNavigate } from "react-router-dom";
+import styles from "./PurchasePanel.module.scss";
+import Button from "@/shared/components/Button/Button";
+import Alert from "@/shared/components/Alert/Alert";
+import Icon from "@/shared/components/Icon/Icon";
+import { useAuth } from "@/shared/hooks/useAuth";
+import { Product } from "@/types";
 
 interface PurchasePanelProps {
   stock: number;
@@ -14,7 +14,7 @@ interface PurchasePanelProps {
 }
 
 interface AlertState {
-  type: 'success' | 'error' | 'warning' | 'info';
+  type: "success" | "error" | "warning" | "info";
   message: string;
 }
 
@@ -26,7 +26,8 @@ function PurchasePanel({ stock, productId, productData }: PurchasePanelProps) {
 
   // 增加數量
   const handleIncrease = () => {
-    const numQuantity = typeof quantity === 'string' ? parseInt(quantity, 10) : quantity;
+    const numQuantity =
+      typeof quantity === "string" ? parseInt(quantity, 10) : quantity;
     if (numQuantity < stock) {
       setQuantity(numQuantity + 1);
     }
@@ -34,7 +35,8 @@ function PurchasePanel({ stock, productId, productData }: PurchasePanelProps) {
 
   // 減少數量
   const handleDecrease = () => {
-    const numQuantity = typeof quantity === 'string' ? parseInt(quantity, 10) : quantity;
+    const numQuantity =
+      typeof quantity === "string" ? parseInt(quantity, 10) : quantity;
     if (numQuantity > 1) {
       setQuantity(numQuantity - 1);
     }
@@ -45,8 +47,8 @@ function PurchasePanel({ stock, productId, productData }: PurchasePanelProps) {
     const value = e.target.value;
 
     // 允許空值（用戶可能正在輸入）
-    if (value === '') {
-      setQuantity('');
+    if (value === "") {
+      setQuantity("");
       return;
     }
 
@@ -61,7 +63,7 @@ function PurchasePanel({ stock, productId, productData }: PurchasePanelProps) {
       setQuantity(1);
     } else if (numValue > stock) {
       setQuantity(stock);
-      showAlert('error', `最多只能購買 ${stock} 件`);
+      showAlert("error", `最多只能購買 ${stock} 件`);
     } else {
       setQuantity(numValue);
     }
@@ -70,14 +72,15 @@ function PurchasePanel({ stock, productId, productData }: PurchasePanelProps) {
   // 輸入框失去焦點時的處理
   const handleInputBlur = () => {
     // 如果是空值，設定為1
-    const numValue = typeof quantity === 'string' ? parseInt(quantity, 10) : quantity;
-    if (quantity === '' || isNaN(numValue) || numValue < 1) {
+    const numValue =
+      typeof quantity === "string" ? parseInt(quantity, 10) : quantity;
+    if (quantity === "" || isNaN(numValue) || numValue < 1) {
       setQuantity(1);
     }
   };
 
   // 顯示 Alert 提示
-  const showAlert = (type: AlertState['type'], message: string) => {
+  const showAlert = (type: AlertState["type"], message: string) => {
     setAlert({ type, message });
     setTimeout(() => {
       setAlert(null);
@@ -88,13 +91,13 @@ function PurchasePanel({ stock, productId, productData }: PurchasePanelProps) {
   const handleAddToCart = () => {
     // 檢查是否登入
     if (!isAuthenticated) {
-      navigate('/auth', { state: { from: `/product/${productId}` } });
+      navigate("/auth", { state: { from: `/product/${productId}` } });
       return;
     }
 
     // 檢查庫存
     if (stock === 0) {
-      showAlert('error', '商品已售完');
+      showAlert("error", "商品已售完");
       return;
     }
 
@@ -102,7 +105,7 @@ function PurchasePanel({ stock, productId, productData }: PurchasePanelProps) {
     // await cartService.addToCart(productId, quantity);
 
     // 模擬成功
-    showAlert('success', `成功加入 ${quantity} 件商品到購物車`);
+    showAlert("success", `成功加入 ${quantity} 件商品到購物車`);
 
     // 重置數量為1
     setQuantity(1);
@@ -112,30 +115,32 @@ function PurchasePanel({ stock, productId, productData }: PurchasePanelProps) {
   const handleBuyNow = () => {
     // 檢查是否登入
     if (!isAuthenticated) {
-      navigate('/auth', { state: { from: `/product/${productId}` } });
+      navigate("/auth", { state: { from: `/product/${productId}` } });
       return;
     }
 
     // 檢查庫存
     if (stock === 0) {
-      showAlert('error', '商品已售完');
+      showAlert("error", "商品已售完");
       return;
     }
 
     // 跳轉到結帳頁面，攜帶商品資訊
-    navigate('/checkout', {
+    navigate("/checkout", {
       state: {
         products: [
           {
             ...productData,
-            quantity: typeof quantity === 'string' ? parseInt(quantity, 10) : quantity,
+            quantity:
+              typeof quantity === "string" ? parseInt(quantity, 10) : quantity,
           },
         ],
       },
     });
   };
 
-  const numQuantity = typeof quantity === 'string' ? parseInt(quantity, 10) || 1 : quantity;
+  const numQuantity =
+    typeof quantity === "string" ? parseInt(quantity, 10) || 1 : quantity;
 
   return (
     <div className={styles.purchasePanel}>
@@ -196,7 +201,7 @@ function PurchasePanel({ stock, productId, productData }: PurchasePanelProps) {
           立即購買
         </Button>
       </div>
-      
+
       {/* Alert 提示 */}
       {alert && (
         <div className={styles.alertContainer}>

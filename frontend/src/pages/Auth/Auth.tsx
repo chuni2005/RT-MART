@@ -3,17 +3,17 @@
  * 佈局：左側品牌視覺 + 右側表單（Tab 切換）
  */
 
-import { useState } from 'react';
-import { useNavigate } from 'react-router-dom';
-import { useAuth } from '../../shared/hooks/useAuth';
-import LoginForm from './components/LoginForm';
-import SignUpForm from './components/SignUpForm';
-import Alert from '../../shared/components/Alert';
-import styles from './Auth.module.scss';
-import { AlertType } from '@/types';
+import { useState } from "react";
+import { useNavigate } from "react-router-dom";
+import { useAuth } from "@/shared/hooks/useAuth";
+import LoginForm from "./components/LoginForm";
+import SignUpForm from "./components/SignUpForm";
+import Alert from "@/shared/components/Alert";
+import styles from "./Auth.module.scss";
+import { AlertType } from "@/types";
 
 interface AlertState {
-  type: AlertType | '';
+  type: AlertType | "";
   message: string;
 }
 
@@ -21,35 +21,43 @@ const Auth = () => {
   const navigate = useNavigate();
   const { login, register, isLoading: authLoading } = useAuth();
 
-  const [activeTab, setActiveTab] = useState<'login' | 'signup'>('login');
+  const [activeTab, setActiveTab] = useState<"login" | "signup">("login");
   const [isLoading, setIsLoading] = useState(false);
-  const [alert, setAlert] = useState<AlertState>({ type: '', message: '' });
+  const [alert, setAlert] = useState<AlertState>({ type: "", message: "" });
 
   // 切換 Tab
-  const handleTabChange = (tab: 'login' | 'signup') => {
+  const handleTabChange = (tab: "login" | "signup") => {
     if (isLoading) return; // 載入中不允許切換
     setActiveTab(tab);
-    setAlert({ type: '', message: '' }); // 清除訊息
+    setAlert({ type: "", message: "" }); // 清除訊息
   };
 
   // 處理登入
   const handleLogin = async (formData: any) => {
     try {
       setIsLoading(true);
-      setAlert({ type: '', message: '' });
+      setAlert({ type: "", message: "" });
 
-      await login(formData.loginIdentifier, formData.password, formData.remember);
+      await login(
+        formData.loginIdentifier,
+        formData.password,
+        formData.remember
+      );
 
       // 登入成功
-      setAlert({ type: 'success', message: '登入成功！即將跳轉...' }); // TODO: i18n
+      setAlert({ type: "success", message: "登入成功！即將跳轉..." }); // TODO: i18n
 
       // 延遲跳轉
       setTimeout(() => {
-        navigate('/');
+        navigate("/");
       }, 1500);
     } catch (error) {
-      console.error('Login failed:', error);
-      setAlert({ type: 'error', message: error instanceof Error ? error.message : '登入失敗，請稍後再試' }); // TODO: i18n
+      console.error("Login failed:", error);
+      setAlert({
+        type: "error",
+        message:
+          error instanceof Error ? error.message : "登入失敗，請稍後再試",
+      }); // TODO: i18n
     } finally {
       setIsLoading(false);
     }
@@ -59,21 +67,31 @@ const Auth = () => {
   const handleRegister = async (formData: any) => {
     try {
       setIsLoading(true);
-      setAlert({ type: '', message: '' });
+      setAlert({ type: "", message: "" });
 
       // 註冊時 formData.name = formData.loginId，後續可透過個人設定更改
-      await register(formData.loginId, formData.name, formData.email, formData.phone, formData.password);
+      await register(
+        formData.loginId,
+        formData.name,
+        formData.email,
+        formData.phone,
+        formData.password
+      );
 
       // 註冊成功（自動登入）
-      setAlert({ type: 'success', message: '註冊成功！即將跳轉...' }); // TODO: i18n
+      setAlert({ type: "success", message: "註冊成功！即將跳轉..." }); // TODO: i18n
 
       // 延遲跳轉
       setTimeout(() => {
-        navigate('/');
+        navigate("/");
       }, 1500);
     } catch (error) {
-      console.error('Register failed:', error);
-      setAlert({ type: 'error', message: error instanceof Error ? error.message : '註冊失敗，請稍後再試' }); // TODO: i18n
+      console.error("Register failed:", error);
+      setAlert({
+        type: "error",
+        message:
+          error instanceof Error ? error.message : "註冊失敗，請稍後再試",
+      }); // TODO: i18n
     } finally {
       setIsLoading(false);
     }

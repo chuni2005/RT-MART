@@ -1,7 +1,6 @@
-import { useState, useEffect } from 'react';
-import styles from './ImageGallery.module.scss';
-import Button from '../../../shared/components/Button';
-import Icon from "../../../shared/components/Icon/Icon";
+import { useState, useEffect } from "react";
+import styles from "./ImageGallery.module.scss";
+import Button from "@/shared/components/Button";
 
 interface ImageGalleryProps {
   images: string[];
@@ -13,12 +12,16 @@ function ImageGallery({ images }: ImageGalleryProps) {
 
   // 切換到上一張圖片
   const handlePrevious = () => {
-    setCurrentIndex((prevIndex) => (prevIndex === 0 ? images.length - 1 : prevIndex - 1));
+    setCurrentIndex((prevIndex) =>
+      prevIndex === 0 ? images.length - 1 : prevIndex - 1
+    );
   };
 
   // 切換到下一張圖片
   const handleNext = () => {
-    setCurrentIndex((prevIndex) => (prevIndex === images.length - 1 ? 0 : prevIndex + 1));
+    setCurrentIndex((prevIndex) =>
+      prevIndex === images.length - 1 ? 0 : prevIndex + 1
+    );
   };
 
   // 點擊縮圖切換主圖
@@ -51,13 +54,13 @@ function ImageGallery({ images }: ImageGalleryProps) {
   useEffect(() => {
     const handleKeyDown = (e: KeyboardEvent) => {
       switch (e.key) {
-        case 'ArrowLeft':
+        case "ArrowLeft":
           handlePrevious();
           break;
-        case 'ArrowRight':
+        case "ArrowRight":
           handleNext();
           break;
-        case 'Escape':
+        case "Escape":
           if (isLightboxOpen) {
             closeLightbox();
           }
@@ -68,11 +71,11 @@ function ImageGallery({ images }: ImageGalleryProps) {
     };
 
     // 添加鍵盤事件監聽
-    window.addEventListener('keydown', handleKeyDown);
+    window.addEventListener("keydown", handleKeyDown);
 
     // 清理函數：移除事件監聽
     return () => {
-      window.removeEventListener('keydown', handleKeyDown);
+      window.removeEventListener("keydown", handleKeyDown);
     };
   }, [isLightboxOpen, images.length]);
 
@@ -101,7 +104,10 @@ function ImageGallery({ images }: ImageGalleryProps) {
           />
 
           <div className={styles.mainImage} onClick={openLightbox}>
-            <img src={images[currentIndex]} alt={`商品圖片 ${currentIndex + 1}`} />
+            <img
+              src={images[currentIndex]}
+              alt={`商品圖片 ${currentIndex + 1}`}
+            />
             <div className={styles.zoomHint}>點擊放大檢視</div>
           </div>
 
@@ -119,7 +125,9 @@ function ImageGallery({ images }: ImageGalleryProps) {
           {images.map((image, index) => (
             <div
               key={index}
-              className={`${styles.thumbnail} ${index === currentIndex ? styles.active : ''}`}
+              className={`${styles.thumbnail} ${
+                index === currentIndex ? styles.active : ""
+              }`}
               onClick={() => handleThumbnailClick(index)}
             >
               <img src={image} alt={`縮圖 ${index + 1}`} />
@@ -148,7 +156,10 @@ function ImageGallery({ images }: ImageGalleryProps) {
           />
 
           <div className={styles.lightboxImage}>
-            <img src={images[currentIndex]} alt={`放大檢視 ${currentIndex + 1}`} />
+            <img
+              src={images[currentIndex]}
+              alt={`放大檢視 ${currentIndex + 1}`}
+            />
           </div>
 
           <Button

@@ -1,21 +1,21 @@
-import { useState } from 'react';
-import styles from './ReviewSection.module.scss';
-import Icon from '../../../shared/components/Icon/Icon';
-import Button from '../../../shared/components/Button';
-import Select from '../../../shared/components/Select';
-import { Review, ReviewStatistics } from '@/types';
+import { useState } from "react";
+import styles from "./ReviewSection.module.scss";
+import Icon from "@/shared/components/Icon/Icon";
+import Button from "@/shared/components/Button";
+import Select from "@/shared/components/Select";
+import { Review, ReviewStatistics } from "@/types";
 
 interface ReviewSectionProps {
   reviews: Review[];
   statistics: ReviewStatistics;
 }
 
-type FilterRating = 'all' | 'hasImage' | '5' | '4' | '3' | '2' | '1';
-type SortBy = 'newest' | 'oldest' | 'highest' | 'lowest';
+type FilterRating = "all" | "hasImage" | "5" | "4" | "3" | "2" | "1";
+type SortBy = "newest" | "oldest" | "highest" | "lowest";
 
 function ReviewSection({ reviews, statistics }: ReviewSectionProps) {
-  const [filterRating, setFilterRating] = useState<FilterRating>('all');
-  const [sortBy, setSortBy] = useState<SortBy>('newest');
+  const [filterRating, setFilterRating] = useState<FilterRating>("all");
+  const [sortBy, setSortBy] = useState<SortBy>("newest");
   const [visibleCount, setVisibleCount] = useState(5);
   const [lightboxImages, setLightboxImages] = useState<string[] | null>(null);
   const [lightboxIndex, setLightboxIndex] = useState(0);
@@ -25,8 +25,8 @@ function ReviewSection({ reviews, statistics }: ReviewSectionProps) {
     let filtered = [...reviews];
 
     // 依星等篩選
-    if (filterRating !== 'all') {
-      if (filterRating === 'hasImage') {
+    if (filterRating !== "all") {
+      if (filterRating === "hasImage") {
         filtered = filtered.filter((r) => r.images && r.images.length > 0);
       } else {
         filtered = filtered.filter((r) => r.rating === parseInt(filterRating));
@@ -35,16 +35,22 @@ function ReviewSection({ reviews, statistics }: ReviewSectionProps) {
 
     // 排序
     switch (sortBy) {
-      case 'newest':
-        filtered.sort((a, b) => new Date(b.createdAt).getTime() - new Date(a.createdAt).getTime());
+      case "newest":
+        filtered.sort(
+          (a, b) =>
+            new Date(b.createdAt).getTime() - new Date(a.createdAt).getTime()
+        );
         break;
-      case 'oldest':
-        filtered.sort((a, b) => new Date(a.createdAt).getTime() - new Date(b.createdAt).getTime());
+      case "oldest":
+        filtered.sort(
+          (a, b) =>
+            new Date(a.createdAt).getTime() - new Date(b.createdAt).getTime()
+        );
         break;
-      case 'highest':
+      case "highest":
         filtered.sort((a, b) => b.rating - a.rating);
         break;
-      case 'lowest':
+      case "lowest":
         filtered.sort((a, b) => a.rating - b.rating);
         break;
       default:
@@ -83,10 +89,10 @@ function ReviewSection({ reviews, statistics }: ReviewSectionProps) {
   // 格式化日期
   const formatDate = (dateString: string) => {
     const date = new Date(dateString);
-    return date.toLocaleDateString('zh-TW', {
-      year: 'numeric',
-      month: '2-digit',
-      day: '2-digit',
+    return date.toLocaleDateString("zh-TW", {
+      year: "numeric",
+      month: "2-digit",
+      day: "2-digit",
     });
   };
 
@@ -103,27 +109,33 @@ function ReviewSection({ reviews, statistics }: ReviewSectionProps) {
 
   const handleLightboxPrevious = (e: React.MouseEvent) => {
     e.stopPropagation();
-    setLightboxIndex((prev) => (prev === 0 ? (lightboxImages?.length || 1) - 1 : prev - 1));
+    setLightboxIndex((prev) =>
+      prev === 0 ? (lightboxImages?.length || 1) - 1 : prev - 1
+    );
   };
 
   const handleLightboxNext = (e: React.MouseEvent) => {
     e.stopPropagation();
-    setLightboxIndex((prev) => (prev === (lightboxImages?.length || 1) - 1 ? 0 : prev + 1));
+    setLightboxIndex((prev) =>
+      prev === (lightboxImages?.length || 1) - 1 ? 0 : prev + 1
+    );
   };
 
   return (
     <div className={styles.reviewSection}>
       {/* 區塊標題 */}
-      <h2 className={styles.sectionTitle}>
-        商品評價 ({statistics.total})
-      </h2>
+      <h2 className={styles.sectionTitle}>商品評價 ({statistics.total})</h2>
 
       {/* 評價統計 */}
       <div className={styles.statisticsSection}>
         <div className={styles.averageRating}>
-          <span className={styles.averageValue}>{statistics.average.toFixed(1)}</span>
+          <span className={styles.averageValue}>
+            {statistics.average.toFixed(1)}
+          </span>
           <span className={styles.averageMax}>/5.0</span>
-          <div className={styles.averageStars}>{renderStars(Math.round(statistics.average))}</div>
+          <div className={styles.averageStars}>
+            {renderStars(Math.round(statistics.average))}
+          </div>
         </div>
 
         <div className={styles.ratingDistribution}>
@@ -133,10 +145,22 @@ function ReviewSection({ reviews, statistics }: ReviewSectionProps) {
               <div className={styles.progressBar}>
                 <div
                   className={styles.progressFill}
-                  style={{ width: `${getPercentage(statistics.distribution[star as keyof typeof statistics.distribution])}%` }}
+                  style={{
+                    width: `${getPercentage(
+                      statistics.distribution[
+                        star as keyof typeof statistics.distribution
+                      ]
+                    )}%`,
+                  }}
                 />
               </div>
-              <span className={styles.countLabel}>{statistics.distribution[star as keyof typeof statistics.distribution]}</span>
+              <span className={styles.countLabel}>
+                {
+                  statistics.distribution[
+                    star as keyof typeof statistics.distribution
+                  ]
+                }
+              </span>
             </div>
           ))}
         </div>
@@ -150,13 +174,13 @@ function ReviewSection({ reviews, statistics }: ReviewSectionProps) {
             value={filterRating}
             onChange={(value) => setFilterRating(value as FilterRating)}
             options={[
-              { value: 'all', label: '全部' },
-              { value: '5', label: '5 星' },
-              { value: '4', label: '4 星' },
-              { value: '3', label: '3 星' },
-              { value: '2', label: '2 星' },
-              { value: '1', label: '1 星' },
-              { value: 'hasImage', label: '有圖片' },
+              { value: "all", label: "全部" },
+              { value: "5", label: "5 星" },
+              { value: "4", label: "4 星" },
+              { value: "3", label: "3 星" },
+              { value: "2", label: "2 星" },
+              { value: "1", label: "1 星" },
+              { value: "hasImage", label: "有圖片" },
             ]}
             variant="compact"
             ariaLabel="篩選評價"
@@ -169,10 +193,10 @@ function ReviewSection({ reviews, statistics }: ReviewSectionProps) {
             value={sortBy}
             onChange={(value) => setSortBy(value as SortBy)}
             options={[
-              { value: 'newest', label: '最新優先' },
-              { value: 'oldest', label: '最舊優先' },
-              { value: 'highest', label: '評分最高' },
-              { value: 'lowest', label: '評分最低' },
+              { value: "newest", label: "最新優先" },
+              { value: "oldest", label: "最舊優先" },
+              { value: "highest", label: "評分最高" },
+              { value: "lowest", label: "評分最低" },
             ]}
             variant="compact"
             ariaLabel="排序方式"
@@ -199,14 +223,20 @@ function ReviewSection({ reviews, statistics }: ReviewSectionProps) {
                 <div className={styles.userInfo}>
                   <span className={styles.userName}>{review.userName}</span>
                   <div className={styles.reviewMeta}>
-                    <div className={styles.reviewStars}>{renderStars(review.rating)}</div>
-                    <span className={styles.reviewDate}>{formatDate(review.createdAt)}</span>
+                    <div className={styles.reviewStars}>
+                      {renderStars(review.rating)}
+                    </div>
+                    <span className={styles.reviewDate}>
+                      {formatDate(review.createdAt)}
+                    </span>
                   </div>
                 </div>
               </div>
 
               {/* 評論內容 */}
-              {review.content && <p className={styles.reviewContent}>{review.content}</p>}
+              {review.content && (
+                <p className={styles.reviewContent}>{review.content}</p>
+              )}
 
               {/* 評論圖片 */}
               {review.images && review.images.length > 0 && (
@@ -256,7 +286,10 @@ function ReviewSection({ reviews, statistics }: ReviewSectionProps) {
           />
 
           <div className={styles.lightboxImage}>
-            <img src={lightboxImages[lightboxIndex]} alt={`放大檢視 ${lightboxIndex + 1}`} />
+            <img
+              src={lightboxImages[lightboxIndex]}
+              alt={`放大檢視 ${lightboxIndex + 1}`}
+            />
           </div>
 
           <Button

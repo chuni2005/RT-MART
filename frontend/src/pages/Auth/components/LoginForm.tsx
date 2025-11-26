@@ -5,8 +5,8 @@
 
 import { useState, ChangeEvent, FocusEvent, FormEvent } from 'react';
 import { useNavigate } from 'react-router-dom';
-import FormInput from '../../../shared/components/FormInput';
-import { validateLoginIdentifier, validatePassword } from '../../../shared/utils/validation';
+import FormInput from '@/shared/components/FormInput';
+import { validateLoginIdentifier, validatePassword } from '@/shared/utils/validation';
 import styles from './LoginForm.module.scss';
 
 interface LoginFormProps {

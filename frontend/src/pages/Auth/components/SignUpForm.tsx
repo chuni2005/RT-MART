@@ -5,7 +5,7 @@
  */
 
 import { useState, ChangeEvent, FocusEvent, FormEvent } from "react";
-import FormInput from "../../../shared/components/FormInput";
+import FormInput from "@/shared/components/FormInput";
 import PasswordStrength from "./PasswordStrength";
 import {
   validateUsername,
@@ -13,7 +13,7 @@ import {
   validatePhone,
   validatePasswordStrength,
   validateConfirmPassword,
-} from "../../../shared/utils/validation";
+} from "@/shared/utils/validation";
 import styles from "./SignUpForm.module.scss";
 
 interface SignUpFormProps {
@@ -253,7 +253,11 @@ const SignUpForm = ({ onSubmit, isLoading }: SignUpFormProps) => {
         value={formData.confirmPassword}
         onChange={handleChange}
         onBlur={handleBlur}
-        error={ touched.confirmPassword ? errors.confirmPassword ?? undefined : undefined}
+        error={
+          touched.confirmPassword
+            ? errors.confirmPassword ?? undefined
+            : undefined
+        }
         placeholder="請再次輸入密碼"
         disabled={isLoading}
         autoComplete="new-password"

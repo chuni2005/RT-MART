@@ -1,8 +1,8 @@
-import { useState } from 'react';
-import styles from './ProductDescription.module.scss';
-import Icon from '../../../shared/components/Icon/Icon';
-import CategoryBreadcrumb from '../../../shared/components/CategoryBreadcrumb/CategoryBreadcrumb';
-import { ProductType } from '../../../types/product';
+import { useState } from "react";
+import styles from "./ProductDescription.module.scss";
+import Icon from "@/shared/components/Icon/Icon";
+import CategoryBreadcrumb from "@/shared/components/CategoryBreadcrumb/CategoryBreadcrumb";
+import { ProductType } from "@/types/product";
 
 interface ProductDescriptionProps {
   description: string;
@@ -51,12 +51,20 @@ function ProductDescription({
             <span className={styles.specLabel}>庫存</span>
             <span
               className={`${styles.specValue} ${
-                stock === 0 ? styles.outOfStockValue : stock <= 10 ? styles.lowStock : styles.normalStock
+                stock === 0
+                  ? styles.outOfStockValue
+                  : stock <= 10
+                  ? styles.lowStock
+                  : styles.normalStock
               }`}
             >
               {stock} 件
-              {stock <= 10 && stock > 0 && <span className={styles.lowStockWarning}> (剩餘不多)</span>}
-              {stock === 0 && <span className={styles.outOfStock}> (已售完)</span>}
+              {stock <= 10 && stock > 0 && (
+                <span className={styles.lowStockWarning}> (剩餘不多)</span>
+              )}
+              {stock === 0 && (
+                <span className={styles.outOfStock}> (已售完)</span>
+              )}
             </span>
           </div>
 
@@ -83,7 +91,9 @@ function ProductDescription({
         <h2 className={styles.sectionTitle}>商品描述</h2>
         <div
           className={`${styles.descriptionContent} ${
-            isDescriptionExpanded || !isLongDescription ? styles.expanded : styles.collapsed
+            isDescriptionExpanded || !isLongDescription
+              ? styles.expanded
+              : styles.collapsed
           }`}
         >
           <p>{description}</p>

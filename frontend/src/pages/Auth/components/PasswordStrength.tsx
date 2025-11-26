@@ -3,7 +3,7 @@
  * 顯示密碼強度等級和提示
  */
 
-import { calculatePasswordStrength } from '../../../shared/utils/validation';
+import { calculatePasswordStrength } from '@/shared/utils/validation';
 import styles from './PasswordStrength.module.scss';
 
 interface PasswordStrengthProps {

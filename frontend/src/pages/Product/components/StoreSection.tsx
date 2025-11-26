@@ -1,8 +1,8 @@
-import { Link } from 'react-router-dom';
+import { useNavigate } from 'react-router-dom';
 import { useState } from 'react';
 import styles from './StoreSection.module.scss';
-import Button from '../../../shared/components/Button';
-import Icon from '../../../shared/components/Icon/Icon';
+import Button from '@/shared/components/Button';
+import Icon from '@/shared/components/Icon/Icon';
 import { Store } from '@/types';
 
 interface StoreSectionProps {
@@ -13,7 +13,11 @@ interface StoreSectionProps {
 
 function StoreSection({ store, variant = 'compact', hideButton = false }: StoreSectionProps) {
   const [isDescriptionExpanded, setIsDescriptionExpanded] = useState(false);
-
+  const navigate = useNavigate();
+  const handleViewStore = () => {
+    navigate(`/store/${store.id}`);
+  };
+    
   const isDetailed = variant === 'detailed';
 
   return (
@@ -92,11 +96,9 @@ function StoreSection({ store, variant = 'compact', hideButton = false }: StoreS
       {/* 查看商店按鈕 */}
       {!hideButton && (
         <div className={styles.storeAction}>
-          <Link to={`/store/${store.id}`}>
-            <Button variant="outline" className={styles.viewStoreBtn}>
-              查看商店
-            </Button>
-          </Link>
+          <Button variant="outline" onClick={handleViewStore} className={styles.viewStoreBtn}>
+            查看商店
+          </Button>
         </div>
       )}
     </div>
