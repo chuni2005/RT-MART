@@ -1,0 +1,37 @@
+.storePage {
+  background-color: $bg-primary;
+  min-height: calc(100vh - 200px);
+  padding: $spacing-xl 0;
+}
+
+.container {
+  @include container(1200px);
+}
+
+.loading {
+  text-align: center;
+  padding: $spacing-xxl 0;
+  color: $text-secondary;
+  font-size: $font-lg;
+}
+
+.productGrid {
+  display: grid;
+  grid-template-columns: repeat(5, 1fr);
+  gap: $spacing-lg;
+  margin-top: $spacing-xl;
+
+  @include max-width($desktop) {
+    grid-template-columns: repeat(4, 1fr);
+  }
+
+  @include tablet {
+    grid-template-columns: repeat(3, 1fr);
+    gap: $spacing-md;
+  }
+
+  @include mobile {
+    grid-template-columns: repeat(2, 1fr);
+    gap: $spacing-sm;
+  }
+}

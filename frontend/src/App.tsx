@@ -4,6 +4,7 @@ import Header from "./shared/components/Header";
 import Home from "./pages/Home";
 import Auth from "./pages/Auth";
 import ProductDetail from "./pages/Product";
+import Store from "./pages/Store";
 import "./shared/lib/iconLibrary";
 
 // Header Wrapper Component to handle conditional rendering
@@ -32,7 +33,7 @@ function AppContent() {
           <Route path="/auth" element={<Auth />} />
           <Route path="/search" element={<h2>商品搜索頁面開發中...</h2>} />
           <Route path="/product/:product_id" element={<ProductDetail />} />
-          <Route path="/store/:store_id" element={<h2>商店頁面開發中...</h2>} />
+          <Route path="/store/:store_id" element={<Store />} />
           <Route path="/cart" element={<h2>購物車頁面開發中...</h2>} />
           <Route path="/checkout" element={<h2>結帳頁面開發中...</h2>} />
           <Route path="/order/success" element={<h2>訂單成功頁面開發中...</h2>} />
