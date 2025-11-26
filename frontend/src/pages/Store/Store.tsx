@@ -5,69 +5,20 @@ import StoreSection from "../Product/components/StoreSection";
 import CategoryFilter from "./components/CategoryFilter";
 import ProductCard from "@/shared/components/ProductCard";
 import { getStoreById } from "@/shared/services/storeService";
+import { getProductsByStore } from "@/shared/services/productService";
 import type { Store as StoreType, Product, TabItem } from "@/types";
-
-// Mock 資料 - 商品相關 (暫時保留，待 productService 完成後移除)
-const productNames = [
-  "藍牙耳機",
-  "智能手錶",
-  "無線滑鼠",
-  "T恤",
-  "牛仔褲",
-  "沙發",
-];
-const categoryIds = ["electronics", "clothing", "home"];
-const categoryCodes = ["ELEC", "CLOTH", "HOME"];
-const categoryNames = ["電子產品", "服飾", "家居用品"];
-
-// 簡化的 Mock Store 用於產品關聯 (臨時使用)
-const tempMockStore: StoreType = {
-  id: "store_001",
-  name: "科技生活旗艦店",
-  avatar: "https://i.pravatar.cc/150?img=10",
-  productCount: 30,
-  rating: 4.8,
-  totalRatings: 150,
-  joinDate: "2023/01",
-  description: "專營3C電子產品、智能家居和配件。",
-  address: "台北市大安區忠孝東路三段 100 號",
-  email: "contact@techlife.com",
-  phone: "02-2345-6789",
-};
-
-const mockProducts: Product[] = Array.from({ length: 30 }, (_, i) => ({
-  id: i + 1,
-  name: `${tempMockStore.name} - ${productNames[i % productNames.length]} ${i + 1}`,
-  currentPrice: 299 + i * 50,
-  originalPrice: i % 3 === 0 ? 399 + i * 50 : null,
-  description: "優質商品，值得信賴",
-  stock: 100 - i,
-  rating: 4 + Math.random(),
-  reviewCount: Math.floor(Math.random() * 100),
-  soldCount: Math.floor(Math.random() * 1000),
-  images: [`https://picsum.photos/seed/${i + 1}/400/400`],
-  store: tempMockStore,
-  productType: {
-    productTypeId: categoryIds[i % 3],
-    typeCode: categoryCodes[i % 3],
-    typeName: categoryNames[i % 3],
-    parentTypeId: null,
-    isActive: true,
-  },
-}));
 
 function Store() {
   const { store_id } = useParams<{ store_id: string }>();
   const navigate = useNavigate();
   const [store, setStore] = useState<StoreType | null>(null);
+  const [products, setProducts] = useState<Product[]>([]);
   const [isLoading, setIsLoading] = useState(true);
   const [activeCategory, setActiveCategory] = useState<string>("all");
 
-  const products = mockProducts;
-
   // ========== 資料載入 ==========
   useEffect(() => {
-    const fetchStoreData = async () => {
+    const fetchData = async () => {
       if (!store_id) {
         alert('無效的商店 ID');
         navigate('/');
@@ -76,18 +27,41 @@ function Store() {
 
       try {
         setIsLoading(true);
-        const response = await getStoreById(store_id);
-        setStore(response.store);
+
+        // 並行載入商店和商品資料（使用 allSettled 實現部分容錯）
+        const [storeResult, productsResult] = await Promise.allSettled([
+          getStoreById(store_id),
+          getProductsByStore(store_id)
+        ]);
+
+        // 處理商店資料
+        if (storeResult.status === 'fulfilled') {
+          setStore(storeResult.value.store);
+        } else {
+          console.error('Failed to load store:', storeResult.reason);
+          alert(storeResult.reason instanceof Error ? storeResult.reason.message : '載入商店資料失敗');
+          navigate('/');
+          return; // 商店資料是必須的，失敗則返回首頁
+        }
+
+        // 處理商品資料（可選）
+        if (productsResult.status === 'fulfilled') {
+          setProducts(productsResult.value.products);
+        } else {
+          console.error('Failed to load products:', productsResult.reason);
+          // 商品載入失敗時，保持空陣列，頁面仍可顯示商店信息
+          setProducts([]);
+        }
       } catch (error) {
-        console.error('Failed to load store:', error);
-        alert(error instanceof Error ? error.message : '載入商店資料失敗');
+        console.error('Unexpected error:', error);
+        alert('發生未預期的錯誤');
         navigate('/');
       } finally {
         setIsLoading(false);
       }
     };
 
-    fetchStoreData();
+    fetchData();
   }, [store_id, navigate]);
 
   const categories = useMemo(() => {

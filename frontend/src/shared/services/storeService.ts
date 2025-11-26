@@ -1,6 +1,5 @@
 /**
  * Store Service - Mock API
- * 商店資料服務（待後端實作後替換）
  */
 
 import { get } from './api';
