@@ -23,13 +23,14 @@ describe('UsersController (e2e)', () => {
   });
 
   it('setup', async () => {
-    await AuthPostTest.loginUser(app, adminTester.loginId, adminTester.password);
+    await AuthPostTest.loginUser(app, adminTester);
+    console.log(adminTester.cookie.accessToken);
   });
 
   it('/users (POST) → Create user', async () => {
-    await UserPostTest.createBuyerUser(app);
-    await UserPostTest.createSellerUser(app);
-    await UserPostTest.createAdminUser(app);
+    await UserPostTest.createUser(app, buyerUser);
+    await UserPostTest.createUser(app, sellerUser);
+    await UserPostTest.createUser(app, adminUser);
     await UserPostTest.createUserWithConflict(app, buyerUser.loginId, 'unique_email@example.com');
     await UserPostTest.createUserWithConflict(app, 'unique_login_id', buyerUser.email);
   });
@@ -75,7 +76,7 @@ describe('UsersController (e2e)', () => {
 
   it('/users/deleted (GET) → Get deleted users', async () => {
     await UserGetTest.getAllOfDeletedUser(app);
-    await UserGetTest.getDeletedUsersWithFilterAndPage(app, '', ''),
+    await UserGetTest.getDeletedUsersWithFilterAndPage(app, 'buyer', 'user'),
       await UserGetTest.getAllOfDeletedUsersWithNonPermissionRole(app);
   });
 
@@ -86,7 +87,7 @@ describe('UsersController (e2e)', () => {
     await UserPostTest.restoreDeletedUserWithNonPermissionRole(app);
   });
 
-  it('/users/:id/permanent (DELETE) → permanently delete by id with non-permission', async () => {
+  it('/users/:id/permanent (DELETE) → permanently delete by id', async () => {
     await UserDeleteTest.permanentlyDeleteUserById(app, buyerUser.userId);
     await UserDeleteTest.permanentlyDeleteUserByDeletedId(app);
     await UserDeleteTest.permanentlyDeleteUserByNonExitedId(app);
@@ -99,6 +100,7 @@ describe('UsersController (e2e)', () => {
 
   it('teardown', async () => {
     await UserDeleteTest.permanentlyDeleteUserById(app, sellerUser.userId);
-    await UserDeleteTest.permanentlyDeleteUserById(app, buyerUser.userId);
+    await UserDeleteTest.permanentlyDeleteUserById(app, adminUser.userId);
+    console.log(buyerUser);
   });
 });

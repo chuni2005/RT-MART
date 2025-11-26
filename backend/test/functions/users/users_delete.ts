@@ -18,7 +18,7 @@ export async function deleteOwnAccountWithNonCookie(app: INestApplication) {
 
 export async function deleteUserById(app: INestApplication) {
     await request(app.getHttpServer())
-        .delete(`/users/${buyerUser.userId}`)
+        .delete(`/users/${sellerUser.userId}`)
         .set('Cookie', `accessToken=${adminTester.cookie.accessToken}`)
         .expect(200)
 }
@@ -39,9 +39,9 @@ export async function deleteUserWithNonExistentId(app: INestApplication) {
 
 export async function deleteUserWithNonPermissionRole(app: INestApplication) {
     await request(app.getHttpServer())
-        .delete(`/users/`)
+        .delete(`/users/${adminUser.userId}`)
         .set('Cookie', `accessToken=${sellerUser.cookie.accessToken}`)
-        .expect(401)
+        .expect(403)
 }
 
 export async function permanentlyDeleteUserById(app: INestApplication, userId: number) {
@@ -62,12 +62,12 @@ export async function permanentlyDeleteUserByNonExitedId(app: INestApplication) 
     await request(app.getHttpServer())
         .delete(`/users/10000/permanent`)
         .set('Cookie', `accessToken=${adminTester.cookie.accessToken}`)
-        .expect(200);
+        .expect(404);
 }
 
 export async function permanentlyDeleteUserByIdWithNonPermissionRole(app: INestApplication) {
     await request(app.getHttpServer())
-        .delete(`/users/10000/permanent`)
+        .delete(`/users/${sellerUser.userId}/permanent`)
         .set('Cookie', `accessToken=${sellerUser.cookie.accessToken}`)
-        .expect(200);
+        .expect(403);
 }

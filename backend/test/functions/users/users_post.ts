@@ -1,66 +1,31 @@
 import request from 'supertest';
 import { INestApplication } from '@nestjs/common';
+import { loginUser } from '../auth/auth_post'
 import { buyerUser, sellerUser, adminUser, adminTester } from '../../variables';
 
-export async function createBuyerUser(app: INestApplication){
+export async function createUser(app: INestApplication, user: any){
     const res = await request(app.getHttpServer())
         .post('/users')
-        .set('Cookie', `refreshToken=${adminTester.cookie.refreshToken}`)
+        .set('Cookie', `accessToken=${adminTester.cookie.accessToken}`)
         .send({
-            loginId: buyerUser.loginId,
-            password: buyerUser.password,
-            name: buyerUser.name,
-            email: buyerUser.email,
-            phone: buyerUser.phone,
-            role: buyerUser.role,
+            loginId: user.loginId,
+            password: user.password,
+            name: user.name,
+            email: user.email,
+            phone: user.phone,
+            role: user.role,
         })
         .expect(201);
     expect(res.body).toHaveProperty('userId');
-    expect(res.body.loginId).toBe(buyerUser.loginId);
-    buyerUser.userId = res.body.userId;
-}
-
-export async function createSellerUser(app: INestApplication){
-    const res = await request(app.getHttpServer())
-        .post('/users')
-        .set('Cookie', `refreshToken=${adminTester.cookie.refreshToken}`)
-        .send({
-            loginId: sellerUser.loginId,
-            password: sellerUser.password,
-            name: sellerUser.name,
-            email: sellerUser.email,
-            phone: sellerUser.phone,
-            role: sellerUser.role,
-        })
-        .expect(201);
-    expect(res.body).toHaveProperty('userId');
-    expect(res.body.loginId).toBe(sellerUser.loginId);
-    sellerUser.userId = res.body.userId;
-}
-
-export async function createAdminUser(app: INestApplication): Promise<string> {
-    const res = await request(app.getHttpServer())
-        .post('/users')
-        .set('Cookie', `refreshToken=${adminTester.cookie.refreshToken}`)
-        .send({
-            loginId: adminUser.loginId,
-            password: adminUser.password,
-            name: adminUser.name,
-            email: adminUser.email,
-            phone: adminUser.phone,
-            role: adminUser.role,
-        })
-        .expect(201);
-    expect(res.body).toHaveProperty('userId');
-    expect(res.body.loginId).toBe(adminUser.loginId);
-    adminUser.userId = res.body.userId;
-    return res.body.userId;
+    expect(res.body.loginId).toBe(user.loginId);
+    user.userId = (res.body.userId!==adminTester.userId)? res.body.userId: 0;
+    await loginUser(app, user);
 }
 
 export async function createUserWithConflict(app: INestApplication, loginId: string, email: string){
     const res = await request(app.getHttpServer())
         .post('/users')
-        .set('Cookie', `refreshToken=${adminTester.cookie.refreshToken}`)
+        .set('Cookie', `accessToken=${adminTester.cookie.accessToken}`)
         .send({
             loginId: loginId,
             password: '!abc12345678',
@@ -76,29 +41,34 @@ export async function createUserWithConflict(app: INestApplication, loginId: str
 export async function restoreDeletedUserById(app: INestApplication){
     const res = await request(app.getHttpServer())
       .post(`/users/${buyerUser.userId}/restore`)
-      .set('Cookie', `refreshToken=${adminTester.cookie.refreshToken}`)
+      .set('Cookie', `accessToken=${adminTester.cookie.accessToken}`)
       .expect(201);
 
     expect(res.body).toHaveProperty('userId', buyerUser.userId);
+
+    await request(app.getHttpServer())
+      .post(`/users/${sellerUser.userId}/restore`)
+      .set('Cookie', `accessToken=${adminTester.cookie.accessToken}`)
+      .expect(201);
 }
 
 export async function restoreNonDeletedUserById(app: INestApplication){
     const res = await request(app.getHttpServer())
       .post(`/users/${buyerUser.userId}/restore`)
-      .set('Cookie', `refreshToken=${adminTester.cookie.refreshToken}`)
-      .expect(404);
+      .set('Cookie', `accessToken=${adminTester.cookie.accessToken}`)
+      .expect(409);
 }
 
 export async function restoreDeletedUserByNonExistentId(app: INestApplication){
     const res = await request(app.getHttpServer())
       .post(`/users/10000/restore`)
-      .set('Cookie', `refreshToken=${adminTester.cookie.refreshToken}`)
+      .set('Cookie', `accessToken=${adminTester.cookie.accessToken}`)
       .expect(404);
 }
 
 export async function restoreDeletedUserWithNonPermissionRole(app: INestApplication){
     const res = await request(app.getHttpServer())
         .post(`/users/${buyerUser.userId}/restore`)
-        .set('Cookie', `refreshToken=${sellerUser.cookie.refreshToken}`)
-        .expect(401);
+        .set('Cookie', `accessToken=${sellerUser.cookie.accessToken}`)
+        .expect(403);
 }

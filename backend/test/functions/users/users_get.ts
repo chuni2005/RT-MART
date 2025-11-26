@@ -22,11 +22,13 @@ export async function getUsersWithFilter(app: INestApplication, role: string, se
 
 export async function getSingleUserById(app: INestApplication) {
     const res = await request(app.getHttpServer())
-        .get(`/users/${sellerUser.userId}`)
+        .get(`/users/${adminUser.userId}`)
         .expect(200);
-    expect(res.body).toHaveProperty('data');
-    expect(Array.isArray(res.body.data)).toBe(true);
-    expect(res.body).toHaveProperty('total');
+    expect(res.body).toHaveProperty('loginId', adminUser.loginId);
+    expect(res.body).toHaveProperty('name', adminUser.name);
+    expect(res.body).toHaveProperty('email', adminUser.email);
+    expect(res.body).toHaveProperty('role', adminUser.role);
+
 }
 
 export async function getSingleUserByDeletedUserId(app: INestApplication) {
@@ -65,7 +67,7 @@ export async function getAllOfDeletedUsersWithNonPermissionRole(app: INestApplic
     const res = await request(app.getHttpServer())
         .get(`/users/deleted?page=1&limit=10`)
         .set('Cookie', `accessToken=${sellerUser.cookie.accessToken}`)
-        .expect(401);
+        .expect(403);
 }
 
 export async function getHealthTest(app: INestApplication) {

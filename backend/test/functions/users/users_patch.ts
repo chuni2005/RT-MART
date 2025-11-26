@@ -18,7 +18,7 @@ export async function updateIntegralOwnData(app: INestApplication) {
         .expect(200);
     expect(res.body).toHaveProperty('userId', buyerUser.userId);
     expect(res.body.loginId).toBe('edited_userId');
-    expect(res.body.name).toBe('更新後的名稱');
+    expect(res.body.name).toBe('更改後的名稱');
     expect(res.body.email).toBe('edited_email@example.com');
     expect(res.body.phone).toBe('0987654321');
 
@@ -59,13 +59,13 @@ export async function updatePartialOwnData(app: INestApplication) {
         })
         .expect(200);
     expect(res.body).toHaveProperty('userId', buyerUser.userId);
-    expect(res.body.name).toBe('更新後的名稱');
+    expect(res.body.name).toBe('更改後的名稱');
 
     // relogin test
     const relogin_res = await request(app.getHttpServer())
         .post('/auth/login')
         .send({
-            loginId: 'edited_userId',
+            loginId: buyerUser.loginId,
             password: '12345678*',
         })
         .expect(201);
@@ -132,7 +132,7 @@ export async function updateIntegralUserData(app: INestApplication) {
 
     expect(res.body).toHaveProperty('userId', buyerUser.userId);
     expect(res.body.loginId).toBe('edited_userId');
-    expect(res.body.name).toBe('更新後的名稱');
+    expect(res.body.name).toBe('更改後的名稱');
     expect(res.body.email).toBe('edited_email@example.com');
     expect(res.body.phone).toBe('0987654321');
 
@@ -175,13 +175,13 @@ export async function updatePartialUserData(app: INestApplication) {
         })
         .expect(200);
     expect(res.body).toHaveProperty('userId', buyerUser.userId);
-    expect(res.body.name).toBe('更新後的名稱');
+    expect(res.body.name).toBe('更改後的名稱');
 
     //login test
     const login_res = await request(app.getHttpServer())
         .post('/auth/login')
         .send({
-            loginId: 'edited_userId',
+            loginId: buyerUser.loginId,
             password: '12345678*',
         })
         .expect(201);
@@ -230,5 +230,5 @@ export async function updateUserDataWithNonPermissionRole(app: INestApplication)
         .send({
             name: '更改後的名稱',
         })
-        .expect(401);
+        .expect(403);
 }

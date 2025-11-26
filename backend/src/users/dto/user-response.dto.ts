@@ -16,7 +16,7 @@ export class UserResponseDto {
   email: string;
 
   @Expose()
-  phoneNumber: string | null;
+  phone: string | null;
 
   @Expose()
   role: UserRole;

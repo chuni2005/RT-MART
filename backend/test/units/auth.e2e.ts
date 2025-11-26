@@ -6,7 +6,9 @@ import { AppModules } from './../module.index';
 import { createTestApp } from './../functions/e2e';
 import * as AuthPostTest from './../functions/auth/auth_post';
 import * as AuthGetTest from './../functions/auth/auth_get';
-import { buyerUser, sellerUser, adminUser } from './../variables';
+import { permanentlyDeleteUserById } from './../functions/users/users_delete';
+import { buyerUser, sellerUser, adminUser, adminTester } from './../variables';
+import { buildMessage } from 'class-validator';
 
 describe('UsersController (e2e)', () => {
   let app: INestApplication;
@@ -18,6 +20,10 @@ describe('UsersController (e2e)', () => {
   afterAll(async () => {
     await app.close();
   });
+
+  it('setup', async () =>{
+    await AuthPostTest.loginUser(app, adminTester);
+  })
 
   it('/register (POST) → User register', async () => {
     await AuthPostTest.registerUser(app);
@@ -34,7 +40,7 @@ describe('UsersController (e2e)', () => {
   });
 
   it('/login (POST) → User login', async () => {
-    await AuthPostTest.loginUser(app);
+    await AuthPostTest.loginUser(app, buyerUser);
     await AuthPostTest.loginUserWithInvalidCredentials(
       app,
       buyerUser.loginId,
@@ -58,21 +64,16 @@ describe('UsersController (e2e)', () => {
   });
 
   it('/logout (POST) → User logout', async () => {
-    await AuthPostTest.logoutUser(app);
+    await AuthPostTest.logoutUser(app, buyerUser);
   });
 
   it('/auth/test/health (GET) → health check', async () => {
-    const res = await request(app.getHttpServer())
-      .get('/auth/test/health')
-      .expect(200);
-
-    expect(res.body).toHaveProperty('status', 'ok');
-    expect(res.body).toHaveProperty('module', 'auth');
-    expect(res.body).toHaveProperty('timestamp');
+    await AuthGetTest.getHealthTest(app);
   });
 
   it('teardown', async () => {
-    //login buyer
-    //delete buyer with user-api
+    await permanentlyDeleteUserById(app, buyerUser.userId);
+    await AuthPostTest.logoutUser(app, adminTester);
+    console.log(buyerUser);
   });
 });
