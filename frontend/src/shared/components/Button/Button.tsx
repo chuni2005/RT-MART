@@ -25,6 +25,8 @@ function Button({
         return styles.btnOutline;
       case 'login':
         return styles.btnLogin;
+      case 'ghost':
+        return styles.btnGhost;
       default:
         return styles.btnPrimary;
     }

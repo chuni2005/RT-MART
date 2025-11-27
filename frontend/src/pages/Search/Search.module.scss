@@ -15,12 +15,13 @@
   gap: $spacing-lg;
 
   @include tablet {
-    grid-template-columns: 1fr; // 平板以下單欄
+    grid-template-columns: 3fr; // 平板以下3欄
     padding: 0 $spacing-md;
   }
 
   @include mobile {
     padding: 0 $spacing-sm;
+    grid-template-columns: 2fr; // 確保手機版2欄
   }
 }
 
@@ -30,12 +31,11 @@
   padding: $spacing-lg;
   height: fit-content;
   position: sticky;
-  top: calc(80px + $spacing-lg); 
+  top: calc(80px + $spacing-lg);
   box-shadow: $shadow-sm;
 
-  @include tablet {
-    position: static; // 平板以下取消 sticky
-    margin-bottom: $spacing-lg;
+  @include belowTablet {
+    display: none;
   }
 }
 
@@ -51,7 +51,7 @@
   padding: $spacing-lg;
   box-shadow: $shadow-sm;
 
-  @include mobile {
+  @include belowTablet {
     padding: $spacing-md;
   }
 }
@@ -63,7 +63,7 @@
   margin-bottom: $spacing-xs;
   word-break: break-word;
 
-  @include mobile {
+  @include belowTablet {
     font-size: $font-lg;
   }
 }
@@ -71,6 +71,27 @@
 .resultCount {
   font-size: $font-sm;
   color: $text-secondary;
+}
+
+.resultHeaderTop {
+  display: flex;
+  justify-content: space-between;
+  align-items: flex-start;
+  gap: $spacing-md;
+  width: 100%;
+}
+
+.filterToggle {
+  display: none;
+  font-size: $font-lg;
+  padding: $spacing-sm $spacing-md;
+
+  @include belowTablet {
+    display: flex;
+    align-items: center;
+    gap: $spacing-xs;
+    flex-shrink: 0;
+  }
 }
 
 .productGrid {
@@ -83,12 +104,13 @@
   }
 
   @include tablet {
-    grid-template-columns: repeat(2, 1fr);
+    grid-template-columns: repeat(3, 1fr);
     gap: $spacing-md;
   }
 
   @include mobile {
-    grid-template-columns: 1fr;
+    grid-template-columns: repeat(2, 1fr);
+    gap: $spacing-md;
   }
 }
 
@@ -142,4 +164,69 @@
   &:hover {
     background: color.adjust($error-color, $lightness: -10%);
   }
+}
+
+// 抽屜背景遮罩
+.drawerBackdrop {
+  display: none;
+
+  @include belowTablet {
+    display: block;
+    position: fixed;
+    top: 0;
+    left: 0;
+    right: 0;
+    bottom: 0;
+    background: rgba(0, 0, 0, 0.5);
+    z-index: $z-index-modal-backdrop;
+    @include fade-in;
+  }
+}
+
+// 抽屜側邊欄
+.drawerSidebar {
+  display: none;
+
+  @include belowTablet {
+    display: flex;
+    flex-direction: column;
+    position: fixed;
+    top: 0;
+    left: 0;
+    bottom: 0;
+    width: 80%;
+    max-width: 320px;
+    background: $card-bg;
+    z-index: $z-index-modal;
+    box-shadow: $shadow-lg;
+    @include slide-in-left;
+    overflow: hidden;
+  }
+}
+
+.drawerHeader {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  padding: $spacing-lg;
+  border-bottom: 1px solid $border-color;
+  flex-shrink: 0;
+
+  h2 {
+    font-size: $font-lg;
+    font-weight: 600;
+    color: $text-primary;
+    margin: 0;
+  }
+}
+
+.closeButton {
+  min-width: auto;
+  font-size: $font-lg;
+}
+
+.drawerContent {
+  flex: 1;
+  overflow-y: auto;
+  padding: $spacing-lg;
 }

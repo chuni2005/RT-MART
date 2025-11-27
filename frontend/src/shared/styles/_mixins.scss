@@ -82,6 +82,15 @@
   }
 }
 
+@mixin belowTablet {
+  @include tablet {
+    @content;
+  }
+  @include mobile {
+    @content;
+  }
+}
+
 // ===========================
 //  Container
 // ===========================
@@ -280,5 +289,18 @@
   to {
     opacity: 1;
     transform: translateY(0);
+  }
+}
+
+@mixin slide-in-left($duration: 0.3s) {
+  animation: slideInLeft $duration ease;
+}
+
+@keyframes slideInLeft {
+  from {
+    transform: translateX(-100%);
+  }
+  to {
+    transform: translateX(0);
   }
 }

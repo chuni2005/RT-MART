@@ -55,12 +55,10 @@
 }
 
 .stars {
-  font-size: $font-md;
+  display: flex;
+  gap: 2px;
+  color: $warning-color;
   line-height: 1;
-
-  @include mobile {
-    font-size: $font-sm;
-  }
 }
 
 .text {

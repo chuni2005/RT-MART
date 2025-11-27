@@ -47,6 +47,18 @@
   }
 }
 
+.btnGhost {
+  background: transparent;
+  color: $text-secondary;
+  border: none;
+  padding: $spacing-xs;
+
+  &:hover:not(:disabled) {
+    color: $text-primary;
+    background: $bg-tertiary;
+  }
+}
+
 .iconButton {
   @include button-base;
   background: transparent;

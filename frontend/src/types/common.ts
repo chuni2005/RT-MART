@@ -15,7 +15,7 @@ export interface AlertProps {
 
 // Button types
 export interface ButtonProps {
-  variant?: 'primary' | 'outline' | 'login';
+  variant?: 'primary' | 'outline' | 'login' | 'ghost';
   onClick?: (e: MouseEvent<HTMLButtonElement>) => void;
   children?: ReactNode;
   type?: 'button' | 'submit' | 'reset';

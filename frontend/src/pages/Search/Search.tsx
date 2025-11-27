@@ -3,6 +3,7 @@ import { useSearchParams, useNavigate } from "react-router-dom";
 import ProductCard from "@/shared/components/ProductCard";
 import Alert from "@/shared/components/Alert";
 import Button from "@/shared/components/Button";
+import Icon from "@/shared/components/Icon";
 import FilterSidebar from "./components/FilterSidebar";
 import Pagination from "./components/Pagination";
 import EmptyState from "./components/EmptyState";
@@ -31,6 +32,9 @@ function Search() {
   const [currentPage, setCurrentPage] = useState<number>(1);
   const pageSize = 16; // 4列 × 4行
 
+  // 平板/手機版篩選抽屜
+  const [isFilterOpen, setIsFilterOpen] = useState<boolean>(false);
+
   // 無關鍵字時重定向至首頁
   useEffect(() => {
     if (!keyword || keyword.trim() === "") {
@@ -38,6 +42,19 @@ function Search() {
       return;
     }
   }, [keyword, navigate]);
+
+  // 防止背景滾動（當抽屜打開時）
+  useEffect(() => {
+    if (isFilterOpen) {
+      document.body.classList.add('drawer-open');
+    } else {
+      document.body.classList.remove('drawer-open');
+    }
+
+    return () => {
+      document.body.classList.remove('drawer-open');
+    };
+  }, [isFilterOpen]);
 
   // 載入商品資料
   const fetchProducts = async () => {
@@ -165,12 +182,64 @@ function Search() {
           />
         </aside>
 
+        {/* 平板/手機版抽屜 */}
+        {isFilterOpen && (
+          <>
+            <div
+              className={styles.drawerBackdrop}
+              onClick={() => setIsFilterOpen(false)}
+            />
+            <aside className={styles.drawerSidebar}>
+              <div className={styles.drawerHeader}>
+                <h2>篩選條件</h2>
+                <Button
+                  variant="ghost"
+                  onClick={() => setIsFilterOpen(false)}
+                  className={styles.closeButton}
+                  ariaLabel="關閉篩選"
+                >
+                  <Icon icon="times" />
+                </Button>
+              </div>
+              <div className={styles.drawerContent}>
+                <FilterSidebar
+                  minPrice={minPrice}
+                  maxPrice={maxPrice}
+                  onPriceChange={handlePriceChange}
+                  rating={rating}
+                  onRatingChange={handleRatingChange}
+                  sortBy={sortBy}
+                  onSortChange={handleSortChange}
+                  onReset={() => {
+                    handleResetFilters();
+                    setIsFilterOpen(false);
+                  }}
+                  onApply={() => setIsFilterOpen(false)}
+                  total={total}
+                />
+              </div>
+            </aside>
+          </>
+        )}
+
         {/* 右側主內容區 */}
         <main className={styles.mainContent}>
           {/* 搜尋結果標題 */}
           <div className={styles.resultHeader}>
-            <h1 className={styles.resultTitle}>搜尋結果："{keyword}"</h1>
-            <p className={styles.resultCount}>共 {total} 件商品</p>
+            <div className={styles.resultHeaderTop}>
+              <div>
+                <h1 className={styles.resultTitle}>搜尋結果："{keyword}"</h1>
+                <p className={styles.resultCount}>共 {total} 件商品</p>
+              </div>
+              <Button
+                variant="outline"
+                onClick={() => setIsFilterOpen(true)}
+                className={styles.filterToggle}
+              >
+                <Icon icon="bars" size="sm" />
+                篩選
+              </Button>
+            </div>
           </div>
 
           {/* 錯誤訊息 */}
