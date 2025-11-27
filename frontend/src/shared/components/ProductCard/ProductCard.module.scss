@@ -72,6 +72,29 @@
   color: $text-secondary;
 }
 
+.ratingStars {
+  display: flex;
+  align-items: center;
+  gap: 0.25rem;
+}
+
+.starIcon {
+
+  &.filled {
+    color: gold;
+  }
+
+  &.empty {
+    color: #e0e0e0;
+  }
+}
+
+.ratingValue {
+  font-size: $font-sm;
+  color: #666;
+  margin-left: 4px;
+}
+
 .soldCount {
   color: $text-tertiary;
 }
