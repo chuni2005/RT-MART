@@ -3,6 +3,7 @@ import { AuthProvider } from "./shared/contexts/AuthContext";
 import Header from "./shared/components/Header";
 import Home from "./pages/Home";
 import Auth from "./pages/Auth";
+import Search from "./pages/Search";
 import ProductDetail from "./pages/Product";
 import Store from "./pages/Store";
 import "./shared/lib/iconLibrary";
@@ -31,7 +32,7 @@ function AppContent() {
           {/* Buyer Pages */}
           <Route path="/" element={<Home />} />
           <Route path="/auth" element={<Auth />} />
-          <Route path="/search" element={<h2>商品搜索頁面開發中...</h2>} />
+          <Route path="/search" element={<Search />} />
           <Route path="/product/:product_id" element={<ProductDetail />} />
           <Route path="/store/:store_id" element={<Store />} />
           <Route path="/cart" element={<h2>購物車頁面開發中...</h2>} />

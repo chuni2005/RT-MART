@@ -9,9 +9,11 @@
   font-weight: 600;
   border-radius: $border-radius-lg;
   transition: $transition-base;
+  max-width: fit-content;
 
   &.fullWidth {
     width: 100%;
+    max-width: 100%;
   }
 
   &:disabled {

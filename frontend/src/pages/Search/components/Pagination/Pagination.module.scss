@@ -1,0 +1,64 @@
+.pagination {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  gap: $spacing-sm;
+  padding: $spacing-lg 0;
+}
+
+.pageButton {
+  min-width: 40px;
+  height: 40px;
+  padding: $spacing-sm $spacing-md;
+  border: 1px solid $border-color;
+  border-radius: $border-radius-md;
+  background: $card-bg;
+  color: $text-primary;
+  font-size: $font-sm;
+  font-weight: 500;
+  cursor: pointer;
+  transition: $transition-fast;
+
+  display: flex;
+  align-items: center;
+  justify-content: center;
+
+  &:hover:not(:disabled):not(.active) {
+    background: $bg-tertiary;
+    border-color: $primary-color;
+    color: $primary-color;
+  }
+
+  &.active {
+    background: $primary-color;
+    color: $text-white;
+    border-color: $primary-color;
+    font-weight: 600;
+  }
+
+  &:disabled {
+    opacity: 0.5;
+    cursor: not-allowed;
+    background: $bg-tertiary;
+  }
+
+  // 響應式調整
+  @include mobile {
+    min-width: 36px;
+    height: 36px;
+    padding: $spacing-xs $spacing-sm;
+    font-size: $font-xs;
+  }
+}
+
+.ellipsis {
+  padding: $spacing-sm;
+  color: $text-tertiary;
+  font-size: $font-sm;
+  user-select: none;
+
+  @include mobile {
+    padding: $spacing-xs;
+    font-size: $font-xs;
+  }
+}
