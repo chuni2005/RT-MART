@@ -16,7 +16,7 @@ export class UsersService {
   constructor(
     @InjectRepository(User)
     private readonly userRepository: Repository<User>,
-  ) {}
+  ) { }
 
   async create(createUserDto: CreateUserDto): Promise<User> {
     // Check if loginId or email already exists (excluding soft-deleted users)
@@ -27,11 +27,15 @@ export class UsersService {
       ],
     });
 
+    //conflict
     if (existingUser) {
       if (existingUser.loginId === createUserDto.loginId) {
         throw new ConflictException('Login ID already exists');
       }
       throw new ConflictException('Email already exists');
+    }
+    if (!Object.values(UserRole).includes(createUserDto.role as UserRole)) {
+      throw new ConflictException('Invalid user role');
     }
 
     // Hash password
@@ -105,7 +109,15 @@ export class UsersService {
   async update(id: string, updateUserDto: UpdateUserDto): Promise<User> {
     const user = await this.findOne(id);
 
-    // Check email uniqueness if being updated
+    // Check loginId uniqueness
+    if (updateUserDto.loginId && updateUserDto.loginId !== user.loginId) {
+      const existingUser = await this.findByLoginId(updateUserDto.loginId);
+      if (existingUser) {
+        throw new ConflictException('Login ID already exists');
+      }
+    }
+
+    // Check email uniqueness
     if (updateUserDto.email && updateUserDto.email !== user.email) {
       const existingUser = await this.findByEmail(updateUserDto.email);
       if (existingUser) {
@@ -113,7 +125,15 @@ export class UsersService {
       }
     }
 
-    Object.assign(user, updateUserDto);
+    // Handle password update
+    if (updateUserDto.password) {
+      user.passwordHash = await bcrypt.hash(updateUserDto.password, 10);
+    }
+
+    // Assign other fields (排除 password)
+    const { password, ...rest } = updateUserDto;
+    Object.assign(user, rest);
+
     return await this.userRepository.save(user);
   }
 

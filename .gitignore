@@ -6,6 +6,8 @@
 .references/
 package-lock.json 
 
+backend/test/logs/
+
 # Ignore all markdown files except README.md
 *.md
 !README.md

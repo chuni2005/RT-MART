@@ -26,9 +26,9 @@ export enum UserRole {
 @Entity('User')
 @Index(['loginId']) // Already unique, but explicit index for faster lookups
 @Index(['email']) // Already unique, but explicit index for faster lookups
-@Index(['role']) // For filtering by role
+@Index(['role']) // Role: buyer, seller, admin
 @Index(['deletedAt']) // For soft delete queries
-@Index(['role', 'deletedAt']) // Composite index for active users by role
+// @Index(['role', 'deletedAt']) // Composite index for active users by role
 @Index(['createdAt']) // For sorting by registration date
 export class User {
   @PrimaryGeneratedColumn({ name: 'user_id', type: 'bigint' })

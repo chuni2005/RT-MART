@@ -1,9 +1,9 @@
 import request from 'supertest';
 import { INestApplication } from '@nestjs/common';
-import { buyerUser, sellerUser, adminUser } from '../../variables';
+import { buyerUser, sellerUser, adminUser, adminTester } from '../../variables';
 
 export async function registerUser(app: INestApplication) {
-  await request(app.getHttpServer())
+  const res = await request(app.getHttpServer())
     .post('/auth/register')
     .send({
       loginId: buyerUser.loginId,
@@ -13,6 +13,8 @@ export async function registerUser(app: INestApplication) {
       phone: buyerUser.phone,
     })
     .expect(201);
+
+    buyerUser.userId = (res.body.userId!==adminTester.userId)? res.body.userId: 0;
 }
 
 export async function registerUserWithConflict(
@@ -34,12 +36,12 @@ export async function registerUserWithConflict(
   expect(res.body).toHaveProperty('message');
 }
 
-export async function loginUser(app: INestApplication) {
+export async function loginUser(app: INestApplication, user: any) {
   const res = await request(app.getHttpServer())
     .post('/auth/login')
     .send({
-      loginId: buyerUser.loginId,
-      password: buyerUser.password,
+      loginId: user.loginId,
+      password: user.password,
     })
     .expect(201);
 
@@ -47,10 +49,10 @@ export async function loginUser(app: INestApplication) {
   const cookieString = Array.isArray(cookies) ? cookies.join(';') : cookies;
   expect(cookieString).toContain('refreshToken');
   expect(cookieString).toContain('accessToken');
-  console.log('Using cookies for login:', cookieString);
-  buyerUser.cookie.accessToken =
+  // console.log('Using cookies for login:', cookieString);
+  user.cookie.accessToken =
     cookieString.match(/accessToken=([^;]+);/)?.[1] || '';
-  buyerUser.cookie.refreshToken =
+  user.cookie.refreshToken =
     cookieString.match(/refreshToken=([^;]+);/)?.[1] || '';
 }
 
@@ -72,10 +74,10 @@ export async function loginUserWithInvalidCredentials(
 }
 
 export async function refreshAccessTokenWithCookie(app: INestApplication) {
-  console.log(
-    'Using cookies for refresh token:',
-    buyerUser.cookie.refreshToken,
-  );
+  // console.log(
+  //   'Using cookies for refresh token:',
+  //   buyerUser.cookie.refreshToken,
+  // );
   const refreshRes = await request(app.getHttpServer())
     .post('/auth/refresh')
     .set('Cookie', `refreshToken=${buyerUser.cookie.refreshToken}`)
@@ -97,10 +99,10 @@ export async function refreshAccessTokenWithWrongRefreshTokenInCookie(
     .expect(401);
 }
 
-export async function logoutUser(app: INestApplication): Promise<void> {
+export async function logoutUser(app: INestApplication, user: any): Promise<void> {
   const res = await request(app.getHttpServer())
     .post('/auth/logout')
-    .set('Cookie', `refreshToken=${buyerUser.cookie.refreshToken}`)
+    .set('Cookie', `refreshToken=${user.cookie.refreshToken}`)
     .expect(201);
 
   const logoutCookies = res.headers['set-cookie'] ?? [];
@@ -108,10 +110,10 @@ export async function logoutUser(app: INestApplication): Promise<void> {
     ? logoutCookies.join(';')
     : logoutCookies;
 
-  buyerUser.cookie.accessToken =
+  user.cookie.accessToken =
     logoutCookieString.match(/accessToken=([^;]+);/)?.[1] || '';
-  buyerUser.cookie.refreshToken =
+  user.cookie.refreshToken =
     logoutCookieString.match(/refreshToken=([^;]+);/)?.[1] || '';
-  expect(buyerUser.cookie.accessToken == '').toBe(true);
-  expect(buyerUser.cookie.refreshToken == '').toBe(true);
+  expect(user.cookie.accessToken == '').toBe(true);
+  expect(user.cookie.refreshToken == '').toBe(true);
 }

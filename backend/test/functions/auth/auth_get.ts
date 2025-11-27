@@ -17,3 +17,13 @@ export async function getUserProfileWithWrongAccessTokenCookie(
     .set('Cookie', `accessToken=invalidaccesstoken`)
     .expect(401);
 }
+
+export async function getHealthTest(app: INestApplication){
+    const res = await request(app.getHttpServer())
+        .get('/auth/test/health')
+        .expect(200);
+
+    expect(res.body).toHaveProperty('status', 'ok');
+    expect(res.body).toHaveProperty('module', 'auth');
+    expect(res.body).toHaveProperty('timestamp');
+}
