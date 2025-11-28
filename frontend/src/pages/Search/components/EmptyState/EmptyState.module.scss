@@ -38,12 +38,14 @@
   font-size: $font-md;
   color: $text-secondary;
   margin-bottom: $spacing-lg;
+  text-align: left;
 
   p {
     margin-bottom: $spacing-sm;
   }
 
   ul {
+    list-style: disc;
     text-align: left;
     margin: 0 auto;
     padding-left: $spacing-xl;
