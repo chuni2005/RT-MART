@@ -53,7 +53,7 @@ const FormInput = ({
   const inputType = isPasswordField && showPassword ? 'text' : type;
 
   return (
-    <div className={`${styles.formGroup} ${className || ''}`}>
+    <div className={`${styles.formGroup} ${className || ""}`}>
       {/* Label */}
       {label && (
         <label htmlFor={name} className={styles.label}>
@@ -63,13 +63,11 @@ const FormInput = ({
       )}
 
       <div className={styles.inputContainer}>
-
         {icon && (
           <div className={styles.icon}>
             <Icon icon={icon} />
           </div>
         )}
-
 
         <input
           type={inputType}
@@ -81,10 +79,10 @@ const FormInput = ({
           placeholder={placeholder}
           disabled={disabled}
           autoComplete={autoComplete}
-          className={`${styles.input} ${error ? styles.error : ''} ${icon ? styles.hasIcon : ''} ${
-            isPasswordField ? styles.hasPasswordToggle : ''
-          }`}
-          aria-invalid={error ? 'true' : 'false'}
+          className={`${styles.input} ${error ? styles.error : ""} ${
+            icon ? styles.hasIcon : ""
+          } ${isPasswordField ? styles.hasPasswordToggle : ""}`}
+          aria-invalid={error ? "true" : "false"}
           aria-describedby={error ? `${name}-error` : undefined}
           {...rest}
         />
@@ -95,15 +93,15 @@ const FormInput = ({
             onClick={togglePasswordVisibility}
             role="button"
             tabIndex={0}
-            aria-label={showPassword ? '隱藏密碼' : '顯示密碼'}
+            aria-label={showPassword ? "隱藏密碼" : "顯示密碼"}
             onKeyDown={(e: KeyboardEvent<HTMLDivElement>) => {
-              if (e.key === 'Enter' || e.key === ' ') {
+              if (e.key === "Enter" || e.key === " ") {
                 e.preventDefault();
                 togglePasswordVisibility();
               }
             }}
           >
-            <Icon icon={showPassword ? 'eye-slash' : 'eye'} />
+            <Icon icon={showPassword ? "eye" : "eye-slash"} />
           </div>
         )}
       </div>

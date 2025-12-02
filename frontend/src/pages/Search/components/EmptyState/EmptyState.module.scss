@@ -1,0 +1,71 @@
+.emptyState {
+  grid-column: 1 / -1;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  padding: $spacing-xxl;
+  text-align: center;
+  background: $card-bg;
+  border-radius: $border-radius-lg;
+  margin: $spacing-xl 0;
+  min-height: 400px;
+}
+
+.emptyIcon {
+  font-size: 64px;
+  color: $text-tertiary;
+  margin-bottom: $spacing-lg;
+
+  @include mobile {
+    font-size: 48px;
+  }
+}
+
+.emptyTitle {
+  font-size: $font-xl;
+  font-weight: 600;
+  color: $text-primary;
+  margin-bottom: $spacing-md;
+  word-break: break-word;
+
+  @include mobile {
+    font-size: $font-lg;
+  }
+}
+
+.emptyMessage {
+  font-size: $font-md;
+  color: $text-secondary;
+  margin-bottom: $spacing-lg;
+  text-align: left;
+
+  p {
+    margin-bottom: $spacing-sm;
+  }
+
+  ul {
+    list-style: disc;
+    text-align: left;
+    margin: 0 auto;
+    padding-left: $spacing-xl;
+    max-width: 400px;
+
+    @include mobile {
+      max-width: 300px;
+    }
+  }
+
+  li {
+    margin-bottom: $spacing-sm;
+    line-height: 1.6;
+  }
+
+  @include mobile {
+    font-size: $font-sm;
+  }
+}
+
+.backButton {
+  margin-top: $spacing-md;
+}

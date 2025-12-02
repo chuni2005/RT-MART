@@ -9,9 +9,11 @@
   font-weight: 600;
   border-radius: $border-radius-lg;
   transition: $transition-base;
+  max-width: fit-content;
 
   &.fullWidth {
     width: 100%;
+    max-width: 100%;
   }
 
   &:disabled {
@@ -45,12 +47,25 @@
   }
 }
 
+.btnGhost {
+  background: transparent;
+  color: $text-secondary;
+  border: none;
+  padding: $spacing-xs;
+
+  &:hover:not(:disabled) {
+    color: $text-primary;
+    background: $bg-tertiary;
+  }
+}
+
 .iconButton {
   @include button-base;
   background: transparent;
   border: none;
+  width: 40px;
+  height: 40px;
   padding: $spacing-sm;
-  font-size: $font-xl;
   color: $text-primary;
   position: relative;
   transition: $transition-base;

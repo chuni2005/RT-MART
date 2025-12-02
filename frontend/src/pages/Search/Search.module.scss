@@ -1,0 +1,232 @@
+@use 'sass:color';
+.searchPage {
+  min-height: 100vh;
+  background-color: $bg-primary;
+  padding-top: $spacing-lg;
+  padding-bottom: $spacing-xxl;
+}
+
+.container {
+  max-width: $desktop-lg;
+  margin: 0 auto;
+  padding: 0 $spacing-lg;
+  display: grid;
+  grid-template-columns: 240px 1fr;
+  gap: $spacing-lg;
+
+  @include tablet {
+    grid-template-columns: 3fr; // 平板以下3欄
+    padding: 0 $spacing-md;
+  }
+
+  @include mobile {
+    padding: 0 $spacing-sm;
+    grid-template-columns: 2fr; // 確保手機版2欄
+  }
+}
+
+.sidebar {
+  background: $card-bg;
+  border-radius: $border-radius-lg;
+  padding: $spacing-lg;
+  height: fit-content;
+  position: sticky;
+  top: calc(80px + $spacing-lg);
+  box-shadow: $shadow-sm;
+
+  @include belowTablet {
+    display: none;
+  }
+}
+
+.mainContent {
+  display: flex;
+  flex-direction: column;
+  gap: $spacing-lg;
+}
+
+.resultHeader {
+  background: $card-bg;
+  border-radius: $border-radius-lg;
+  padding: $spacing-lg;
+  box-shadow: $shadow-sm;
+
+  @include belowTablet {
+    padding: $spacing-md;
+  }
+}
+
+.resultTitle {
+  font-size: $font-xl;
+  font-weight: 600;
+  color: $text-primary;
+  margin-bottom: $spacing-xs;
+  word-break: break-word;
+
+  @include belowTablet {
+    font-size: $font-lg;
+  }
+}
+
+.resultCount {
+  font-size: $font-sm;
+  color: $text-secondary;
+}
+
+.resultHeaderTop {
+  display: flex;
+  justify-content: space-between;
+  align-items: flex-start;
+  gap: $spacing-md;
+  width: 100%;
+}
+
+.filterToggle {
+  display: none;
+  font-size: $font-lg;
+  padding: $spacing-sm $spacing-md;
+
+  @include belowTablet {
+    display: flex;
+    align-items: center;
+    gap: $spacing-xs;
+    flex-shrink: 0;
+  }
+}
+
+.productGrid {
+  display: grid;
+  grid-template-columns: repeat(4, 1fr);
+  gap: $spacing-lg;
+
+  @include max-width($desktop) {
+    grid-template-columns: repeat(3, 1fr);
+  }
+
+  @include tablet {
+    grid-template-columns: repeat(3, 1fr);
+    gap: $spacing-md;
+  }
+
+  @include mobile {
+    grid-template-columns: repeat(2, 1fr);
+    gap: $spacing-md;
+  }
+}
+
+.loading {
+  grid-column: 1 / -1;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  text-align: center;
+  padding: $spacing-xxl;
+  color: $text-secondary;
+  min-height: 400px;
+
+  p {
+    margin-top: $spacing-md;
+    font-size: $font-md;
+  }
+}
+
+.spinner {
+  width: 48px;
+  height: 48px;
+  border: 4px solid $border-color;
+  border-top-color: $primary-color;
+  border-radius: 50%;
+  animation: spin 0.8s linear infinite;
+}
+
+@keyframes spin {
+  to {
+    transform: rotate(360deg);
+  }
+}
+
+.errorAlert {
+  margin-bottom: 0;
+}
+
+.retryButton {
+  padding: $spacing-sm $spacing-lg;
+  background: $error-color;
+  color: $text-white;
+  border: none;
+  border-radius: $border-radius-md;
+  font-size: $font-md;
+  cursor: pointer;
+  transition: $transition-fast;
+  align-self: center;
+
+  &:hover {
+    background: color.adjust($error-color, $lightness: -10%);
+  }
+}
+
+// 抽屜背景遮罩
+.drawerBackdrop {
+  display: none;
+
+  @include belowTablet {
+    display: block;
+    position: fixed;
+    top: 0;
+    left: 0;
+    right: 0;
+    bottom: 0;
+    background: rgba(0, 0, 0, 0.5);
+    z-index: $z-index-modal-backdrop;
+    @include fade-in;
+  }
+}
+
+// 抽屜側邊欄
+.drawerSidebar {
+  display: none;
+
+  @include belowTablet {
+    display: flex;
+    flex-direction: column;
+    position: fixed;
+    top: 0;
+    left: 0;
+    bottom: 0;
+    width: 80%;
+    max-width: 320px;
+    background: $card-bg;
+    z-index: $z-index-modal;
+    box-shadow: $shadow-lg;
+    @include slide-in-left;
+    overflow: hidden;
+  }
+}
+
+.drawerHeader {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  padding: $spacing-lg;
+  border-bottom: 1px solid $border-color;
+  flex-shrink: 0;
+
+  h2 {
+    font-size: $font-lg;
+    font-weight: 600;
+    color: $text-primary;
+    margin: 0;
+  }
+}
+
+.closeButton {
+  min-width: auto;
+  font-size: $font-lg;
+}
+
+.drawerContent {
+  flex: 1;
+  overflow-y: auto;
+  padding: $spacing-lg;
+}

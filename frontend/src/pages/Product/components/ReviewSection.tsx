@@ -260,7 +260,7 @@ function ReviewSection({ reviews, statistics }: ReviewSectionProps) {
       {/* 載入更多 */}
       {hasMore && (
         <div className={styles.loadMore}>
-          <Button variant="outline" onClick={handleLoadMore}>
+          <Button variant="outline" onClick={handleLoadMore} fullWidth>
             載入更多
           </Button>
         </div>

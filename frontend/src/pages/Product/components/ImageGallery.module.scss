@@ -3,9 +3,9 @@
   flex-direction: column;
   gap: $spacing-md;
   width: 100%;
-  max-width: 600px;
+  max-width: 37.5rem; // 600px
 
-  @include mobile {
+  @include belowTablet {
     max-width: 100%;
   }
 }
@@ -50,7 +50,7 @@
   border-radius: $border-radius-sm;
   font-size: $font-sm;
   opacity: 0;
-  transition: opacity 0.3s ease;
+  transition: opacity $duration-base ease;
   pointer-events: none;
 }
 
@@ -61,11 +61,11 @@
   background-color: rgba(255, 255, 255, 0.9);
   border: none;
   border-radius: 50%;
-  width: 40px;
-  height: 40px;
+  width: auto;
+  height: 2.5rem; // 40px
   @include flex-center;
   cursor: pointer;
-  transition: all 0.3s ease;
+  transition: all $duration-base ease;
   z-index: 10;
   box-shadow: $box-shadow-sm;
 
@@ -96,7 +96,7 @@
 
   // 隱藏滾動條但保持滾動功能
   &::-webkit-scrollbar {
-    height: 4px;
+    height: $spacing-xs;
   }
 
   &::-webkit-scrollbar-track {
@@ -116,13 +116,13 @@
 
 .thumbnail {
   flex-shrink: 0;
-  width: 80px;
-  height: 80px;
+  width: auto;
+  height: 5rem; // 80px
   border-radius: $border-radius-sm;
   overflow: hidden;
   cursor: pointer;
   border: 2px solid transparent;
-  transition: all 0.3s ease;
+  transition: all $duration-base ease;
   background-color: $bg-primary;
 
   img {
@@ -143,8 +143,8 @@
   }
 
   @include mobile {
-    width: 60px;
-    height: 60px;
+    width: auto;
+    height: 3.75rem; // 60px
   }
 }
 
@@ -157,7 +157,7 @@
   background-color: rgba(0, 0, 0, 0.95);
   z-index: 9999;
   @include flex-center;
-  animation: fadeIn 0.3s ease;
+  animation: fadeIn $duration-base ease;
 }
 
 @keyframes fadeIn {
@@ -176,12 +176,12 @@
   background-color: rgba(255, 255, 255, 0.2);
   border: none;
   border-radius: 50%;
-  width: 50px;
-  height: 50px;
+  width: auto;
+  height: 3.125rem; // 50px
   @include flex-center;
   cursor: pointer;
   color: $text-white;
-  transition: all 0.3s ease;
+  transition: all $duration-base ease;
   z-index: 10001;
 
   &:hover {
@@ -196,8 +196,8 @@
   @include mobile {
     top: $spacing-md;
     right: $spacing-md;
-    width: 40px;
-    height: 40px;
+    width: auto;
+    height: 2.5rem; // 40px
 
     svg {
       font-size: $font-xl;
@@ -225,12 +225,12 @@
   background-color: rgba(255, 255, 255, 0.2);
   border: none;
   border-radius: 50%;
-  width: 60px;
-  height: 60px;
+  width: auto;
+  height: 3.75rem; // 60px
   @include flex-center;
   cursor: pointer;
   color: $text-white;
-  transition: all 0.3s ease;
+  transition: all $duration-base ease;
   z-index: 10001;
 
   &:hover {
@@ -243,8 +243,8 @@
   }
 
   @include mobile {
-    width: 40px;
-    height: 40px;
+    width: auto;
+    height: 2.5rem; // 40px
 
     svg {
       font-size: $font-lg;

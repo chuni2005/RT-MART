@@ -54,6 +54,9 @@ export interface GetProductsParams {
   storeId?: string;
   productTypeId?: string;
   keyword?: string;
+  minPrice?: number;
+  maxPrice?: number;
+  minRating?: number;
   page?: number;
   limit?: number;
   sortBy?: 'price' | 'rating' | 'soldCount' | 'createdAt';
@@ -299,6 +302,20 @@ export const getProducts = async (
     );
   }
 
+  // 價格範圍過濾
+  if (params.minPrice !== undefined && params.minPrice !== null) {
+    filteredProducts = filteredProducts.filter(p => p.currentPrice >= params.minPrice!);
+  }
+
+  if (params.maxPrice !== undefined && params.maxPrice !== null) {
+    filteredProducts = filteredProducts.filter(p => p.currentPrice <= params.maxPrice!);
+  }
+
+  // 評價過濾
+  if (params.minRating !== undefined && params.minRating !== null) {
+    filteredProducts = filteredProducts.filter(p => p.rating >= params.minRating!);
+  }
+
   // 排序
   if (params.sortBy) {
     filteredProducts.sort((a, b) => {
@@ -356,6 +373,23 @@ export const getProductsByType = async (
   return getProducts({ ...params, productTypeId });
 };
 
+/**
+ * 取得所有商品類型 (Mock 版本)
+ * @returns 商品類型列表
+ */
+export const getProductTypes = async (): Promise<ProductType[]> => {
+  // TODO: 待後端 API 完成後，替換為真實 API 呼叫
+  // return get<ProductType[]>('/product-types');
+
+  console.log('[Mock API] Get all product types');
+
+  // 模擬網路延遲
+  await mockDelay(300);
+
+  // 返回所有分類
+  return Object.values(mockProductTypes);
+};
+
 // ============================================
 // 預設匯出
 // ============================================
@@ -365,4 +399,5 @@ export default {
   getProducts,
   getProductsByStore,
   getProductsByType,
+  getProductTypes,
 };

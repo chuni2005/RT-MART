@@ -7,8 +7,9 @@
   background: transparent;
   border: 1px solid $border-color;
   border-radius: 50%;
-  width: 40px;
-  height: 40px;
+  width: 2.5rem !important; 
+  height: 2.5rem !important; 
+  padding: 0 !important;
   display: flex;
   align-items: center;
   justify-content: center;
@@ -35,7 +36,7 @@
   border: 1px solid $border-color;
   border-radius: $border-radius-md;
   box-shadow: $shadow-lg;
-  min-width: 240px;
+  min-width: 15rem; // 240px
   z-index: $z-index-dropdown;
   overflow: hidden;
 }
@@ -67,7 +68,7 @@
 .dropdownItem {
   display: block;
   width: 100%;
-  padding: 12px $spacing-md;
+  padding: 0.75rem $spacing-md; // 12px
   text-align: left;
   background: transparent;
   border: none;
@@ -93,19 +94,19 @@
 // Responsive
 @media (max-width: $tablet) {
   .userButton {
-    width: 36px;
-    height: 36px;
+    width: 2.25rem !important; // 36px
+    height: 2.25rem !important; // 36px
   }
 
   .dropdown {
-    min-width: 200px;
+    min-width: 12.5rem; // 200px
   }
 }
 
 @media (max-width: $mobile) {
   .userButton {
-    width: 32px;
-    height: 32px;
+    width: 2rem !important; // 32px
+    height: 2rem !important; // 32px
   }
 
   .dropdown {
@@ -126,7 +127,7 @@
   }
 
   .dropdownItem {
-    padding: 10px $spacing-sm;
+    padding: 0.625rem $spacing-sm; // 10px
     font-size: $font-xs;
   }
 }

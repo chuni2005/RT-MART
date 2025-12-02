@@ -1,4 +1,4 @@
-import Icon from '../Icon/Icon';
+import Icon from '../Icon';
 import styles from './Button.module.scss';
 import type { ButtonProps } from '@/types';
 
@@ -25,6 +25,8 @@ function Button({
         return styles.btnOutline;
       case 'login':
         return styles.btnLogin;
+      case 'ghost':
+        return styles.btnGhost;
       default:
         return styles.btnPrimary;
     }

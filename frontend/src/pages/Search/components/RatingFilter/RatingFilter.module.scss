@@ -1,0 +1,71 @@
+.ratingFilter {
+  // Inherits from parent .filterSection
+}
+
+.filterTitle {
+  font-size: $font-md;
+  font-weight: 600;
+  color: $text-primary;
+  margin-bottom: $spacing-md;
+}
+
+.ratingOptions {
+  display: flex;
+  flex-direction: column;
+  gap: $spacing-sm;
+}
+
+.ratingOption {
+  display: flex;
+  align-items: center;
+  gap: $spacing-sm;
+  padding: $spacing-sm;
+  border-radius: $border-radius-md;
+  cursor: pointer;
+  transition: $transition-fast;
+  border: 1px solid transparent;
+
+  &:hover {
+    background-color: $bg-tertiary;
+  }
+
+  &.active {
+    background-color: rgba($primary-color, 0.1);
+    border-color: $primary-color;
+  }
+}
+
+.radioInput {
+  margin: 0;
+  cursor: pointer;
+  flex-shrink: 0;
+  width: 16px;
+  height: 16px;
+  accent-color: $primary-color;
+}
+
+.optionLabel {
+  display: flex;
+  align-items: center;
+  gap: $spacing-xs;
+  font-size: $font-sm;
+  color: $text-primary;
+  flex: 1;
+  user-select: none;
+}
+
+.stars {
+  display: flex;
+  gap: 2px;
+  color: $warning-color;
+  line-height: 1;
+}
+
+.text {
+  color: $text-secondary;
+
+  .active & {
+    color: $text-primary;
+    font-weight: 500;
+  }
+}

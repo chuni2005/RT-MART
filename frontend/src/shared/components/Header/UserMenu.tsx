@@ -30,7 +30,7 @@ const UserMenu = () => {
   if (!isAuthenticated) {
     return (
       <Link to="/auth">
-        <Button variant="login">登入</Button>
+        <Button variant="login" fullWidth>登入</Button>
       </Link>
     );
   }
@@ -38,7 +38,7 @@ const UserMenu = () => {
   return (
     <div className={styles.userMenu}>
       <Button
-        iconOnly
+        iconOnly={!user?.avatar}
         icon={user?.avatar ? undefined : "user"}
         onClick={() => setShowUserMenu(!showUserMenu)}
         className={styles.userButton}
@@ -88,6 +88,7 @@ const UserMenu = () => {
           {/* Logout Button */}
           <Button
             onClick={handleLogout}
+            fullWidth
             className={`${styles.dropdownItem} ${styles.logout}`}
           >
             登出

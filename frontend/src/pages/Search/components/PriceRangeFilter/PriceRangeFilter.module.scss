@@ -1,0 +1,68 @@
+.priceFilter {
+  // Inherits from parent .filterSection
+}
+
+.filterTitle {
+  font-size: $font-md;
+  font-weight: 600;
+  color: $text-primary;
+  margin-bottom: $spacing-md;
+}
+
+.priceInputs {
+  display: flex;
+  align-items: center;
+  gap: $spacing-sm;
+  margin-bottom: $spacing-md;
+}
+
+.priceInput {
+  flex: 1;
+  width: 100%;
+  padding: $spacing-sm;
+  border: 1px solid $border-color;
+  border-radius: $border-radius-md;
+  font-size: $font-sm;
+  color: $text-primary;
+  background: $bg-secondary;
+  transition: $transition-fast;
+
+  &:focus {
+    outline: none;
+    border-color: $primary-color;
+    box-shadow: 0 0 0 3px rgba($primary-color, 0.1);
+  }
+
+  &::placeholder {
+    color: $text-tertiary;
+  }
+
+  // 隱藏數字輸入的上下箭頭
+  &::-webkit-outer-spin-button,
+  &::-webkit-inner-spin-button {
+    -webkit-appearance: none;
+    margin: 0;
+  }
+
+  &[type='number'] {
+    -moz-appearance: textfield;
+  }
+}
+
+.separator {
+  color: $text-secondary;
+  font-weight: 500;
+  user-select: none;
+}
+
+.error {
+  font-size: $font-xs;
+  color: $error-color;
+  margin-bottom: $spacing-sm;
+  margin-top: -$spacing-xs;
+}
+
+.applyButton {
+  padding: $spacing-xs $spacing-md;
+  font-size: $font-md;
+}

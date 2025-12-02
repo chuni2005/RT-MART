@@ -6,6 +6,7 @@
 
 import { IconProp, IconDefinition } from '@fortawesome/fontawesome-svg-core';
 import {
+  faArrowRotateRight,
   faBars,
   faCheckCircle,
   faChevronDown,
@@ -36,6 +37,7 @@ import {
  * 用於 FontAwesome library.add() 批量註冊
  */
 const icons: IconDefinition[] = [
+  faArrowRotateRight,
   faBars,
   faCheckCircle,
   faChevronDown,
@@ -70,6 +72,7 @@ const icons: IconDefinition[] = [
  * - 外部組件可以傳遞字符串: <Icon icon="search" />
  */
 export const iconMap: Record<string, IconProp> = {
+  'arrow-rotate-right': faArrowRotateRight,
   'bars': faBars,
   'check-circle': faCheckCircle,
   'chevron-down': faChevronDown,
