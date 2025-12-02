@@ -91,6 +91,14 @@ export class StoresController {
     return { message: 'Store deleted successfully' };
   }
 
+  @Roles(UserRole.ADMIN)
+  @UseGuards(JwtAccessGuard, RolesGuard)
+  @Delete(':storeId/permanent')
+  async hardRemove(@Param('storeId') storeId: string) {
+    await this.storesService.permanentlyDelete(storeId);
+    return { message: 'User permanently deleted successfully' };
+  }
+
   @Get('test/health')
   getHealth(): object {
     return {

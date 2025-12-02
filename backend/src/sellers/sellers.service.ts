@@ -11,28 +11,31 @@ import { CreateSellerDto } from './dto/create-seller.dto';
 import { UpdateSellerDto } from './dto/update-seller.dto';
 import { VerifySellerDto } from './dto/verify-seller.dto';
 import { UsersService } from '../users/users.service';
-import { UserRole } from '../users/entities/user.entity';
+import { User, UserRole } from '../users/entities/user.entity';
+import { Store } from '../stores/entities/store.entity';
+import { QuerySellerDto } from './dto/query-seller.dto';
 
 @Injectable()
 export class SellersService {
   constructor(
     @InjectRepository(Seller)
     private readonly sellerRepository: Repository<Seller>,
+    @InjectRepository(Store)
+    private readonly storeRepository: Repository<Store>,
+    @InjectRepository(User)
+    private readonly userRepository: Repository<Store>,
     private readonly usersService: UsersService,
-  ) {}
+  ) { }
 
   async create(createSellerDto: CreateSellerDto): Promise<Seller> {
-    // Check if user exists and is not already a seller
     const user = await this.usersService.findOne(createSellerDto.userId);
 
-    if (user.role !== UserRole.BUYER && user.role !== UserRole.SELLER) {
+    if (!user || user.role == UserRole.ADMIN || user.role == UserRole.SELLER) {
       throw new BadRequestException('Only buyers can become sellers');
     }
 
-    const existingSeller = await this.sellerRepository.findOne({
-      where: { userId: createSellerDto.userId },
-    });
-
+    const existingSeller = await this.findByUserId(createSellerDto.userId);
+    // console.log(existingSeller);
     if (existingSeller) {
       throw new ConflictException('User is already a seller');
     }
@@ -46,21 +49,37 @@ export class SellersService {
     return savedSeller;
   }
 
-  async findAll(): Promise<Seller[]> {
-    return await this.sellerRepository.find({
-      relations: ['user'],
-      order: { sellerId: 'DESC' },
-    });
+  async findAll(queryDto: QuerySellerDto,): Promise<{ data: Seller[]; total: number }> {
+    const page = parseInt(queryDto.page || '1', 10);
+    const limit = parseInt(queryDto.limit || '10', 10);
+    const skip = (page - 1) * limit;
+
+    const query = this.sellerRepository.createQueryBuilder('seller')
+      .leftJoinAndSelect('seller.user', 'user')
+      .orderBy('seller.sellerId', 'DESC')
+      .skip(skip)
+      .take(limit);
+
+    if (queryDto.loginId) {
+      query.andWhere('user.loginId = :loginId', { loginId: queryDto.loginId });
+    }
+
+    if (queryDto.verified !== undefined) {
+      query.andWhere('seller.verified = :verified', { verified: queryDto.verified });
+    }
+
+    const [data, total] = await query.getManyAndCount();
+    return { data, total };
   }
 
-  async findOne(id: string): Promise<Seller> {
+  async findOne(sellerId: string): Promise<Seller> {
     const seller = await this.sellerRepository.findOne({
-      where: { sellerId: id },
+      where: { sellerId: sellerId },
       relations: ['user', 'verifier'],
     });
 
     if (!seller) {
-      throw new NotFoundException(`Seller with ID ${id} not found`);
+      throw new NotFoundException(`Seller with ID ${sellerId} not found`);
     }
 
     return seller;
@@ -73,34 +92,47 @@ export class SellersService {
     });
   }
 
-  async update(id: string, updateSellerDto: UpdateSellerDto): Promise<Seller> {
-    const seller = await this.findOne(id);
+  async update(sellerId: string, updateSellerDto: UpdateSellerDto): Promise<Seller> {
+    const seller = await this.findOne(sellerId);
     Object.assign(seller, updateSellerDto);
     return await this.sellerRepository.save(seller);
   }
 
-  async verify(id: string, verifyDto: VerifySellerDto): Promise<Seller> {
-    const seller = await this.findOne(id);
+  async verify(sellerId: string, verifier: string) {
+    const seller = await this.findOne(sellerId);
+    const user = await this.usersService.findOne(seller.userId);
 
     if (seller.verified) {
       throw new ConflictException('Seller is already verified');
     }
 
-    // Verify that the verifier is an admin
-    const verifier = await this.usersService.findOne(verifyDto.verifiedBy);
-    if (verifier.role !== UserRole.ADMIN) {
-      throw new BadRequestException('Only admins can verify sellers');
-    }
-
+    user.role = UserRole.SELLER;
     seller.verified = true;
     seller.verifiedAt = new Date();
-    seller.verifiedBy = verifyDto.verifiedBy;
+    seller.verifiedBy = verifier;
 
-    return await this.sellerRepository.save(seller);
+    const defaultStore = this.storeRepository.create({
+      sellerId: seller.sellerId,
+      storeName: `${(await this.usersService.findOne(seller.userId)).name}'s Store`,
+      storeDescription: 'Default store created upon seller verification',
+      storeAddress: null,
+      storeEmail: null,
+      storePhone: null,
+      averageRating: 0,
+      totalRatings: 0,
+    });
+
+    await this.sellerRepository.save(seller);
+    await this.userRepository.save(user);
+    return await this.storeRepository.save(defaultStore);
   }
 
-  async remove(id: string): Promise<void> {
-    const seller = await this.findOne(id);
+  async remove(sellerId: string): Promise<void> {
+    const seller = await this.findOne(sellerId);
+    if (seller.verified) {
+      throw new ConflictException('Seller is already verified'); //already have a store
+    }
+
     await this.sellerRepository.remove(seller);
   }
 }

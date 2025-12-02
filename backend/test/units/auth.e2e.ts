@@ -10,7 +10,7 @@ import { permanentlyDeleteUserById } from './../functions/users/users_delete';
 import { buyerUser, sellerUser, adminUser, adminTester } from './../variables';
 import { buildMessage } from 'class-validator';
 
-describe('UsersController (e2e)', () => {
+describe('AuthController (e2e)', () => {
   let app: INestApplication;
 
   beforeAll(async () => {

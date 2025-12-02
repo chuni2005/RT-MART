@@ -11,12 +11,15 @@ import { CreateStoreDto } from './dto/create-store.dto';
 import { UpdateStoreDto } from './dto/update-store.dto';
 import { QueryStoreDto } from './dto/query-store.dto';
 import { SellersService } from '../sellers/sellers.service';
+import { Seller } from '../sellers/entities/seller.entity';
 
 @Injectable()
 export class StoresService {
   constructor(
     @InjectRepository(Store)
     private readonly storeRepository: Repository<Store>,
+    @InjectRepository(Seller)
+    private readonly sellerRepository: Repository<Seller>,
     private readonly sellersService: SellersService,
   ) {}
 
@@ -112,6 +115,17 @@ export class StoresService {
     }
 
     await this.storeRepository.softRemove(store);
+  }
+
+  async permanentlyDelete(storeId: string): Promise<void> {
+    const store = await this.findOne(storeId);
+    const seller = await this.sellersService.findOne(store.sellerId);
+    if(!seller){
+      throw new NotFoundException('Can\t find the seller');
+    }
+
+   this.storeRepository.remove(store);
+   this.sellerRepository.remove(seller);
   }
 
   async updateRating(storeId: string, newRating: number): Promise<void> {

@@ -24,7 +24,7 @@ describe('UsersController (e2e)', () => {
 
   it('setup', async () => {
     await AuthPostTest.loginUser(app, adminTester);
-    console.log(adminTester.cookie.accessToken);
+    // console.log(adminTester.cookie.accessToken);
   });
 
   it('/users (POST) → Create user', async () => {
@@ -101,6 +101,6 @@ describe('UsersController (e2e)', () => {
   it('teardown', async () => {
     await UserDeleteTest.permanentlyDeleteUserById(app, sellerUser.userId);
     await UserDeleteTest.permanentlyDeleteUserById(app, adminUser.userId);
-    console.log(buyerUser);
+    // console.log(buyerUser);
   });
 });

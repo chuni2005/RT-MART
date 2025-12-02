@@ -7,6 +7,10 @@ import {
   Param,
   Delete,
   UseGuards,
+  Req,
+  NotFoundException,
+  ConflictException,
+  Query,
 } from '@nestjs/common';
 import { SellersService } from './sellers.service';
 import { CreateSellerDto } from './dto/create-seller.dto';
@@ -16,54 +20,74 @@ import { JwtAccessGuard } from '../auth/guards/jwt-auth.guard';
 import { RolesGuard } from '../auth/guards/roles.guard';
 import { Roles } from '../auth/decorators/roles.decorator';
 import { UserRole } from '../users/entities/user.entity';
+import { UsersService } from '../users/users.service';
+import { QuerySellerDto } from './dto/query-seller.dto';
 
 @Controller('sellers')
-@UseGuards(JwtAccessGuard)
 export class SellersController {
-  constructor(private readonly sellersService: SellersService) {}
+  constructor(private readonly sellersService: SellersService) { }
 
+  @Roles(UserRole.BUYER)
+  @UseGuards(JwtAccessGuard, RolesGuard)
   @Post()
-  async create(@Body() createSellerDto: CreateSellerDto) {
-    return await this.sellersService.create(createSellerDto);
+  async create(@Req() req, createSellerDto: CreateSellerDto) {
+    const userId = req.user.userId;
+    return this.sellersService.create({
+      ...createSellerDto,
+      userId,
+    });
   }
 
+  @Roles(UserRole.ADMIN)
+  @UseGuards(JwtAccessGuard, RolesGuard)
   @Get()
-  @UseGuards(RolesGuard)
+  async findAll(@Query() queryDto: QuerySellerDto) {
+    const { data, total } = await this.sellersService.findAll(queryDto);
+
+    return {
+      data,
+      total,
+      page: parseInt(queryDto.page || '1', 10),
+      limit: parseInt(queryDto.limit || '10', 10),
+    };
+  }
+
+  // @Get('users/:userId')
+  // async findByUserId(@Param('userId') userId: string) {
+  //   return await this.sellersService.findByUserId(userId);
+  // }
+
   @Roles(UserRole.ADMIN)
-  async findAll() {
-    return await this.sellersService.findAll();
+  @UseGuards(JwtAccessGuard, RolesGuard)
+  @Get(':sellerId')
+  async findOne(@Param('sellerId') sellerId: string) {
+    return await this.sellersService.findOne(sellerId);
   }
 
-  @Get('user/:userId')
-  async findByUserId(@Param('userId') userId: string) {
-    return await this.sellersService.findByUserId(userId);
-  }
+  // @UseGuards(JwtAccessGuard)
+  // @Patch('me')
+  // async update(@Req() req: any, @Body() updateSellerDto: UpdateSellerDto) {
+  //   const userId = req.user.userId;
+  //   const seller = await this.sellersService.findByUserId(userId);
+  //   if (!seller) {
+  //     throw new NotFoundException('Seller record not found for this user');
+  //   }
+  //   return await this.sellersService.update(seller.sellerId, updateSellerDto);
+  // }
 
-  @Get(':id')
-  async findOne(@Param('id') id: string) {
-    return await this.sellersService.findOne(id);
-  }
-
-  @Patch(':id')
-  async update(
-    @Param('id') id: string,
-    @Body() updateSellerDto: UpdateSellerDto,
-  ) {
-    return await this.sellersService.update(id, updateSellerDto);
-  }
-
-  @Post(':id/verify')
-  @UseGuards(RolesGuard)
   @Roles(UserRole.ADMIN)
-  async verify(@Param('id') id: string, @Body() verifyDto: VerifySellerDto) {
-    return await this.sellersService.verify(id, verifyDto);
+  @UseGuards(JwtAccessGuard, RolesGuard)
+  @Post(':sellerId/verify')
+  async verify(@Req() req: any, @Param('sellerId') sellerId: string) {
+    const verifier = req.user.userId;
+    return await this.sellersService.verify(sellerId, verifier);
   }
 
-  @Delete(':id')
-  @UseGuards(RolesGuard)
   @Roles(UserRole.ADMIN)
-  async remove(@Param('id') id: string) {
-    await this.sellersService.remove(id);
+  @UseGuards(JwtAccessGuard, RolesGuard)
+  @Delete(':sellerId')
+  async remove(@Param('sellerId') sellerId: string) {
+    await this.sellersService.remove(sellerId);
     return { message: 'Seller deleted successfully' };
   }
 
