@@ -1,0 +1,96 @@
+.cartPage {
+  max-width: 1200px;
+  margin: 0 auto;
+  padding: 24px;
+  min-height: calc(100vh - 120px);
+}
+
+.pageHeader {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  margin-bottom: 24px;
+
+  h1 {
+    font-size: 28px;
+    font-weight: 600;
+    color: $text-primary;
+  }
+
+  .itemCount {
+    font-size: $font-md;
+    color: $text-secondary;
+  }
+}
+
+.cartContainer {
+  display: flex;
+  gap: 24px;
+
+  @include mobile {
+    flex-direction: column;
+    padding-bottom: 400px; // 為底部固定的摘要留空間
+  }
+}
+
+.cartContent {
+  flex: 1;
+}
+
+.selectAllSection {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  padding: 16px;
+  background: $bg-secondary;
+  border-radius: $border-radius-lg;
+  margin-bottom: 16px;
+
+  input[type='checkbox'] {
+    width: 18px;
+    height: 18px;
+    cursor: pointer;
+  }
+
+  label {
+    font-size: $font-md;
+    font-weight: 500;
+    color: $text-primary;
+    cursor: pointer;
+  }
+}
+
+.cartItems {
+  display: flex;
+  flex-direction: column;
+}
+
+// Loading 狀態
+.loading {
+  @include flex-center;
+  min-height: 400px;
+
+  p {
+    font-size: $font-lg;
+    color: $text-secondary;
+  }
+}
+
+// 空購物車狀態
+.emptyCart {
+  @include flex-center;
+  flex-direction: column;
+  min-height: 400px;
+  gap: 16px;
+
+  h2 {
+    font-size: $font-2xl;
+    font-weight: 600;
+    color: $text-primary;
+  }
+
+  p {
+    font-size: $font-lg;
+    color: $text-secondary;
+  }
+}

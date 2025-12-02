@@ -84,3 +84,55 @@ export interface TabProps {
   variant?: "default" | "underline" | "pills";
   className?: string;
 }
+
+// Cart types
+export interface CartItem {
+  id: string;
+  productId: string;
+  productName: string;
+  productImage: string;
+  price: number;
+  quantity: number;
+  stock: number;
+  selected: boolean;
+}
+
+export interface GetCartResponse {
+  success: boolean;
+  message?: string;
+  items: CartItem[];
+  total: number;
+}
+
+// ItemListCard types
+export interface ItemListCardBaseProps {
+  variant: 'cart' | 'order-list' | 'order-detail';
+  item: CartItem | any; // TODO: Add OrderItem type when implementing orders
+  onClick?: () => void;
+}
+
+export interface CartVariantProps {
+  selectable?: boolean;
+  onSelect?: (selected: boolean) => void;
+  editable?: boolean;
+  onQuantityChange?: (quantity: number) => void;
+  deletable?: boolean;
+  onDelete?: () => void;
+}
+
+export interface OrderListVariantProps {
+  orderHeader?: {
+    orderId: string;
+    orderDate: string;
+    status: string;
+  };
+  actions?: Array<'pay' | 'cancel' | 'confirm' | 'detail'>;
+  onAction?: (action: string) => void;
+}
+
+export interface OrderDetailVariantProps {
+  readonly?: boolean;
+}
+
+export type ItemListCardProps = ItemListCardBaseProps &
+  (CartVariantProps | OrderListVariantProps | OrderDetailVariantProps);
