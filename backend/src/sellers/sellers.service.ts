@@ -35,7 +35,7 @@ export class SellersService {
     }
 
     const existingSeller = await this.findByUserId(createSellerDto.userId);
-    console.log(existingSeller);
+    // console.log(existingSeller);
     if (existingSeller) {
       throw new ConflictException('User is already a seller');
     }

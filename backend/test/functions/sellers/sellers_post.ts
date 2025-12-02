@@ -1,6 +1,6 @@
 import request from 'supertest';
 import { INestApplication } from '@nestjs/common';
-import { adminTester, buyerUser, buyerUser_sellerCase, adminUser} from '../../variables';
+import { adminTester, buyerUser, sellerUser, adminUser, buyerUser_sellerCase } from '../../variables';
 
 export async function appplyOwnBuyerAccountToSellerRole(app: INestApplication) {
     const res = await request(app.getHttpServer())
@@ -21,7 +21,7 @@ export async function appplyOwnBuyerAccountToSellerRole(app: INestApplication) {
 export async function appplyOwnSellerAccountToSellerRole(app: INestApplication) {
     await request(app.getHttpServer())
         .post(`/sellers`)
-        .set('Cookie', `accessToken=${buyerUser_sellerCase.cookie.accessToken}`)
+        .set('Cookie', `accessToken=${sellerUser.cookie.accessToken}`)
         .expect(403);
 }
 
@@ -47,9 +47,9 @@ export async function verifyApplicationOfSeller(app: INestApplication) {
     buyerUser.storeId = res.body.storeId;
 
     const res_user = await request(app.getHttpServer())
-        .post(`/users/${buyerUser.userId}`)
-        .expect(201);
-    expect(res_user.body).toHaveProperty('storeName', buyerUser.name + '\'s Store');
+        .get(`/users/${buyerUser.userId}`)
+        .expect(200);
+    expect(res_user.body).toHaveProperty('role', 'seller');
 }
 
 export async function verifyApplicationOfVerifiedSeller(app: INestApplication) {
@@ -69,6 +69,6 @@ export async function verifyApplicationOfNonExistedSeller(app: INestApplication)
 export async function verifyApplicationOfSellerWithNonPermissionRole(app: INestApplication) {
     await request(app.getHttpServer())
         .post(`/sellers/${buyerUser.sellerId}/verify`)
-        .set('Cookie', `accessToken=${buyerUser_sellerCase.cookie.accessToken}`)
+        .set('Cookie', `accessToken=${sellerUser.cookie.accessToken}`)
         .expect(403);
 }

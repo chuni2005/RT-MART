@@ -58,6 +58,6 @@ export async function getHealthTest(app: INestApplication) {
         .get('/sellers/test/health')
         .expect(200);
     expect(res.body).toHaveProperty('status', 'ok');
-    expect(res.body).toHaveProperty('module', 'users');
+    expect(res.body).toHaveProperty('module', 'sellers');
     expect(res.body).toHaveProperty('timestamp');
 }

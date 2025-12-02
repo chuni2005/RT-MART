@@ -12,7 +12,6 @@ import * as SellerDeleteTest from './../functions/sellers/sellers_delete';
 import * as SellerGetTest from './../functions/sellers/sellers_get';
 import { buyerUser, sellerUser, adminUser, adminTester, buyerUser_sellerCase } from './../variables';
 
-
 describe('SellerController (e2e)', () => {
   let app: INestApplication;
 
@@ -28,9 +27,11 @@ describe('SellerController (e2e)', () => {
     await AuthPostTest.loginUser(app, adminTester);
     await UserPostTest.createUser(app, buyerUser);
     await UserPostTest.createUser(app, buyerUser_sellerCase);
+    await UserPostTest.createUser(app, sellerUser);
     await UserPostTest.createUser(app, adminUser);
     await AuthPostTest.loginUser(app, buyerUser);
     await AuthPostTest.loginUser(app, buyerUser_sellerCase);
+    await AuthPostTest.loginUser(app, sellerUser);
     await AuthPostTest.loginUser(app, adminUser);
   }, 25000);
 
