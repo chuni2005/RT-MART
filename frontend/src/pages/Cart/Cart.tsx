@@ -129,6 +129,19 @@ function Cart() {
     );
   }
 
+  // 空購物車狀態
+  if (cartItems.length === 0) {
+    return (
+      <div className={styles.emptyCart}>
+        <h2>您的購物車是空的</h2>
+        <p>快去逛逛吧！</p>
+        <Button variant="primary" onClick={() => navigate('/')}>
+          去逛逛
+        </Button>
+      </div>
+    );
+  }
+
   return (
     <div className={styles.cartPage}>
       <div className={styles.pageHeader}>

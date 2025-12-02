@@ -136,3 +136,19 @@ export interface OrderDetailVariantProps {
 
 export type ItemListCardProps = ItemListCardBaseProps &
   (CartVariantProps | OrderListVariantProps | OrderDetailVariantProps);
+
+// EmptyState types
+export interface EmptyStateProps {
+  type?: 'search' | 'cart' | 'order';
+  icon?: string;
+  title?: string;
+  message?: string | ReactNode;
+  suggestions?: string[];
+  buttonText?: string;
+  buttonAction?: () => void;
+
+  // Deprecated (for backward compatibility with Search page)
+  keyword?: string;
+  categoryName?: string;
+}
+
