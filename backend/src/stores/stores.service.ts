@@ -120,12 +120,12 @@ export class StoresService {
   async permanentlyDelete(storeId: string): Promise<void> {
     const store = await this.findOne(storeId);
     const seller = await this.sellersService.findOne(store.sellerId);
-    if(!seller){
+    if (!seller) {
       throw new NotFoundException('Can\t find the seller');
     }
 
-   this.storeRepository.remove(store);
-   this.sellerRepository.remove(seller);
+    this.storeRepository.remove(store);
+    this.sellerRepository.remove(seller);
   }
 
   async updateRating(storeId: string, newRating: number): Promise<void> {

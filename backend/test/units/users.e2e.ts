@@ -31,8 +31,16 @@ describe('UsersController (e2e)', () => {
     await UserPostTest.createUser(app, buyerUser);
     await UserPostTest.createUser(app, sellerUser);
     await UserPostTest.createUser(app, adminUser);
-    await UserPostTest.createUserWithConflict(app, buyerUser.loginId, 'unique_email@example.com');
-    await UserPostTest.createUserWithConflict(app, 'unique_login_id', buyerUser.email);
+    await UserPostTest.createUserWithConflict(
+      app,
+      buyerUser.loginId,
+      'unique_email@example.com',
+    );
+    await UserPostTest.createUserWithConflict(
+      app,
+      'unique_login_id',
+      buyerUser.email,
+    );
   });
 
   it('/users (GET) → Get users', async () => {
@@ -59,25 +67,25 @@ describe('UsersController (e2e)', () => {
   it('/user/me (DELETE) → Delete own account', async () => {
     await UserDeleteTest.deleteOwnAccount(app);
     await UserDeleteTest.deleteOwnAccountWithNonCookie(app);
-  })
+  });
 
   it('/user/:id (DELETE) → Delete user', async () => {
     await UserDeleteTest.deleteUserById(app);
     await UserDeleteTest.deleteUserWithDeletedUserId(app);
     await UserDeleteTest.deleteUserWithNonExistentId(app);
     await UserDeleteTest.deleteUserWithNonPermissionRole(app);
-  })
+  });
 
   it('/users/:id (GET) → get a single user by id', async () => {
     await UserGetTest.getSingleUserById(app);
     await UserGetTest.getSingleUserByDeletedUserId(app);
     await UserGetTest.getSingleUserByNonExistentId(app);
-  })
+  });
 
   it('/users/deleted (GET) → Get deleted users', async () => {
     await UserGetTest.getAllOfDeletedUser(app);
-    await UserGetTest.getDeletedUsersWithFilterAndPage(app, 'buyer', 'user'),
-      await UserGetTest.getAllOfDeletedUsersWithNonPermissionRole(app);
+    (await UserGetTest.getDeletedUsersWithFilterAndPage(app, 'buyer', 'user'),
+      await UserGetTest.getAllOfDeletedUsersWithNonPermissionRole(app));
   });
 
   it('/users/:id/restore (POST) → restore a deleted user by id', async () => {

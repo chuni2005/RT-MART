@@ -21,9 +21,9 @@ describe('AuthController (e2e)', () => {
     await app.close();
   });
 
-  it('setup', async () =>{
+  it('setup', async () => {
     await AuthPostTest.loginUser(app, adminTester);
-  })
+  });
 
   it('/register (POST) → User register', async () => {
     await AuthPostTest.registerUser(app);

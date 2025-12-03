@@ -10,7 +10,13 @@ import * as UserDeleteTest from './../functions/users/users_delete';
 import * as SellerPostTest from './../functions/sellers/sellers_post';
 import * as SellerDeleteTest from './../functions/sellers/sellers_delete';
 import * as SellerGetTest from './../functions/sellers/sellers_get';
-import { buyerUser, sellerUser, adminUser, adminTester, buyerUser_sellerCase } from './../variables';
+import {
+  buyerUser,
+  sellerUser,
+  adminUser,
+  adminTester,
+  buyerUser_sellerCase,
+} from './../variables';
 
 describe('SellerController (e2e)', () => {
   let app: INestApplication;
@@ -79,9 +85,11 @@ describe('SellerController (e2e)', () => {
       .set('Cookie', `accessToken=${adminTester.cookie.accessToken}`)
       .expect(200);
     await UserDeleteTest.permanentlyDeleteUserById(app, buyerUser.userId);
-    await UserDeleteTest.permanentlyDeleteUserById(app, buyerUser_sellerCase.userId);
+    await UserDeleteTest.permanentlyDeleteUserById(
+      app,
+      buyerUser_sellerCase.userId,
+    );
     await UserDeleteTest.permanentlyDeleteUserById(app, sellerUser.userId);
     await UserDeleteTest.permanentlyDeleteUserById(app, adminUser.userId);
   });
-
 });
