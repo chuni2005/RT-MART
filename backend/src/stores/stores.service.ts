@@ -21,7 +21,7 @@ export class StoresService {
     @InjectRepository(Seller)
     private readonly sellerRepository: Repository<Seller>,
     private readonly sellersService: SellersService,
-  ) {}
+  ) { }
 
   // async create(sellerId: string, createDto: CreateStoreDto): Promise<Store> {
   //   // Verify seller exists and is verified
@@ -47,10 +47,6 @@ export class StoresService {
     const skip = (page - 1) * limit;
 
     const where: Record<string, string | ReturnType<typeof Like>> = {};
-
-    if (queryDto.sellerId) {
-      where.sellerId = queryDto.sellerId;
-    }
 
     if (queryDto.search) {
       where.storeName = Like(`%${queryDto.search}%`);
@@ -82,7 +78,7 @@ export class StoresService {
     return store;
   }
 
-  async findBySeller(sellerId: string): Promise<Store|null> {
+  async findBySeller(sellerId: string): Promise<Store | null> {
     return await this.storeRepository.findOne({
       where: { sellerId },
       order: { createdAt: 'DESC' },
@@ -99,20 +95,44 @@ export class StoresService {
     return await this.storeRepository.save(store);
   }
 
+  async restore(storeId: string): Promise<Store> {  
+    const store = await this.storeRepository.findOne({
+      where: { storeId },
+      withDeleted: true, // 包含已刪除的商店
+    });
+
+    if (!store) {
+      throw new NotFoundException(`Store with ID ${storeId} not found`);
+    }
+    
+    if (!store.deletedAt) {
+      throw new BadRequestException('Store is not deleted');
+    }
+
+    store.deletedAt = null;
+    return await this.storeRepository.save(store);
+  }
+
   async remove(id: string): Promise<void> {
     const store = await this.findOne(id);
     await this.storeRepository.softRemove(store);
   }
 
   async permanentlyDelete(storeId: string): Promise<void> {
-    const store = await this.findOne(storeId);
+    const store = await this.storeRepository.findOne({
+      where: { storeId: storeId },
+      withDeleted: true,
+    });
+    if (!store) {
+      throw new NotFoundException(`Store with ID ${storeId} not found`);
+    }
     const seller = await this.sellersService.findOne(store.sellerId);
-    if(!seller){
-      throw new NotFoundException('Can\t find the seller');
+    if (!seller) {
+      throw new NotFoundException('Can\'t find the seller');
     }
 
-   this.storeRepository.remove(store);
-   this.sellerRepository.remove(seller);
+    await this.storeRepository.remove(store);
+    await this.sellerRepository.remove(seller);
   }
 
   async updateRating(storeId: string, newRating: number): Promise<void> {

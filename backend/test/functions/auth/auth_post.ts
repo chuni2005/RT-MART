@@ -73,20 +73,22 @@ export async function loginUserWithInvalidCredentials(
   expect(res.body).toHaveProperty('message');
 }
 
-export async function refreshAccessTokenWithCookie(app: INestApplication) {
+export async function refreshAccessTokenWithCookie(app: INestApplication, user: any): Promise<void> {
   // console.log(
   //   'Using cookies for refresh token:',
   //   buyerUser.cookie.refreshToken,
   // );
   const refreshRes = await request(app.getHttpServer())
     .post('/auth/refresh')
-    .set('Cookie', `refreshToken=${buyerUser.cookie.refreshToken}`)
+    .set('Cookie', `refreshToken=${user.cookie.refreshToken}`)
     .expect(201);
   const refreshCookies = refreshRes.headers['set-cookie'];
   const refreshCookieString = Array.isArray(refreshCookies)
     ? refreshCookies.join(';')
     : refreshCookies;
   expect(refreshCookieString).toContain('accessToken');
+  user.cookie.accessToken =
+    refreshCookieString.match(/accessToken=([^;]+);/)?.[1] || '';
 }
 
 export async function refreshAccessTokenWithWrongRefreshTokenInCookie(

@@ -54,7 +54,7 @@ describe('AuthController (e2e)', () => {
   });
 
   it('/register (POST) → Refresh access token', async () => {
-    await AuthPostTest.refreshAccessTokenWithCookie(app);
+    await AuthPostTest.refreshAccessTokenWithCookie(app, buyerUser);
     await AuthPostTest.refreshAccessTokenWithWrongRefreshTokenInCookie(app);
   });
 
@@ -74,6 +74,6 @@ describe('AuthController (e2e)', () => {
   it('teardown', async () => {
     await permanentlyDeleteUserById(app, buyerUser.userId);
     await AuthPostTest.logoutUser(app, adminTester);
-    console.log(buyerUser);
+    // console.log(buyerUser);
   });
 });

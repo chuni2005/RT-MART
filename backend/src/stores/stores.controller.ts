@@ -27,7 +27,7 @@ export class StoresController {
   constructor(
     private readonly storesService: StoresService,
     private readonly sellersService: SellersService,
-  ) {}
+  ) { }
 
   //Administrators can only create a store by establishing and verifying a seller's application.
   // @Post()
@@ -67,7 +67,7 @@ export class StoresController {
 
   @Roles(UserRole.SELLER)
   @UseGuards(JwtAccessGuard, RolesGuard)
-  @Patch('update')
+  @Patch()
   async update(
     @Req() req: AuthRequest,
     @Body() updateDto: UpdateStoreDto,
@@ -83,6 +83,13 @@ export class StoresController {
       throw new NotFoundException('Store not found for this seller');
     }
     return await this.storesService.update(store.storeId, updateDto);
+  }
+
+  @Roles(UserRole.ADMIN)
+  @UseGuards(JwtAccessGuard, RolesGuard)
+  @Patch(':storeId')
+  async restore(@Param('storeId') storeId: string) {
+    return await this.storesService.restore(storeId);
   }
 
   @Roles(UserRole.SELLER)
@@ -111,13 +118,13 @@ export class StoresController {
     return { message: 'Store deleted successfully' };
   }
 
-  // @Roles(UserRole.ADMIN)
-  // @UseGuards(JwtAccessGuard, RolesGuard)
-  // @Delete(':storeId/permanent')
-  // async hardRemove(@Param('storeId') storeId: string) {
-  //   await this.storesService.permanentlyDelete(storeId);
-  //   return { message: 'User permanently deleted successfully' };
-  // }
+  @Roles(UserRole.ADMIN)
+  @UseGuards(JwtAccessGuard, RolesGuard)
+  @Delete(':storeId/permanent')
+  async hardRemove(@Param('storeId') storeId: string) {
+    await this.storesService.permanentlyDelete(storeId);
+    return { message: 'User permanently deleted successfully' };
+  }
 
   @Get('test/health')
   getHealth(): object {

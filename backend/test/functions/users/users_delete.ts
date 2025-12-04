@@ -1,7 +1,6 @@
 import request from 'supertest';
 import { INestApplication } from '@nestjs/common';
 import { buyerUser, sellerUser, adminUser, adminTester } from '../../variables';
-import { Seller } from '@/sellers/entities/seller.entity';
 
 export async function deleteOwnAccount(app: INestApplication) {
     const res = await request(app.getHttpServer())

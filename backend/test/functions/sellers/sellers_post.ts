@@ -2,20 +2,14 @@ import request from 'supertest';
 import { INestApplication } from '@nestjs/common';
 import { adminTester, buyerUser, sellerUser, adminUser, buyerUser_sellerCase } from '../../variables';
 
-export async function appplyOwnBuyerAccountToSellerRole(app: INestApplication) {
+export async function appplyOwnBuyerAccountToSellerRole(app: INestApplication, buyer: any) {
     const res = await request(app.getHttpServer())
         .post(`/sellers`)
-        .set('Cookie', `accessToken=${buyerUser.cookie.accessToken}`)
+        .set('Cookie', `accessToken=${buyer.cookie.accessToken}`)
         .expect(201);
-    expect(res.body).toHaveProperty('userId', buyerUser.userId);
+    expect(res.body).toHaveProperty('userId', buyer.userId);
     expect(res.body).toHaveProperty('sellerId');
-    buyerUser.sellerId = res.body.sellerId;
-
-    const res_unverifiedUser = await request(app.getHttpServer())
-        .post(`/sellers`)
-        .set('Cookie', `accessToken=${buyerUser_sellerCase.cookie.accessToken}`)
-        .expect(201);
-    buyerUser_sellerCase.sellerId = res_unverifiedUser.body.sellerId;
+    buyer.sellerId = res.body.sellerId;
 }
 
 export async function appplyOwnSellerAccountToSellerRole(app: INestApplication) {
@@ -32,22 +26,22 @@ export async function appplyOwnAdminAccountToSellerRole(app: INestApplication) {
         .expect(403);
 }
 
-export async function appplyOwnSellerAccountToSellerRoleWithNonCookie(app: INestApplication) {
+export async function appplyOwnBuyerAccountToSellerRoleWithNonCookie(app: INestApplication) {
     await request(app.getHttpServer())
         .post(`/sellers`)
         .expect(401);
 }
 
-export async function verifyApplicationOfSeller(app: INestApplication) {
+export async function verifyApplicationOfSeller(app: INestApplication, buyer: any) {
     const res = await request(app.getHttpServer())
-        .post(`/sellers/${buyerUser.sellerId}/verify`)
+        .post(`/sellers/${buyer.sellerId}/verify`)
         .set('Cookie', `accessToken=${adminUser.cookie.accessToken}`)
         .expect(201);
     expect(res.body).toHaveProperty('storeId');
-    buyerUser.storeId = res.body.storeId;
+    buyer.storeId = res.body.storeId;
 
     const res_user = await request(app.getHttpServer())
-        .get(`/users/${buyerUser.userId}`)
+        .get(`/users/${buyer.userId}`)
         .expect(200);
     expect(res_user.body).toHaveProperty('role', 'seller');
 }

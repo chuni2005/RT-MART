@@ -7,12 +7,14 @@ import { createTestApp } from './../functions/e2e';
 import * as AuthPostTest from './../functions/auth/auth_post';
 import * as UserPostTest from './../functions/users/users_post';
 import * as UserDeleteTest from './../functions/users/users_delete';
+import * as StoreDeleteTest from './../functions/stores/stores_delete'
 import * as SellerPostTest from './../functions/sellers/sellers_post';
 import * as SellerDeleteTest from './../functions/sellers/sellers_delete';
 import * as SellerGetTest from './../functions/sellers/sellers_get';
 import { buyerUser, sellerUser, adminUser, adminTester, buyerUser_sellerCase } from './../variables';
+import { Store } from '@/stores/entities/store.entity';
 
-describe('SellerController (e2e)', () => {
+describe('SellersController (e2e)', () => {
   let app: INestApplication;
 
   beforeAll(async () => {
@@ -36,10 +38,11 @@ describe('SellerController (e2e)', () => {
   }, 25000);
 
   it('/sellers (POST) → Apply to upgrade to seller', async () => {
-    await SellerPostTest.appplyOwnBuyerAccountToSellerRole(app);
+    await SellerPostTest.appplyOwnBuyerAccountToSellerRole(app, buyerUser);
+    await SellerPostTest.appplyOwnBuyerAccountToSellerRole(app, buyerUser_sellerCase);
     await SellerPostTest.appplyOwnSellerAccountToSellerRole(app);
     await SellerPostTest.appplyOwnAdminAccountToSellerRole(app);
-    await SellerPostTest.appplyOwnSellerAccountToSellerRoleWithNonCookie(app);
+    await SellerPostTest.appplyOwnBuyerAccountToSellerRoleWithNonCookie(app);
   });
 
   it('/sellers (GET) → Get sellers', async () => {
@@ -55,7 +58,7 @@ describe('SellerController (e2e)', () => {
   });
 
   it('/sellers:sellerId/verify (POST) → Verify application of seller', async () => {
-    await SellerPostTest.verifyApplicationOfSeller(app);
+    await SellerPostTest.verifyApplicationOfSeller(app, buyerUser);
     await SellerPostTest.verifyApplicationOfVerifiedSeller(app);
     await SellerPostTest.verifyApplicationOfNonExistedSeller(app);
     await SellerPostTest.verifyApplicationOfSellerWithNonPermissionRole(app);
@@ -68,16 +71,12 @@ describe('SellerController (e2e)', () => {
     await SellerDeleteTest.deleteSellerWithNonPermissionRole(app);
   });
 
-  it('/users/test/health (GET) → health check', async () => {
+  it('/sellers/test/health (GET) → health check', async () => {
     await SellerGetTest.getHealthTest(app);
   });
 
   it('teardown', async () => {
-    //stores delete api will delete sellers together
-    await request(app.getHttpServer())
-      .delete(`/stores/${buyerUser.storeId}/permanent`)
-      .set('Cookie', `accessToken=${adminTester.cookie.accessToken}`)
-      .expect(200);
+    await StoreDeleteTest.permanentlyDeleteStoreById(app, buyerUser.storeId);
     await UserDeleteTest.permanentlyDeleteUserById(app, buyerUser.userId);
     await UserDeleteTest.permanentlyDeleteUserById(app, buyerUser_sellerCase.userId);
     await UserDeleteTest.permanentlyDeleteUserById(app, sellerUser.userId);
