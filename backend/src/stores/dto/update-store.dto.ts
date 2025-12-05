@@ -6,10 +6,7 @@ import {
   Matches,
 } from 'class-validator';
 
-/**
- * UpdateStoreDto - 更新商店資料
- * 所有欄位皆為可選，僅更新提供的欄位
- */
+
 export class UpdateStoreDto {
   @IsString()
   @IsOptional()

@@ -64,16 +64,16 @@ export class SellersController {
     return await this.sellersService.findOne(sellerId);
   }
 
-  // @UseGuards(JwtAccessGuard)
-  // @Patch('me')
-  // async update(@Req() req: any, @Body() updateSellerDto: UpdateSellerDto) {
-  //   const userId = req.user.userId;
-  //   const seller = await this.sellersService.findByUserId(userId);
-  //   if (!seller) {
-  //     throw new NotFoundException('Seller record not found for this user');
-  //   }
-  //   return await this.sellersService.update(seller.sellerId, updateSellerDto);
-  // }
+  @UseGuards(JwtAccessGuard)
+  @Patch()
+  async update(@Req() req: any, @Body() updateSellerDto: UpdateSellerDto) {
+    const userId = req.user.userId;
+    const seller = await this.sellersService.findByUserId(userId);
+    if (!seller) {
+      throw new NotFoundException('Seller record not found for this user');
+    }
+    return await this.sellersService.update(seller.sellerId, updateSellerDto);
+  }
 
   @Roles(UserRole.ADMIN)
   @UseGuards(JwtAccessGuard, RolesGuard)

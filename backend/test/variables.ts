@@ -35,6 +35,7 @@ export let buyerUser = {
 export let buyerUser_sellerCase = {
   userId: 0,
   sellerId: 0,
+  storeId: 0,
   loginId: 'buyer_user2',
   name: 'Buyer Test User 2',
   password: '!abc12345678',

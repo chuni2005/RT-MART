@@ -21,23 +21,23 @@ export class StoresService {
     @InjectRepository(Seller)
     private readonly sellerRepository: Repository<Seller>,
     private readonly sellersService: SellersService,
-  ) {}
+  ) { }
 
-  async create(sellerId: string, createDto: CreateStoreDto): Promise<Store> {
-    // Verify seller exists and is verified
-    const seller = await this.sellersService.findOne(sellerId);
+  // async create(sellerId: string, createDto: CreateStoreDto): Promise<Store> {
+  //   // Verify seller exists and is verified
+  //   const seller = await this.sellersService.findOne(sellerId);
 
-    if (!seller.verified) {
-      throw new ForbiddenException('Seller must be verified to create a store');
-    }
+  //   if (!seller.verified) {
+  //     throw new ForbiddenException('Seller must be verified to create a store');
+  //   }
 
-    const store = this.storeRepository.create({
-      ...createDto,
-      sellerId,
-    });
+  //   const store = this.storeRepository.create({
+  //     ...createDto,
+  //     sellerId,
+  //   });
 
-    return await this.storeRepository.save(store);
-  }
+  //   return await this.storeRepository.save(store);
+  // }
 
   async findAll(
     queryDto: QueryStoreDto,
@@ -47,10 +47,6 @@ export class StoresService {
     const skip = (page - 1) * limit;
 
     const where: Record<string, string | ReturnType<typeof Like>> = {};
-
-    if (queryDto.sellerId) {
-      where.sellerId = queryDto.sellerId;
-    }
 
     if (queryDto.search) {
       where.storeName = Like(`%${queryDto.search}%`);
@@ -68,22 +64,22 @@ export class StoresService {
     return { data, total };
   }
 
-  async findOne(id: string): Promise<Store> {
+  async findOne(storeId: string): Promise<Store> {
     const store = await this.storeRepository.findOne({
-      where: { storeId: id },
+      where: { storeId: storeId },
       relations: ['seller', 'seller.user'],
       withDeleted: false, // 過濾軟刪除的商店
     });
 
     if (!store) {
-      throw new NotFoundException(`Store with ID ${id} not found`);
+      throw new NotFoundException(`Store with ID ${storeId} not found`);
     }
 
     return store;
   }
 
-  async findBySeller(sellerId: string): Promise<Store[]> {
-    return await this.storeRepository.find({
+  async findBySeller(sellerId: string): Promise<Store | null> {
+    return await this.storeRepository.findOne({
       where: { sellerId },
       order: { createdAt: 'DESC' },
       withDeleted: false, // 過濾軟刪除的商店
@@ -91,41 +87,52 @@ export class StoresService {
   }
 
   async update(
-    id: string,
-    sellerId: string,
+    storeId: string,
     updateDto: UpdateStoreDto,
   ): Promise<Store> {
-    const store = await this.findOne(id);
-
-    // Verify ownership
-    if (store.sellerId !== sellerId) {
-      throw new ForbiddenException('You can only update your own stores');
-    }
-
+    const store = await this.findOne(storeId);
     Object.assign(store, updateDto);
     return await this.storeRepository.save(store);
   }
 
-  async remove(id: string, sellerId: string): Promise<void> {
-    const store = await this.findOne(id);
+  async restore(storeId: string): Promise<Store> {  
+    const store = await this.storeRepository.findOne({
+      where: { storeId },
+      withDeleted: true, // 包含已刪除的商店
+    });
 
-    // Verify ownership
-    if (store.sellerId !== sellerId) {
-      throw new ForbiddenException('You can only delete your own stores');
+    if (!store) {
+      throw new NotFoundException(`Store with ID ${storeId} not found`);
+    }
+    
+    if (!store.deletedAt) {
+      throw new BadRequestException('Store is not deleted');
     }
 
+    store.deletedAt = null;
+    return await this.storeRepository.save(store);
+  }
+
+  async remove(id: string): Promise<void> {
+    const store = await this.findOne(id);
     await this.storeRepository.softRemove(store);
   }
 
   async permanentlyDelete(storeId: string): Promise<void> {
-    const store = await this.findOne(storeId);
+    const store = await this.storeRepository.findOne({
+      where: { storeId: storeId },
+      withDeleted: true,
+    });
+    if (!store) {
+      throw new NotFoundException(`Store with ID ${storeId} not found`);
+    }
     const seller = await this.sellersService.findOne(store.sellerId);
     if (!seller) {
-      throw new NotFoundException('Can\t find the seller');
+      throw new NotFoundException('Can\'t find the seller');
     }
 
-    this.storeRepository.remove(store);
-    this.sellerRepository.remove(seller);
+    await this.storeRepository.remove(store);
+    await this.sellerRepository.remove(seller);
   }
 
   async updateRating(storeId: string, newRating: number): Promise<void> {

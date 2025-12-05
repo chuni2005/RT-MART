@@ -20,24 +20,29 @@ import { RolesGuard } from '../auth/guards/roles.guard';
 import { Roles } from '../auth/decorators/roles.decorator';
 import { UserRole } from '../users/entities/user.entity';
 import type { AuthRequest } from '../common/types';
+import { SellersService } from '../sellers/sellers.service';
 
 @Controller('stores')
 export class StoresController {
-  constructor(private readonly storesService: StoresService) {}
+  constructor(
+    private readonly storesService: StoresService,
+    private readonly sellersService: SellersService,
+  ) { }
 
-  @Post()
-  @UseGuards(JwtAccessGuard, RolesGuard)
-  @Roles(UserRole.SELLER)
-  async create(@Req() req: AuthRequest, @Body() createDto: CreateStoreDto) {
-    // Get seller ID from user
-    const seller = await this.storesService['sellersService'].findByUserId(
-      req.user.userId,
-    );
-    if (!seller) {
-      throw new NotFoundException('Seller profile not found');
-    }
-    return await this.storesService.create(seller.sellerId, createDto);
-  }
+  //Administrators can only create a store by establishing and verifying a seller's application.
+  // @Post()
+  // @UseGuards(JwtAccessGuard, RolesGuard)
+  // @Roles(UserRole.SELLER)
+  // async create(@Req() req: AuthRequest, @Body() createDto: CreateStoreDto) {
+  //   // Get seller ID from user
+  //   const seller = await this.storesService['sellersService'].findByUserId(
+  //     req.user.userId,
+  //   );
+  //   if (!seller) {
+  //     throw new NotFoundException('Seller profile not found');
+  //   }
+  //   return await this.storesService.create(seller.sellerId, createDto);
+  // }
 
   @Get()
   async findAll(@Query() queryDto: QueryStoreDto) {
@@ -50,44 +55,66 @@ export class StoresController {
     };
   }
 
-  @Get(':id')
-  async findOne(@Param('id') id: string) {
-    return await this.storesService.findOne(id);
+  @Get(':storeId')
+  async findOne(@Param('storeId') storeId: string) {
+    return await this.storesService.findOne(storeId);
   }
 
-  @Get('seller/:sellerId')
-  async findBySeller(@Param('sellerId') sellerId: string) {
-    return await this.storesService.findBySeller(sellerId);
-  }
+  // @Get('seller/:sellerId')
+  // async findBySeller(@Param('sellerId') sellerId: string) {
+  //   return await this.storesService.findBySeller(sellerId);
+  // }
 
-  @Patch(':id')
-  @UseGuards(JwtAccessGuard, RolesGuard)
   @Roles(UserRole.SELLER)
+  @UseGuards(JwtAccessGuard, RolesGuard)
+  @Patch()
   async update(
     @Req() req: AuthRequest,
-    @Param('id') id: string,
     @Body() updateDto: UpdateStoreDto,
   ) {
-    const seller = await this.storesService['sellersService'].findByUserId(
+    const seller = await this.sellersService.findByUserId(
       req.user.userId,
     );
     if (!seller) {
       throw new NotFoundException('Seller profile not found');
     }
-    return await this.storesService.update(id, seller.sellerId, updateDto);
+    const store = await this.storesService.findBySeller(seller.sellerId);
+    if (!store) {
+      throw new NotFoundException('Store not found for this seller');
+    }
+    return await this.storesService.update(store.storeId, updateDto);
   }
 
-  @Delete(':id')
+  @Roles(UserRole.ADMIN)
   @UseGuards(JwtAccessGuard, RolesGuard)
+  @Patch(':storeId')
+  async restore(@Param('storeId') storeId: string) {
+    return await this.storesService.restore(storeId);
+  }
+
   @Roles(UserRole.SELLER)
-  async remove(@Req() req: AuthRequest, @Param('id') id: string) {
-    const seller = await this.storesService['sellersService'].findByUserId(
+  @UseGuards(JwtAccessGuard, RolesGuard)
+  @Delete()
+  async remove(@Req() req: AuthRequest) {
+    const seller = await this.sellersService.findByUserId(
       req.user.userId,
     );
     if (!seller) {
       throw new NotFoundException('Seller profile not found');
     }
-    await this.storesService.remove(id, seller.sellerId);
+    const store = await this.storesService.findBySeller(seller.sellerId);
+    if (!store) {
+      throw new NotFoundException('Store not found for this seller');
+    }
+    await this.storesService.remove(store.storeId);
+    return { message: 'Store deleted successfully' };
+  }
+
+  @Roles(UserRole.ADMIN)
+  @UseGuards(JwtAccessGuard, RolesGuard)
+  @Delete(':storeId')
+  async softRemove(@Param('storeId') storeId: string) {
+    await this.storesService.remove(storeId);
     return { message: 'Store deleted successfully' };
   }
 

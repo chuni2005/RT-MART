@@ -7,10 +7,6 @@ export class QueryStoreDto {
 
   @IsString()
   @IsOptional()
-  sellerId?: string;
-
-  @IsString()
-  @IsOptional()
   page?: string;
 
   @IsString()
