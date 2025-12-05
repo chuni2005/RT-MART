@@ -12,7 +12,7 @@ export const adminTester = Object.freeze({
   cookie: {
     accessToken: '',
     refreshToken: '',
-  }
+  },
 });
 
 export let buyerUser = {

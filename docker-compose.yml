@@ -93,6 +93,8 @@ services:
       - CHOKIDAR_USEPOLLING=true
       # Backend API URL for development
       - VITE_API_URL=http://localhost:3000
+      # Docker environment flag
+      - DOCKER_ENV=true
     env_file:
       # Load additional environment variables from .env file
       - ./frontend/.env

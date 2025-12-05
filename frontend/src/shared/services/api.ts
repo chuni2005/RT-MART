@@ -23,32 +23,33 @@ const getToken = (): string | null => {
  * @returns API 回應
  */
 const apiRequest = async <T = any>(endpoint: string, options: RequestOptions = {}): Promise<T> => {
-  const token = getToken();
 
   const config: RequestOptions = {
     ...options,
     headers: {
       'Content-Type': 'application/json',
-      ...(token && { Authorization: `Bearer ${token}` }),
       ...options.headers,
     },
   };
 
+  const response = await fetch(`${API_BASE_URL}${endpoint}`, config);
+  // const data = await response.json();
+  let data: any = null;
+  const text = await response.text();
+
+
   try {
-    const response = await fetch(`${API_BASE_URL}${endpoint}`, config);
-    const data = await response.json();
-
-    if (!response.ok) {
-      // 處理 HTTP 錯誤狀態
-      throw new Error(data.message || `HTTP Error: ${response.status}`);
-    }
-
-    return data;
-  } catch (error) {
-    // 處理網路錯誤或其他異常
-    console.error('API Request Error:', error);
-    throw error;
+    data = JSON.parse(text);
+  } catch {
+    data = text;
   }
+
+  if (!response.ok) {
+    // 處理 HTTP 錯誤狀態
+    throw new Error(data.message || `HTTP Error: ${response.status}`);
+  }
+
+  return data;
 };
 
 /**

@@ -25,7 +25,7 @@ export class SellersService {
     @InjectRepository(User)
     private readonly userRepository: Repository<Store>,
     private readonly usersService: UsersService,
-  ) { }
+  ) {}
 
   async create(createSellerDto: CreateSellerDto): Promise<Seller> {
     const user = await this.usersService.findOne(createSellerDto.userId);
@@ -49,12 +49,15 @@ export class SellersService {
     return savedSeller;
   }
 
-  async findAll(queryDto: QuerySellerDto,): Promise<{ data: Seller[]; total: number }> {
+  async findAll(
+    queryDto: QuerySellerDto,
+  ): Promise<{ data: Seller[]; total: number }> {
     const page = parseInt(queryDto.page || '1', 10);
     const limit = parseInt(queryDto.limit || '10', 10);
     const skip = (page - 1) * limit;
 
-    const query = this.sellerRepository.createQueryBuilder('seller')
+    const query = this.sellerRepository
+      .createQueryBuilder('seller')
       .leftJoinAndSelect('seller.user', 'user')
       .orderBy('seller.sellerId', 'DESC')
       .skip(skip)
@@ -65,7 +68,9 @@ export class SellersService {
     }
 
     if (queryDto.verified !== undefined) {
-      query.andWhere('seller.verified = :verified', { verified: queryDto.verified });
+      query.andWhere('seller.verified = :verified', {
+        verified: queryDto.verified,
+      });
     }
 
     const [data, total] = await query.getManyAndCount();
@@ -92,7 +97,10 @@ export class SellersService {
     });
   }
 
-  async update(sellerId: string, updateSellerDto: UpdateSellerDto): Promise<Seller> {
+  async update(
+    sellerId: string,
+    updateSellerDto: UpdateSellerDto,
+  ): Promise<Seller> {
     const seller = await this.findOne(sellerId);
     Object.assign(seller, updateSellerDto);
     return await this.sellerRepository.save(seller);

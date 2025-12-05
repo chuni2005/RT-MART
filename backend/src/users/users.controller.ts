@@ -18,7 +18,10 @@ import { UpdateUserDto } from './dto/update-user.dto';
 import { QueryUserDto } from './dto/query-user.dto';
 import { UserResponseDto } from './dto/user-response.dto';
 import { plainToInstance } from 'class-transformer';
-import { JwtAccessGuard, JwtRefreshGuard } from './../auth/guards/jwt-auth.guard';
+import {
+  JwtAccessGuard,
+  JwtRefreshGuard,
+} from './../auth/guards/jwt-auth.guard';
 import { UserRole } from './entities/user.entity';
 import { Roles } from './../auth/decorators/roles.decorator';
 import { RolesGuard } from './../auth/guards/roles.guard';
@@ -56,7 +59,7 @@ export class UsersController {
   @UseGuards(JwtAccessGuard, RolesGuard)
   @Get('deleted')
   async findAllDeleted(@Query() queryDto: QueryUserDto) {
-   const { data, total } = await this.usersService.findDeleted(queryDto);
+    const { data, total } = await this.usersService.findDeleted(queryDto);
     return {
       data: plainToInstance(UserResponseDto, data),
       total,
@@ -72,7 +75,7 @@ export class UsersController {
     return plainToInstance(UserResponseDto, user);
   }
 
-// Update own data: User updates their own data
+  // Update own data: User updates their own data
   @UseGuards(JwtAccessGuard)
   @Patch('me')
   async updateMe(@Req() req, @Body() updateUserDto: UpdateUserDto) {
@@ -89,7 +92,7 @@ export class UsersController {
     const user = await this.usersService.update(id, updateUserDto);
     return plainToInstance(UserResponseDto, user);
   }
-  
+
   //Delete own account: User deletes their own account
   @UseGuards(JwtAccessGuard)
   @Delete('me')
@@ -116,7 +119,7 @@ export class UsersController {
     const user = await this.usersService.restore(id);
     return plainToInstance(UserResponseDto, user);
   }
- 
+
   //Permanently delete user: Permanently delete by ID
   @Roles(UserRole.ADMIN)
   @UseGuards(JwtAccessGuard, RolesGuard)
@@ -135,5 +138,4 @@ export class UsersController {
       timestamp: new Date().toISOString(),
     };
   }
-
 }

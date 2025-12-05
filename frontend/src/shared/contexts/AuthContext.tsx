@@ -3,9 +3,15 @@
  * 提供登入、註冊、登出功能和使用者狀態
  */
 
-import { createContext, useContext, useState, useEffect, ReactNode } from 'react';
-import * as authService from '../services/authService';
-import { AuthContextValue, User, AuthResponse } from '@/types';
+import {
+  createContext,
+  useContext,
+  useState,
+  useEffect,
+  ReactNode,
+} from "react";
+import * as authService from "../services/authService";
+import { AuthContextValue, User, AuthResponse } from "@/types";
 
 const AuthContext = createContext<AuthContextValue | null>(null);
 
@@ -30,24 +36,11 @@ export const AuthProvider = ({ children }: AuthProviderProps) => {
    */
   const checkAuth = async () => {
     try {
-      const token = localStorage.getItem('token') || sessionStorage.getItem('token');
+      // 呼叫後端：如果 cookies 中有合法 token ，就會回傳 user
+      const { user: userData } = await authService.getCurrentUser();
 
-      if (!token) {
-        setIsLoading(false);
-        return;
-      }
-
-      // 驗證 token 並取得使用者資訊
-      const { valid } = await authService.validateToken();
-
-      if (valid) {
-        const { user: userData } = await authService.getCurrentUser();
-        setUser(userData);
-        setIsAuthenticated(true);
-      } else {
-        // Token 無效，清除
-        clearAuth();
-      }
+      setUser(userData);
+      setIsAuthenticated(true);
     } catch (error) {
       console.error('Auth check failed:', error);
       clearAuth();
@@ -58,20 +51,27 @@ export const AuthProvider = ({ children }: AuthProviderProps) => {
 
   /**
    * 登入
-   * @param identifier - 可以是 email 或 loginId
+   * @param identifier - 現在當作 loginId 使用（後端目前只支援 loginId）
    * @param password
-   * @param remember - 是否記住登入狀態
+   * @param remember - 是否記住登入狀態（可選：你可以自己決定要不要把 user 存到 localStorage）
    */
-  const login = async (identifier: string, password: string, remember = false): Promise<AuthResponse> => {
+  const login = async (
+    identifier: string,
+    password: string,
+    remember = false
+  ): Promise<AuthResponse> => {
     try {
       setIsLoading(true);
 
+      // identifier 在這邊當作 loginId 傳給後端
       const response = await authService.login(identifier, password);
 
       if (response.success) {
-        // 儲存 token（根據「記住我」選擇儲存位置）
-        const storage = remember ? localStorage : sessionStorage;
-        storage.setItem('token', response.token);
+        // 不再儲存 token（token 已在 httpOnly cookies 中）
+        if (remember) {
+          // 如果你想記住使用者資訊，可以存 user（非必須）
+          localStorage.setItem('user', JSON.stringify(response.user));
+        }
 
         // 更新狀態
         setUser(response.user);
@@ -79,10 +79,10 @@ export const AuthProvider = ({ children }: AuthProviderProps) => {
 
         return response;
       } else {
-        throw new Error(response.message || '登入失敗'); // TODO: i18n
+        throw new Error(response.message || "登入失敗"); // TODO: i18n
       }
     } catch (error) {
-      console.error('Login error:', error);
+      console.error("Login error:", error);
       throw error;
     } finally {
       setIsLoading(false);
@@ -107,22 +107,25 @@ export const AuthProvider = ({ children }: AuthProviderProps) => {
     try {
       setIsLoading(true);
 
-      const response = await authService.register(loginId, name, email, phone, password);
+      const response = await authService.register(
+        loginId,
+        name,
+        email,
+        phone,
+        password
+      );
 
       if (response.success) {
-        // 註冊成功後自動登入，儲存 token
-        localStorage.setItem('token', response.token);
-
         // 更新狀態
         setUser(response.user);
         setIsAuthenticated(true);
 
         return response;
       } else {
-        throw new Error(response.message || '註冊失敗'); // TODO: i18n
+        throw new Error(response.message || "註冊失敗"); // TODO: i18n
       }
     } catch (error) {
-      console.error('Register error:', error);
+      console.error("Register error:", error);
       throw error;
     } finally {
       setIsLoading(false);
@@ -138,7 +141,7 @@ export const AuthProvider = ({ children }: AuthProviderProps) => {
       await authService.logout();
       clearAuth();
     } catch (error) {
-      console.error('Logout error:', error);
+      console.error("Logout error:", error);
       // 即使 API 失敗，仍清除本地狀態
       clearAuth();
     } finally {
@@ -150,8 +153,8 @@ export const AuthProvider = ({ children }: AuthProviderProps) => {
    * 清除認證狀態
    */
   const clearAuth = () => {
-    localStorage.removeItem('token');
-    sessionStorage.removeItem('token');
+    localStorage.removeItem("user");
+    sessionStorage.removeItem("user");
     setUser(null);
     setIsAuthenticated(false);
   };
@@ -160,7 +163,7 @@ export const AuthProvider = ({ children }: AuthProviderProps) => {
    * 更新使用者資訊
    */
   const updateUser = (userData: Partial<User>) => {
-    setUser(prevUser => prevUser ? { ...prevUser, ...userData } : null);
+    setUser((prevUser) => (prevUser ? { ...prevUser, ...userData } : null));
   };
 
   const value: AuthContextValue = {
@@ -184,7 +187,7 @@ export const useAuth = (): AuthContextValue => {
   const context = useContext(AuthContext);
 
   if (!context) {
-    throw new Error('useAuth must be used within AuthProvider');
+    throw new Error("useAuth must be used within AuthProvider");
   }
 
   return context;

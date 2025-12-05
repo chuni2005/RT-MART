@@ -78,9 +78,11 @@ describe('SellersController (e2e)', () => {
   it('teardown', async () => {
     await StoreDeleteTest.permanentlyDeleteStoreById(app, buyerUser.storeId);
     await UserDeleteTest.permanentlyDeleteUserById(app, buyerUser.userId);
-    await UserDeleteTest.permanentlyDeleteUserById(app, buyerUser_sellerCase.userId);
+    await UserDeleteTest.permanentlyDeleteUserById(
+      app,
+      buyerUser_sellerCase.userId,
+    );
     await UserDeleteTest.permanentlyDeleteUserById(app, sellerUser.userId);
     await UserDeleteTest.permanentlyDeleteUserById(app, adminUser.userId);
   });
-
 });

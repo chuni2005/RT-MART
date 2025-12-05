@@ -14,7 +14,8 @@ export async function registerUser(app: INestApplication) {
     })
     .expect(201);
 
-    buyerUser.userId = (res.body.userId!==adminTester.userId)? res.body.userId: 0;
+  buyerUser.userId =
+    res.body.userId !== adminTester.userId ? res.body.userId : 0;
 }
 
 export async function registerUserWithConflict(
@@ -101,7 +102,10 @@ export async function refreshAccessTokenWithWrongRefreshTokenInCookie(
     .expect(401);
 }
 
-export async function logoutUser(app: INestApplication, user: any): Promise<void> {
+export async function logoutUser(
+  app: INestApplication,
+  user: any,
+): Promise<void> {
   const res = await request(app.getHttpServer())
     .post('/auth/logout')
     .set('Cookie', `refreshToken=${user.cookie.refreshToken}`)

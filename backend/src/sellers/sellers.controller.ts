@@ -25,7 +25,7 @@ import { QuerySellerDto } from './dto/query-seller.dto';
 
 @Controller('sellers')
 export class SellersController {
-  constructor(private readonly sellersService: SellersService) { }
+  constructor(private readonly sellersService: SellersService) {}
 
   @Roles(UserRole.BUYER)
   @UseGuards(JwtAccessGuard, RolesGuard)

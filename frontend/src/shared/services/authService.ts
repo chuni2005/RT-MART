@@ -4,7 +4,14 @@
  */
 
 import { post } from './api';
-import { User, AuthResponse, ValidateTokenResponse, GetUserResponse, LogoutResponse } from '@/types';
+import { 
+  User, 
+  AuthResponse, 
+  ValidateTokenResponse, 
+  GetUserResponse, 
+  LogoutResponse 
+} from '@/types';
+import { get } from './api';
 
 interface MockUser extends User {
   password: string;
@@ -23,48 +30,79 @@ const mockUsers: MockUser[] = [
   },
 ];
 
-/**
- * 模擬 API 延遲
- */
-const mockDelay = (ms = 1000): Promise<void> => new Promise(resolve => setTimeout(resolve, ms));
-
-/**
- * 登入（Mock 版本）
- */
-export const login = async (identifier: string, password: string): Promise<AuthResponse> => {
-  // TODO: 待後端 API 完成後，替換為真實 API 呼叫
-  // return post('/auth/login', { identifier, password });
-
-  console.log('[Mock API] Login attempt:', { identifier });
-
-  // 模擬網路延遲
-  await mockDelay(1000);
-
-  // 模擬驗證邏輯 - 支援 email 或 loginId
-  const user = mockUsers.find(u => u.email === identifier || u.loginId === identifier);
-
-  if (!user) {
-    throw new Error('帳號或 Email 不存在'); // TODO: i18n
-  }
-
-  if (user.password !== password) {
-    throw new Error('密碼錯誤，請重新輸入'); // TODO: i18n
-  }
-
-  // 模擬成功回應
-  const { password: _, ...userWithoutPassword } = user;
-  const mockToken = `mock-jwt-token-${Date.now()}`;
-
+// TODO: 頭像avatar要從後端取得
+const mapUserResponseToUser = (data: {
+  userId: string;
+  loginId: string;
+  name: string;
+  email: string;
+  phone: string | null;
+  role: string;
+}): User => {
   return {
-    success: true,
-    message: '登入成功！', // TODO: i18n
-    user: userWithoutPassword,
-    token: mockToken,
-  };
+    id: data.userId,
+    loginId: data.loginId,
+    name: data.name,
+    email: data.email,
+    phone: data.phone ?? '',
+    avatar: "https://media.tenor.com/fGLpFBW-QBoAAAAe/memecat.png",
+  }
+}
+
+/**
+ * 取得完整用戶資料：先打 /auth/profile 拿 userId，再打 /users/:id
+ */
+const fetchFullUser = async (): Promise<User> => {
+  // 1) 先從 cookie 中的 accessToken 取得 profile
+  const profile = await get<{ userId: string; loginId: string; role: string }>('/auth/profile');
+
+  // 2) 再用 userId 去查 users/:id，拿完整資料
+  const userDetail = await get<{
+    userId: string;
+    loginId: string;
+    name: string;
+    email: string;
+    phone: string | null;
+    role: string;
+  }>(`/users/${profile.userId}`);
+
+  return mapUserResponseToUser(userDetail);
+}
+
+/**
+ * 登入：呼叫 /auth/login，cookies 內會寫入 token，然後再查完整用戶資料
+ */
+export const login = async (
+  loginId: string, 
+  password: string
+): Promise<AuthResponse> => {
+  try {
+    // 1) 先登入，後端會把 accessToken / refreshToken 寫進 httpOnly cookies
+    const tokenResult = await post<{
+      accessToken: string;
+      refreshToken: string;
+    }>(
+      '/auth/login', 
+      { loginId, password }
+    );
+
+    // 2) 再拿用戶資料
+    const user = await fetchFullUser();
+
+    return {
+      success: true,
+      message: '登入成功!',
+      user,
+      // 前端型別裡有 token 欄位沿用後端回來的 accessToken
+      token: tokenResult.accessToken,
+    }
+  } catch (error: any) {
+    throw new Error(error.message || '登入失敗，請檢查賬號密碼');
+  }
 };
 
 /**
- * 註冊（Mock 版本）
+ * 註冊：POST /auth/register，成功後再自動登入
  */
 export const register = async (
   loginId: string,
@@ -73,116 +111,84 @@ export const register = async (
   phone: string,
   password: string
 ): Promise<AuthResponse> => {
-  // TODO: 待後端 API 完成後，替換為真實 API 呼叫
-  // return post('/auth/register', { loginId, name, email, phone, password });
+  try {
+    //後端 DTO 是 phoneNumber, 不是 phone
+    const result = await post<{
+      success: boolean;
+      userId:string
+    }>(
+      '/auth/register',
+      {
+        loginId,
+        name,
+        email,
+        phoneNumber: phone,
+        password,
+      },
+    );
 
-  console.log('[Mock API] Register attempt:', { loginId, name, email, phone });
+    if (!result.success) {
+      throw new Error('注冊失敗');
+    }
 
-  // 模擬網路延遲
-  await mockDelay(1200);
-
-  // 檢查 loginId 是否已存在
-  const existingLoginId = mockUsers.find(u => u.loginId === loginId);
-  if (existingLoginId) {
-    throw new Error('此帳號已被使用'); // TODO: i18n
-  }
-
-  // 檢查 Email 是否已存在
-  const existingUser = mockUsers.find(u => u.email === email);
-  if (existingUser) {
-    throw new Error('此 Email 已被註冊'); // TODO: i18n
-  }
-
-  // 模擬建立新用戶
-  const newUser: MockUser = {
-    id: String(mockUsers.length + 1),
-    loginId,
-    name,
-    email,
-    phone,
-    password, // 實際應用中絕不在前端存密碼
-    avatar: `https://i.pravatar.cc/150?img=${mockUsers.length + 2}`,
-  };
-
-  mockUsers.push(newUser);
-
-  // 模擬成功回應（自動登入）
-  const { password: _, ...userWithoutPassword } = newUser;
-  const mockToken = `mock-jwt-token-${Date.now()}`;
-
-  return {
-    success: true,
-    message: '註冊成功！已自動登入', // TODO: i18n
-    user: userWithoutPassword,
-    token: mockToken,
+    // 注冊成功後，自動登入
+    return await login(loginId, password);
+  } catch (error: any) {
+    throw new Error(error.message || '注冊失敗');
   };
 };
 
 /**
- * 登出（Mock 版本）
+ * 登出：/auth/logout，清除後端 refresh/access token
  */
 export const logout = async (): Promise<LogoutResponse> => {
-  // TODO: 待後端 API 完成後，替換為真實 API 呼叫
-  // return post('/auth/logout');
 
-  console.log('[Mock API] Logout');
-
-  // 模擬網路延遲
-  await mockDelay(300);
-
-  return {
-    success: true,
-    message: '登出成功', // TODO: i18n
-  };
+  try {
+    const res = await post<{ success: boolean }>('/auth/logout');
+    return {
+      success: res.success,
+      message: '登出成功',
+    };
+  } catch {
+    // 即使 API 失敗，前端一樣清楚本地狀態
+    return {
+      success: true,
+      message: '登出成功',
+    }
+  }
 };
 
 /**
- * 取得當前用戶資訊（Mock 版本）
+ * 取得當前用戶資訊：直接用上面的 fetchFullUser
  */
 export const getCurrentUser = async (): Promise<GetUserResponse> => {
-  // TODO: 待後端 API 完成後，替換為真實 API 呼叫
-  // return get('/auth/me');
-
-  console.log('[Mock API] Get current user');
-
-  // 模擬網路延遲
-  await mockDelay(500);
-
-  // 檢查是否有 token
-  const token = localStorage.getItem('token') || sessionStorage.getItem('token');
-
-  if (!token) {
-    throw new Error('未登入'); // TODO: i18n
+  try {
+    const user = await fetchFullUser();
+    return {
+      success: true,
+      user,
+    };
+  } catch (error: any) {
+    throw new Error(error.message || '取得用戶資訊失敗');
   }
-
-  // 模擬回傳第一個用戶（實際應根據 token 解析）
-  const user = mockUsers[0];
-  const { password: _, ...userWithoutPassword } = user;
-
-  return {
-    success: true,
-    user: userWithoutPassword,
-  };
 };
 
 /**
- * 驗證 Token（Mock 版本）
+ * 驗證目前是否已登入：能不能成功拿到 user
  */
 export const validateToken = async (): Promise<ValidateTokenResponse> => {
-  // TODO: 待後端 API 完成後，替換為真實 API 呼叫
-  // return get('/auth/validate');
-
-  console.log('[Mock API] Validate token');
-
-  // 模擬網路延遲
-  await mockDelay(300);
-
-  const token = localStorage.getItem('token') || sessionStorage.getItem('token');
-
-  return {
-    success: true,
-    valid: !!token && token.startsWith('mock-jwt-token-'),
-  };
+  try {
+    await fetchFullUser();
+    return {
+      success: true,
+      valid: true,
+    };
+  } catch {
+    return {
+      success: true,
+      valid: false,
+    };
+  }
 };
 
 export default {
