@@ -4,19 +4,56 @@ import styles from './Cart.module.scss';
 import ItemListCard from '@/shared/components/ItemListCard';
 import CheckoutSummary from './components/CheckoutSummary';
 import EmptyState from '@/shared/components/EmptyState';
+import StoreGroupHeader from '@/shared/components/StoreGroupHeader';
 import type { CartItem } from '@/types';
+import type { StoreGroup } from '@/types/cart';
 import {
   getCartItems,
   updateCartItemQuantity,
   removeFromCart,
   toggleCartItemSelection,
   selectAllCartItems,
+  selectStoreItems,
 } from '@/shared/services/cartService';
+
+/**
+ * Group cart items by store
+ */
+const groupItemsByStore = (items: CartItem[]): StoreGroup[] => {
+  const storeMap = new Map<string, StoreGroup>();
+
+  items.forEach((item) => {
+    const existing = storeMap.get(item.storeId);
+
+    if (existing) {
+      existing.items.push(item);
+    } else {
+      storeMap.set(item.storeId, {
+        storeId: item.storeId,
+        storeName: item.storeName,
+        items: [item],
+        allSelected: false,
+      });
+    }
+  });
+
+  // Calculate allSelected status for each store group
+  const groups = Array.from(storeMap.values());
+  groups.forEach((group) => {
+    group.allSelected =
+      group.items.length > 0 && group.items.every((item) => item.selected);
+  });
+
+  return groups;
+};
 
 function Cart() {
   const navigate = useNavigate();
   const [cartItems, setCartItems] = useState<CartItem[]>([]);
   const [isLoading, setIsLoading] = useState(true);
+
+  // Group items by store
+  const storeGroups = useMemo(() => groupItemsByStore(cartItems), [cartItems]);
 
   // 計算選取的項目
   const selectedItems = useMemo(
@@ -31,7 +68,7 @@ function Cart() {
     [selectedItems]
   );
 
-  // 計算運費（滿 500 免運）
+  // 計算運費（滿 500 免運）TODO: 改為管理員設定
   const shipping = subtotal >= 500 ? 0 : 60;
 
   // 總計
@@ -67,6 +104,20 @@ function Cart() {
       );
     } catch (error) {
       console.error('Failed to select all:', error);
+    }
+  };
+
+  // Handle store-level selection
+  const handleSelectStore = async (storeId: string, selected: boolean) => {
+    try {
+      await selectStoreItems(storeId, selected);
+      setCartItems((prev) =>
+        prev.map((item) =>
+          item.storeId === storeId ? { ...item, selected } : item
+        )
+      );
+    } catch (error) {
+      console.error('Failed to select store items:', error);
     }
   };
 
@@ -147,32 +198,75 @@ function Cart() {
         <div className={styles.cartContent}>
           {/* 全選控制 */}
           <div className={styles.selectAllSection}>
-            <input
-              type="checkbox"
-              id="selectAll"
-              checked={allSelected}
-              onChange={handleSelectAll}
-            />
-            <label htmlFor="selectAll">
-              全選 ({selectedItems.length}/{cartItems.length})
-            </label>
+            {/* Checkbox Area */}
+            <div className={styles.checkboxArea}>
+              <input
+                type="checkbox"
+                id="selectAll"
+                checked={allSelected}
+                onChange={handleSelectAll}
+              />
+            </div>
+
+            {/* Image Placeholder with Product Label */}
+            <div className={styles.imagePlaceholder}>
+              <span>商品 ({selectedItems.length}/{cartItems.length})</span>
+            </div>
+
+            {/* Column Headers matching productInfo grid */}
+            <div className={styles.columnHeaders}>
+              <span className={styles.unitPrice}>單價</span>
+              <span className={styles.quantity}>數量</span>
+              <span className={styles.subtotal}>小計</span>
+            </div>
+
+            {/* Delete Button Placeholder */}
+            <div className={styles.deletePlaceholder}></div>
           </div>
 
           {/* 購物車項目列表 */}
           <div className={styles.cartItems}>
-            {cartItems.map((item) => (
-              <ItemListCard
-                key={item.id}
-                variant="cart"
-                item={item}
-                selectable
-                editable
-                deletable
-                onSelect={(selected) => handleSelectItem(item.id, selected)}
-                onQuantityChange={(qty) => handleQuantityChange(item.id, qty)}
-                onDelete={() => handleDelete(item.id)}
-                onClick={() => navigate(`/product/${item.productId}`)}
-              />
+            {storeGroups.map((storeGroup) => (
+              <div key={storeGroup.storeId} className={styles.storeGroup}>
+                {/* Store Header */}
+                <StoreGroupHeader
+                  storeId={storeGroup.storeId}
+                  storeName={storeGroup.storeName}
+                  allSelected={storeGroup.allSelected}
+                  onSelectAll={(selected) =>
+                    handleSelectStore(storeGroup.storeId, selected)
+                  }
+                />
+
+                {/* Store Items */}
+                <div className={styles.storeItems}>
+                  {storeGroup.items.map((item, index) => {
+                    const isLast = index === storeGroup.items.length - 1;
+
+                    const itemClassName = isLast
+                          ? styles.lastItem
+                          : '';
+
+                    return (
+                      <ItemListCard
+                        key={item.id}
+                        variant="cart"
+                        item={item}
+                        selectable
+                        editable
+                        deletable
+                        className={itemClassName}
+                        onSelect={(selected) => handleSelectItem(item.id, selected)}
+                        onQuantityChange={(qty) =>
+                          handleQuantityChange(item.id, qty)
+                        }
+                        onDelete={() => handleDelete(item.id)}
+                        onClick={() => navigate(`/product/${item.productId}`)}
+                      />
+                    );
+                  })}
+                </div>
+              </div>
             ))}
           </div>
         </div>
