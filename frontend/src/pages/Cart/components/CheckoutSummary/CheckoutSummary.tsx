@@ -1,6 +1,6 @@
-import styles from './CheckoutSummary.module.scss';
-import Button from '@/shared/components/Button';
-import type { CheckoutSummaryProps } from '@/types';
+import styles from "./CheckoutSummary.module.scss";
+import Button from "@/shared/components/Button";
+import type { CheckoutSummaryProps } from "@/types";
 
 function CheckoutSummary({
   subtotal,
@@ -20,7 +20,7 @@ function CheckoutSummary({
       {/* 免運提示 */}
       {subtotal < freeShippingThreshold && (
         <div className={styles.freeShippingHint}>
-          再買 NT$ {freeShippingThreshold - subtotal} 即可免運
+          再買 $ {freeShippingThreshold - subtotal} 即可免運
         </div>
       )}
 
@@ -28,18 +28,18 @@ function CheckoutSummary({
       <div className={styles.priceBreakdown}>
         <div className={styles.row}>
           <span>商品總額</span>
-          <span>NT$ {subtotal}</span>
+          <span>$ {subtotal}</span>
         </div>
         <div className={styles.row}>
           <span>運費</span>
-          <span className={shipping === 0 ? styles.free : ''}>
-            {shipping === 0 ? '免運' : `NT$ ${shipping}`}
+          <span className={shipping === 0 ? styles.free : ""}>
+            {shipping === 0 ? "免運" : `$ ${shipping}`}
           </span>
         </div>
         <div className={styles.divider} />
         <div className={`${styles.row} ${styles.total}`}>
           <span>應付總額</span>
-          <span className={styles.totalAmount}>NT$ {total}</span>
+          <span className={styles.totalAmount}>$ {total}</span>
         </div>
       </div>
 

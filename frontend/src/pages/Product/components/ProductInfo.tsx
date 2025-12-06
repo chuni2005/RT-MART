@@ -75,12 +75,12 @@ function ProductInfo({
       <div className={styles.priceSection}>
         <div className={styles.priceContainer}>
           <span className={styles.currentPrice}>
-            NT$ {currentPrice.toLocaleString()}
+            $ {currentPrice.toLocaleString()}
           </span>
           {originalPrice && originalPrice > currentPrice && (
             <>
               <span className={styles.originalPrice}>
-                NT$ {originalPrice.toLocaleString()}
+                $ {originalPrice.toLocaleString()}
               </span>
               {discount && (
                 <span className={styles.discountBadge}>-{discount}%</span>
