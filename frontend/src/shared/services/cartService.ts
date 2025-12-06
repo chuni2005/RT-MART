@@ -1,7 +1,7 @@
 import type { CartItem, GetCartResponse } from '@/types';
 
 // TODO: Replace with real backend API calls
-// Mock data for development
+// Mock data for development (4 items across 3 stores)
 const mockCartItems: CartItem[] = [
   {
     id: 'cart_001',
@@ -12,6 +12,8 @@ const mockCartItems: CartItem[] = [
     quantity: 2,
     stock: 50,
     selected: true,
+    storeId: 'store_001',
+    storeName: '科技生活旗艦店',
   },
   {
     id: 'cart_002',
@@ -22,6 +24,8 @@ const mockCartItems: CartItem[] = [
     quantity: 1,
     stock: 30,
     selected: true,
+    storeId: 'store_001',
+    storeName: '科技生活旗艦店',
   },
   {
     id: 'cart_003',
@@ -32,6 +36,8 @@ const mockCartItems: CartItem[] = [
     quantity: 3,
     stock: 100,
     selected: false,
+    storeId: 'store_002',
+    storeName: '時尚服飾精品館',
   },
   {
     id: 'cart_004',
@@ -42,6 +48,8 @@ const mockCartItems: CartItem[] = [
     quantity: 1,
     stock: 45,
     selected: true,
+    storeId: 'store_003',
+    storeName: '居家生活館',
   },
 ];
 
@@ -93,6 +101,9 @@ export const addToCart = async (
     quantity,
     stock: 50,
     selected: true,
+    // Default store info (TODO: Get from product API)
+    storeId: 'store_001',
+    storeName: '科技生活旗艦店',
   };
 
   mockCartItems.push(newItem);
@@ -213,5 +224,29 @@ export const selectAllCartItems = async (
   return {
     success: true,
     message: selected ? '已全選' : '已取消全選',
+  };
+};
+
+/**
+ * Select/deselect all items from a specific store
+ * TODO: Replace with PUT /api/v1/cart/select-store/:storeId
+ */
+export const selectStoreItems = async (
+  storeId: string,
+  selected: boolean
+): Promise<{ success: boolean; message: string }> => {
+  await delay(200);
+
+  let affectedCount = 0;
+  mockCartItems.forEach((item) => {
+    if (item.storeId === storeId) {
+      item.selected = selected;
+      affectedCount++;
+    }
+  });
+
+  return {
+    success: true,
+    message: `已${selected ? '選取' : '取消選取'} ${affectedCount} 個商品`,
   };
 };
