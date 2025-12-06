@@ -4,8 +4,7 @@
   padding: $spacing-md;
   background: $card-bg;
   border: 1px solid $border-color;
-  border-radius: $border-radius-lg;
-  margin-bottom: 0.75rem;
+  border-radius: 0;
   transition: $transition-base;
 
   &:hover {
@@ -57,40 +56,89 @@
   }
 }
 
-// 商品信息區域
+// 商品信息區域 - Grid Layout for Desktop
 .productInfo {
   flex: 1;
-  display: flex;
-  flex-direction: column;
-  gap: $spacing-sm;
+  display: grid;
+  grid-template-columns: 2fr 1fr 1.5fr 1fr;
+  align-items: center;
+  gap: $spacing-md;
+  padding: $spacing-sm 0;
 }
 
+// Product Name Cell
 .productName {
-  font-size: $font-md;
-  font-weight: 500;
-  color: $text-primary;
+  grid-column: 1;
+  grid-row: 1;
   cursor: pointer;
-  transition: $transition-base;
-  display: -webkit-box;
-  -webkit-line-clamp: 2;
-  -webkit-box-orient: vertical;
-  overflow: hidden;
 
-  &:hover {
-    color: $primary-color;
+  h4 {
+    font-size: $font-md;
+    font-weight: 500;
+    color: $text-primary;
+    cursor: pointer;
+    transition: $transition-fast;
+    @include text-multiline-ellipsis(2);
+    margin: 0;
+
+    &:hover {
+      color: $primary-color;
+    }
+  }
+}
+
+// Unit Price Cell
+.unitPrice {
+  grid-column: 2;
+  grid-row: 1;
+  text-align: center;
+
+  .priceLabel {
+    display: none; // Hidden on desktop
   }
 }
 
 .price {
-  font-size: $font-lg;
+  font-size: $font-md;
   font-weight: 600;
   color: $text-primary;
+  margin: 0;
+}
+
+// Quantity Cell
+.quantityWrapper {
+  grid-column: 3;
+  grid-row: 1;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: $spacing-xs;
+
+  .quantityLabel {
+    display: none; // Hidden on desktop
+  }
+}
+
+.quantityDisplay {
+  font-size: $font-md;
+  color: $text-primary;
+}
+
+// Subtotal Cell
+.subtotalWrapper {
+  grid-column: 4;
+  grid-row: 1;
+  text-align: right;
+
+  .subtotalLabel {
+    display: none; // Hidden on desktop
+  }
 }
 
 .subtotal {
   font-size: $font-md;
   color: $text-secondary;
-  margin-top: auto;
+  margin: 0;
 
   span {
     font-weight: 600;
@@ -99,10 +147,16 @@
   }
 }
 
+// Stock Warning - Spans all columns
 .stockWarning {
-  font-size: $font-xs;
-  color: $error-color;
-  margin-top: $spacing-xs;
+  grid-column: 1 / -1;
+  grid-row: 2;
+
+  p {
+    font-size: $font-xs;
+    color: $error-color;
+    margin: 0;
+  }
 }
 
 // 刪除按鈕
@@ -153,5 +207,38 @@
 
   .itemListCard[data-variant='cart'] {
     position: relative;
+
+    // Switch productInfo to vertical layout on mobile
+    .productInfo {
+      display: flex;
+      flex-direction: column;
+      gap: $spacing-sm;
+      align-items: stretch;
+
+      .productName h4 {
+        font-size: $font-sm;
+      }
+
+      // Show labels and use horizontal layout for each row
+      .unitPrice,
+      .quantityWrapper,
+      .subtotalWrapper {
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+
+        .priceLabel,
+        .quantityLabel,
+        .subtotalLabel {
+          display: block;
+          font-size: $font-sm;
+          color: $text-secondary;
+        }
+      }
+
+      .stockWarning {
+        text-align: center;
+      }
+    }
   }
 }

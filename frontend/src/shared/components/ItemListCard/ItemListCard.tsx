@@ -4,7 +4,7 @@ import Button from '../Button';
 import QuantitySelector from '../QuantitySelector';
 
 function ItemListCard(props: ItemListCardProps) {
-  const { variant, item, onClick } = props;
+  const { variant, item, onClick, className } = props;
 
   // 購物車變體
   if (variant === 'cart') {
@@ -31,9 +31,14 @@ function ItemListCard(props: ItemListCardProps) {
       }
     };
 
+    const subtotal = item.price * item.quantity;
+
     return (
-      <div className={styles.itemListCard} data-variant="cart">
-        {/* 選擇框 */}
+      <div
+        className={`${styles.itemListCard} ${className || ''}`}
+        data-variant="cart"
+      >
+        {/* Checkbox */}
         {selectable && (
           <div className={styles.selectBox}>
             <input
@@ -45,7 +50,7 @@ function ItemListCard(props: ItemListCardProps) {
           </div>
         )}
 
-        {/* 商品圖片 */}
+        {/* Product Image - Clickable */}
         <div className={styles.productImage} onClick={onClick}>
           {item.productImage ? (
             <img src={item.productImage} alt={item.productName} />
@@ -54,37 +59,52 @@ function ItemListCard(props: ItemListCardProps) {
           )}
         </div>
 
-        {/* 商品信息 */}
+        {/* Product Info - Horizontal Grid Layout */}
         <div className={styles.productInfo}>
-          <h4 className={styles.productName} onClick={onClick}>
-            {item.productName}
-          </h4>
-          <p className={styles.price}>NT$ {item.price}</p>
+          {/* Product Name */}
+          <div className={styles.productName} onClick={onClick}>
+            <h4>{item.productName}</h4>
+          </div>
 
-          {/* 數量調整器 */}
-          {editable && (
-            <QuantitySelector
-              value={item.quantity}
-              onChange={handleQuantityChange}
-              max={item.stock}
-              min={1}
-              readOnly={!editable}
-              size="md"
-            />
-          )}
+          {/* Unit Price */}
+          <div className={styles.unitPrice}>
+            <span className={styles.priceLabel}>單價</span>
+            <p className={styles.price}>NT$ {item.price}</p>
+          </div>
 
-          {/* 小計 */}
-          <p className={styles.subtotal}>
-            小計: <span>NT$ {item.price * item.quantity}</span>
-          </p>
+          {/* Quantity */}
+          <div className={styles.quantityWrapper}>
+            <span className={styles.quantityLabel}>數量</span>
+            {editable ? (
+              <QuantitySelector
+                value={item.quantity}
+                onChange={handleQuantityChange}
+                max={item.stock}
+                min={1}
+                size="md"
+              />
+            ) : (
+              <span className={styles.quantityDisplay}>{item.quantity}</span>
+            )}
+          </div>
 
-          {/* 庫存提示 */}
+          {/* Subtotal */}
+          <div className={styles.subtotalWrapper}>
+            <span className={styles.subtotalLabel}>小計</span>
+            <p className={styles.subtotal}>
+              <span>NT$ {subtotal}</span>
+            </p>
+          </div>
+
+          {/* Stock Warning - Spans full width */}
           {item.stock < 10 && (
-            <p className={styles.stockWarning}>僅剩 {item.stock} 件</p>
+            <div className={styles.stockWarning}>
+              <p>僅剩 {item.stock} 件</p>
+            </div>
           )}
         </div>
 
-        {/* 刪除按鈕 */}
+        {/* Delete Button */}
         {deletable && (
           <Button
             type="button"
@@ -93,8 +113,7 @@ function ItemListCard(props: ItemListCardProps) {
             aria-label="刪除商品"
             iconOnly
             icon="trash"
-          >
-          </Button>
+          />
         )}
       </div>
     );
