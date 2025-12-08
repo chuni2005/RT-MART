@@ -165,6 +165,18 @@ export interface EmptyStateProps {
   categoryName?: string;
 }
 
+// Address types
+export interface Address {
+  id: string;
+  recipientName: string;
+  phone: string;
+  city: string;
+  district: string;
+  postalCode: string;
+  detail: string;
+  isDefault: boolean;
+}
+
 // CheckoutSummary types
 export interface CheckoutSummaryProps {
   subtotal: number;
@@ -176,6 +188,7 @@ export interface CheckoutSummaryProps {
   freeShippingThreshold?: number;
   onCheckout: () => void;
   disabled: boolean;
+  buttonText?: string; // 自訂按鈕文字，預設 "前往結帳"
 }
 
 // QuantitySelector types
