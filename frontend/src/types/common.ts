@@ -84,3 +84,133 @@ export interface TabProps {
   variant?: "default" | "underline" | "pills";
   className?: string;
 }
+
+// Cart types
+export interface CartItem {
+  id: string;
+  productId: string;
+  productName: string;
+  productImage: string;
+  price: number;
+  quantity: number;
+  stock: number;
+  selected: boolean;
+  // Store information
+  storeId: string;
+  storeName: string;
+}
+
+// StoreGroupHeader types (Shared component)
+export interface StoreGroupHeaderProps {
+  storeId: string;
+  storeName: string;
+  allSelected: boolean;
+  onSelectAll: (selected: boolean) => void;
+  onStoreClick?: () => void;
+}
+
+export interface GetCartResponse {
+  success: boolean;
+  message?: string;
+  items: CartItem[];
+  total: number;
+}
+
+// ItemListCard types
+export interface ItemListCardBaseProps {
+  variant: 'cart' | 'order-list' | 'order-detail';
+  item: CartItem | any; // TODO: Add OrderItem type when implementing orders
+  onClick?: () => void;
+  className?: string;
+}
+
+export interface CartVariantProps {
+  selectable?: boolean;
+  onSelect?: (selected: boolean) => void;
+  editable?: boolean;
+  onQuantityChange?: (quantity: number) => void;
+  deletable?: boolean;
+  onDelete?: () => void;
+}
+
+export interface OrderListVariantProps {
+  orderHeader?: {
+    orderId: string;
+    orderDate: string;
+    status: string;
+  };
+  actions?: Array<'pay' | 'cancel' | 'confirm' | 'detail'>;
+  onAction?: (action: string) => void;
+}
+
+export interface OrderDetailVariantProps {
+  readonly?: boolean;
+}
+
+export type ItemListCardProps = ItemListCardBaseProps &
+  (CartVariantProps | OrderListVariantProps | OrderDetailVariantProps);
+
+// EmptyState types
+export interface EmptyStateProps {
+  type?: 'search' | 'cart' | 'order';
+  icon?: string;
+  title?: string;
+  message?: string | ReactNode;
+  suggestions?: string[];
+  buttonText?: string;
+  buttonAction?: () => void;
+
+  // Deprecated (for backward compatibility with Search page)
+  keyword?: string;
+  categoryName?: string;
+}
+
+// CheckoutSummary types
+export interface CheckoutSummaryProps {
+  subtotal: number;
+  shipping: number;
+  discount: number;
+  total: number;
+  itemCount: number;
+  selectedCount: number;
+  freeShippingThreshold?: number;
+  onCheckout: () => void;
+  disabled: boolean;
+}
+
+// QuantitySelector types
+export interface QuantitySelectorProps {
+  value: number | string;
+  onChange: (value: number | string) => void;
+  min?: number;
+  max: number;
+  disabled?: boolean;
+  readOnly?: boolean;
+  onValidationError?: (message: string) => void;
+  onBlur?: () => void;
+  className?: string;
+  size?: 'sm' | 'md' | 'lg';
+  ariaLabel?: string;
+}
+
+// Dialog types
+export interface DialogProps {
+  isOpen: boolean;
+  onClose: () => void;
+  title?: string;
+  message?: string | ReactNode;
+  type?: 'confirm' | 'alert' | 'custom';
+  confirmText?: string;
+  cancelText?: string;
+  onConfirm?: () => void | Promise<void>;
+  onCancel?: () => void;
+  variant?: 'danger' | 'warning' | 'info';
+  icon?: string;
+  mediaUrl?: string; // 圖片或影片的路徑（優先於 icon）
+  mediaType?: 'image' | 'video'; // 媒體類型（預設自動偵測）
+  children?: ReactNode;
+  showCloseButton?: boolean;
+  closeOnOverlayClick?: boolean;
+  closeOnEsc?: boolean;
+  className?: string;
+}

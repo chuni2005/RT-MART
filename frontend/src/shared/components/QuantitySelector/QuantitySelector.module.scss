@@ -1,0 +1,141 @@
+.quantitySelector {
+  display: flex;
+  align-items: center;
+  gap: 0;
+  width: fit-content;
+  border: 1px solid $border-color;
+  border-radius: $border-radius-md;
+  overflow: hidden;
+  background: $card-bg;
+  transition: $transition-base;
+
+  &.disabled {
+    opacity: 0.6;
+    pointer-events: none;
+  }
+
+  &.readOnly {
+    .quantityInput {
+      cursor: default;
+    }
+  }
+}
+
+.quantityButton {
+  @include flex-center;
+  background-color: $bg-secondary;
+  border: none;
+  cursor: pointer;
+  transition: $transition-base;
+  color: $text-secondary;
+  padding: 0;
+  font-size: inherit;
+  font-weight: normal;
+  border-radius: 0;
+  gap: 0;
+  max-width: unset;
+
+  &:hover:not(:disabled) {
+    background-color: $bg-primary;
+    color: $primary-color;
+    transform: none;
+    box-shadow: none;
+  }
+
+  &:disabled {
+    cursor: not-allowed;
+    opacity: 0.5;
+  }
+
+  svg {
+    font-size: $font-sm;
+  }
+}
+
+.quantityInput {
+  text-align: center;
+  border: none;
+  border-left: 1px solid $border-color;
+  border-right: 1px solid $border-color;
+  font-weight: 500;
+  color: $text-primary;
+  background: $card-bg;
+  outline: none;
+  transition: $transition-base;
+
+  &:focus:not(:read-only) {
+    background-color: $bg-primary;
+  }
+
+  &:disabled {
+    cursor: not-allowed;
+    opacity: 0.6;
+  }
+
+  // 移除數字輸入框的上下箭頭
+  &::-webkit-inner-spin-button,
+  &::-webkit-outer-spin-button {
+    -webkit-appearance: none;
+    margin: 0;
+  }
+  -moz-appearance: textfield;
+}
+
+// 不同尺寸
+.size-sm {
+  .quantityButton {
+    width: 2rem;
+    height: 2rem;
+  }
+
+  .quantityInput {
+    width: 3.75rem;
+    height: 2rem;
+    font-size: $font-md;
+    padding: 0 $spacing-sm;
+  }
+}
+
+.size-md {
+  .quantityButton {
+    width: 2.5rem;
+    height: 2.5rem;
+  }
+
+  .quantityInput {
+    width: 3.75rem;
+    height: 2.5rem;
+    font-size: $font-md;
+    padding: 0 $spacing-sm;
+  }
+}
+
+.size-lg.quantityButton {
+  width: 4rem;
+  height: 2.5rem;
+}
+
+.size-lg.quantityInput {
+  width: 2.75rem;
+  height: 2.5rem;
+  font-size: $font-md;
+  padding: 0 $spacing-sm;
+}
+
+// 響應式設計
+@include mobile {
+  .quantitySelector {
+    &.size-lg {
+      width: 100%;
+
+      .quantityButton {
+        flex: 0 0 40px;
+      }
+
+      .quantityInput {
+        flex: 1;
+        width: auto;
+      }
+    }
+  }
+}

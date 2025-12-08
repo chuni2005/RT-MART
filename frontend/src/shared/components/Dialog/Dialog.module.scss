@@ -1,0 +1,190 @@
+@use '@/shared/styles/variables' as *;
+@use '@/shared/styles/mixins' as *;
+
+// Overlay (遮罩層)
+.dialogOverlay {
+  position: fixed;
+  top: 0;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  background: rgba(0, 0, 0, 0.5);
+  @include flex-center;
+  z-index: $z-index-modal-backdrop;
+  animation: fadeIn 0.2s ease-out;
+}
+
+// Content (內容框)
+.dialogContent {
+  background: $bg-secondary;
+  border-radius: $border-radius-xl;
+  width: 90%;
+  max-width: 500px;
+  box-shadow: $shadow-xl;
+  animation: slideUp 0.3s ease-out;
+  outline: none;
+
+  @include mobile {
+    max-width: 90%;
+  }
+}
+
+// Header
+.dialogHeader {
+  @include flex-between;
+  padding: $spacing-lg;
+  border-bottom: 1px solid $border-color;
+
+  @include mobile {
+    padding: $spacing-md;
+  }
+}
+
+.dialogTitle {
+  font-size: $font-lg;
+  font-weight: 600;
+  color: $text-primary;
+  margin: 0;
+}
+
+.closeButton {
+  background: none;
+  border: none;
+  font-size: $font-xl;
+  color: $text-tertiary;
+  cursor: pointer;
+  padding: $spacing-xs;
+  @include transition-color;
+
+  &:hover {
+    color: $text-primary;
+  }
+}
+
+// Body
+.dialogBody {
+  padding: $spacing-lg;
+  text-align: center;
+
+  @include mobile {
+    padding: $spacing-md;
+  }
+}
+
+.iconWrapper {
+  margin-bottom: $spacing-md;
+}
+
+.icon {
+  font-size: $font-3xl;
+}
+
+// Media (圖片/影片)
+.mediaWrapper {
+  margin-bottom: $spacing-md;
+  @include flex-center;
+}
+
+.media {
+  max-width: 150px;
+  max-height: 150px;
+  width: auto;
+  height: auto;
+  object-fit: contain;
+  border-radius: $border-radius-md;
+
+  @include mobile {
+    max-width: 120px;
+    max-height: 120px;
+  }
+}
+
+.message {
+  font-size: $font-md;
+  color: $text-secondary;
+  line-height: 1.6;
+  margin: 0;
+}
+
+// Footer
+.dialogFooter {
+  display: flex;
+  gap: $spacing-sm;
+  padding: $spacing-lg;
+  border-top: 1px solid $border-color;
+  justify-content: flex-end;
+
+  @include mobile {
+    padding: $spacing-md;
+    flex-direction: column-reverse;
+
+    button {
+      width: 100%;
+    }
+  }
+}
+
+// Variant 樣式
+.danger {
+  .icon {
+    color: $error-color;
+  }
+
+  .confirmButton {
+    background: $error-color;
+
+    &:hover:not(:disabled) {
+      background: #e63946;
+    }
+  }
+}
+
+.warning {
+  .icon {
+    color: $warning-color;
+  }
+
+  .confirmButton {
+    background: $warning-color;
+    color: $text-primary;
+
+    &:hover:not(:disabled) {
+      background: #eba800;
+    }
+  }
+}
+
+.info {
+  .icon {
+    color: $info-color;
+  }
+
+  .confirmButton {
+    background: $primary-color;
+
+    &:hover:not(:disabled) {
+      background: $primary-hover;
+    }
+  }
+}
+
+// 動畫
+@keyframes fadeIn {
+  from {
+    opacity: 0;
+  }
+  to {
+    opacity: 1;
+  }
+}
+
+@keyframes slideUp {
+  from {
+    opacity: 0;
+    transform: translateY(50px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}

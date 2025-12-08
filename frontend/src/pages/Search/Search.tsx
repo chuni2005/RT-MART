@@ -6,7 +6,7 @@ import Button from "@/shared/components/Button";
 import Icon from "@/shared/components/Icon";
 import FilterSidebar from "./components/FilterSidebar";
 import Pagination from "./components/Pagination";
-import EmptyState from "./components/EmptyState";
+import EmptyState from '@/shared/components/EmptyState';
 import { getProducts, getProductTypes } from "@/shared/services/productService";
 import type { Product, ProductType } from "@/types";
 import styles from "./Search.module.scss";

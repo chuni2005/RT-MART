@@ -1,0 +1,207 @@
+.itemListCard {
+  display: flex;
+  gap: $spacing-md;
+  padding: $spacing-md;
+  background: $card-bg;
+  border: 1px solid $border-color;
+  border-radius: 0;
+  transition: $transition-base;
+  align-items: center;
+
+  &:hover {
+    box-shadow: $shadow-sm;
+  }
+}
+
+.selectBox {
+  display: flex;
+  align-items: center;
+  padding-right: $spacing-sm;
+
+  input[type='checkbox'] {
+    width: 1.125rem;
+    height: 1.125rem;
+    cursor: pointer;
+    accent-color: $primary-color;
+  }
+}
+
+.productImage {
+  width: 7.5rem;
+  height: 7.5rem;
+  flex-shrink: 0;
+  border-radius: $border-radius-md;
+  overflow: hidden;
+  background: $bg-tertiary;
+  cursor: pointer;
+  transition: $transition-base;
+
+  &:hover {
+    opacity: 0.8;
+  }
+
+  img {
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+  }
+
+  .placeholder {
+    @include flex-center;
+    width: 100%;
+    height: 100%;
+    color: $text-tertiary;
+    font-size: $font-sm;
+  }
+}
+
+// 商品信息區域 - Grid Layout for Desktop
+.productInfo {
+  flex: 1;
+  display: grid;
+  grid-template-columns: 2fr 1fr 1.5fr 1fr;
+  align-items: center;
+  gap: $spacing-md;
+  padding: $spacing-sm 0;
+}
+
+.productName {
+  grid-column: 1;
+  grid-row: 1;
+  cursor: pointer;
+
+  h4 {
+    font-size: $font-md;
+    font-weight: 500;
+    color: $text-primary;
+    cursor: pointer;
+    transition: $transition-fast;
+    @include text-multiline-ellipsis(2);
+    margin: 0;
+
+    &:hover {
+      color: $primary-color;
+    }
+  }
+}
+
+.unitPrice {
+  grid-column: 2;
+  grid-row: 1;
+  text-align: center;
+}
+
+.price {
+  font-size: $font-md;
+  font-weight: 600;
+  color: $text-primary;
+  margin: 0;
+}
+
+.quantityWrapper {
+  grid-column: 3;
+  grid-row: 1;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: $spacing-xs;
+}
+
+.quantityDisplay {
+  font-size: $font-md;
+  color: $text-primary;
+}
+
+.subtotalWrapper {
+  grid-column: 4;
+  grid-row: 1;
+  text-align: right;
+}
+
+.subtotal {
+  font-size: $font-md;
+  color: $text-secondary;
+  margin: 0;
+}
+
+.stockWarning {
+  grid-column: 1 / -1;
+  grid-row: 2;
+
+  p {
+    font-size: $font-xs;
+    color: $error-color;
+    margin: 0;
+  }
+}
+
+// 刪除按鈕
+.deleteBtn {
+  @include flex-center;
+  width: 2.5rem;
+  height: 2.5rem;
+  border: none;
+  background: transparent;
+  cursor: pointer;
+  color: $text-tertiary;
+  transition: $transition-base;
+  border-radius: $border-radius-md;
+
+  &:hover {
+    background: #fee;
+    color: $primary-color;
+  }
+}
+
+// 響應式設計
+@include mobile {
+  .itemListCard {
+    gap: $spacing-sm;
+    padding: $spacing-sm;
+  }
+
+  .productImage {
+    width: 5rem;
+    height: 5rem;
+  }
+
+  .productInfo {
+    display: flex;
+    flex-direction: column;
+    gap: $spacing-xs;
+    padding: 0;
+    align-items: flex-start;
+
+    .productName h4 {
+      font-size: $font-sm;
+    }
+  }
+
+  .unitPrice {
+    display: flex;
+    align-items: center;
+    text-align: left;
+  }
+
+  .quantityWrapper {
+    flex-direction: row;
+  }
+
+  .price {
+    font-size: $font-sm;
+  }
+
+  .quantityDisplay {
+    font-size: $font-sm;
+  }
+
+  // Hide subtotal on mobile
+  .subtotalWrapper {
+    display: none;
+  }
+
+  .deleteBtn {
+    width: 2rem;
+    height: 2rem;
+  }
+}

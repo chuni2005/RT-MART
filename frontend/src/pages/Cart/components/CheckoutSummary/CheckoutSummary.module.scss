@@ -1,0 +1,150 @@
+// 結帳摘要
+.checkoutSummary {
+  background: $card-bg;
+  border: 1px solid $border-color;
+  border-radius: $border-radius-lg;
+  padding: $spacing-lg;
+
+  h3 {
+    font-size: $font-xl;
+    font-weight: 600;
+    margin-bottom: $spacing-md;
+    color: $text-primary;
+  }
+
+  // Desktop: Sticky sidebar on the right
+  @include desktop {
+    position: sticky;
+    top: 5rem;
+    width: 21.875rem;
+    max-height: calc(100vh - 6.25rem);
+    overflow-y: auto;
+  }
+
+  // Tablet & Mobile: Fixed bottom panel with simplified content
+  @include belowTablet {
+    position: fixed;
+    bottom: 0;
+    left: 0;
+    right: 0;
+    width: 100%;
+    max-height: none;
+    height: auto;
+    border: none;
+    border-top: 1px solid $border-color;
+    border-radius: 16px 16px 0 0;
+    box-shadow: 0 -4px 12px rgba(0, 0, 0, 0.15);
+    z-index: 100;
+    padding: 14px 16px;
+    overflow: visible;
+    animation: slideUp 0.3s ease-out;
+
+    // Hide detailed content on tablet/mobile
+    h3,
+    .freeShippingHint,
+    .selectedInfo {
+      display: none;
+    }
+  }
+}
+
+.freeShippingHint {
+  padding: 0.75rem;
+  background: #fff7ed;
+  border: 1px solid #fed7aa;
+  border-radius: $border-radius-md;
+  margin-bottom: $spacing-md;
+  color: #c2410c;
+  font-size: $font-sm;
+  text-align: center;
+}
+
+.priceBreakdown {
+  .row {
+    display: flex;
+    justify-content: space-between;
+    margin-bottom: 0.75rem;
+    font-size: $font-md;
+    color: $text-secondary;
+
+    &.total {
+      font-size: $font-lg;
+      font-weight: 600;
+      color: $text-primary;
+      margin-top: $spacing-sm;
+    }
+  }
+
+  .free {
+    color: $success-color;
+    font-weight: 500;
+  }
+
+  .totalAmount {
+    color: $primary-color;
+    font-size: $font-2xl;
+  }
+
+  .divider {
+    height: 1px;
+    background: $border-color;
+    margin: $spacing-md 0;
+  }
+
+  @include belowTablet {
+    margin: 0;
+    flex: 0 0 auto;
+
+    .row:not(.total),
+    .divider {
+      display: none;
+    }
+
+    .row.total {
+      margin: 0 0 4px 0;
+      font-size: $font-sm;
+      align-items: center;
+    }
+
+    .totalAmount {
+      font-size: $font-lg;
+      font-weight: 700;
+    }
+  }
+}
+
+.selectedInfo {
+  text-align: center;
+  color: $text-tertiary;
+  font-size: $font-sm;
+  margin: $spacing-md 0;
+}
+
+.checkoutBtn {
+  margin-top: $spacing-sm;
+
+  &:disabled {
+    background: #ccc;
+    cursor: not-allowed;
+    opacity: 0.6;
+  }
+
+  // Tablet & Mobile: Remove top margin for compact layout
+  @include belowTablet {
+    margin: 0;
+    padding: 10px 16px;
+    font-size: $font-md;
+    font-weight: 600;
+    flex: 0 0 auto;
+  }
+}
+
+// Slide-up animation for mobile
+@keyframes slideUp {
+  from {
+    transform: translateY(100%);
+  }
+  to {
+    transform: translateY(0);
+  }
+}

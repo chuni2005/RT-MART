@@ -1,0 +1,164 @@
+.cartPage {
+  max-width: 1200px;
+  margin: 0 auto;
+  padding: 24px;
+  min-height: calc(100vh - 120px);
+}
+
+.pageHeader {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  margin-bottom: 24px;
+
+  h1 {
+    font-size: 28px;
+    font-weight: 600;
+    color: $text-primary;
+  }
+
+  .itemCount {
+    font-size: $font-md;
+    color: $text-secondary;
+  }
+}
+
+.cartContainer {
+  display: flex;
+  gap: 24px;
+
+  @include mobile {
+    flex-direction: column;
+    padding-bottom: 10rem; // 為底部固定的摘要留空間
+  }
+}
+
+.cartContent {
+  flex: 1;
+}
+
+.selectAllSection {
+  display: flex;
+  align-items: center;
+  gap: $spacing-md;
+  padding: $spacing-md;
+  background: $bg-secondary;
+  border-radius: $border-radius-lg;
+  margin-bottom: 16px;
+
+  // Checkbox Area
+  .checkboxArea {
+    display: flex;
+    align-items: center;
+    padding-right: $spacing-sm;
+
+    input[type='checkbox'] {
+      width: 1.125rem;
+      height: 1.125rem;
+      cursor: pointer;
+      accent-color: $primary-color;
+    }
+  }
+
+  .imagePlaceholder {
+    width: 7.5rem;
+    flex-shrink: 0;
+    display: flex;
+    align-items: center;
+
+    span {
+      font-size: $font-md;
+      font-weight: 500;
+      color: $text-primary;
+      text-align: left;
+    }
+  }
+
+  .columnHeaders {
+    flex: 1;
+    display: grid;
+    grid-template-columns: 2fr 1fr 1.5fr 1fr;
+    align-items: center;
+    gap: $spacing-md;
+    padding: $spacing-sm 0;
+    font-size: $font-sm;
+    font-weight: 500;
+    color: $text-secondary;
+
+    @include mobile {
+      display: none;
+    }
+
+    .unitPrice {
+      grid-column: 2;
+      text-align: center;
+    }
+
+    .quantity {
+      grid-column: 3;
+      text-align: center;
+    }
+
+    .subtotal {
+      grid-column: 4;
+      text-align: right;
+    }
+  }
+
+  .deletePlaceholder {
+    width: 2.5rem;
+    flex-shrink: 0;
+  }
+}
+
+.cartItems {
+  display: flex;
+  flex-direction: column;
+  gap: $spacing-lg; // Store group spacing
+}
+
+.storeGroup {
+  display: flex;
+  flex-direction: column;
+}
+
+.storeItems {
+  display: flex;
+  flex-direction: column;
+  gap: 0; // ItemListCard has its own margin-bottom
+}
+
+.lastItem {
+  border-radius: 0 0 $border-radius-lg $border-radius-lg !important;
+}
+
+// Loading 狀態
+.loading {
+  @include flex-center;
+  min-height: 400px;
+
+  p {
+    font-size: $font-lg;
+    color: $text-secondary;
+  }
+}
+
+// 響應式設計
+@include mobile {
+  .selectAllSection {
+    gap: $spacing-sm;
+    padding: $spacing-sm;
+
+    .imagePlaceholder {
+      width: 5rem;
+
+      span {
+        font-size: $font-sm;
+      }
+    }
+
+    .deletePlaceholder {
+      width: 2rem;
+    }
+  }
+}

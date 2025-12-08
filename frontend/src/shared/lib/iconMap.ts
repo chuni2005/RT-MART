@@ -28,6 +28,7 @@ import {
   faStar,
   faStore,
   faTimes,
+  faTrash,
   faTruckFast,
   faUser,
 } from '@fortawesome/free-solid-svg-icons';
@@ -59,6 +60,7 @@ const icons: IconDefinition[] = [
   faStar,
   faStore,
   faTimes,
+  faTrash,
   faTruckFast,
   faUser,
 ];
@@ -94,6 +96,7 @@ export const iconMap: Record<string, IconProp> = {
   'star': faStar,
   'store': faStore,
   'times': faTimes,
+  'trash': faTrash,
   'truck-fast': faTruckFast,
   'user': faUser,
 };

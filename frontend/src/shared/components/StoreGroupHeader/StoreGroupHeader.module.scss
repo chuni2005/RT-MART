@@ -1,0 +1,66 @@
+.storeGroupHeader {
+  @include flex-between;
+  padding: $spacing-sm $spacing-md;
+  background: $bg-secondary;
+  border: 1px solid $border-color;
+  border-radius: $border-radius-lg $border-radius-lg 0 0;
+  transition: $transition-base;
+
+  &:hover {
+    box-shadow: $shadow-sm;
+  }
+}
+
+.storeSelect {
+  display: flex;
+  align-items: center;
+  margin-right: $spacing-md;
+
+  input[type="checkbox"] {
+    width: 1.125rem;
+    height: 1.125rem;
+    cursor: pointer;
+    accent-color: $primary-color;
+  }
+}
+
+.storeInfo {
+  @include flex($align: center);
+  flex: 1;
+  gap: $spacing-sm;
+  cursor: pointer;
+  transition: $transition-fast;
+
+  &:hover {
+    .storeName {
+      color: $primary-color;
+    }
+  }
+}
+
+.storeIcon {
+  color: $primary-color;
+}
+
+.storeName {
+  font-size: $font-md;
+  font-weight: 600;
+  color: $text-primary;
+  margin: 0;
+  transition: $transition-fast;
+}
+
+@include mobile {
+  .storeGroupHeader {
+    padding: $spacing-sm $spacing-md;
+  }
+
+  .storeAvatar {
+    width: 2rem;
+    height: 2rem;
+  }
+
+  .storeName {
+    font-size: $font-sm;
+  }
+}

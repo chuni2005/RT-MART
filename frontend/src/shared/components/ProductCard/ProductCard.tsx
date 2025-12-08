@@ -1,6 +1,6 @@
-import type { ProductCardProps } from '@/types';
-import styles from './ProductCard.module.scss';
-import Icon from '@/shared/components/Icon';
+import type { ProductCardProps } from "@/types";
+import styles from "./ProductCard.module.scss";
+import Icon from "@/shared/components/Icon";
 
 function ProductCard({
   id,
@@ -30,9 +30,9 @@ function ProductCard({
       <div className={styles.productInfo}>
         <h4 className={styles.productName}>{name}</h4>
         <p className={styles.productPrice}>
-          <span className={styles.currentPrice}>NT$ {currentPrice}</span>
+          <span className={styles.currentPrice}>$ {currentPrice}</span>
           {originalPrice && (
-            <span className={styles.originalPrice}>NT$ {originalPrice}</span>
+            <span className={styles.originalPrice}>$ {originalPrice}</span>
           )}
         </p>
         <div className={styles.productRating}>
