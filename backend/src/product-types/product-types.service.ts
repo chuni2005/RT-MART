@@ -41,16 +41,37 @@ export class ProductTypesService {
   async findAll(): Promise<ProductType[]> {
     return await this.productTypeRepository.find({
       order: { typeCode: 'ASC' },
+      where: { isActive: true },
     });
   }
 
-  async findTree(): Promise<ProductType[]> {
-    return await this.productTypeRepository.findTrees();
+  async adminFindAll(): Promise<ProductType[]> {
+    return await this.productTypeRepository.find({
+      order: { typeCode: 'ASC' },
+      relations: ['parent', 'children'],
+    });
   }
+
+  async adminFindOne(id: string): Promise<ProductType> {
+    const productType = await this.productTypeRepository.findOne({
+      where: { productTypeId: id },
+      relations: ['parent', 'children'],
+    });
+
+    if (!productType) {
+      throw new NotFoundException(`Product type with ID ${id} not found`);
+    }
+
+    return productType;
+  }
+
+  // async findTree(): Promise<ProductType[]> {
+  //   return await this.productTypeRepository.findTrees();
+  // }
 
   async findOne(id: string): Promise<ProductType> {
     const productType = await this.productTypeRepository.findOne({
-      where: { productTypeId: id },
+      where: { productTypeId: id, isActive: true },
       relations: ['parent', 'children'],
     });
 

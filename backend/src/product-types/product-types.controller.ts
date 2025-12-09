@@ -19,10 +19,10 @@ import { UserRole } from '../users/entities/user.entity';
 @Controller('product-types')
 export class ProductTypesController {
   constructor(private readonly productTypesService: ProductTypesService) {}
-
-  @Post()
-  @UseGuards(JwtAccessGuard, RolesGuard)
+  
   @Roles(UserRole.ADMIN)
+  @UseGuards(JwtAccessGuard, RolesGuard)
+  @Post()
   async create(@Body() createDto: CreateProductTypeDto) {
     return await this.productTypesService.create(createDto);
   }
@@ -32,24 +32,36 @@ export class ProductTypesController {
     return await this.productTypesService.findAll();
   }
 
-  @Get('tree')
-  async findTree() {
-    return await this.productTypesService.findTree();
+  @Get('admin')
+  async adminFindAll() {
+    return await this.productTypesService.adminFindAll();
   }
 
+  @Roles(UserRole.ADMIN)
+  @UseGuards(JwtAccessGuard, RolesGuard)  
+  @Get('admin/:id')
+  async adminFindOne(@Param('id') id: string) {
+    return await this.productTypesService.adminFindOne(id);
+  }
+  
   @Get(':id')
   async findOne(@Param('id') id: string) {
     return await this.productTypesService.findOne(id);
   }
 
-  @Get(':id/children')
-  async findChildren(@Param('id') id: string) {
-    return await this.productTypesService.findChildren(id);
-  }
+  // @Get('tree')
+  // async findTree() {
+  //   return await this.productTypesService.findTree();
+  // }
 
-  @Patch(':id')
-  @UseGuards(JwtAccessGuard, RolesGuard)
+  // @Get(':id/children')
+  // async findChildren(@Param('id') id: string) {
+  //   return await this.productTypesService.findChildren(id);
+  // }
+
   @Roles(UserRole.ADMIN)
+  @UseGuards(JwtAccessGuard, RolesGuard)
+  @Patch(':id')
   async update(
     @Param('id') id: string,
     @Body() updateDto: UpdateProductTypeDto,
@@ -57,9 +69,9 @@ export class ProductTypesController {
     return await this.productTypesService.update(id, updateDto);
   }
 
-  @Delete(':id')
-  @UseGuards(JwtAccessGuard, RolesGuard)
   @Roles(UserRole.ADMIN)
+  @UseGuards(JwtAccessGuard, RolesGuard)
+  @Delete(':id')
   async remove(@Param('id') id: string) {
     await this.productTypesService.remove(id);
     return { message: 'Product type deleted successfully' };
