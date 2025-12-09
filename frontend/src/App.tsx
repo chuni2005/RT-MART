@@ -7,6 +7,7 @@ import Search from "./pages/Search";
 import ProductDetail from "./pages/Product";
 import Store from "./pages/Store";
 import Cart from "./pages/Cart";
+import Checkout from "./pages/Checkout";
 import "./shared/lib/iconLibrary";
 
 // Header Wrapper Component to handle conditional rendering
@@ -37,7 +38,7 @@ function AppContent() {
           <Route path="/product/:product_id" element={<ProductDetail />} />
           <Route path="/store/:store_id" element={<Store />} />
           <Route path="/cart" element={<Cart />} />
-          <Route path="/checkout" element={<h2>結帳頁面開發中...</h2>} />
+          <Route path="/checkout" element={<Checkout />} />
           <Route path="/order/success" element={<h2>訂單成功頁面開發中...</h2>} />
           <Route path="/faq" element={<h2>常見問題頁面開發中...</h2>} />
 

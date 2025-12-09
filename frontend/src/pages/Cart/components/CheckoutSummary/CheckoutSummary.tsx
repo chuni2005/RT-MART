@@ -12,6 +12,7 @@ function CheckoutSummary({
   freeShippingThreshold = 500,
   onCheckout,
   disabled,
+  buttonText = "前往結帳",
 }: CheckoutSummaryProps) {
   return (
     <div className={styles.checkoutSummary}>
@@ -56,7 +57,7 @@ function CheckoutSummary({
         disabled={disabled}
         className={styles.checkoutBtn}
       >
-        前往結帳 ({selectedCount})
+        {buttonText} ({selectedCount})
       </Button>
     </div>
   );

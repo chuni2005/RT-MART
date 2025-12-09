@@ -153,6 +153,38 @@
   }
 }
 
+// order-detail 變體樣式（唯讀模式）
+[data-variant='order-detail'] {
+  // 移除 hover 效果
+  &:hover {
+    box-shadow: none;
+  }
+
+  // 圖片區域 - 移除互動效果
+  .productImage {
+    cursor: default;
+
+    &:hover {
+      opacity: 1;
+    }
+  }
+
+  // 商品名稱 - 移除互動效果
+  .productName h4 {
+    cursor: default;
+
+    &:hover {
+      color: inherit;
+    }
+  }
+
+  // 數量顯示 - 唯讀樣式
+  .quantityDisplay {
+    font-weight: 500;
+    color: $text-secondary;
+  }
+}
+
 // 響應式設計
 @include mobile {
   .itemListCard {

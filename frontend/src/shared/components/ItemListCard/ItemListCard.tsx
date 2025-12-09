@@ -124,9 +124,48 @@ function ItemListCard(props: ItemListCardProps) {
     return <div>Order List Variant - Coming Soon</div>;
   }
 
-  // TODO: 訂單詳情變體
+  // 訂單詳情變體（唯讀模式）
   if (variant === "order-detail") {
-    return <div>Order Detail Variant - Coming Soon</div>;
+    const subtotal = item.price * item.quantity;
+
+    return (
+      <div
+        className={`${styles.itemListCard} ${className || ""}`}
+        data-variant="order-detail"
+      >
+        {/* Product Image */}
+        <div className={styles.productImage} onClick={onClick}>
+          {item.productImage ? (
+            <img src={item.productImage} alt={item.productName} />
+          ) : (
+            <div className={styles.placeholder}>商品圖片</div>
+          )}
+        </div>
+
+        {/* Product Info */}
+        <div className={styles.productInfo}>
+          {/* Product Name */}
+          <div className={styles.productName} onClick={onClick}>
+            <h4>{item.productName}</h4>
+          </div>
+
+          {/* Unit Price */}
+          <div className={styles.unitPrice}>
+            <p className={styles.price}>$ {item.price}</p>
+          </div>
+
+          {/* Quantity (Read-only) */}
+          <div className={styles.quantityWrapper}>
+            <span className={styles.quantityDisplay}>x {item.quantity}</span>
+          </div>
+
+          {/* Subtotal */}
+          <div className={styles.subtotalWrapper}>
+            <p className={styles.subtotal}>$ {subtotal}</p>
+          </div>
+        </div>
+      </div>
+    );
   }
 
   return null;

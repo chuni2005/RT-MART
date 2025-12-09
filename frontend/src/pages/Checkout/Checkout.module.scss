@@ -1,0 +1,197 @@
+.checkoutPage {
+  min-height: calc(100vh - 80px);
+  background: $bg-primary;
+  padding: $spacing-lg 0;
+}
+
+.container {
+  max-width: 1200px;
+  margin: 0 auto;
+  padding: 0 $spacing-lg;
+  display: flex;
+  gap: $spacing-lg;
+
+  @include mobile {
+    flex-direction: column;
+    padding: 0 $spacing-md;
+  }
+}
+
+.checkoutContent {
+  flex: 1;
+}
+
+.section {
+  background: $bg-secondary;
+  border-radius: $border-radius-lg;
+  padding: $spacing-lg;
+  margin-bottom: $spacing-md;
+}
+
+.sectionHeader {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: $spacing-md;
+}
+
+.sectionTitle {
+  font-size: $font-lg;
+  font-weight: 600;
+  color: $text-primary;
+  margin-bottom: $spacing-md;
+}
+
+.changeBtn {
+  font-size: $font-sm;
+}
+
+.itemList {
+  display: flex;
+  flex-direction: column;
+  gap: 0.75rem;
+}
+
+// 地址顯示
+.addressDisplay {
+  padding: $spacing-md;
+  background: $bg-tertiary;
+  border: 1px solid $border-color;
+  border-radius: $border-radius-md;
+}
+
+.recipientInfo {
+  display: flex;
+  align-items: center;
+  gap: 0.75rem;
+  margin-bottom: $spacing-sm;
+  font-size: $font-md;
+
+  strong {
+    color: $text-primary;
+  }
+
+  span {
+    color: $text-secondary;
+    font-size: $font-sm;
+  }
+}
+
+.addressText {
+  font-size: $font-sm;
+  color: $text-secondary;
+  line-height: 1.6;
+  margin: 0;
+}
+
+.noAddress {
+  text-align: center;
+  padding: $spacing-xl;
+  background: $bg-tertiary;
+  border: 1px dashed $border-color;
+  border-radius: $border-radius-lg;
+
+  p {
+    font-size: calc($font-sm + 1px);
+    color: $text-secondary;
+    margin-bottom: $spacing-md;
+  }
+}
+
+// 付款方式
+.paymentMethods {
+  display: flex;
+  flex-direction: column;
+  gap: 0.75rem;
+}
+
+.methodCard {
+  display: flex;
+  align-items: center;
+  gap: $spacing-md;
+  padding: $spacing-md;
+  background: $bg-secondary;
+  border: 2px solid $border-color;
+  border-radius: $border-radius-lg;
+  cursor: pointer;
+  transition: $transition-fast;
+
+  &:hover {
+    border-color: $primary-color;
+    background: #fff7f5;
+  }
+
+  &.selected {
+    border-color: $primary-color;
+    background: #fff7f5;
+  }
+
+  input[type='radio'] {
+    width: 20px;
+    height: 20px;
+    cursor: pointer;
+    accent-color: $primary-color;
+  }
+}
+
+.methodContent {
+  flex: 1;
+
+  h4 {
+    font-size: $font-md;
+    font-weight: 600;
+    color: $text-primary;
+    margin: 0 0 $spacing-xs 0;
+  }
+
+  p {
+    font-size: $font-sm;
+    color: $text-secondary;
+    margin: 0;
+  }
+}
+
+// 訂單備註
+.noteTextarea {
+  width: 100%;
+  padding: 0.75rem;
+  border: 1px solid $border-color;
+  border-radius: $border-radius-md;
+  font-size: $font-sm;
+  font-family: inherit;
+  resize: vertical;
+  transition: border-color 0.2s;
+
+  &:focus {
+    outline: none;
+    border-color: $primary-color;
+  }
+
+  &::placeholder {
+    color: $text-tertiary;
+  }
+}
+
+.charCount {
+  text-align: right;
+  font-size: $font-sm;
+  color: $text-tertiary;
+  margin-top: $spacing-xs;
+}
+
+.checkoutSummary {
+  width: 350px;
+
+  @include mobile {
+    width: 100%;
+  }
+}
+
+.loading {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  min-height: 400px;
+  font-size: $font-md;
+  color: $text-secondary;
+}
