@@ -1,0 +1,67 @@
+.content {
+  padding: $spacing-lg;
+  max-height: 60vh;
+  display: flex;
+  flex-direction: column;
+}
+
+.addressList {
+  flex: 1;
+  overflow-y: auto;
+  margin-bottom: $spacing-md;
+
+  /* Custom scrollbar styling */
+  &::-webkit-scrollbar {
+    width: 8px;
+  }
+
+  &::-webkit-scrollbar-track {
+    background: $bg-tertiary;
+    border-radius: $border-radius-md;
+  }
+
+  &::-webkit-scrollbar-thumb {
+    background: $border-color;
+    border-radius: $border-radius-md;
+
+    &:hover {
+      background: $text-tertiary;
+    }
+  }
+}
+
+.addressItem {
+  margin-bottom: 0.75rem;
+  cursor: pointer;
+  border-radius: $border-radius-lg;
+  transition: transform 0.2s;
+
+  &:last-child {
+    margin-bottom: 0;
+  }
+
+  &:hover {
+    transform: translateY(-2px);
+  }
+
+  &.selected {
+    .addressCard {
+      border-color: $primary-color;
+      background: #fff7f5;
+    }
+  }
+}
+
+.emptyState {
+  text-align: center;
+  padding: $spacing-xl;
+  color: $text-secondary;
+
+  p {
+    font-size: $font-md;
+  }
+}
+
+.addButton {
+  margin-top: $spacing-md;
+}

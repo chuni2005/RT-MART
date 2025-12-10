@@ -1,0 +1,54 @@
+.addressCard {
+  position: relative;
+  background: $bg-secondary;
+  border: 1px solid $border-color;
+  border-radius: $border-radius-lg;
+  padding: $spacing-md;
+  transition: $transition-fast;
+
+  &:hover {
+    box-shadow: $shadow-md;
+  }
+
+  &.selected {
+    border-color: $primary-hover;
+    background: #fff7f5;
+  }
+}
+
+.defaultBadge {
+  position: absolute;
+  top: 0.75rem;
+  right: 0.75rem;
+  background: $primary-color;
+  color: $text-white;
+  padding: $spacing-xs 0.75rem;
+  border-radius: $border-radius-xl;
+  font-size: $font-xs;
+  font-weight: 500;
+}
+
+.recipientInfo {
+  display: flex;
+  align-items: center;
+  gap: 0.75rem;
+  margin-bottom: $spacing-sm;
+
+  .name {
+    font-size: $font-md;
+    font-weight: 600;
+    color: $text-primary;
+  }
+
+  .phone {
+    font-size: $font-sm;
+    color: $text-secondary;
+  }
+}
+
+.address {
+  font-size: $font-sm;
+  color: $text-secondary;
+  line-height: 1.6;
+  margin: $spacing-sm 0;
+}
