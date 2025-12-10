@@ -77,3 +77,19 @@ export let adminUser = {
     refreshToken: '',
   },
 };
+
+export let productTypeWithParent = {
+  productTypeId: 0,
+  typeCode: "testCode",
+  typeName:"test",
+  parentTypeId: 1,
+  isActive:true
+}
+
+export let productType = {
+  productTypeId: 0,
+  typeCode: "testCode_noneParent",
+  typeName:"test_noneParent",
+  parentTypeId: null,
+  isActive:true
+}

@@ -12,7 +12,6 @@ import * as SellerPostTest from './../functions/sellers/sellers_post';
 import * as SellerDeleteTest from './../functions/sellers/sellers_delete';
 import * as SellerGetTest from './../functions/sellers/sellers_get';
 import { buyerUser, sellerUser, adminUser, adminTester, buyerUser_sellerCase } from './../variables';
-import { Store } from '@/stores/entities/store.entity';
 
 describe('SellersController (e2e)', () => {
   let app: INestApplication;

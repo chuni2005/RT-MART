@@ -7,6 +7,7 @@ import {
   Param,
   Delete,
   UseGuards,
+  Query,
 } from '@nestjs/common';
 import { ProductTypesService } from './product-types.service';
 import { CreateProductTypeDto } from './dto/create-product-type.dto';
@@ -18,23 +19,25 @@ import { UserRole } from '../users/entities/user.entity';
 
 @Controller('product-types')
 export class ProductTypesController {
-  constructor(private readonly productTypesService: ProductTypesService) {}
+  constructor(private readonly productTypesService: ProductTypesService) { }
 
-  @Post()
-  @UseGuards(JwtAccessGuard, RolesGuard)
   @Roles(UserRole.ADMIN)
+  @UseGuards(JwtAccessGuard, RolesGuard)
+  @Post()
   async create(@Body() createDto: CreateProductTypeDto) {
     return await this.productTypesService.create(createDto);
   }
 
   @Get()
-  async findAll() {
-    return await this.productTypesService.findAll();
+  async findAll(@Query() queryDto: any) {
+    return await this.productTypesService.findAll(queryDto);
   }
 
-  @Get('tree')
-  async findTree() {
-    return await this.productTypesService.findTree();
+  @Roles(UserRole.ADMIN)
+  @UseGuards(JwtAccessGuard, RolesGuard)
+  @Get('admin')
+  async adminFindAll() {
+    return await this.productTypesService.adminFindAll();
   }
 
   @Get(':id')
@@ -42,14 +45,26 @@ export class ProductTypesController {
     return await this.productTypesService.findOne(id);
   }
 
-  @Get(':id/children')
-  async findChildren(@Param('id') id: string) {
-    return await this.productTypesService.findChildren(id);
+  @Roles(UserRole.ADMIN)
+  @UseGuards(JwtAccessGuard, RolesGuard)
+  @Get('admin/:id')
+  async adminFindOne(@Param('id') id: string) {
+    return await this.productTypesService.adminFindOne(id);
   }
 
-  @Patch(':id')
-  @UseGuards(JwtAccessGuard, RolesGuard)
+  // @Get('tree')
+  // async findTree() {
+  //   return await this.productTypesService.findTree();
+  // }
+
+  // @Get(':id/children')
+  // async findChildren(@Param('id') id: string) {
+  //   return await this.productTypesService.findChildren(id);
+  // }
+
   @Roles(UserRole.ADMIN)
+  @UseGuards(JwtAccessGuard, RolesGuard)
+  @Patch(':id')
   async update(
     @Param('id') id: string,
     @Body() updateDto: UpdateProductTypeDto,
@@ -57,9 +72,9 @@ export class ProductTypesController {
     return await this.productTypesService.update(id, updateDto);
   }
 
-  @Delete(':id')
-  @UseGuards(JwtAccessGuard, RolesGuard)
   @Roles(UserRole.ADMIN)
+  @UseGuards(JwtAccessGuard, RolesGuard)
+  @Delete(':id')
   async remove(@Param('id') id: string) {
     await this.productTypesService.remove(id);
     return { message: 'Product type deleted successfully' };

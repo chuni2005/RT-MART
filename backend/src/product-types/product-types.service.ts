@@ -14,7 +14,7 @@ export class ProductTypesService {
   constructor(
     @InjectRepository(ProductType)
     private readonly productTypeRepository: TreeRepository<ProductType>,
-  ) {}
+  ) { }
 
   async create(createDto: CreateProductTypeDto): Promise<ProductType> {
     // Check if typeCode already exists
@@ -38,19 +38,50 @@ export class ProductTypesService {
     return await this.productTypeRepository.save(productType);
   }
 
-  async findAll(): Promise<ProductType[]> {
+  async findAll(queryDto: any): Promise<ProductType[]> {
+    const productTypes = await this.productTypeRepository.find({
+      order: { typeCode: 'ASC' },
+      where: { isActive: true },
+    });
+
+    if (queryDto.typeName) {
+      return productTypes.filter(pt => pt.typeName.includes(queryDto.typeName));
+    }
+
+    if (queryDto.typeCode) {
+      return productTypes.filter(pt => pt.typeCode.includes(queryDto.typeCode));
+    }
+
+    return productTypes;
+  }
+
+  async adminFindAll(): Promise<ProductType[]> {
     return await this.productTypeRepository.find({
       order: { typeCode: 'ASC' },
+      relations: ['parent', 'children'],
     });
   }
 
-  async findTree(): Promise<ProductType[]> {
-    return await this.productTypeRepository.findTrees();
+  async adminFindOne(id: string): Promise<ProductType> {
+    const productType = await this.productTypeRepository.findOne({
+      where: { productTypeId: id },
+      relations: ['parent', 'children'],
+    });
+
+    if (!productType) {
+      throw new NotFoundException(`Product type with ID ${id} not found`);
+    }
+
+    return productType;
   }
+
+  // async findTree(): Promise<ProductType[]> {
+  //   return await this.productTypeRepository.findTrees();
+  // }
 
   async findOne(id: string): Promise<ProductType> {
     const productType = await this.productTypeRepository.findOne({
-      where: { productTypeId: id },
+      where: { productTypeId: id, isActive: true },
       relations: ['parent', 'children'],
     });
 
@@ -80,7 +111,7 @@ export class ProductTypesService {
 
     // Verify parent exists if being updated
     if (updateDto.parentTypeId) {
-      const parent = await this.findOne(updateDto.parentTypeId);
+      const parent = await this.adminFindOne(updateDto.parentTypeId);
       if (!parent) {
         throw new NotFoundException('Parent product type not found');
       }
@@ -96,7 +127,7 @@ export class ProductTypesService {
   }
 
   async remove(id: string): Promise<void> {
-    const productType = await this.findOne(id);
+    const productType = await this.adminFindOne(id);
     await this.productTypeRepository.remove(productType);
   }
 }
