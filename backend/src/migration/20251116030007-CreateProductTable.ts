@@ -10,7 +10,7 @@ export class CreateProductTable20251116030007 implements MigrationInterface {
         product_name VARCHAR(200) NOT NULL,
         description TEXT,
         price DECIMAL(10,2) NOT NULL,
-        view_count BIGINT DEFAULT 0,
+        sold_count BIGINT DEFAULT 0,
         average_rating DECIMAL(2,1) DEFAULT 0.0,
         total_reviews INT DEFAULT 0,
         deleted_at TIMESTAMP NULL,

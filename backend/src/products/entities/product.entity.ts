@@ -43,7 +43,7 @@ export class Product {
   @Column({ type: 'decimal', precision: 10, scale: 2 })
   price: number;
 
-  @Column({ name: 'view_count', type: 'bigint', default: 0 })
+  @Column({ name: 'sold_count', type: 'bigint', default: 0 })
   viewCount: number;
 
   @Column({

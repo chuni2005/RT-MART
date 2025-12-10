@@ -46,9 +46,9 @@ export class ProductLoader extends BaseLoader<Product> {
         typeof data.description === 'string' ? data.description : null;
       product.price = Number(data.price);
       product.viewCount =
-        typeof data.view_count === 'number'
-          ? data.view_count
-          : Number(data.view_count) || 0;
+        typeof data.sold_count === 'number'
+          ? data.sold_count
+          : Number(data.sold_count) || 0;
       product.averageRating =
         typeof data.average_rating === 'number'
           ? data.average_rating

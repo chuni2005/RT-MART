@@ -1,7 +1,11 @@
-// Use DBML to define your database structure
+/
+/
+Use DBML to define your database structure
 // Docs: https://dbml.dbdiagram.io/docs
 
-// RT-Mart E-Commerce Platform Database Schema
+/
+/
+RT-Mart E-Commerce Platform Database Schema
 // ==========================================
 // 1. 使用者體系 (User System)
 // ==========================================
@@ -69,7 +73,9 @@ Table UserToken {
 
 Ref: UserToken.user_id > User.user_id [delete: cascade]
 
-// ==========================================
+/
+/
+==========================================
 // 2. 商店與商品 (Store & Product)
 // ==========================================
 
@@ -120,7 +126,7 @@ Table Product {
   product_name varchar(200) [not null]
   description text
   price decimal(10,2) [not null]
-  view_count bigint [default: 0]  // 瀏覽量
+  sold_count bigint [default: 0]  // 瀏覽量
   average_rating decimal(2,1) [default: 0.0]
   total_reviews int [default: 0]  // 評論數量
   deleted_at timestamp [null]   // 下架時設定這個
@@ -155,7 +161,9 @@ Table ProductImage {
 }
 Ref: ProductImage.product_id > Product.product_id [delete: cascade]
 
-// ==========================================
+/
+/
+==========================================
 // 2.1. 庫存管理系統
 // ==========================================
 
@@ -176,7 +184,9 @@ Table Inventory {
 }
 Ref: Inventory.product_id - Product.product_id [delete: cascade]
 
-// ==========================================
+/
+/
+==========================================
 // 3. 購物車系統 (Shopping Cart)
 // ==========================================
 
@@ -237,8 +247,9 @@ Table CartHistory {
 }
 Ref: CartHistory.user_id > User.user_id [delete: cascade]
 
-
-// ==========================================
+/
+/
+==========================================
 // 4. 訂單系統 (Order System)
 // ==========================================
 
@@ -247,8 +258,10 @@ Table Order {
   order_number varchar(50) [unique, not null, note: '對外顯示的訂單號']
   user_id bigint [not null]
   store_id bigint [not null]
-  
-  // 訂單狀態（包含付款狀態）
+
+/
+/
+訂單狀態（包含付款狀態）
   order_status enum(
     'pending_payment',  // 待付款（剛下單，還沒付款）
     'payment_failed',   // 付款失敗
@@ -300,8 +313,10 @@ Table OrderItem {
   product_id bigint [null]
   product_snapshot json [not null, note:"保存「當下商品狀態」--> 因爲商家後續可能會更改商品資訊"]
   quantity int [not null]
-  
-  // 價格資訊
+
+/
+/
+價格資訊
   original_price decimal(10,2) [not null, note: '商品原價']
   item_discount decimal(10,2) [default: 0, note: '商品本身的折扣 = original_price - unit_price']
   unit_price decimal(10,2) [not null, note: '實際單價（可能是特價）']
@@ -323,8 +338,10 @@ Table OrderItem {
 }
 Ref: OrderItem.order_id > Order.order_id [delete: cascade]
 Ref: OrderItem.product_id > Product.product_id [delete: set null]
-  
-// ==========================================
+
+/
+/
+==========================================
 // 5. 折扣系統 (Discount System)
 // ==========================================
 
@@ -393,7 +410,9 @@ Ref: SpecialDiscount.discount_id - Discount.discount_id [delete: cascade]
 Ref: SpecialDiscount.store_id > Store.store_id [delete: cascade]
 Ref: SpecialDiscount.product_type_id > ProductType.product_type_id [delete: restrict]
 
-// 中介表（junction table）
+/
+/
+中介表（junction table）
 Table OrderDiscount {
   order_discount_id bigint [pk, increment]
   order_id bigint [not null]
@@ -413,7 +432,9 @@ Table OrderDiscount {
 Ref: OrderDiscount.order_id > Order.order_id [delete: cascade]
 Ref: OrderDiscount.discount_id > Discount.discount_id [delete: restrict]
 
-// ==========================================
+/
+/
+==========================================
 // 6. 審計系統 (Audit System) （可移除）
 // ==========================================
 
@@ -451,7 +472,9 @@ Table AuditLog {
 }
 Ref: AuditLog.user_id > User.user_id [delete: set null]
 
-// > : 多對一（N:1）
+/
+/
+> : 多對一（N:1）
 // < : 一對多（1:N）
 // - : 一對一（1:1）
 // <> : 多對多（需要中間表）
