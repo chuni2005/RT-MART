@@ -1,18 +1,20 @@
 import { useState, useEffect, useMemo } from 'react';
 import { useNavigate, useLocation } from 'react-router-dom';
 import styles from './Checkout.module.scss';
-import ItemListCard from '@/shared/components/ItemListCard';
-import CheckoutSummary from '@/pages/Cart/components/CheckoutSummary';
+import Icon from '@/shared/components/Icon';
+import CheckoutSummary from '@/shared/components/CheckoutSummary';
 import Button from '@/shared/components/Button';
 import Dialog from '@/shared/components/Dialog';
 import AddressCard from './components/AddressCard';
 import AddressSelectionDialog from './components/AddressSelectionDialog';
 import AddressFormDialog, { type AddressFormData } from './components/AddressFormDialog';
 import PaymentMethodSelector from './components/PaymentMethodSelector';
+import StoreOrderSection from './components/StoreOrderSection';
 import type { CartItem, Address } from '@/types';
-import type { PaymentMethod, CreateOrderRequest } from '@/types/order';
+import type { PaymentMethod, CreateOrderRequest, CreateMultipleOrdersResponse } from '@/types/order';
 import { getAddresses, getDefaultAddress, addAddress } from '@/shared/services/addressService';
 import { createOrder } from '@/shared/services/orderService';
+import { groupOrdersByStore } from './utils/groupOrdersByStore';
 
 function Checkout() {
   const navigate = useNavigate();
@@ -28,8 +30,8 @@ function Checkout() {
   // 付款方式
   const [paymentMethod, setPaymentMethod] = useState<PaymentMethod | null>(null);
 
-  // 訂單備註
-  const [orderNote, setOrderNote] = useState('');
+  // 商店備註（每個商店獨立）
+  const [storeNotes, setStoreNotes] = useState<Map<string, string>>(new Map());
 
   // 載入狀態
   const [isLoading, setIsLoading] = useState(true);
@@ -39,17 +41,13 @@ function Checkout() {
   const [showAddressDialog, setShowAddressDialog] = useState(false);
   const [showAddressFormDialog, setShowAddressFormDialog] = useState(false);
   const [showSuccessDialog, setShowSuccessDialog] = useState(false);
-  const [orderId, setOrderId] = useState('');
+  const [orderResponse, setOrderResponse] = useState<CreateMultipleOrdersResponse | null>(null);
 
-  // 計算金額
-  const subtotal = useMemo(
-    () => checkoutItems.reduce((sum, item) => sum + item.price * item.quantity, 0),
+  // 按商店分組
+  const storeGroups = useMemo(
+    () => groupOrdersByStore(checkoutItems),
     [checkoutItems]
   );
-
-  const shipping = subtotal >= 500 ? 0 : 60;
-  const discount = 0; // TODO: 優惠券功能
-  const total = subtotal + shipping - discount;
 
   // 初始化
   useEffect(() => {
@@ -84,6 +82,15 @@ function Checkout() {
     initCheckout();
   }, [location.state, navigate]);
 
+  // 初始化商店備註
+  useEffect(() => {
+    const initialNotes = new Map<string, string>();
+    storeGroups.forEach((group) => {
+      initialNotes.set(group.storeId, '');
+    });
+    setStoreNotes(initialNotes);
+  }, [storeGroups]);
+
   // 變更地址
   const handleChangeAddress = () => {
     setShowAddressDialog(true);
@@ -115,6 +122,15 @@ function Checkout() {
     }
   };
 
+  // 備註變更處理
+  const handleNoteChange = (storeId: string, note: string) => {
+    setStoreNotes((prev) => {
+      const updated = new Map(prev);
+      updated.set(storeId, note);
+      return updated;
+    });
+  };
+
   // 確認訂單
   const handleConfirmOrder = async () => {
     if (!selectedAddress) {
@@ -130,25 +146,25 @@ function Checkout() {
     try {
       setIsSubmitting(true);
 
+      // 合併所有商店備註（因後端目前只接受單一 note 字段）
+      const combinedNotes = Array.from(storeNotes.entries())
+        .filter(([_, note]) => note.trim())
+        .map(([storeId, note]) => {
+          const storeName = storeGroups.find((g) => g.storeId === storeId)?.storeName;
+          return `【${storeName}】${note}`;
+        })
+        .join('\n');
+
       const orderData: CreateOrderRequest = {
-        items: checkoutItems.map((item) => ({
-          productId: item.productId,
-          quantity: item.quantity,
-          price: item.price,
-        })),
         addressId: selectedAddress.id,
         paymentMethod: paymentMethod,
-        note: orderNote,
-        subtotal,
-        shipping,
-        discount,
-        totalAmount: total,
+        note: combinedNotes || undefined,
       };
 
       const response = await createOrder(orderData);
 
       // 顯示成功 Dialog
-      setOrderId(response.orderId);
+      setOrderResponse(response);
       setShowSuccessDialog(true);
     } catch (error) {
       console.error('Failed to create order:', error);
@@ -178,21 +194,30 @@ function Checkout() {
       <div className={styles.container}>
         {/* 左側：訂單資訊 */}
         <div className={styles.checkoutContent}>
-          {/* 1. 商品清單 */}
-          <section className={styles.section}>
-            <h2 className={styles.sectionTitle}>商品清單</h2>
-            <div className={styles.itemList}>
-              {checkoutItems.map((item) => (
-                <ItemListCard
-                  key={item.id}
-                  variant="order-detail"
-                  item={item}
-                />
-              ))}
+          {/* 多訂單提示 */}
+          {storeGroups.length > 1 && (
+            <div className={styles.multiOrderInfo}>
+              <Icon icon="info-circle" />
+              <span>
+                您的購物車包含 {storeGroups.length} 個商店的商品，將建立 {storeGroups.length} 筆訂單
+              </span>
             </div>
+          )}
+
+          {/* 1. 訂單明細（按商店分組） */}
+          <section className={styles.section}>
+            <h2 className={styles.sectionTitle}>訂單明細</h2>
+            {storeGroups.map((group) => (
+              <StoreOrderSection
+                key={group.storeId}
+                storeGroup={group}
+                note={storeNotes.get(group.storeId) || ''}
+                onNoteChange={handleNoteChange}
+              />
+            ))}
           </section>
 
-          {/* 2. 收件地址 */}
+          {/* 2. 收件地址（共用） */}
           <section className={styles.section}>
             <div className={styles.sectionHeader}>
               <h2 className={styles.sectionTitle}>收件地址</h2>
@@ -217,37 +242,18 @@ function Checkout() {
             )}
           </section>
 
-          {/* 3. 付款方式 */}
+          {/* 3. 付款方式（共用） */}
           <section className={styles.section}>
             <h2 className={styles.sectionTitle}>付款方式</h2>
             <PaymentMethodSelector value={paymentMethod} onChange={setPaymentMethod} />
-          </section>
-
-          {/* 4. 訂單備註 */}
-          <section className={styles.section}>
-            <h2 className={styles.sectionTitle}>訂單備註</h2>
-            <textarea
-              className={styles.noteTextarea}
-              placeholder="給賣家的備註（選填，最多 200 字）"
-              maxLength={200}
-              value={orderNote}
-              onChange={(e) => setOrderNote(e.target.value)}
-              rows={4}
-            />
-            <div className={styles.charCount}>{orderNote.length} / 200</div>
           </section>
         </div>
 
         {/* 右側：訂單摘要 */}
         <div className={styles.checkoutSummary}>
           <CheckoutSummary
-            subtotal={subtotal}
-            shipping={shipping}
-            discount={discount}
-            total={total}
-            itemCount={checkoutItems.length}
-            selectedCount={checkoutItems.length}
-            freeShippingThreshold={500} // TODO: 改為從後端取得
+            mode="checkout"
+            storeGroups={storeGroups}
             onCheckout={handleConfirmOrder}
             disabled={isSubmitting || !selectedAddress || !paymentMethod}
             buttonText={isSubmitting ? '處理中...' : '確認訂單'}
@@ -281,7 +287,25 @@ function Checkout() {
         variant="info"
         icon="check-circle"
         title="訂單建立成功！"
-        message={`您的訂單編號：${orderId}\n我們將盡快為您處理訂單`}
+        message={
+          orderResponse ? (
+            <div>
+              <p>已成功建立 {orderResponse.orders.length} 筆訂單</p>
+              <div style={{ marginTop: '0.75rem' }}>
+                {orderResponse.orders.map((order) => (
+                  <div key={order.orderId} style={{ marginBottom: '0.5rem' }}>
+                    <strong>{order.storeName}</strong>: {order.orderId}
+                  </div>
+                ))}
+              </div>
+              <p style={{ marginTop: '1rem', fontWeight: 500 }}>
+                總金額：$ {orderResponse.totalAmount}
+              </p>
+            </div>
+          ) : (
+            '我們將盡快為您處理訂單'
+          )
+        }
         confirmText="返回首頁"
         onConfirm={handleSuccessConfirm}
       />

@@ -21,6 +21,24 @@ max-width: $desktop;
   flex: 1;
 }
 
+.multiOrderInfo {
+  background: #e8f4fd;
+  border-left: 4px solid $primary-color;
+  padding: $spacing-md;
+  border-radius: $border-radius-md;
+  margin-bottom: $spacing-lg;
+  display: flex;
+  align-items: center;
+  gap: $spacing-sm;
+  font-size: $font-sm;
+  color: $text-primary;
+
+  @include mobile {
+    font-size: $font-xs;
+    padding: $spacing-sm;
+  }
+}
+
 .section {
   background: $bg-secondary;
   border-radius: $border-radius-lg;
