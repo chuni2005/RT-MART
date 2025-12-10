@@ -1,5 +1,6 @@
 import { useLocation, useNavigate } from "react-router-dom";
 import { useAuth } from "@/shared/contexts/AuthContext";
+import { useCart } from "@/shared/contexts/CartContext";
 import Icon from "../Icon/Icon";
 import TopBar from "./TopBar";
 import SearchBar from "./SearchBar";
@@ -12,6 +13,7 @@ function HeaderA() {
   const location = useLocation();
   const navigate = useNavigate();
   const { isAuthenticated } = useAuth();
+  const { itemCount } = useCart();
 
   // Hide cart icon on cart and checkout pages
   const hideCartIcon = ["/cart", "/checkout"].includes(location.pathname);
@@ -53,8 +55,7 @@ function HeaderA() {
                   aria-label="購物車"
                   icon="shopping-cart"
                 >
-                  {/* TODO: Replace with actual cart count */}
-                  <span className={styles.badge}>0</span>
+                  <span className={styles.badge}>{itemCount}</span>
                 </Button>
               )}
 

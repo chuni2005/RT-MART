@@ -1,5 +1,6 @@
 import { BrowserRouter as Router, Routes, Route, useLocation } from "react-router-dom";
 import { AuthProvider } from "./shared/contexts/AuthContext";
+import { CartProvider } from "./shared/contexts/CartContext";
 import Header from "./shared/components/Header";
 import ProtectedRoute from "./shared/components/ProtectedRoute";
 import Home from "./pages/Home";
@@ -89,9 +90,11 @@ function AppContent() {
 function App() {
   return (
     <AuthProvider>
-      <Router>
-        <AppContent />
-      </Router>
+      <CartProvider>
+        <Router>
+          <AppContent />
+        </Router>
+      </CartProvider>
     </AuthProvider>
   );
 }
