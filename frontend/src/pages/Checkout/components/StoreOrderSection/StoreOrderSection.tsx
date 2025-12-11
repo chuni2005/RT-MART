@@ -54,7 +54,7 @@ function StoreOrderSection({ storeGroup, note, onNoteChange }: StoreOrderSection
         </div>
         <div className={styles.divider} />
         <div className={`${styles.row} ${styles.total}`}>
-          <span>此商店小計</span>
+          <span>小計</span>
           <span className={styles.totalAmount}>$ {storeGroup.total}</span>
         </div>
       </div>

@@ -4,15 +4,22 @@
  * 使用觀察者模式自動同步購物車狀態到 Header badge
  */
 
-import { createContext, useContext, useState, useEffect, ReactNode, useCallback } from 'react';
-import * as cartService from '../services/cartService';
-import { CartItem } from '@/types';
-import { useAuth } from './AuthContext';
+import {
+  createContext,
+  useContext,
+  useState,
+  useEffect,
+  ReactNode,
+  useCallback,
+} from "react";
+import * as cartService from "../services/cartService";
+import { CartItem } from "@/types";
+import { useAuth } from "./AuthContext";
 
 interface CartContextValue {
   items: CartItem[];
   itemCount: number; // Badge 顯示的數量（商品種類數）
-  totalAmount: number; // 購物車總金額
+  totalAmount: number; // 購物車總額
   isLoading: boolean;
   addToCart: (productId: string, quantity: number) => Promise<void>;
   removeFromCart: (itemId: string) => Promise<void>;
@@ -73,7 +80,7 @@ export const CartProvider = ({ children }: CartProviderProps) => {
         setTotalAmount(amount);
       }
     } catch (error) {
-      console.error('Failed to load cart:', error);
+      console.error("Failed to load cart:", error);
       // On error, reset to empty state
       setItems([]);
       setItemCount(0);
@@ -105,7 +112,7 @@ export const CartProvider = ({ children }: CartProviderProps) => {
       // Auto-refresh cart after adding
       await refreshCart();
     } catch (error) {
-      console.error('Failed to add to cart:', error);
+      console.error("Failed to add to cart:", error);
       throw error;
     } finally {
       setIsLoading(false);
@@ -126,7 +133,7 @@ export const CartProvider = ({ children }: CartProviderProps) => {
       // Auto-refresh cart after removing
       await refreshCart();
     } catch (error) {
-      console.error('Failed to remove from cart:', error);
+      console.error("Failed to remove from cart:", error);
       throw error;
     } finally {
       setIsLoading(false);
@@ -147,7 +154,7 @@ export const CartProvider = ({ children }: CartProviderProps) => {
       // Auto-refresh cart after updating
       await refreshCart();
     } catch (error) {
-      console.error('Failed to update cart item:', error);
+      console.error("Failed to update cart item:", error);
       throw error;
     } finally {
       setIsLoading(false);
@@ -168,7 +175,7 @@ export const CartProvider = ({ children }: CartProviderProps) => {
       // Auto-refresh (will be empty)
       await refreshCart();
     } catch (error) {
-      console.error('Failed to clear cart:', error);
+      console.error("Failed to clear cart:", error);
       throw error;
     } finally {
       setIsLoading(false);
@@ -197,7 +204,7 @@ export const useCart = (): CartContextValue => {
   const context = useContext(CartContext);
 
   if (!context) {
-    throw new Error('useCart must be used within CartProvider');
+    throw new Error("useCart must be used within CartProvider");
   }
 
   return context;
