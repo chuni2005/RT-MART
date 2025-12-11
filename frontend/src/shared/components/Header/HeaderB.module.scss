@@ -16,19 +16,35 @@
   }
 }
 
-// Responsive
-@media (max-width: $tablet) {
-  .headerB {
+.headerB {
+  @include belowTablet {
     padding: $spacing-sm 0;
   }
-}
 
-@media (max-width: $mobile) {
-  .headerB {
-    padding: $spacing-sm 0;
-
+  @include mobile {
+    background: $primary-color;
     .container {
       padding: 0 $spacing-sm;
     }
+  }
+}
+
+@include mobile {
+  .whiteLogo {
+    filter: brightness(0) invert(1) contrast(2);
+  }
+
+  .whiteIcon {
+    color: $text-white;
+  }
+
+  .whiteTrigger {
+    border: 1px solid $border-color;
+    background-color: transparent;
+    color: $text-white;
+  }
+
+  .whiteChevron {
+    color: $text-white;
   }
 }

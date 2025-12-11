@@ -12,16 +12,14 @@
     color: $text-primary;
   }
 
-  // Desktop: Sticky sidebar on the right
   @include desktop {
     position: sticky;
-    top: 5rem;
-    width: 21.875rem;
+    top: 8rem;
+    min-width: 350px;
     max-height: calc(100vh - 6.25rem);
     overflow-y: auto;
   }
 
-  // Tablet & Mobile: Fixed bottom panel with simplified content
   @include belowTablet {
     position: fixed;
     bottom: 0;
@@ -41,22 +39,10 @@
 
     // Hide detailed content on tablet/mobile
     h3,
-    .freeShippingHint,
     .selectedInfo {
       display: none;
     }
   }
-}
-
-.freeShippingHint {
-  padding: 0.75rem;
-  background: #fff7ed;
-  border: 1px solid #fed7aa;
-  border-radius: $border-radius-md;
-  margin-bottom: $spacing-md;
-  color: #c2410c;
-  font-size: $font-sm;
-  text-align: center;
 }
 
 .priceBreakdown {
@@ -118,6 +104,11 @@
   color: $text-tertiary;
   font-size: $font-sm;
   margin: $spacing-md 0;
+}
+
+.discount {
+  color: $success-color;
+  font-weight: 500;
 }
 
 .checkoutBtn {

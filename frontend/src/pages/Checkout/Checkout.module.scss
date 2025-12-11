@@ -1,0 +1,104 @@
+.checkoutPage {
+  min-height: calc(100vh - $header-height);
+  background: $bg-primary;
+  padding: $spacing-lg 0;
+}
+
+.container {
+max-width: $desktop;
+  margin: 0 auto;
+  padding: 0 $spacing-lg;
+  display: flex;
+  gap: $spacing-lg;
+
+  @include mobile {
+    flex-direction: column;
+    padding: 0 $spacing-md;
+  }
+}
+
+.checkoutContent {
+  flex: 1;
+}
+
+.section {
+  background: $bg-secondary;
+  border-radius: $border-radius-lg;
+  padding: $spacing-lg;
+  margin-bottom: $spacing-md;
+}
+
+.sectionHeader {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: $spacing-md;
+}
+
+.sectionTitle {
+  font-size: $font-lg;
+  font-weight: 600;
+  color: $text-primary;
+  margin-bottom: $spacing-md;
+}
+
+.changeBtn {
+  font-size: $font-sm;
+}
+
+.itemList {
+  display: flex;
+  flex-direction: column;
+  gap: 0.75rem;
+}
+
+.noAddress {
+  text-align: center;
+  padding: $spacing-xl;
+  background: $bg-tertiary;
+  border: 1px dashed $border-color;
+  border-radius: $border-radius-lg;
+
+  p {
+    font-size: $font-md;
+    color: $text-secondary;
+    margin-bottom: $spacing-md;
+  }
+}
+
+// 訂單備註
+.noteTextarea {
+  width: 100%;
+  padding: 0.75rem;
+  border: 1px solid $border-color;
+  border-radius: $border-radius-md;
+  font-size: $font-sm;
+  font-family: inherit;
+  resize: vertical;
+  transition: border-color 0.2s;
+
+  &:focus {
+    outline: none;
+    border-color: $primary-color;
+  }
+
+  &::placeholder {
+    color: $text-tertiary;
+  }
+}
+
+.charCount {
+  text-align: right;
+  font-size: $font-sm;
+  color: $text-tertiary;
+  margin-top: $spacing-xs;
+}
+
+.loading {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  min-height: 400px;
+  font-size: $font-md;
+  color: $text-secondary;
+}

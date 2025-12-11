@@ -1,0 +1,135 @@
+.storeOrderSection {
+  background: $bg-secondary;
+  border-radius: $border-radius-lg;
+  padding: $spacing-lg;
+  margin-bottom: $spacing-lg;
+  border: 1px solid $border-color;
+
+  &:last-child {
+    margin-bottom: 0;
+  }
+}
+
+.storeHeader {
+  display: flex;
+  align-items: center;
+  gap: $spacing-sm;
+  margin-bottom: $spacing-md;
+  padding-bottom: $spacing-md;
+  border-bottom: 1px solid $border-color;
+
+  .storeIcon {
+    color: $primary-color;
+  }
+
+  .storeName {
+    font-size: $font-lg;
+    font-weight: 600;
+    color: $text-primary;
+    margin: 0;
+  }
+}
+
+.itemList {
+  margin-bottom: $spacing-lg;
+}
+
+.storeNote {
+  margin-bottom: $spacing-lg;
+
+  .noteLabel {
+    display: block;
+    font-size: $font-sm;
+    font-weight: 500;
+    color: $text-primary;
+    margin-bottom: $spacing-xs;
+  }
+
+  .noteTextarea {
+    width: 100%;
+    padding: $spacing-sm;
+    border: 1px solid $border-color;
+    border-radius: $border-radius-md;
+    font-size: $font-sm;
+    font-family: inherit;
+    resize: none; // 鎖定大小，不允許調整
+    transition: border-color 0.2s;
+
+    &:focus {
+      outline: none;
+      border-color: $primary-color;
+    }
+
+    &::placeholder {
+      color: $text-tertiary;
+    }
+  }
+
+  .charCount {
+    font-size: $font-xs;
+    color: $text-tertiary;
+    text-align: right;
+    margin-top: $spacing-xs;
+  }
+}
+
+.storeSubtotal {
+  background: $bg-primary;
+  padding: $spacing-md;
+  border-radius: $border-radius-md;
+
+  .row {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    font-size: $font-sm;
+    color: $text-secondary;
+    margin-bottom: $spacing-xs;
+
+    &:last-child {
+      margin-bottom: 0;
+    }
+
+    &.total {
+      font-size: $font-md;
+      font-weight: 600;
+      color: $text-primary;
+      margin-top: $spacing-xs;
+
+      .totalAmount {
+        color: $primary-color;
+        font-size: $font-lg;
+      }
+    }
+
+    .free {
+      color: $success-color;
+      font-weight: 500;
+    }
+  }
+
+  .divider {
+    height: 1px;
+    background: $border-color;
+    margin: $spacing-sm 0;
+  }
+}
+
+// 響應式設計
+@media (max-width: 768px) {
+  .storeOrderSection {
+    padding: $spacing-md;
+  }
+
+  .storeHeader {
+    .storeName {
+      font-size: $font-md;
+    }
+  }
+
+  .storeNote {
+    .noteTextarea {
+      font-size: $font-xs;
+    }
+  }
+}

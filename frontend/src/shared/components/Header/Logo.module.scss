@@ -24,11 +24,8 @@
     letter-spacing: 0.05em;
     white-space: nowrap;
   }
-}
 
-// Responsive
-@media (max-width: $tablet) {
-  .logo {
+  @include max-width($tablet) {
     order: 0;
 
     img {
@@ -39,10 +36,8 @@
       font-size: 1.25rem;
     }
   }
-}
 
-@media (max-width: $mobile) {
-  .logo {
+  @include max-width($mobile) {
     gap: $spacing-xs;
 
     img {
@@ -54,3 +49,5 @@
     }
   }
 }
+
+

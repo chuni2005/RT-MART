@@ -2,7 +2,7 @@ import { useState, useEffect, useMemo } from 'react';
 import { useNavigate } from 'react-router-dom';
 import styles from './Cart.module.scss';
 import ItemListCard from '@/shared/components/ItemListCard';
-import CheckoutSummary from './components/CheckoutSummary';
+import CheckoutSummary from '@/shared/components/CheckoutSummary';
 import EmptyState from '@/shared/components/EmptyState';
 import StoreGroupHeader from '@/shared/components/StoreGroupHeader';
 import Dialog from '@/shared/components/Dialog';
@@ -16,6 +16,7 @@ import {
   selectAllCartItems,
   selectStoreItems,
 } from '@/shared/services/cartService';
+import { groupOrdersByStore } from '@/shared/utils/groupOrdersByStore';
 
 /**
  * Group cart items by store
@@ -64,18 +65,18 @@ function Cart() {
     [cartItems]
   );
 
-  // 計算小計
-  const subtotal = useMemo(
-    () =>
-      selectedItems.reduce((sum, item) => sum + item.price * item.quantity, 0),
-    [selectedItems]
-  );
+  // 按商店分組計算運費（每個商店獨立計算滿 500 免運）
+  // TODO: 改為管理員設定
+  const { subtotal, shipping, shippingDiscount, total } = useMemo(() => {
+    const storeGroups = groupOrdersByStore(selectedItems);
 
-  // 計算運費（滿 500 免運）TODO: 改為管理員設定
-  const shipping = subtotal >= 500 ? 0 : 60;
-
-  // 總計
-  const total = subtotal + shipping;
+    return {
+      subtotal: storeGroups.reduce((sum, group) => sum + group.subtotal, 0),
+      shipping: storeGroups.reduce((sum, group) => sum + group.shipping, 0),
+      shippingDiscount: storeGroups.reduce((sum, group) => sum + group.shippingDiscount, 0),
+      total: storeGroups.reduce((sum, group) => sum + group.total, 0),
+    };
+  }, [selectedItems]);
 
   // 全選狀態
   const allSelected =
@@ -201,7 +202,6 @@ function Cart() {
     <div className={styles.cartPage}>
       <div className={styles.pageHeader}>
         <h1>購物車</h1>
-        <span className={styles.itemCount}>共 {cartItems.length} 件商品</span>
       </div>
 
       <div className={styles.cartContainer}>
@@ -286,6 +286,7 @@ function Cart() {
         <CheckoutSummary
           subtotal={subtotal}
           shipping={shipping}
+          shippingDiscount={shippingDiscount}
           discount={0}
           total={total}
           itemCount={cartItems.length}

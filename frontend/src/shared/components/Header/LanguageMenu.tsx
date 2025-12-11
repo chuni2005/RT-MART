@@ -1,10 +1,7 @@
 import { useState } from "react";
 import Select from "../Select/Select";
+import { LanguageMenuProps } from "@/types/common";
 import styles from "./LanguageMenu.module.scss";
-
-interface LanguageMenuProps {
-  variant?: "default" | "topbar";
-}
 
 /**
  * LanguageMenu Component
@@ -19,7 +16,11 @@ const languages = [
   { value: "en", label: "English" },
 ];
 
-const LanguageMenu = ({ variant = "default" }: LanguageMenuProps) => {
+const LanguageMenu = ({
+  variant = "default",
+  className,
+  classNames
+}: LanguageMenuProps) => {
   const [language, setLanguage] = useState("zh-TW");
 
   const handleLanguageChange = (newLanguage: string) => {
@@ -37,12 +38,12 @@ const LanguageMenu = ({ variant = "default" }: LanguageMenuProps) => {
       icon="globe"
       ariaLabel="選擇語言"
       classNames={{
-        prefixIcon: styles.icon,
-        trigger: styles.trigger,
-        chevron: styles.chevron,
-        dropdown: styles.dropdown,
-        option: styles.option,
-        optionActive: styles.optionActive,
+        prefixIcon: className || classNames?.icon || styles.icon,
+        trigger: classNames?.trigger || styles.trigger,
+        chevron: classNames?.chevron || styles.chevron,
+        dropdown: classNames?.dropdown || styles.dropdown,
+        option: classNames?.option || styles.option,
+        optionActive: classNames?.optionActive || styles.optionActive,
       }}
     />
   );

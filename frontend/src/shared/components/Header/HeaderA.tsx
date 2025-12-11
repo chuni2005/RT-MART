@@ -1,16 +1,34 @@
-import { Link, useLocation } from "react-router-dom";
+import { useLocation, useNavigate } from "react-router-dom";
+import { useAuth } from "@/shared/contexts/AuthContext";
+import { useCart } from "@/shared/contexts/CartContext";
 import Icon from "../Icon/Icon";
 import TopBar from "./TopBar";
 import SearchBar from "./SearchBar";
 import UserMenu from "./UserMenu";
 import Logo from "./Logo";
 import styles from "./HeaderA.module.scss";
+import Button from "../Button";
 
 function HeaderA() {
   const location = useLocation();
+  const navigate = useNavigate();
+  const { isAuthenticated } = useAuth();
+  const { itemCount } = useCart();
 
   // Hide cart icon on cart and checkout pages
   const hideCartIcon = ["/cart", "/checkout"].includes(location.pathname);
+
+  // Handle cart button click with auth check
+  const handleCartClick = (e: React.MouseEvent) => {
+    e.preventDefault();
+
+    if (!isAuthenticated) {
+      navigate('/auth', { state: { from: '/cart' } });
+      return;
+    }
+
+    navigate('/cart');
+  };
 
   return (
     <header className={styles.headerA}>
@@ -31,11 +49,14 @@ function HeaderA() {
             <div className={styles.rightSection}>
               {/* Shopping Cart */}
               {!hideCartIcon && (
-                <Link to="/cart" className={styles.cartButton}>
-                  <Icon icon="shopping-cart" />
-                  {/* TODO: Replace with actual cart count */}
-                  <span className={styles.badge}>0</span>
-                </Link>
+                <Button
+                  onClick={handleCartClick}
+                  className={styles.cartButton}
+                  aria-label="購物車"
+                  icon="shopping-cart"
+                >
+                  <span className={styles.badge}>{itemCount}</span>
+                </Button>
               )}
 
               {/* User Menu */}

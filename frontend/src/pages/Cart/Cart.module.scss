@@ -8,18 +8,13 @@
 .pageHeader {
   display: flex;
   align-items: center;
-  justify-content: space-between;
+  justify-content: flex-start;
   margin-bottom: 24px;
 
   h1 {
     font-size: 28px;
     font-weight: 600;
     color: $text-primary;
-  }
-
-  .itemCount {
-    font-size: $font-md;
-    color: $text-secondary;
   }
 }
 

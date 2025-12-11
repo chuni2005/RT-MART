@@ -1,12 +1,15 @@
 import { BrowserRouter as Router, Routes, Route, useLocation } from "react-router-dom";
 import { AuthProvider } from "./shared/contexts/AuthContext";
+import { CartProvider } from "./shared/contexts/CartContext";
 import Header from "./shared/components/Header";
+import ProtectedRoute from "./shared/components/ProtectedRoute";
 import Home from "./pages/Home";
 import Auth from "./pages/Auth";
 import Search from "./pages/Search";
 import ProductDetail from "./pages/Product";
 import Store from "./pages/Store";
 import Cart from "./pages/Cart";
+import Checkout from "./pages/Checkout";
 import "./shared/lib/iconLibrary";
 
 // Header Wrapper Component to handle conditional rendering
@@ -36,8 +39,22 @@ function AppContent() {
           <Route path="/search" element={<Search />} />
           <Route path="/product/:product_id" element={<ProductDetail />} />
           <Route path="/store/:store_id" element={<Store />} />
-          <Route path="/cart" element={<Cart />} />
-          <Route path="/checkout" element={<h2>結帳頁面開發中...</h2>} />
+          <Route
+            path="/cart"
+            element={
+              <ProtectedRoute>
+                <Cart />
+              </ProtectedRoute>
+            }
+          />
+          <Route
+            path="/checkout"
+            element={
+              <ProtectedRoute>
+                <Checkout />
+              </ProtectedRoute>
+            }
+          />
           <Route path="/order/success" element={<h2>訂單成功頁面開發中...</h2>} />
           <Route path="/faq" element={<h2>常見問題頁面開發中...</h2>} />
 
@@ -73,9 +90,11 @@ function AppContent() {
 function App() {
   return (
     <AuthProvider>
-      <Router>
-        <AppContent />
-      </Router>
+      <CartProvider>
+        <Router>
+          <AppContent />
+        </Router>
+      </CartProvider>
     </AuthProvider>
   );
 }

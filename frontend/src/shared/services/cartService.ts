@@ -250,3 +250,45 @@ export const selectStoreItems = async (
     message: `已${selected ? '選取' : '取消選取'} ${affectedCount} 個商品`,
   };
 };
+
+/**
+ * Get cart summary (total items count and total amount)
+ * Lightweight API for header badge display
+ *
+ * Real API call (commented out):
+ * ```typescript
+ * const response = await fetch('/api/v1/carts/summary', {
+ *   method: 'GET',
+ *   headers: {
+ *     'Authorization': `Bearer ${token}`,
+ *     'Content-Type': 'application/json',
+ *   },
+ * });
+ * const data = await response.json();
+ * return {
+ *   success: true,
+ *   totalItems: data.totalItems,
+ *   totalAmount: data.totalAmount,
+ * };
+ * ```
+ */
+export const getCartSummary = async (): Promise<{
+  success: boolean;
+  totalItems: number;
+  totalAmount: number;
+}> => {
+  await delay(300);
+
+  // Mock implementation: calculate from mockCartItems
+  const totalItems = mockCartItems.reduce((sum, item) => sum + item.quantity, 0);
+  const totalAmount = mockCartItems.reduce(
+    (sum, item) => sum + item.price * item.quantity,
+    0
+  );
+
+  return {
+    success: true,
+    totalItems,
+    totalAmount,
+  };
+};

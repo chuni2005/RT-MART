@@ -44,9 +44,14 @@
   color: $text-primary;
   text-decoration: none;
   transition: $transition-fast;
+  background: none;
+  border: none;
+  font: inherit;
+  cursor: pointer;
 
   &:hover {
     color: $primary-color;
+    background: transparent !important;
   }
 
   .badge {
