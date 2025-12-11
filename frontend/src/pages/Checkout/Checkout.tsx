@@ -1,20 +1,30 @@
-import { useState, useEffect, useMemo } from 'react';
-import { useNavigate, useLocation } from 'react-router-dom';
-import styles from './Checkout.module.scss';
-import Icon from '@/shared/components/Icon';
-import CheckoutSummary from '@/shared/components/CheckoutSummary';
-import Button from '@/shared/components/Button';
-import Dialog from '@/shared/components/Dialog';
-import AddressCard from './components/AddressCard';
-import AddressSelectionDialog from './components/AddressSelectionDialog';
-import AddressFormDialog, { type AddressFormData } from './components/AddressFormDialog';
-import PaymentMethodSelector from './components/PaymentMethodSelector';
-import StoreOrderSection from './components/StoreOrderSection';
-import type { CartItem, Address } from '@/types';
-import type { PaymentMethod, CreateOrderRequest, CreateMultipleOrdersResponse } from '@/types/order';
-import { getAddresses, getDefaultAddress, addAddress } from '@/shared/services/addressService';
-import { createOrder } from '@/shared/services/orderService';
-import { groupOrdersByStore } from './utils/groupOrdersByStore';
+import { useState, useEffect, useMemo } from "react";
+import { useNavigate, useLocation } from "react-router-dom";
+import styles from "./Checkout.module.scss";
+import Icon from "@/shared/components/Icon";
+import CheckoutSummary from "@/shared/components/CheckoutSummary";
+import Button from "@/shared/components/Button";
+import Dialog from "@/shared/components/Dialog";
+import AddressCard from "./components/AddressCard";
+import AddressSelectionDialog from "./components/AddressSelectionDialog";
+import AddressFormDialog, {
+  type AddressFormData,
+} from "./components/AddressFormDialog";
+import PaymentMethodSelector from "./components/PaymentMethodSelector";
+import StoreOrderSection from "./components/StoreOrderSection";
+import type { CartItem, Address } from "@/types";
+import type {
+  PaymentMethod,
+  CreateOrderRequest,
+  CreateMultipleOrdersResponse,
+} from "@/types/order";
+import {
+  getAddresses,
+  getDefaultAddress,
+  addAddress,
+} from "@/shared/services/addressService";
+import { createOrder } from "@/shared/services/orderService";
+import { groupOrdersByStore } from "@/shared/utils/groupOrdersByStore";
 
 function Checkout() {
   const navigate = useNavigate();
@@ -28,7 +38,9 @@ function Checkout() {
   const [selectedAddress, setSelectedAddress] = useState<Address | null>(null);
 
   // 付款方式
-  const [paymentMethod, setPaymentMethod] = useState<PaymentMethod | null>(null);
+  const [paymentMethod, setPaymentMethod] = useState<PaymentMethod | null>(
+    null
+  );
 
   // 商店備註（每個商店獨立）
   const [storeNotes, setStoreNotes] = useState<Map<string, string>>(new Map());
@@ -41,7 +53,8 @@ function Checkout() {
   const [showAddressDialog, setShowAddressDialog] = useState(false);
   const [showAddressFormDialog, setShowAddressFormDialog] = useState(false);
   const [showSuccessDialog, setShowSuccessDialog] = useState(false);
-  const [orderResponse, setOrderResponse] = useState<CreateMultipleOrdersResponse | null>(null);
+  const [orderResponse, setOrderResponse] =
+    useState<CreateMultipleOrdersResponse | null>(null);
 
   // 按商店分組
   const storeGroups = useMemo(
@@ -59,7 +72,7 @@ function Checkout() {
         const items = location.state?.items as CartItem[] | undefined;
         if (!items || items.length === 0) {
           // 沒有商品，導回購物車
-          navigate('/cart', { replace: true });
+          navigate("/cart", { replace: true });
           return;
         }
         setCheckoutItems(items);
@@ -73,7 +86,7 @@ function Checkout() {
         if (defaultAddr) setSelectedAddress(defaultAddr);
         setAddresses(allAddresses);
       } catch (error) {
-        console.error('Failed to initialize checkout:', error);
+        console.error("Failed to initialize checkout:", error);
       } finally {
         setIsLoading(false);
       }
@@ -86,7 +99,7 @@ function Checkout() {
   useEffect(() => {
     const initialNotes = new Map<string, string>();
     storeGroups.forEach((group) => {
-      initialNotes.set(group.storeId, '');
+      initialNotes.set(group.storeId, "");
     });
     setStoreNotes(initialNotes);
   }, [storeGroups]);
@@ -117,8 +130,8 @@ function Checkout() {
       setAddresses((prev) => [...prev, newAddress]);
       setSelectedAddress(newAddress);
     } catch (error) {
-      console.error('Failed to add address:', error);
-      alert('新增地址失敗');
+      console.error("Failed to add address:", error);
+      alert("新增地址失敗");
     }
   };
 
@@ -134,26 +147,28 @@ function Checkout() {
   // 確認訂單
   const handleConfirmOrder = async () => {
     if (!selectedAddress) {
-      alert('請選擇收件地址');
+      alert("請選擇收件地址");
       return;
     }
 
     if (!paymentMethod) {
-      alert('請選擇付款方式');
+      alert("請選擇付款方式");
       return;
     }
 
     try {
       setIsSubmitting(true);
 
-      // 合併所有商店備註（因後端目前只接受單一 note 字段）
+      // 合併所有商店備註（因後端只接受單一 note 字段）
       const combinedNotes = Array.from(storeNotes.entries())
         .filter(([_, note]) => note.trim())
         .map(([storeId, note]) => {
-          const storeName = storeGroups.find((g) => g.storeId === storeId)?.storeName;
+          const storeName = storeGroups.find(
+            (g) => g.storeId === storeId
+          )?.storeName;
           return `【${storeName}】${note}`;
         })
-        .join('\n');
+        .join("\n");
 
       const orderData: CreateOrderRequest = {
         addressId: selectedAddress.id,
@@ -167,8 +182,8 @@ function Checkout() {
       setOrderResponse(response);
       setShowSuccessDialog(true);
     } catch (error) {
-      console.error('Failed to create order:', error);
-      alert(error instanceof Error ? error.message : '訂單建立失敗');
+      console.error("Failed to create order:", error);
+      alert(error instanceof Error ? error.message : "訂單建立失敗");
     } finally {
       setIsSubmitting(false);
     }
@@ -177,7 +192,7 @@ function Checkout() {
   // 成功 Dialog 確認
   const handleSuccessConfirm = () => {
     setShowSuccessDialog(false);
-    navigate('/', { replace: true });
+    navigate("/", { replace: true });
   };
 
   // Loading 狀態
@@ -194,16 +209,6 @@ function Checkout() {
       <div className={styles.container}>
         {/* 左側：訂單資訊 */}
         <div className={styles.checkoutContent}>
-          {/* 多訂單提示 */}
-          {storeGroups.length > 1 && (
-            <div className={styles.multiOrderInfo}>
-              <Icon icon="info-circle" />
-              <span>
-                您的購物車包含 {storeGroups.length} 個商店的商品，將建立 {storeGroups.length} 筆訂單
-              </span>
-            </div>
-          )}
-
           {/* 1. 訂單明細（按商店分組） */}
           <section className={styles.section}>
             <h2 className={styles.sectionTitle}>訂單明細</h2>
@@ -211,7 +216,7 @@ function Checkout() {
               <StoreOrderSection
                 key={group.storeId}
                 storeGroup={group}
-                note={storeNotes.get(group.storeId) || ''}
+                note={storeNotes.get(group.storeId) || ""}
                 onNoteChange={handleNoteChange}
               />
             ))}
@@ -231,7 +236,10 @@ function Checkout() {
             </div>
 
             {selectedAddress ? (
-              <AddressCard address={selectedAddress} isDefault={selectedAddress.isDefault} />
+              <AddressCard
+                address={selectedAddress}
+                isDefault={selectedAddress.isDefault}
+              />
             ) : (
               <div className={styles.noAddress}>
                 <p>尚未設定收件地址</p>
@@ -245,7 +253,10 @@ function Checkout() {
           {/* 3. 付款方式（共用） */}
           <section className={styles.section}>
             <h2 className={styles.sectionTitle}>付款方式</h2>
-            <PaymentMethodSelector value={paymentMethod} onChange={setPaymentMethod} />
+            <PaymentMethodSelector
+              value={paymentMethod}
+              onChange={setPaymentMethod}
+            />
           </section>
         </div>
 
@@ -256,7 +267,7 @@ function Checkout() {
             storeGroups={storeGroups}
             onCheckout={handleConfirmOrder}
             disabled={isSubmitting || !selectedAddress || !paymentMethod}
-            buttonText={isSubmitting ? '處理中...' : '確認訂單'}
+            buttonText={isSubmitting ? "處理中..." : "確認訂單"}
           />
         </div>
       </div>
@@ -291,19 +302,19 @@ function Checkout() {
           orderResponse ? (
             <div>
               <p>已成功建立 {orderResponse.orders.length} 筆訂單</p>
-              <div style={{ marginTop: '0.75rem' }}>
+              <div style={{ marginTop: "0.75rem" }}>
                 {orderResponse.orders.map((order) => (
-                  <div key={order.orderId} style={{ marginBottom: '0.5rem' }}>
-                    <strong>{order.storeName}</strong>: {order.orderId}
+                  <div key={order.orderId} style={{ marginBottom: "0.5rem" }}>
+                    <b>{order.storeName}</b>: {order.orderId}
                   </div>
                 ))}
               </div>
-              <p style={{ marginTop: '1rem', fontWeight: 500 }}>
-                總金額：$ {orderResponse.totalAmount}
+              <p style={{ marginTop: "1rem", fontWeight: 500 }}>
+                總額：$ {orderResponse.totalAmount}
               </p>
             </div>
           ) : (
-            '我們將盡快為您處理訂單'
+            "我們將盡快為您處理訂單"
           )
         }
         confirmText="返回首頁"
