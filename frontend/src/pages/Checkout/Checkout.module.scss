@@ -94,14 +94,6 @@ max-width: $desktop;
   margin-top: $spacing-xs;
 }
 
-.checkoutSummary {
-  width: 350px;
-
-  @include belowTablet {
-    width: 100%;
-  }
-}
-
 .loading {
   display: flex;
   justify-content: center;

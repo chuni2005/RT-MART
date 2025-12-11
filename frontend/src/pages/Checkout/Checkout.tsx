@@ -261,15 +261,13 @@ function Checkout() {
         </div>
 
         {/* 右側：訂單摘要 */}
-        <div className={styles.checkoutSummary}>
-          <CheckoutSummary
-            mode="checkout"
-            storeGroups={storeGroups}
-            onCheckout={handleConfirmOrder}
-            disabled={isSubmitting || !selectedAddress || !paymentMethod}
-            buttonText={isSubmitting ? "處理中..." : "確認訂單"}
-          />
-        </div>
+        <CheckoutSummary
+          mode="checkout"
+          storeGroups={storeGroups}
+          onCheckout={handleConfirmOrder}
+          disabled={isSubmitting || !selectedAddress || !paymentMethod}
+          buttonText={isSubmitting ? "處理中..." : "確認訂單"}
+        />
       </div>
 
       {/* 地址選擇 Dialog */}
