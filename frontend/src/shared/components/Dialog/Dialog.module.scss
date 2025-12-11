@@ -112,7 +112,7 @@
   gap: $spacing-sm;
   padding: $spacing-lg;
   border-top: 1px solid $border-color;
-  justify-content: flex-end;
+  justify-content: center;
 
   @include mobile {
     padding: $spacing-md;

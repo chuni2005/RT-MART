@@ -195,6 +195,37 @@ function Checkout() {
     navigate("/", { replace: true });
   };
 
+  // 倒數計時狀態
+  const [countdown, setCountdown] = useState(5);
+
+  // 訂單成功後倒數計時
+  useEffect(() => {
+    if (showSuccessDialog) {
+      setCountdown(5); // 重置倒數
+
+      // 每秒更新倒數
+      const countdownInterval = setInterval(() => {
+        setCountdown((prev) => {
+          if (prev <= 1) {
+            clearInterval(countdownInterval);
+            return 0;
+          }
+          return prev - 1;
+        });
+      }, 1000);
+
+      // 5 秒後自動跳轉
+      const timer = setTimeout(() => {
+        handleSuccessConfirm();
+      }, 3000);
+
+      return () => {
+        clearInterval(countdownInterval);
+        clearTimeout(timer);
+      };
+    }
+  }, [showSuccessDialog]);
+
   // Loading 狀態
   if (isLoading) {
     return (
@@ -299,7 +330,7 @@ function Checkout() {
         message={
           orderResponse ? (
             <div>
-              <p>已成功建立 {orderResponse.orders.length} 筆訂單</p>
+              <b>已成功建立 {orderResponse.orders.length} 筆訂單</b>
               <div style={{ marginTop: "0.75rem" }}>
                 {orderResponse.orders.map((order) => (
                   <div key={order.orderId} style={{ marginBottom: "0.5rem" }}>
@@ -310,13 +341,20 @@ function Checkout() {
               <p style={{ marginTop: "1rem", fontWeight: 500 }}>
                 總額：$ {orderResponse.totalAmount}
               </p>
+              <p
+                style={{
+                  marginTop: "0.75rem",
+                  fontSize: "0.875rem",
+                  color: "#666",
+                }}
+              >
+                {countdown} 秒後自動返回首頁...
+              </p>
             </div>
           ) : (
             "我們將盡快為您處理訂單"
           )
         }
-        confirmText="返回首頁"
-        onConfirm={handleSuccessConfirm}
       />
     </div>
   );
