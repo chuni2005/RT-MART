@@ -1,0 +1,65 @@
+.timeline {
+  display: flex;
+  flex-direction: column;
+  gap: $spacing-md;
+}
+
+.timelineItem {
+  display: flex;
+  gap: $spacing-md;
+  position: relative;
+
+  &.completed {
+    .dot {
+      background: $success-color;
+      color: $text-white;
+      border-color: $success-color;
+    }
+
+    .content .label {
+      color: $text-primary;
+      font-weight: 500;
+    }
+  }
+}
+
+.dot {
+  width: 32px;
+  height: 32px;
+  border: 2px solid $border-color;
+  border-radius: 50%;
+  background: $bg-secondary;
+  @include flex-center;
+  flex-shrink: 0;
+  position: relative;
+  z-index: 2;
+}
+
+.line {
+  position: absolute;
+  left: 15px;
+  top: 32px;
+  width: 2px;
+  height: calc(100% + $spacing-md);
+  background: $border-color;
+
+  .completed + & {
+    background: $success-color;
+  }
+}
+
+.content {
+  flex: 1;
+  padding-top: $spacing-xs;
+
+  .label {
+    font-size: $font-md;
+    color: $text-secondary;
+    margin-bottom: $spacing-xs;
+  }
+
+  .timestamp {
+    font-size: $font-sm;
+    color: $text-tertiary;
+  }
+}
