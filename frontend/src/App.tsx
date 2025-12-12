@@ -76,7 +76,7 @@ function AppContent() {
 
             {/* Order Routes */}
             <Route path="orders" element={<OrderListPage />} />
-            <Route path="order/:order_id" element={<OrderDetailPage />} />
+            <Route path="orders/:order_id" element={<OrderDetailPage />} />
           </Route>
 
           {/* Seller Pages */}

@@ -48,8 +48,7 @@ function OrderListPage() {
   // 處理查看詳情
   const handleViewDetail = (orderId: string) => {
     console.log("View order detail:", orderId);
-    // TODO: 導航到訂單詳情頁
-    // navigate(`/user-center/orders/${orderId}`);
+    navigate(`/user/orders/${orderId}`);
   };
 
   // 處理訂單操作
