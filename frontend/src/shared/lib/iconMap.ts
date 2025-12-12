@@ -4,7 +4,7 @@
  * 供 Icon Component 使用,實現 string 到 IconProp 的類型轉換
  */
 
-import { IconProp, IconDefinition } from '@fortawesome/fontawesome-svg-core';
+import { IconProp, IconDefinition } from "@fortawesome/fontawesome-svg-core";
 import {
   faArrowRotateRight,
   faBars,
@@ -13,9 +13,8 @@ import {
   faChevronLeft,
   faChevronRight,
   faChevronUp,
+  faCircleExclamation,
   faEnvelope,
-  faExclamationCircle,
-  faExclamationTriangle,
   faEye,
   faEyeSlash,
   faGlobe,
@@ -31,9 +30,10 @@ import {
   faStore,
   faTimes,
   faTrash,
+  faTriangleExclamation,
   faTruckFast,
   faUser,
-} from '@fortawesome/free-solid-svg-icons';
+} from "@fortawesome/free-solid-svg-icons";
 
 /**
  * 所有 icon 定義對象
@@ -47,9 +47,8 @@ const icons: IconDefinition[] = [
   faChevronLeft,
   faChevronRight,
   faChevronUp,
+  faCircleExclamation,
   faEnvelope,
-  faExclamationCircle,
-  faExclamationTriangle,
   faEye,
   faEyeSlash,
   faGlobe,
@@ -65,6 +64,7 @@ const icons: IconDefinition[] = [
   faStore,
   faTimes,
   faTrash,
+  faTriangleExclamation,
   faTruckFast,
   faUser,
 ];
@@ -78,33 +78,33 @@ const icons: IconDefinition[] = [
  * - 外部組件可以傳遞字符串: <Icon icon="search" />
  */
 export const iconMap: Record<string, IconProp> = {
-  'arrow-rotate-right': faArrowRotateRight,
-  'bars': faBars,
-  'check-circle': faCheckCircle,
-  'chevron-down': faChevronDown,
-  'chevron-left': faChevronLeft,
-  'chevron-right': faChevronRight,
-  'chevron-up': faChevronUp,
-  'envelope': faEnvelope,
-  'exclamation-circle': faExclamationCircle,
-  'exclamation-triangle': faExclamationTriangle,
-  'eye': faEye,
-  'eye-slash': faEyeSlash,
-  'globe': faGlobe,
-  'info-circle': faInfoCircle,
-  'map-marker-alt': faMapMarkerAlt,
-  'minus': faMinus,
-  'plus': faPlus,
-  'receipt': faReceipt,
-  'search': faSearch,
-  'shopping-cart': faShoppingCart,
-  'sign-out-alt': faSignOutAlt,
-  'star': faStar,
-  'store': faStore,
-  'times': faTimes,
-  'trash': faTrash,
-  'truck-fast': faTruckFast,
-  'user': faUser,
+  "arrow-rotate-right": faArrowRotateRight,
+  "bars": faBars,
+  "check-circle": faCheckCircle,
+  "chevron-down": faChevronDown,
+  "chevron-left": faChevronLeft,
+  "chevron-right": faChevronRight,
+  "chevron-up": faChevronUp,
+  "circle-exclamation": faCircleExclamation,
+  "envelope": faEnvelope,
+  "eye": faEye,
+  "eye-slash": faEyeSlash,
+  "globe": faGlobe,
+  "info-circle": faInfoCircle,
+  "map-marker-alt": faMapMarkerAlt,
+  "minus": faMinus,
+  "plus": faPlus,
+  "receipt": faReceipt,
+  "search": faSearch,
+  "shopping-cart": faShoppingCart,
+  "sign-out-alt": faSignOutAlt,
+  "star": faStar,
+  "store": faStore,
+  "times": faTimes,
+  "trash": faTrash,
+  "triangle-exclamation": faTriangleExclamation,
+  "truck-fast": faTruckFast,
+  "user": faUser,
 };
 
 /**
