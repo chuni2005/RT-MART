@@ -52,10 +52,15 @@
   color: $text-secondary;
   border: none;
   padding: $spacing-xs;
+  cursor: pointer;
 
   &:hover:not(:disabled) {
-    color: $text-primary;
-    background: $bg-tertiary;
+    color: $primary-color;
+  }
+
+  &:focus:not(:disabled),
+  &:active:not(:disabled) {
+    color: $primary-light;
   }
 }
 
