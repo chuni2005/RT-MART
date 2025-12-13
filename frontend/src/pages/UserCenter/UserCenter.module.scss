@@ -1,0 +1,17 @@
+.userCenter {
+  max-width: 1200px;
+  margin: 0 auto;
+  padding: $spacing-lg;
+  display: flex;
+  gap: $spacing-lg;
+
+  @include mobile {
+    flex-direction: column;
+    padding: $spacing-md;
+  }
+}
+
+.mainContent {
+  flex: 1;
+  min-width: 0; // 防止 flex item 溢出
+}

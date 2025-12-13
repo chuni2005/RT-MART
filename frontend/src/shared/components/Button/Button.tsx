@@ -4,6 +4,7 @@ import type { ButtonProps } from '@/types';
 
 function Button({
   variant = 'primary',
+  size = 'md',
   onClick,
   children,
   type = 'button',
@@ -32,9 +33,22 @@ function Button({
     }
   };
 
+  const getSizeClass = () => {
+    switch (size) {
+      case 'sm':
+        return styles.btnSmall;
+      case 'lg':
+        return styles.btnLarge;
+      case 'md':
+      default:
+        return styles.btnMedium;
+    }
+  };
+
   const buttonClasses = [
     styles.btn,
     getVariantClass(),
+    !iconOnly && getSizeClass(),
     fullWidth && styles.fullWidth,
     className,
   ]

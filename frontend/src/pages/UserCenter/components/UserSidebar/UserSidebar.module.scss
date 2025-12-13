@@ -1,0 +1,62 @@
+.sidebar {
+  width: 250px;
+  background: $bg-secondary;
+  border-radius: $border-radius-lg;
+  padding: $spacing-lg;
+  height: fit-content;
+  position: sticky;
+  top: $spacing-lg;
+
+  @include mobile {
+    width: 100%;
+    position: static;
+  }
+}
+
+.navSection {
+  &:not(:last-child) {
+    margin-bottom: $spacing-lg;
+    border-bottom: 1px solid $border-color;
+  }
+}
+
+.sectionTitle {
+  font-size: $font-md;
+  font-weight: 600;
+  color: $text-secondary;
+  text-transform: uppercase;
+  letter-spacing: 0.05em;
+
+  &.active {
+    color: $primary-color;
+  }
+}
+
+.navList {
+  list-style: none;
+  padding: 0;
+  margin: 0;
+}
+
+.navItem {
+  @include flex-center;
+  width: calc(100% - ($spacing-md + $font-md));
+  padding: $spacing-sm $spacing-md;
+  margin-left: calc($spacing-md + $font-md);
+  border: none;
+  background: transparent;
+
+  transition: $transition-fast;;
+  font-size: $font-sm;
+  text-align: left;
+  gap: $spacing-sm;
+
+  &.active {
+    color: $primary-color;
+    font-weight: 600;
+  }
+}
+
+.navIcon {
+  font-size: $font-md;
+}

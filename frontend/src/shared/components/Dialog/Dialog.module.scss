@@ -124,6 +124,25 @@
   }
 }
 
+// Text Align 樣式
+.textLeft {
+  .dialogBody {
+    text-align: left;
+  }
+}
+
+.textCenter {
+  .dialogBody {
+    text-align: center;
+  }
+}
+
+.textRight {
+  .dialogBody {
+    text-align: right;
+  }
+}
+
 // Variant 樣式
 .danger {
   .icon {

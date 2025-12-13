@@ -11,6 +11,11 @@ import Store from "./pages/Store";
 import Cart from "./pages/Cart";
 import Checkout from "./pages/Checkout";
 import "./shared/lib/iconLibrary";
+import UserCenter from "./pages/UserCenter/UserCenter";
+import ProfilePage from "./pages/UserCenter/components/ProfilePage";
+import AddressPage from "./pages/UserCenter/components/AddressPage";
+import OrderListPage from "./pages/UserCenter/components/OrderListPage";
+import OrderDetailPage from "./pages/UserCenter/components/OrderDetailPage";
 
 // Header Wrapper Component to handle conditional rendering
 function AppHeader() {
@@ -55,14 +60,24 @@ function AppContent() {
               </ProtectedRoute>
             }
           />
-          <Route path="/order/success" element={<h2>訂單成功頁面開發中...</h2>} />
           <Route path="/faq" element={<h2>常見問題頁面開發中...</h2>} />
 
           {/* User Center */}
-          <Route path="/user/account/profile" element={<h2>個人資料編輯頁開發中...</h2>} />
-          <Route path="/user/account/address" element={<h2>收件地址管理頁開發中...</h2>} />
-          <Route path="/user/orders" element={<h2>訂單列表頁開發中...</h2>} />
-          <Route path="/user/order/:order_id" element={<h2>訂單詳情頁開發中...</h2>} />
+          <Route path="/user/*"
+            element={
+              <ProtectedRoute>
+                <UserCenter />
+              </ProtectedRoute>
+            }
+          >
+            {/* User Account Routes */}
+            <Route path="account/profile" element={<ProfilePage />} />
+            <Route path="account/address" element={<AddressPage />} />
+
+            {/* Order Routes */}
+            <Route path="orders" element={<OrderListPage />} />
+            <Route path="orders/:order_id" element={<OrderDetailPage />} />
+          </Route>
 
           {/* Seller Pages */}
           <Route path="/seller/center" element={<h2>賣家中心首頁開發中...</h2>} />

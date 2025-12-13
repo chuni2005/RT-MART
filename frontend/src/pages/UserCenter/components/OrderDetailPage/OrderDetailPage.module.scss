@@ -1,0 +1,196 @@
+// ========== 頁面容器 ==========
+.orderDetailPage {
+  max-width: 800px;
+}
+
+.backButton {
+  margin-bottom: $spacing-lg;
+}
+
+// ========== 區塊容器 ==========
+.section {
+  background: $bg-secondary;
+  border-radius: $border-radius-lg;
+  padding: $spacing-lg;
+  margin-bottom: $spacing-md;
+
+  &:last-child {
+    margin-bottom: 0;
+  }
+}
+
+.sectionTitle {
+  font-size: $font-md;
+  font-weight: 600;
+  color: $text-primary;
+  margin-bottom: $spacing-md;
+  padding-bottom: $spacing-sm;
+  border-bottom: 1px solid $border-color;
+}
+
+// ========== 訂單頭部 ==========
+.orderHeader {
+  display: flex;
+  justify-content: space-between;
+  align-items: flex-start;
+  gap: $spacing-md;
+  flex-wrap: wrap;
+
+  @media (max-width: $mobile) {
+    flex-direction: column;
+    align-items: stretch;
+  }
+}
+
+.orderNumber {
+  font-size: $font-lg;
+  font-weight: 600;
+  color: $text-primary;
+  margin-bottom: $spacing-xs;
+}
+
+.orderDate {
+  font-size: $font-sm;
+  color: $text-secondary;
+}
+
+// ========== 狀態徽章 ==========
+.statusBadge {
+  padding: $spacing-xs 0.75rem;
+  border-radius: $border-radius-xl;
+  font-size: $font-sm;
+  font-weight: 500;
+  white-space: nowrap;
+
+  // 根據狀態顯示不同顏色
+  &.pending_payment {
+    background: #fff3cd;
+    color: #856404;
+  }
+
+  &.payment_failed {
+    background: #f8d7da;
+    color: #721c24;
+  }
+
+  &.paid,
+  &.processing {
+    background: #cce5ff;
+    color: #004085;
+  }
+
+  &.shipped,
+  &.delivered {
+    background: #d4edda;
+    color: #155724;
+  }
+
+  &.completed {
+    background: #d1ecf1;
+    color: #0c5460;
+  }
+
+  &.cancelled {
+    background: #f8d7da;
+    color: #721c24;
+  }
+}
+
+// ========== 商品列表 ==========
+.itemList {
+  display: flex;
+  flex-direction: column;
+  gap: $spacing-sm;
+}
+
+// ========== 金額明細 ==========
+.amountDetails {
+  display: flex;
+  flex-direction: column;
+  gap: $spacing-sm;
+}
+
+.amountRow {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  font-size: $font-sm;
+  color: $text-secondary;
+
+  &.total {
+    margin-top: $spacing-sm;
+    padding-top: $spacing-sm;
+    border-top: 1px solid $border-color;
+    font-size: $font-md;
+    font-weight: 600;
+    color: $text-primary;
+  }
+}
+
+.totalAmount {
+  color: $primary-color;
+  font-size: $font-lg;
+}
+
+.discount {
+  color: $success-color;
+}
+
+// ========== 付款資訊 ==========
+.paymentInfo {
+  display: flex;
+  flex-direction: column;
+  gap: $spacing-sm;
+}
+
+.infoRow {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  font-size: $font-sm;
+
+  span:first-child {
+    color: $text-secondary;
+  }
+
+  span:last-child {
+    color: $text-primary;
+    font-weight: 500;
+  }
+}
+
+// ========== 訂單備註 ==========
+.note {
+  font-size: $font-sm;
+  color: $text-secondary;
+  line-height: 1.6;
+  padding: $spacing-sm;
+  background: $bg-tertiary;
+  border-radius: $border-radius-md;
+  white-space: pre-wrap; // 保留換行符
+}
+
+// ========== Loading 狀態 ==========
+.loading {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  min-height: 400px;
+  font-size: $font-md;
+  color: $text-secondary;
+}
+
+// ========== Error 狀態 ==========
+.error {
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  align-items: center;
+  min-height: 400px;
+  gap: $spacing-md;
+
+  p {
+    font-size: $font-md;
+    color: $error-color;
+  }
+}

@@ -17,6 +17,7 @@ export interface AlertProps {
 // Button types
 export interface ButtonProps {
   variant?: 'primary' | 'outline' | 'login' | 'ghost';
+  size?: 'sm' | 'md' | 'lg';
   onClick?: (e: MouseEvent<HTMLButtonElement>) => void;
   children?: ReactNode;
   type?: 'button' | 'submit' | 'reset';
@@ -261,6 +262,7 @@ export interface DialogProps {
   closeOnOverlayClick?: boolean;
   closeOnEsc?: boolean;
   className?: string;
+  textAlign?: 'left' | 'center' | 'right';
 }
 
 // Logo types

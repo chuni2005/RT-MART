@@ -1,0 +1,64 @@
+.addressPage {
+  max-width: 900px;
+}
+
+.pageHeader {
+  @include flex-between;
+  margin-bottom: $spacing-lg;
+
+  .pageTitle {
+    font-size: $font-xl;
+    font-weight: 600;
+    color: $text-primary;
+  }
+}
+
+.addressGrid {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(350px, 1fr));
+  gap: $spacing-md;
+
+  @include mobile {
+    grid-template-columns: 1fr;
+  }
+}
+
+.addressItem {
+  background: $bg-secondary;
+  border: 1px solid $border-color;
+  border-radius: $border-radius-lg;
+  padding: $spacing-md;
+  transition: $transition-fast;
+
+  &:hover {
+    box-shadow: $shadow-md;
+  }
+}
+
+.addressActions {
+  display: flex;
+  gap: $spacing-sm;
+  margin-top: $spacing-md;
+  padding-top: $spacing-md;
+  border-top: 1px solid $border-color;
+}
+
+.emptyState {
+  @include flex-center;
+  flex-direction: column;
+  padding: $spacing-xl * 2;
+  background: $bg-secondary;
+  border-radius: $border-radius-lg;
+  gap: $spacing-md;
+
+  p {
+    font-size: $font-md;
+    color: $text-secondary;
+  }
+}
+
+.loading {
+  @include flex-center;
+  padding: $spacing-xl;
+  color: $text-secondary;
+}

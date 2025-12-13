@@ -1,0 +1,27 @@
+.orderListPage {
+  max-width: 900px;
+}
+
+.title {
+  font-size: $font-xl;
+  font-weight: 600;
+  color: $text-primary;
+  margin-bottom: $spacing-lg;
+}
+
+.orderTabs {
+  margin-bottom: $spacing-lg;
+}
+
+.orderList {
+  display: flex;
+  flex-direction: column;
+  gap: $spacing-md;
+}
+
+.loading {
+  @include flex-center;
+  padding: $spacing-xl * 2;
+  color: $text-secondary;
+  font-size: $font-md;
+}

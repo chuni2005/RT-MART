@@ -10,7 +10,7 @@ import {
   useEffect,
   ReactNode,
 } from "react";
-import * as authService from "../services/authService";
+import * as authService from "../services/authService.index";
 import { AuthContextValue, User, AuthResponse } from "@/types";
 
 const AuthContext = createContext<AuthContextValue | null>(null);

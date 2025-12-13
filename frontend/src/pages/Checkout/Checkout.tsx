@@ -217,7 +217,7 @@ function Checkout() {
       // 5 秒後自動跳轉
       const timer = setTimeout(() => {
         handleSuccessConfirm();
-      }, 3000);
+      }, 5000);
 
       return () => {
         clearInterval(countdownInterval);

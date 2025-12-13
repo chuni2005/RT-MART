@@ -24,6 +24,7 @@ function Dialog({
   closeOnOverlayClick = true,
   closeOnEsc = true,
   className = '',
+  textAlign = 'center',
 }: DialogProps) {
   const previousActiveElement = useRef<HTMLElement | null>(null);
   const dialogRef = useRef<HTMLDivElement>(null);
@@ -36,6 +37,19 @@ function Dialog({
   };
 
   const displayIcon = icon || defaultIcons[variant];
+
+  // 文字對齊類
+  const getTextAlignClass = () => {
+    switch (textAlign) {
+      case 'left':
+        return styles.textLeft;
+      case 'right':
+        return styles.textRight;
+      case 'center':
+      default:
+        return styles.textCenter;
+    }
+  };
 
   // 自動偵測媒體類型
   const getMediaType = (): 'image' | 'video' | null => {
@@ -116,7 +130,7 @@ function Dialog({
         ref={dialogRef}
         className={`${styles.dialogContent} ${
           className ? className : ''
-        } ${styles[variant]}`}
+        } ${styles[variant]} ${getTextAlignClass()}`}
         tabIndex={-1}
       >
         {/* Header */}
