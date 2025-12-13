@@ -1,4 +1,145 @@
+/**
+ * ProfilePage Styles
+ * 個人資料頁面樣式
+ * 注意: 所有變數和 mixins 已全域載入,無需 @use
+ */
+
+ @use "sass:color"; 
+
 .profilePage {
   padding: $spacing-lg;
   max-width: 600px;
+  margin: 0 auto;
+
+  @include mobile {
+    padding: $spacing-md;
+  }
+}
+
+// Section Container (卡片樣式)
+.section {
+  background: $bg-secondary;
+  border-radius: $border-radius-lg;
+  padding: $spacing-lg;
+  margin-bottom: $spacing-lg;
+  box-shadow: $shadow-sm;
+
+  &:last-child {
+    margin-bottom: 0;
+  }
+
+  @include mobile {
+    padding: $spacing-md;
+  }
+}
+
+// Section Title (區塊標題)
+.sectionTitle {
+  font-size: $font-lg;
+  font-weight: 600;
+  color: $text-primary;
+  margin: 0 0 $spacing-lg 0;
+  padding-bottom: $spacing-md;
+  border-bottom: 1px solid $border-color;
+}
+
+// Helper Text (輔助文字,用於密碼要求說明)
+.helperText {
+  font-size: $font-sm;
+  color: $text-tertiary;
+  margin-top: -$spacing-sm;
+  margin-bottom: $spacing-md;
+  padding-left: $spacing-xs;
+  line-height: 1.5;
+}
+
+// Form Spacing (表單間距)
+.form {
+  display: flex;
+  flex-direction: column;
+  gap: $spacing-md;
+}
+
+// ===========================
+// Danger Zone Styling (危險區域樣式)
+// ===========================
+
+.dangerZone {
+  padding: $spacing-md;
+  border: 1px solid $error-color;
+  border-radius: $border-radius-md;
+  background: #fff5f5;
+  margin-top: $spacing-md;
+}
+
+.dangerTitle {
+  font-size: $font-md;
+  font-weight: 600;
+  color: $error-color;
+  margin: 0 0 $spacing-sm 0;
+}
+
+.dangerWarning {
+  font-size: $font-sm;
+  color: $text-secondary;
+  margin: 0 0 $spacing-md 0;
+  line-height: 1.6;
+}
+
+.dangerButton {
+  border-color: $error-color !important;
+  color: $error-color !important;
+  @include transition-all;
+
+  &:hover:not(:disabled) {
+    background: $error-color !important;
+    color: $text-white !important;
+  }
+
+  &:focus {
+    box-shadow: 0 0 0 3px rgba($error-color, 0.2);
+  }
+}
+
+// ===========================
+// Delete Dialog Styling (刪除確認對話框樣式)
+// ===========================
+
+.deleteDialogContent {
+  padding: $spacing-md 0;
+}
+
+.deleteMessage {
+  font-size: $font-md;
+  color: $text-secondary;
+  margin-bottom: $spacing-lg;
+  line-height: 1.6;
+  text-align: center;
+}
+
+.deleteDialogActions {
+  display: flex;
+  gap: $spacing-sm;
+  margin-top: $spacing-lg;
+  justify-content: center;
+
+  @include mobile {
+    flex-direction: column-reverse;
+
+    button {
+      width: 100%;
+    }
+  }
+}
+
+.deleteConfirmButton {
+  background: $error-color !important;
+
+  &:hover:not(:disabled) {
+    background: color.adjust($error-color, $lightness: -10%) !important;
+  }
+
+  &:focus {
+    box-shadow: 0 0 0 3px rgba($error-color, 0.2);
+  }
 }
