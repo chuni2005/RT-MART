@@ -5,7 +5,7 @@ import {
 } from '@nestjs/common';
 import { InjectRepository } from '@nestjs/typeorm';
 import { Repository, DataSource } from 'typeorm';
-import { Order, OrderStatus } from './entities/order.entity';
+import { Order, OrderStatus, PaymentMethod, PaymentStatus } from './entities/order.entity';
 import { OrderItem } from './entities/order-item.entity';
 import { CreateOrderDto } from './dto/create-order.dto';
 import { UpdateOrderStatusDto } from './dto/update-order-status.dto';
@@ -83,10 +83,11 @@ export class OrdersService {
           shippingFee,
           totalDiscount: 0,
           totalAmount,
-          paymentMethod: createDto.paymentMethod,
+          paymentMethod: PaymentMethod.CREDIT_CARD,
           shippingAddressSnapshot: shippingAddress,
           notes: createDto.notes,
-          orderStatus: OrderStatus.PENDING_PAYMENT,
+          orderStatus: OrderStatus.CREATED,
+          paymentStatus: PaymentStatus.UNPAID
         });
 
         const savedOrder = await manager.save(Order, order);
@@ -181,19 +182,19 @@ export class OrdersService {
 
       // Update timestamps based on status
       switch (updateDto.status) {
-        case OrderStatus.PAID:
-          order.paidAt = new Date();
-          // Commit reserved inventory
-          for (const item of order.items || []) {
-            if (item.productId) {
-              await this.inventoryService.commitReserved(
-                item.productId,
-                item.quantity,
-              );
-            }
-          }
-          break;
-        case OrderStatus.SHIPPED:
+        // case OrderStatus.PAID:
+        //   order.paidAt = new Date();
+        //   // Commit reserved inventory
+        //   for (const item of order.items || []) {
+        //     if (item.productId) {
+        //       await this.inventoryService.commitReserved(
+        //         item.productId,
+        //         item.quantity,
+        //       );
+        //     }
+        //   }
+        //   break;
+        case OrderStatus.SHIPPING:
           order.shippedAt = new Date();
           break;
         case OrderStatus.DELIVERED:
@@ -237,25 +238,25 @@ export class OrdersService {
     currentStatus: OrderStatus,
     newStatus: OrderStatus,
   ): void {
-    const validTransitions: Record<OrderStatus, OrderStatus[]> = {
-      [OrderStatus.PENDING_PAYMENT]: [
-        OrderStatus.PAID,
-        OrderStatus.PAYMENT_FAILED,
-        OrderStatus.CANCELLED,
-      ],
-      [OrderStatus.PAYMENT_FAILED]: [OrderStatus.PAID, OrderStatus.CANCELLED],
-      [OrderStatus.PAID]: [OrderStatus.PROCESSING, OrderStatus.CANCELLED],
-      [OrderStatus.PROCESSING]: [OrderStatus.SHIPPED, OrderStatus.CANCELLED],
-      [OrderStatus.SHIPPED]: [OrderStatus.DELIVERED],
-      [OrderStatus.DELIVERED]: [OrderStatus.COMPLETED],
-      [OrderStatus.COMPLETED]: [],
-      [OrderStatus.CANCELLED]: [],
-    };
+    // const validTransitions: Record<OrderStatus, OrderStatus[]> = {
+    //   [OrderStatus.PENDING_PAYMENT]: [
+    //     OrderStatus.PAID,
+    //     OrderStatus.PAYMENT_FAILED,
+    //     OrderStatus.CANCELLED,
+    //   ],
+    //   [OrderStatus.PAYMENT_FAILED]: [OrderStatus.PAID, OrderStatus.CANCELLED],
+    //   [OrderStatus.PAID]: [OrderStatus.PROCESSING, OrderStatus.CANCELLED],
+    //   [OrderStatus.PROCESSING]: [OrderStatus.SHIPPED, OrderStatus.CANCELLED],
+    //   [OrderStatus.SHIPPED]: [OrderStatus.DELIVERED],
+    //   [OrderStatus.DELIVERED]: [OrderStatus.COMPLETED],
+    //   [OrderStatus.COMPLETED]: [],
+    //   [OrderStatus.CANCELLED]: [],
+    // };
 
-    if (!validTransitions[currentStatus].includes(newStatus)) {
-      throw new BadRequestException(
-        `Cannot transition from ${currentStatus} to ${newStatus}`,
-      );
-    }
+    // if (!validTransitions[currentStatus].includes(newStatus)) {
+    //   throw new BadRequestException(
+    //     `Cannot transition from ${currentStatus} to ${newStatus}`,
+    //   );
+    // }
   }
 }

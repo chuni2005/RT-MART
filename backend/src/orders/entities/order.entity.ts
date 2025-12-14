@@ -15,14 +15,27 @@ import { OrderItem } from './order-item.entity';
 import { OrderDiscount } from './order-discount.entity';
 
 export enum OrderStatus {
-  PENDING_PAYMENT = 'pending_payment',
-  PAYMENT_FAILED = 'payment_failed',
-  PAID = 'paid',
-  PROCESSING = 'processing',
-  SHIPPED = 'shipped',
+  CREATED = 'created',
+  PAYMENT_VERIFIED = 'payment_verified',
+  ORDER_CONFIRMED = 'order_confirmed',
+  TO_SHIP = 'to_ship',
+  SHIPPING = 'shipping',
   DELIVERED = 'delivered',
+  PICKEDUP = 'picked_up',
   COMPLETED = 'completed',
   CANCELLED = 'cancelled',
+}
+
+export enum PaymentStatus {
+  UNPAID = 'unpaid',
+  PAID = 'paid',
+  REFUNDED = 'refunded',
+}
+
+export enum PaymentMethod {
+  CREDIT_CARD = 'credit_card',
+  PAYPAL = 'paypal',
+  COD = 'COD',
 }
 
 @Entity('Order')
@@ -51,9 +64,25 @@ export class Order {
     name: 'order_status',
     type: 'enum',
     enum: OrderStatus,
-    default: OrderStatus.PENDING_PAYMENT,
+    default: OrderStatus.CREATED,
   })
   orderStatus: OrderStatus;
+
+  @Column({
+    name: 'payment_status',
+    type: 'enum',
+    enum: PaymentStatus,
+    default: PaymentStatus.UNPAID,
+  })
+  paymentStatus: PaymentStatus;
+
+  @Column({
+    name: 'payment_method',
+    type: 'enum',
+    enum: PaymentMethod,
+    nullable: true,
+  })
+  paymentMethod: PaymentMethod | null;
 
   @Column({ type: 'decimal', precision: 10, scale: 2 })
   subtotal: number;
@@ -78,14 +107,6 @@ export class Order {
 
   @Column({ name: 'total_amount', type: 'decimal', precision: 10, scale: 2 })
   totalAmount: number;
-
-  @Column({
-    name: 'payment_method',
-    type: 'varchar',
-    length: 50,
-    nullable: true,
-  })
-  paymentMethod: string | null;
 
   @Column({
     name: 'payment_reference',

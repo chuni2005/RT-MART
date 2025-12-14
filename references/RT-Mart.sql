@@ -263,21 +263,23 @@ Table Order {
 /
 訂單狀態（包含付款狀態）
   order_status enum(
-    'pending_payment',  // 待付款（剛下單，還沒付款）
-    'payment_failed',   // 付款失敗
-    'paid',             // 已付款（付款成功）
-    'processing',       // 處理中（賣家準備商品）
-    'shipped',          // 已出貨
-    'delivered',        // 已送達
-    'completed',        // 已完成（買家確認收貨）
-    'cancelled'         // 已取消
-  ) [not null, default: 'pending_payment']
+    'created',
+    'payment_verified',
+    'order_confirmed',
+    'to_ship',
+    'shipping',
+    'delivered',
+    'completed',
+    'cancelled'
+  ) [not null, default: 'created', note: '訂單狀態']
+
+  payment_method enum('credit_card', 'COD') [not null, note: '付款方式']
+  payment_status enum('unpaid', 'paid', 'failed') [not null, default: 'unpaid', note: '付款狀態']
 
   subtotal decimal(10,2) [not null]
   shipping_fee decimal(10,2) [not null, default: 60]
   total_discount decimal(10,2) [default: 0]
   total_amount decimal(10,2) [not null, note: "總"]
-  payment_method varchar(50)
   payment_reference varchar(255) [null, note: '金流商訂單號']  
   idempotency_key varchar(128) [unique, null, note: '冪等性鍵-防止重複下單的鍵（可移除）']  
   shipping_address_snapshot json [not null, note: '配送地址快照']

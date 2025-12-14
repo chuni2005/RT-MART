@@ -10,20 +10,29 @@ export class CreateOrderTable20251116030013 implements MigrationInterface {
         user_id BIGINT NOT NULL,
         store_id BIGINT NOT NULL,
         order_status ENUM(
-          'pending_payment',
-          'payment_failed',
-          'paid',
-          'processing',
-          'shipped',
+          'created',
+          'payment_verified',
+          'order_confirmed',
+          'to_ship',
+          'shipping',
           'delivered',
+          'picked_up',
           'completed',
           'cancelled'
-        ) NOT NULL DEFAULT 'pending_payment',
+        ) NOT NULL DEFAULT 'created',
+        payment_status ENUM(
+          'unpaid',
+          'paid',
+          'refunded'
+        ) NOT NULL DEFAULT 'unpaid',
+        payment_method ENUM(
+          'credit_card',
+          'COD'
+        ) DEFAULT NULL,
         subtotal DECIMAL(10,2) NOT NULL,
         shipping_fee DECIMAL(10,2) NOT NULL DEFAULT 60,
         total_discount DECIMAL(10,2) DEFAULT 0,
         total_amount DECIMAL(10,2) NOT NULL,
-        payment_method VARCHAR(50),
         payment_reference VARCHAR(255),
         idempotency_key VARCHAR(128) UNIQUE,
         shipping_address_snapshot JSON NOT NULL,

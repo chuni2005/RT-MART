@@ -1,5 +1,5 @@
 import { BaseLoader } from './base.loader';
-import { Order, OrderStatus } from '../../orders/entities/order.entity';
+import { Order, OrderStatus, PaymentMethod, PaymentStatus } from '../../orders/entities/order.entity';
 import { DataMapper } from '../utils/data-mapper';
 
 export class OrderLoader extends BaseLoader<Order> {
@@ -68,8 +68,8 @@ export class OrderLoader extends BaseLoader<Order> {
       order.shippingFee = Number(data.shipping_fee || 60);
       order.totalDiscount = Number(data.total_discount || 0);
       order.totalAmount = Number(data.total_amount);
-      order.paymentMethod =
-        typeof data.payment_method === 'string' ? data.payment_method : null;
+      order.paymentMethod = data.payment_method as PaymentMethod;
+      order.paymentStatus = data.payment_status as PaymentStatus;
       order.paymentReference =
         typeof data.payment_reference === 'string'
           ? data.payment_reference

@@ -22,6 +22,7 @@
     "test:sellers": "npx jest ../units/sellers.e2e.ts --config ./test/jest-e2e.json",
     "test:stores": "npx jest ../units/stores.e2e.ts --config ./test/jest-e2e.json",
     "test:product-types": "npx jest ../units/product-types.e2e.ts --config ./test/jest-e2e.json",
+    "test:shipping-addresses": "npx jest ../units/shipping-addresses.e2e.ts --config ./test/jest-e2e.json",
     "migration:run": "typeorm-ts-node-commonjs migration:run -d src/config/data-source.ts",
     "migration:revert": "typeorm-ts-node-commonjs migration:revert -d src/config/data-source.ts",
     "migration:generate": "typeorm-ts-node-commonjs migration:generate -n NewMigration -d src/config/data-source.ts",
