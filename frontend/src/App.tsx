@@ -10,6 +10,7 @@ import ProductDetail from "./pages/Product";
 import Store from "./pages/Store";
 import Cart from "./pages/Cart";
 import Checkout from "./pages/Checkout";
+import FAQ from "./pages/FAQ/FAQ";
 import "./shared/lib/iconLibrary";
 import UserCenter from "./pages/UserCenter/UserCenter";
 import ProfilePage from "./pages/UserCenter/components/ProfilePage";
@@ -60,7 +61,7 @@ function AppContent() {
               </ProtectedRoute>
             }
           />
-          <Route path="/faq" element={<h2>常見問題頁面開發中...</h2>} />
+          <Route path="/faq" element={<FAQ />} />
 
           {/* User Center */}
           <Route path="/user/*"

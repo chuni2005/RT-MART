@@ -1,0 +1,83 @@
+.faqItem {
+  border-bottom: 1px solid $border-color;
+
+  &:last-child {
+    border-bottom: none;
+  }
+}
+
+.question {
+  width: 100%;
+  @include flex($align: center);
+  gap: $spacing-md;
+  padding: $spacing-md;
+  background: none;
+  border: none;
+  cursor: pointer;
+  text-align: left;
+  @include transition-color;
+
+  &:hover {
+    background-color: $bg-tertiary;
+  }
+
+  &:focus {
+    outline: 2px solid $primary-color;
+    outline-offset: -2px;
+  }
+
+  @include mobile {
+    padding: $spacing-md;
+    gap: $spacing-sm;
+  }
+}
+
+.icon {
+  flex-shrink: 0;
+  font-size: $font-md;
+  color: $primary-color;
+  @include transition-transform;
+
+  @include mobile {
+    font-size: $font-sm;
+  }
+}
+
+.questionText {
+  flex: 1;
+  font-size: $font-md;
+  font-weight: 500;
+  color: $text-primary;
+
+  @include mobile {
+    font-size: $font-sm;
+  }
+}
+
+.answer {
+  max-height: 0;
+  overflow: hidden;
+  @include transition(max-height, $duration-base);
+
+  &.expanded {
+    max-height: 31.25rem;
+  }
+}
+
+.answerContent {
+  padding: $spacing-sm 3rem;
+  font-size: $font-sm;
+  line-height: 1.6;
+  color: $text-secondary;
+
+  @include mobile {
+    padding: 0 $spacing-md $spacing-md 2rem;
+    font-size: $font-xs;
+  }
+}
+
+.answerLabel {
+  font-weight: 700;
+  color: $text-primary;
+  margin-right: 0.25rem;
+}

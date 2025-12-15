@@ -1,0 +1,42 @@
+.faq {
+  display: flex;
+  flex-direction: column;
+  min-height: calc(100vh - $header-height);
+  background-color: $bg-primary;
+  padding: 2.5rem $spacing-lg;
+
+  @include mobile {
+    min-height: calc(100vh - $header-height-mobile);
+    padding: $spacing-lg $spacing-md;
+  }
+}
+
+.container {
+  max-width: 50rem;
+  margin: 0 auto;
+  width: 100%;
+}
+
+.title {
+  font-size: $font-4xl;
+  font-weight: 600;
+  color: $text-primary;
+  margin-bottom: $spacing-xl;
+  text-align: center;
+
+  @include mobile {
+    font-size: $font-2xl;
+    margin-bottom: $spacing-lg;
+  }
+}
+
+.faqList {
+  background-color: $bg-secondary;
+  border: 1px solid $border-color;
+  border-radius: $border-radius-lg;
+  overflow: hidden;
+
+  @include mobile {
+    border-radius: $border-radius-md;
+  }
+}
