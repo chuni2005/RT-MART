@@ -1,0 +1,68 @@
+.sidebar {
+  width: 260px;
+  background: $bg-secondary;
+  border-radius: $border-radius-lg;
+  padding: $spacing-lg;
+  height: fit-content;
+  position: sticky;
+  top: $spacing-lg;
+
+  @include mobile {
+    width: 100%;
+    position: static;
+  }
+}
+
+.navSection {
+  &:not(:last-child) {
+    margin-bottom: $spacing-sm;
+  }
+}
+
+.sectionTitle {
+  @include flex-align;
+  width: 100%;
+  padding: $spacing-md;
+  gap: $spacing-sm;
+  font-weight: 600;
+  color: $text-primary;
+  justify-content: flex-start;
+
+  &.active {
+    background: rgba($primary-color, 0.1);
+    color: $primary-color;
+  }
+
+  &:hover {
+    background: rgba($primary-color, 0.05);
+  }
+}
+
+.sectionIcon {
+  font-size: $font-lg;
+}
+
+.navList {
+  list-style: none;
+  padding: 0;
+  margin: $spacing-xs 0 0 0;
+}
+
+.navItem {
+  width: 100%;
+  padding: $spacing-sm $spacing-md $spacing-sm calc($spacing-md * 2 + $font-lg);
+  font-size: $font-sm;
+  color: $text-secondary;
+  justify-content: flex-start;
+
+  &.active {
+    background: rgba($primary-color, 0.1);
+    color: $primary-color;
+    font-weight: 500;
+  }
+
+  &:hover {
+    background: rgba($primary-color, 0.05);
+    color: $primary-color;
+  }
+}
