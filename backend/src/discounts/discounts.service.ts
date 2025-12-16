@@ -3,6 +3,7 @@ import {
   NotFoundException,
   ConflictException,
   BadRequestException,
+  ForbiddenException,
 } from '@nestjs/common';
 import { InjectRepository } from '@nestjs/typeorm';
 import { Repository, LessThan, MoreThan } from 'typeorm';
@@ -29,12 +30,13 @@ export class DiscountsService {
     private readonly shippingRepository: Repository<ShippingDiscount>,
     @InjectRepository(SpecialDiscount)
     private readonly specialRepository: Repository<SpecialDiscount>,
-  ) {}
+  ) { }
 
-  async create(
+  async adminCreate(
     createDto: CreateDiscountDto,
-    createdById?: string,
+    createdById: string,
   ): Promise<Discount> {
+
     // Check if discount code already exists
     const existing = await this.discountRepository.findOne({
       where: { discountCode: createDto.discountCode },
@@ -52,7 +54,7 @@ export class DiscountsService {
     // Create base discount
     const discount = this.discountRepository.create({
       ...createDto,
-      createdByType: createdById ? CreatedByType.SELLER : CreatedByType.SYSTEM,
+      createdByType: CreatedByType.SYSTEM,
       createdById,
     });
 
@@ -103,6 +105,52 @@ export class DiscountsService {
       }
     }
 
+    return await this.findOne(savedDiscount.discountId);
+  }
+
+  async sellerCreate(
+    createDto: CreateDiscountDto,
+    createdById: string,
+  ): Promise<Discount> {
+
+    // Check if discount code already exists
+    const existing = await this.discountRepository.findOne({
+      where: { discountCode: createDto.discountCode },
+    });
+
+    if (existing) {
+      throw new ConflictException('Discount code already exists');
+    }
+
+    // Validate dates
+    if (createDto.startDatetime >= createDto.endDatetime) {
+      throw new BadRequestException('End date must be after start date');
+    }
+
+    if (createDto.discountType !== DiscountType.SPECIAL) {
+      throw new ForbiddenException('Seller can only create special discount');
+    }
+
+    // Create base discount
+    const discount = this.discountRepository.create({
+      ...createDto,
+      createdByType: CreatedByType.SELLER,
+      createdById,
+    });
+
+    const savedDiscount = await this.discountRepository.save(discount);
+
+    // Create type-specific discount
+    if (!createDto.specialDetails) {
+      throw new BadRequestException(
+        'Special discount details are required',
+      );
+    }
+    const special = this.specialRepository.create({
+      discountId: savedDiscount.discountId,
+      ...createDto.specialDetails,
+    });
+    await this.specialRepository.save(special);
     return await this.findOne(savedDiscount.discountId);
   }
 
@@ -172,7 +220,35 @@ export class DiscountsService {
     });
   }
 
-  async update(id: string, updateDto: UpdateDiscountDto): Promise<Discount> {
+  async update(userId: string, id: string, updateDto: UpdateDiscountDto): Promise<Discount> {
+    const discount = await this.discountRepository.findOne({
+      where: { discountId: id , createdById: userId},
+      relations: [
+        'seasonalDiscount',
+        'shippingDiscount',
+        'specialDiscount',
+        'specialDiscount.store',
+        'specialDiscount.productType',
+      ],
+    })
+
+    if(!discount){
+      throw new NotFoundException(`Discount with ID ${id} not found`);
+    }
+
+    if (updateDto.startDatetime && updateDto.endDatetime) {
+      if (updateDto.startDatetime >= updateDto.endDatetime) {
+        throw new BadRequestException('End date must be after start date');
+      }
+    }
+
+    Object.assign(discount, updateDto);
+    await this.discountRepository.save(discount);
+
+    return await this.findOne(id);
+  }
+
+  async adminUpdate(id: string, updateDto: UpdateDiscountDto): Promise<Discount> {
     const discount = await this.findOne(id);
 
     if (updateDto.startDatetime && updateDto.endDatetime) {
