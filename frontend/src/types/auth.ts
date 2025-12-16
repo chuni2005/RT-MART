@@ -6,6 +6,7 @@ export interface User {
   email: string;
   phone: string;
   avatar?: string;
+  role: 'buyer' | 'seller' | 'admin';  // 對應 DB: enum('buyer', 'seller', 'admin')
 }
 
 // Auth API response types
