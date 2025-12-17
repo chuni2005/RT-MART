@@ -44,7 +44,7 @@
 }
 
 .dialogActions {
-  @include flex-align;
+  @include flex-center;
   justify-content: flex-end;
   gap: $spacing-md;
 }

@@ -1,5 +1,5 @@
 .sidebar {
-  width: 260px;
+  width: 250px;
   background: $bg-secondary;
   border-radius: $border-radius-lg;
   padding: $spacing-lg;
@@ -15,54 +15,48 @@
 
 .navSection {
   &:not(:last-child) {
-    margin-bottom: $spacing-sm;
+    margin-bottom: $spacing-lg;
+    border-bottom: 1px solid $border-color;
   }
 }
 
 .sectionTitle {
-  @include flex-align;
-  width: 100%;
-  padding: $spacing-md;
-  gap: $spacing-sm;
+  font-size: $font-md;
   font-weight: 600;
-  color: $text-primary;
-  justify-content: flex-start;
+  color: $text-secondary;
+  text-transform: uppercase;
+  letter-spacing: 0.05em;
 
   &.active {
-    background: rgba($primary-color, 0.1);
     color: $primary-color;
   }
-
-  &:hover {
-    background: rgba($primary-color, 0.05);
-  }
-}
-
-.sectionIcon {
-  font-size: $font-lg;
 }
 
 .navList {
   list-style: none;
   padding: 0;
-  margin: $spacing-xs 0 0 0;
+  margin: 0;
 }
 
 .navItem {
-  width: 100%;
-  padding: $spacing-sm $spacing-md $spacing-sm calc($spacing-md * 2 + $font-lg);
+  @include flex-center;
+  width: calc(100% - ($spacing-md + $font-md));
+  padding: $spacing-sm $spacing-md;
+  margin-left: calc($spacing-md + $font-md);
+  border: none;
+  background: transparent;
+
+  transition: $transition-fast;
   font-size: $font-sm;
-  color: $text-secondary;
-  justify-content: flex-start;
+  text-align: left;
+  gap: $spacing-sm;
 
   &.active {
-    background: rgba($primary-color, 0.1);
     color: $primary-color;
-    font-weight: 500;
+    font-weight: 600;
   }
+}
 
-  &:hover {
-    background: rgba($primary-color, 0.05);
-    color: $primary-color;
-  }
+.navIcon {
+  font-size: $font-md;
 }
