@@ -131,7 +131,6 @@ export class ProductsService {
     }
 
     // Step 2: Fetch Full Data for selected IDs
-    // eslint-disable-next-line @typescript-eslint/no-unsafe-member-access
     const productIds = paginatedResults.map((r) => r.id as string);
     const products = await this.productRepository
       .createQueryBuilder('product')
@@ -148,15 +147,12 @@ export class ProductsService {
     const enrichedProducts = paginatedResults
       .map((rawItem) => {
         const product = products.find(
-          // eslint-disable-next-line @typescript-eslint/no-unsafe-member-access
           (p) => p.productId === (rawItem.id as string),
         );
         if (!product) return null; // Should not happen
 
-        // eslint-disable-next-line @typescript-eslint/no-unsafe-member-access
         const maxDiscountRate = rawItem.maxDiscountRate
-          ? // eslint-disable-next-line @typescript-eslint/no-unsafe-member-access
-            parseFloat(rawItem.maxDiscountRate as string)
+          ? parseFloat(rawItem.maxDiscountRate as string)
           : 0;
         const currentPrice = Math.round(product.price * (1 - maxDiscountRate));
 
