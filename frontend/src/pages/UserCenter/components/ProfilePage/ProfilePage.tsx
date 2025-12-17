@@ -6,25 +6,29 @@
  * 3. 帳號設定 (刪除帳號)
  */
 
-import { useState, useEffect, ChangeEvent, FocusEvent, FormEvent } from 'react';
-import { useNavigate } from 'react-router-dom';
-import { useAuth } from '@/shared/hooks/useAuth';
-import FormInput from '@/shared/components/FormInput';
-import Button from '@/shared/components/Button';
-import Icon from '@/shared/components/Icon';
-import Alert from '@/shared/components/Alert';
-import Dialog from '@/shared/components/Dialog';
+import { useState, useEffect, ChangeEvent, FocusEvent, FormEvent } from "react";
+import { useNavigate } from "react-router-dom";
+import { useAuth } from "@/shared/hooks/useAuth";
+import FormInput from "@/shared/components/FormInput";
+import Button from "@/shared/components/Button";
+import Icon from "@/shared/components/Icon";
+import Alert from "@/shared/components/Alert";
+import Dialog from "@/shared/components/Dialog";
 import {
   validateName,
   validateEmail,
   validatePhone,
   validatePassword,
   validatePasswordStrength,
-  validateConfirmPassword
-} from '@/shared/utils/validation';
-import { updateProfile, updatePassword, deleteAccount } from '@/shared/services/userService';
-import type { AlertType } from '@/types';
-import styles from './ProfilePage.module.scss';
+  validateConfirmPassword,
+} from "@/shared/utils/validation";
+import {
+  updateProfile,
+  updatePassword,
+  deleteAccount,
+} from "@/shared/services/userService";
+import type { AlertType } from "@/types";
+import styles from "./ProfilePage.module.scss";
 
 // Type Definitions
 interface ProfileFormData {
@@ -52,7 +56,7 @@ interface PasswordFormErrors {
 }
 
 interface AlertState {
-  type: AlertType | '';
+  type: AlertType | "";
   message: string;
 }
 
@@ -69,52 +73,62 @@ interface SuccessDialogState {
 }
 
 function ProfilePage() {
-  const { user, updateUser, checkAuth } = useAuth();
+  const { user, updateUser, checkAuth, logout } = useAuth();
   const navigate = useNavigate();
 
   // Profile Form State
   const [profileData, setProfileData] = useState<ProfileFormData>({
-    name: '',
-    email: '',
-    phone: ''
+    name: "",
+    email: "",
+    phone: "",
   });
   const [profileErrors, setProfileErrors] = useState<ProfileFormErrors>({});
-  const [profileTouched, setProfileTouched] = useState<Record<string, boolean>>({});
+  const [profileTouched, setProfileTouched] = useState<Record<string, boolean>>(
+    {}
+  );
   const [isProfileLoading, setIsProfileLoading] = useState(false);
-  const [profileAlert, setProfileAlert] = useState<AlertState>({ type: '', message: '' });
+  const [profileAlert, setProfileAlert] = useState<AlertState>({
+    type: "",
+    message: "",
+  });
 
   // Password Form State
   const [passwordData, setPasswordData] = useState<PasswordFormData>({
-    currentPassword: '',
-    newPassword: '',
-    confirmPassword: ''
+    currentPassword: "",
+    newPassword: "",
+    confirmPassword: "",
   });
   const [passwordErrors, setPasswordErrors] = useState<PasswordFormErrors>({});
-  const [passwordTouched, setPasswordTouched] = useState<Record<string, boolean>>({});
+  const [passwordTouched, setPasswordTouched] = useState<
+    Record<string, boolean>
+  >({});
   const [isPasswordLoading, setIsPasswordLoading] = useState(false);
-  const [passwordAlert, setPasswordAlert] = useState<AlertState>({ type: '', message: '' });
+  const [passwordAlert, setPasswordAlert] = useState<AlertState>({
+    type: "",
+    message: "",
+  });
 
   // Delete Dialog State
   const [deleteDialog, setDeleteDialog] = useState<DeleteDialogState>({
     isOpen: false,
-    password: '',
-    error: '',
-    isDeleting: false
+    password: "",
+    error: "",
+    isDeleting: false,
   });
 
   // Success Dialog State (for account deletion)
   const [successDialog, setSuccessDialog] = useState<SuccessDialogState>({
     isOpen: false,
-    countdown: 5
+    countdown: 5,
   });
 
   // Initialize profile data from user context
   useEffect(() => {
     if (user) {
       setProfileData({
-        name: user.name || '',
-        email: user.email || '',
-        phone: user.phone || ''
+        name: user.name || "",
+        email: user.email || "",
+        phone: user.phone || "",
       });
     }
   }, [user]);
@@ -126,16 +140,16 @@ function ProfilePage() {
   const handleProfileChange = (e: ChangeEvent<HTMLInputElement>) => {
     const { name, value } = e.target;
 
-    setProfileData(prev => ({
+    setProfileData((prev) => ({
       ...prev,
-      [name]: value
+      [name]: value,
     }));
 
     // Clear error when user types
     if (profileErrors[name as keyof ProfileFormErrors]) {
-      setProfileErrors(prev => ({
+      setProfileErrors((prev) => ({
         ...prev,
-        [name]: null
+        [name]: null,
       }));
     }
   };
@@ -143,9 +157,9 @@ function ProfilePage() {
   const handleProfileBlur = (e: FocusEvent<HTMLInputElement>) => {
     const { name, value } = e.target;
 
-    setProfileTouched(prev => ({
+    setProfileTouched((prev) => ({
       ...prev,
-      [name]: true
+      [name]: true,
     }));
 
     validateProfileField(name, value);
@@ -155,20 +169,20 @@ function ProfilePage() {
     let error: string | null = null;
 
     switch (name) {
-      case 'name':
+      case "name":
         error = validateName(value);
         break;
-      case 'email':
+      case "email":
         error = validateEmail(value);
         break;
-      case 'phone':
+      case "phone":
         error = validatePhone(value);
         break;
     }
 
-    setProfileErrors(prev => ({
+    setProfileErrors((prev) => ({
       ...prev,
-      [name]: error
+      [name]: error,
     }));
 
     return error;
@@ -178,14 +192,14 @@ function ProfilePage() {
     const newErrors: ProfileFormErrors = {
       name: validateName(profileData.name),
       email: validateEmail(profileData.email),
-      phone: validatePhone(profileData.phone)
+      phone: validatePhone(profileData.phone),
     };
 
     setProfileErrors(newErrors);
     setProfileTouched({
       name: true,
       email: true,
-      phone: true
+      phone: true,
     });
 
     return !newErrors.name && !newErrors.email && !newErrors.phone;
@@ -200,7 +214,7 @@ function ProfilePage() {
 
     try {
       setIsProfileLoading(true);
-      setProfileAlert({ type: '', message: '' });
+      setProfileAlert({ type: "", message: "" });
 
       // Call API to update profile
       const updatedUser = await updateProfile(profileData);
@@ -213,20 +227,19 @@ function ProfilePage() {
 
       // Show success message
       setProfileAlert({
-        type: 'success',
-        message: '個人資料已更新成功'
+        type: "success",
+        message: "個人資料已更新成功",
       });
 
       // Auto-hide success message after 3 seconds
       setTimeout(() => {
-        setProfileAlert({ type: '', message: '' });
+        setProfileAlert({ type: "", message: "" });
       }, 3000);
-
     } catch (error) {
-      console.error('Profile update failed:', error);
+      console.error("Profile update failed:", error);
       setProfileAlert({
-        type: 'error',
-        message: error instanceof Error ? error.message : '更新失敗,請稍後再試'
+        type: "error",
+        message: error instanceof Error ? error.message : "更新失敗,請稍後再試",
       });
     } finally {
       setIsProfileLoading(false);
@@ -240,25 +253,28 @@ function ProfilePage() {
   const handlePasswordChange = (e: ChangeEvent<HTMLInputElement>) => {
     const { name, value } = e.target;
 
-    setPasswordData(prev => ({
+    setPasswordData((prev) => ({
       ...prev,
-      [name]: value
+      [name]: value,
     }));
 
     // Clear error when user types
     if (passwordErrors[name as keyof PasswordFormErrors]) {
-      setPasswordErrors(prev => ({
+      setPasswordErrors((prev) => ({
         ...prev,
-        [name]: null
+        [name]: null,
       }));
     }
 
     // Re-validate confirm password when new password changes
-    if (name === 'newPassword' && passwordTouched.confirmPassword) {
-      const confirmError = validateConfirmPassword(value, passwordData.confirmPassword);
-      setPasswordErrors(prev => ({
+    if (name === "newPassword" && passwordTouched.confirmPassword) {
+      const confirmError = validateConfirmPassword(
+        value,
+        passwordData.confirmPassword
+      );
+      setPasswordErrors((prev) => ({
         ...prev,
-        confirmPassword: confirmError
+        confirmPassword: confirmError,
       }));
     }
   };
@@ -266,32 +282,35 @@ function ProfilePage() {
   const handlePasswordBlur = (e: FocusEvent<HTMLInputElement>) => {
     const { name, value } = e.target;
 
-    setPasswordTouched(prev => ({
+    setPasswordTouched((prev) => ({
       ...prev,
-      [name]: true
+      [name]: true,
     }));
 
     validatePasswordField(name, value);
   };
 
-  const validatePasswordField = (name: string, value: string): string | null => {
+  const validatePasswordField = (
+    name: string,
+    value: string
+  ): string | null => {
     let error: string | null = null;
 
     switch (name) {
-      case 'currentPassword':
+      case "currentPassword":
         error = validatePassword(value); // Basic validation
         break;
-      case 'newPassword':
+      case "newPassword":
         error = validatePasswordStrength(value); // Strong validation
         break;
-      case 'confirmPassword':
+      case "confirmPassword":
         error = validateConfirmPassword(passwordData.newPassword, value);
         break;
     }
 
-    setPasswordErrors(prev => ({
+    setPasswordErrors((prev) => ({
       ...prev,
-      [name]: error
+      [name]: error,
     }));
 
     return error;
@@ -304,19 +323,21 @@ function ProfilePage() {
       confirmPassword: validateConfirmPassword(
         passwordData.newPassword,
         passwordData.confirmPassword
-      )
+      ),
     };
 
     setPasswordErrors(newErrors);
     setPasswordTouched({
       currentPassword: true,
       newPassword: true,
-      confirmPassword: true
+      confirmPassword: true,
     });
 
-    return !newErrors.currentPassword &&
-           !newErrors.newPassword &&
-           !newErrors.confirmPassword;
+    return (
+      !newErrors.currentPassword &&
+      !newErrors.newPassword &&
+      !newErrors.confirmPassword
+    );
   };
 
   const handlePasswordSubmit = async (e: FormEvent<HTMLFormElement>) => {
@@ -328,40 +349,40 @@ function ProfilePage() {
 
     try {
       setIsPasswordLoading(true);
-      setPasswordAlert({ type: '', message: '' });
+      setPasswordAlert({ type: "", message: "" });
 
       // Call API to update password
       const response = await updatePassword({
         currentPassword: passwordData.currentPassword,
-        newPassword: passwordData.newPassword
+        newPassword: passwordData.newPassword,
       });
 
       if (response.success) {
         // Clear password form
         setPasswordData({
-          currentPassword: '',
-          newPassword: '',
-          confirmPassword: ''
+          currentPassword: "",
+          newPassword: "",
+          confirmPassword: "",
         });
         setPasswordTouched({});
 
         // Show success message
         setPasswordAlert({
-          type: 'success',
-          message: '密碼已更新成功'
+          type: "success",
+          message: "密碼已更新成功",
         });
 
         // Auto-hide success message after 3 seconds
         setTimeout(() => {
-          setPasswordAlert({ type: '', message: '' });
+          setPasswordAlert({ type: "", message: "" });
         }, 3000);
       }
-
     } catch (error) {
-      console.error('Password update failed:', error);
+      console.error("Password update failed:", error);
       setPasswordAlert({
-        type: 'error',
-        message: error instanceof Error ? error.message : '密碼更新失敗,請稍後再試'
+        type: "error",
+        message:
+          error instanceof Error ? error.message : "密碼更新失敗,請稍後再試",
       });
     } finally {
       setIsPasswordLoading(false);
@@ -375,41 +396,41 @@ function ProfilePage() {
   const handleOpenDeleteDialog = () => {
     setDeleteDialog({
       isOpen: true,
-      password: '',
-      error: '',
-      isDeleting: false
+      password: "",
+      error: "",
+      isDeleting: false,
     });
   };
 
   const handleCloseDeleteDialog = () => {
     setDeleteDialog({
       isOpen: false,
-      password: '',
-      error: '',
-      isDeleting: false
+      password: "",
+      error: "",
+      isDeleting: false,
     });
   };
 
   const handleDeletePasswordChange = (e: ChangeEvent<HTMLInputElement>) => {
-    setDeleteDialog(prev => ({
+    setDeleteDialog((prev) => ({
       ...prev,
       password: e.target.value,
-      error: '' // Clear error when typing
+      error: "", // Clear error when typing
     }));
   };
 
   const handleConfirmDelete = async () => {
     // Validate password is entered
     if (!deleteDialog.password.trim()) {
-      setDeleteDialog(prev => ({
+      setDeleteDialog((prev) => ({
         ...prev,
-        error: '請輸入密碼以確認刪除'
+        error: "請輸入密碼以確認刪除",
       }));
       return;
     }
 
     try {
-      setDeleteDialog(prev => ({ ...prev, isDeleting: true }));
+      setDeleteDialog((prev) => ({ ...prev, isDeleting: true }));
 
       // Call API to delete account
       const response = await deleteAccount(deleteDialog.password);
@@ -421,46 +442,55 @@ function ProfilePage() {
         // Open success dialog with countdown
         setSuccessDialog({
           isOpen: true,
-          countdown: 5
+          countdown: 5,
         });
 
         // Start countdown timer
         startSuccessCountdown();
       }
-
     } catch (error) {
-      console.error('Account deletion failed:', error);
-      setDeleteDialog(prev => ({
+      console.error("Account deletion failed:", error);
+      setDeleteDialog((prev) => ({
         ...prev,
-        error: error instanceof Error ? error.message : '刪除失敗,請檢查密碼是否正確',
-        isDeleting: false
+        error:
+          error instanceof Error
+            ? error.message
+            : "刪除失敗,請檢查密碼是否正確",
+        isDeleting: false,
       }));
     }
   };
 
   const startSuccessCountdown = () => {
-    const timer = setInterval(() => {
-      setSuccessDialog(prev => {
+    const timer = setInterval(async () => {
+      let isZero = false;
+      setSuccessDialog((prev) => {
         const newCountdown = prev.countdown - 1;
 
         if (newCountdown <= 0) {
-          clearInterval(timer);
-          // Redirect to home page
-          navigate('/');
+          isZero = true;
           return prev;
         }
 
         return {
           ...prev,
-          countdown: newCountdown
+          countdown: newCountdown,
         };
       });
+
+      if (isZero) {
+        clearInterval(timer);
+        // 執行登出並跳轉
+        await logout();
+        navigate("/");
+      }
     }, 1000);
   };
 
-  const handleCloseSuccessDialog = () => {
+  const handleCloseSuccessDialog = async () => {
     setSuccessDialog({ isOpen: false, countdown: 0 });
-    navigate('/');
+    await logout();
+    navigate("/");
   };
 
   // ===========================
