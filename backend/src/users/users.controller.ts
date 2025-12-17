@@ -16,6 +16,7 @@ import { UsersService } from './users.service';
 import { CreateUserDto } from './dto/create-user.dto';
 import { UpdateUserDto } from './dto/update-user.dto';
 import { QueryUserDto } from './dto/query-user.dto';
+import { DeleteAccountDto } from './dto/delete-account.dto';
 import { UserResponseDto } from './dto/user-response.dto';
 import { plainToInstance } from 'class-transformer';
 import {
@@ -79,7 +80,7 @@ export class UsersController {
   @UseGuards(JwtAccessGuard)
   @Patch('me')
   async updateMe(@Req() req, @Body() updateUserDto: UpdateUserDto) {
-    const userId = req.user.userId;
+    const userId = (req.user as { userId: string }).userId;
     const user = await this.usersService.update(userId, updateUserDto);
     return plainToInstance(UserResponseDto, user);
   }
@@ -96,9 +97,9 @@ export class UsersController {
   //Delete own account: User deletes their own account
   @UseGuards(JwtAccessGuard)
   @Delete('me')
-  async removeMe(@Req() req) {
-    const userId = req.user.userId;
-    await this.usersService.remove(userId);
+  async removeMe(@Req() req, @Body() deleteAccountDto: DeleteAccountDto) {
+    const userId = (req.user as { userId: string }).userId;
+    await this.usersService.removeMe(userId, deleteAccountDto.password);
     return { message: 'Your account has been deleted successfully' };
   }
 

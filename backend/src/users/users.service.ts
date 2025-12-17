@@ -2,6 +2,7 @@ import {
   Injectable,
   NotFoundException,
   ConflictException,
+  UnauthorizedException,
 } from '@nestjs/common';
 import { InjectRepository } from '@nestjs/typeorm';
 import { Repository, Like, IsNull } from 'typeorm';
@@ -44,6 +45,7 @@ export class UsersService {
 
     const user = this.userRepository.create({
       ...createUserDto,
+      phoneNumber: this.formatPhoneNumber(createUserDto.phoneNumber),
       passwordHash,
     });
 
@@ -127,14 +129,53 @@ export class UsersService {
 
     // Handle password update
     if (updateUserDto.password) {
+      // If currentPassword is provided, verify it (usually for users updating their own password)
+      if (updateUserDto.currentPassword) {
+        const isPasswordMatch = await bcrypt.compare(
+          updateUserDto.currentPassword,
+          user.passwordHash,
+        );
+        if (!isPasswordMatch) {
+          throw new UnauthorizedException('Current password does not match');
+        }
+      }
+
       user.passwordHash = await bcrypt.hash(updateUserDto.password, 10);
     }
 
-    // Assign other fields (排除 password)
-    const { password, ...rest } = updateUserDto;
+    // Assign other fields (排除 password, currentPassword)
+    // eslint-disable-next-line @typescript-eslint/no-unused-vars
+    const { password, currentPassword, ...rest } = updateUserDto;
+    // Normalize phone number if present
+    if (rest.phoneNumber) {
+      rest.phoneNumber = this.formatPhoneNumber(rest.phoneNumber);
+    }
     Object.assign(user, rest);
 
     return await this.userRepository.save(user);
+  }
+
+  /**
+   * Remove own account with password verification
+   */
+  async removeMe(userId: string, password?: string): Promise<void> {
+    const user = await this.userRepository.findOne({
+      where: { userId, deletedAt: IsNull() },
+    });
+
+    if (!user) {
+      throw new NotFoundException(`User with ID ${userId} not found`);
+    }
+
+    // Verify password if provided
+    if (password) {
+      const isPasswordMatch = await bcrypt.compare(password, user.passwordHash);
+      if (!isPasswordMatch) {
+        throw new UnauthorizedException('Invalid password');
+      }
+    }
+
+    await this.userRepository.softRemove(user);
   }
 
   /**
@@ -219,5 +260,27 @@ export class UsersService {
     }
 
     await this.userRepository.remove(user);
+  }
+
+  /**
+   * Normalize phone number to XXXX-XXX-XXX format
+   */
+  private formatPhoneNumber(phoneNumber?: string): string | undefined {
+    if (!phoneNumber) return phoneNumber;
+
+    // If already in correct format, return as is
+    if (/^\d{4}-\d{3}-\d{3}$/.test(phoneNumber)) {
+      return phoneNumber;
+    }
+
+    // Extract only digits
+    const digits = phoneNumber.replace(/\D/g, '');
+
+    // If we have exactly 10 digits, format them
+    if (digits.length === 10) {
+      return digits.replace(/(\d{4})(\d{3})(\d{3})/, '$1-$2-$3');
+    }
+
+    return phoneNumber;
   }
 }

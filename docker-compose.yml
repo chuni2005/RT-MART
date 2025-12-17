@@ -35,7 +35,7 @@ services:
       context: ./backend
       dockerfile: ./Dockerfile.dev
     container_name: rt_mart_backend
-    # command: sh -c "npm run migration:run && npm run start:dev" #if migrations are needed on startup
+    command: sh -c "npm run migration:run && npm run start:dev" #if migrations are needed on startup
     ports:
       - '3000:3000'
     volumes:
