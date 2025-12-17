@@ -1,0 +1,80 @@
+.dashboard {
+  padding: $spacing-lg;
+
+  @include mobile {
+    padding: $spacing-md;
+  }
+}
+
+.pageTitle {
+  font-size: $font-3xl;
+  font-weight: 700;
+  color: $text-primary;
+  margin-bottom: $spacing-lg;
+}
+
+.section {
+  background: $bg-secondary;
+  border-radius: $border-radius-lg;
+  padding: $spacing-lg;
+  margin-bottom: $spacing-lg;
+
+  h2 {
+    font-size: $font-xl;
+    font-weight: 600;
+    color: $text-primary;
+    margin-bottom: $spacing-md;
+  }
+}
+
+.sectionHeader {
+  @include flex-between;
+  margin-bottom: $spacing-md;
+
+  @include mobile {
+    flex-direction: column;
+    align-items: flex-start;
+    gap: $spacing-md;
+  }
+}
+
+.statsGrid {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+  gap: $spacing-md;
+  margin-bottom: $spacing-lg;
+}
+
+.statCard {
+  background: $bg-primary;
+  border-radius: $border-radius-md;
+  padding: $spacing-lg;
+  text-align: center;
+
+  .statLabel {
+    font-size: $font-sm;
+    color: $text-secondary;
+    margin-bottom: $spacing-sm;
+  }
+
+  .statValue {
+    font-size: $font-2xl;
+    font-weight: 700;
+    color: $primary-color;
+  }
+}
+
+.chartContainer {
+  min-height: 400px;
+  padding: $spacing-md;
+  background: $bg-primary;
+  border-radius: $border-radius-md;
+}
+
+.loading,
+.error {
+  @include flex-center;
+  min-height: 400px;
+  font-size: $font-lg;
+  color: $text-secondary;
+}

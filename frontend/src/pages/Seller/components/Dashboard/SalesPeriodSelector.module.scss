@@ -1,0 +1,10 @@
+.selector {
+  @include flex-center;
+  gap: $spacing-sm;
+}
+
+.periodButton {
+  min-width: 60px;
+  padding: $spacing-sm $spacing-md;
+  font-size: $font-sm;
+}
