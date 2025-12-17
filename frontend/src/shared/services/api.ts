@@ -91,9 +91,10 @@ export const patch = <T = any>(endpoint: string, data?: any, options: RequestOpt
 /**
  * DELETE 請求
  */
-export const del = <T = any>(endpoint: string, options: RequestOptions = {}): Promise<T> => {
+export const del = <T = any>(endpoint: string, data?: any, options: RequestOptions = {}): Promise<T> => {
   return apiRequest<T>(endpoint, {
     method: 'DELETE',
+    body: data ? JSON.stringify(data) : undefined,
     ...options,
   });
 };

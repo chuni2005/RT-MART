@@ -1,6 +1,6 @@
 /**
- * Authentication Service - Mock API
- * 模擬認證 API 回應（待後端實作後替換）
+ * Authentication Service
+ * 認證相關服務 (登入、註冊、登出、身份驗證)
  */
 
 import { post } from './api';
@@ -13,41 +13,39 @@ import {
 } from '@/types';
 import { get } from './api';
 
-// Mock 用戶資料庫（僅供開發測試-->接入api后要刪除）
-
-// TODO: 頭像avatar要從後端取得
-const mapUserResponseToUser = (data: {
+export const mapUserResponseToUser = (data: {
   userId: string;
   loginId: string;
   name: string;
   email: string;
-  phone: string | null;
+  phoneNumber: string | null;
   role: string;
 }): User => {
   return {
     id: data.userId,
+    userId: data.userId,
     loginId: data.loginId,
     name: data.name,
     email: data.email,
-    phone: data.phone ?? '',
+    phone: data.phoneNumber ?? '',
     avatar: "https://media.tenor.com/fGLpFBW-QBoAAAAe/memecat.png",
   }
 }
 
 /**
- * 取得完整用戶資料：先打 /auth/profile 拿 userId，再打 /users/:id
+ * 取得完整用戶資料：先從 JWT 取得 profile，再用 userId 查完整資料
  */
 const fetchFullUser = async (): Promise<User> => {
-  // 1) 先從 cookie 中的 accessToken 取得 profile
+  // 1) 從後端 /auth/profile 取得 JWT payload 中的基本資訊
   const profile = await get<{ userId: string; loginId: string; role: string }>('/auth/profile');
 
-  // 2) 再用 userId 去查 users/:id，拿完整資料
+  // 2) 使用 userId 取得完整用戶細節
   const userDetail = await get<{
     userId: string;
     loginId: string;
     name: string;
     email: string;
-    phone: string | null;
+    phoneNumber: string | null;
     role: string;
   }>(`/users/${profile.userId}`);
 
