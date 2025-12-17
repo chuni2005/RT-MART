@@ -1,4 +1,4 @@
-import api from './api';
+// import api from './api'; // TODO: 當實作真實 API 時取消註解
 import {
   DashboardData,
   SalesPeriod,
@@ -7,8 +7,7 @@ import {
   ProductFormData,
   RecentOrder,
   Discount,
-  DiscountFormData,
-  ProductImage
+  DiscountFormData
 } from '@/types/seller';
 
 /**
@@ -128,19 +127,65 @@ export const updateProductStatus = async (id: string, deletedAt: string | null):
   return new Promise((resolve) => setTimeout(resolve, 500));
 };
 
+/**
+ * 啟用商品（上架）
+ */
+export const activateProduct = async (id: string): Promise<void> => {
+  return updateProductStatus(id, null);
+};
+
+/**
+ * 停用商品（下架）
+ */
+export const deactivateProduct = async (id: string): Promise<void> => {
+  return updateProductStatus(id, new Date().toISOString());
+};
+
 // ========== Orders ==========
 
 /**
  * 獲取訂單列表
  */
-export const getOrders = async (status?: string): Promise<RecentOrder[]> => {
+export const getOrders = async (status?: string): Promise<any[]> => {
   // TODO: return api.get('/seller/orders', { params: { status } });
   return new Promise((resolve) => {
     setTimeout(() => {
+      const mockOrders = MOCK_RECENT_ORDERS.map(order => ({
+        ...order,
+        items: [
+          {
+            id: '1',
+            productId: '1',
+            productName: '無線藍牙耳機',
+            productImage: 'https://picsum.photos/100/100?random=1',
+            quantity: 1,
+            price: 1299
+          }
+        ],
+        shippingAddress: {
+          id: '1',
+          recipientName: order.buyerName,
+          phone: '0912345678',
+          city: '台北市',
+          district: '大安區',
+          postalCode: '106',
+          detail: '忠孝東路三段100號',
+          isDefault: true
+        },
+        paymentMethod: 'credit_card',
+        subtotal: order.totalAmount,
+        shipping: 60,
+        discount: 0,
+        orderId: order.id,
+        userId: '1',
+        storeId: '1',
+        storeName: '優質商店'
+      }));
+
       if (status && status !== 'all') {
-        resolve(MOCK_RECENT_ORDERS.filter(order => order.status === status));
+        resolve(mockOrders.filter(order => order.status === status));
       } else {
-        resolve(MOCK_RECENT_ORDERS);
+        resolve(mockOrders);
       }
     }, 500);
   });
@@ -153,12 +198,57 @@ export const getOrderDetail = async (id: string): Promise<any> => {
   // TODO: return api.get(`/seller/orders/${id}`);
   return new Promise((resolve) => {
     setTimeout(() => resolve({
-      id,
-      orderNumber: 'ORD20250101001',
-      // ... 其他訂單詳情
+      orderId: id,
+      orderNumber: 'ORD20250115001',
+      userId: '1',
+      storeId: '1',
+      storeName: '優質商店',
+      status: 'paid',
+      items: [
+        {
+          id: '1',
+          productId: '1',
+          productName: '無線藍牙耳機',
+          productImage: 'https://picsum.photos/100/100?random=1',
+          quantity: 1,
+          price: 1299
+        },
+        {
+          id: '2',
+          productId: '3',
+          productName: '智能手環',
+          productImage: 'https://picsum.photos/100/100?random=3',
+          quantity: 1,
+          price: 899
+        }
+      ],
+      shippingAddress: {
+        id: '1',
+        recipientName: '王小明',
+        phone: '0912345678',
+        city: '台北市',
+        district: '大安區',
+        postalCode: '106',
+        detail: '忠孝東路三段100號',
+        isDefault: true
+      },
+      paymentMethod: 'credit_card',
+      note: '請在下午送達',
+      subtotal: 2198,
+      shipping: 60,
+      discount: 0,
+      totalAmount: 2258,
+      createdAt: '2025-01-15T14:30:00Z',
+      updatedAt: '2025-01-15T14:35:00Z',
+      paidAt: '2025-01-15T14:35:00Z'
     }), 300);
   });
 };
+
+/**
+ * 獲取訂單詳情（別名）
+ */
+export const getOrder = getOrderDetail;
 
 /**
  * 更新訂單狀態
@@ -187,6 +277,23 @@ export const getDiscounts = async (): Promise<Discount[]> => {
   // TODO: return api.get('/seller/discounts');
   return new Promise((resolve) => {
     setTimeout(() => resolve(MOCK_DISCOUNTS), 500);
+  });
+};
+
+/**
+ * 獲取單個折扣
+ */
+export const getDiscount = async (id: string): Promise<Discount> => {
+  // TODO: return api.get(`/seller/discounts/${id}`);
+  return new Promise((resolve, reject) => {
+    setTimeout(() => {
+      const discount = MOCK_DISCOUNTS.find(d => d.discountId === id);
+      if (!discount) {
+        reject(new Error('Discount not found'));
+      } else {
+        resolve(discount);
+      }
+    }, 300);
   });
 };
 
@@ -480,11 +587,15 @@ export default {
   updateProduct,
   deleteProduct,
   updateProductStatus,
+  activateProduct,
+  deactivateProduct,
   getOrders,
+  getOrder,
   getOrderDetail,
   updateOrderStatus,
   replyToReview,
   getDiscounts,
+  getDiscount,
   createDiscount,
   updateDiscount,
   deleteDiscount,
