@@ -238,6 +238,22 @@ const mockProducts = generateMockProducts();
 // ============================================
 
 /**
+ * 將後端商品類型資料轉換為前端使用的格式
+ */
+const mapBackendProductType = (data: any): ProductType => {
+  if (!data) return {} as ProductType;
+  return {
+    productTypeId: data.productTypeId,
+    typeName: data.typeName,
+    typeCode: data.typeCode || 'UNKNOWN',
+    parentTypeId: data.parentTypeId,
+    isActive: data.isActive ?? true,
+    // 支援遞迴結構
+    parent: data.parent ? mapBackendProductType(data.parent) : undefined,
+  };
+};
+
+/**
  * 模擬 API 延遲
  * @param ms - 延遲毫秒數，預設 500ms
  */
@@ -287,13 +303,7 @@ export const getProductById = async (
           email: p.store.storeEmail || "",
           phone: p.store.storePhone || ""
         },
-        productType: {
-          productTypeId: p.productType.productTypeId,
-          typeName: p.productType.typeName,
-          typeCode: p.productType.typeCode || 'UNKNOWN',
-          parentTypeId: p.productType.parentTypeId,
-          isActive: p.productType.isActive
-        }
+        productType: mapBackendProductType(p.productType)
       };
 
       return {
@@ -389,13 +399,7 @@ export const getProducts = async (
           email: p.store.storeEmail || "",
           phone: p.store.storePhone || ""
         },
-        productType: {
-          productTypeId: p.productType.productTypeId,
-          typeName: p.productType.typeName,
-          typeCode: p.productType.typeCode || 'UNKNOWN',
-          parentTypeId: p.productType.parentTypeId,
-          isActive: p.productType.isActive
-        }
+        productType: mapBackendProductType(p.productType)
       })),
         total: response.total,
       };
@@ -511,13 +515,41 @@ export const getProductsByType = async (
 };
 
 /**
+ * 取得單一商品類型
+ */
+export const getProductTypeById = async (
+  productTypeId: string
+): Promise<ProductType | undefined> => {
+  // Real API Mode
+  if (!USE_MOCK_API) {
+    try {
+      const response = await get<any>(`/product-types/${productTypeId}`);
+      return mapBackendProductType(response);
+    } catch (error) {
+      console.error("[API Error] getProductTypes:", error);
+      throw error;
+    }
+  }
+
+  // Mock Mode
+  console.log("[Mock API] Get product type by ID:", productTypeId);
+
+  // 模擬網路延遲
+  await mockDelay(300);
+
+  // 返回特定分類 (可能為 undefined)
+  return mockProductTypes[productTypeId];
+};
+
+/**
  * 取得所有商品類型
  */
 export const getProductTypes = async (): Promise<ProductType[]> => {
   // Real API Mode
   if (!USE_MOCK_API) {
     try {
-      return await get<ProductType[]>('/product-types');
+      const response = await get<any[]>('/product-types');
+      return response.map(mapBackendProductType);
     } catch (error) {
       console.error('[API Error] getProductTypes:', error);
       throw error;
@@ -531,7 +563,7 @@ export const getProductTypes = async (): Promise<ProductType[]> => {
   await mockDelay(300);
 
   // 返回所有分類
-  return Object.values(mockProductTypes);
+  return Object.values(mockProductTypes).map(mapBackendProductType);
 };
 
 // ============================================
