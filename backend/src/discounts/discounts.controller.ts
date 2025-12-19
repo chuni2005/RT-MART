@@ -11,7 +11,10 @@ import {
   Req,
 } from '@nestjs/common';
 import { DiscountsService } from './discounts.service';
-import { CreateDiscountDto, SpecialDiscountDetailsDto } from './dto/create-discount.dto';
+import {
+  CreateDiscountDto,
+  SpecialDiscountDetailsDto,
+} from './dto/create-discount.dto';
 import { UpdateDiscountDto } from './dto/update-discount.dto';
 import { QueryDiscountDto } from './dto/query-discount.dto';
 import { JwtAccessGuard } from '../auth/guards/jwt-auth.guard';
@@ -24,7 +27,7 @@ import type { AuthRequest } from '../common/types';
 @Controller('discounts')
 export class DiscountsController {
   constructor(private readonly discountsService: DiscountsService) {}
-  
+
   @Roles(UserRole.SELLER)
   @UseGuards(JwtAccessGuard, RolesGuard)
   @Post()
@@ -76,14 +79,21 @@ export class DiscountsController {
   @Roles(UserRole.SELLER)
   @UseGuards(JwtAccessGuard, RolesGuard)
   @Patch(':id')
-  async update(@Req() req: AuthRequest, @Param('id') id: string, @Body() updateDto: UpdateDiscountDto) {
+  async update(
+    @Req() req: AuthRequest,
+    @Param('id') id: string,
+    @Body() updateDto: UpdateDiscountDto,
+  ) {
     return await this.discountsService.update(req.user.userId, id, updateDto);
   }
 
   @Roles(UserRole.ADMIN)
   @UseGuards(JwtAccessGuard, RolesGuard)
   @Patch('admin/:id')
-  async adminUpdate(@Param('id') id: string, @Body() updateDto: UpdateDiscountDto) {
+  async adminUpdate(
+    @Param('id') id: string,
+    @Body() updateDto: UpdateDiscountDto,
+  ) {
     return await this.discountsService.adminUpdate(id, updateDto);
   }
 

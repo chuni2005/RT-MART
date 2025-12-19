@@ -14,7 +14,10 @@ import { QueryProductDto } from './dto/query-product.dto';
 import { StoresService } from '../stores/stores.service';
 import { CloudinaryService } from '../cloudinary/cloudinary.service';
 import { SellersService } from '../sellers/sellers.service';
-import { SortImagesDto, UpdateSortedImagesDto } from './dto/upate-sortedImages.dto';
+import {
+  SortImagesDto,
+  UpdateSortedImagesDto,
+} from './dto/upate-sortedImages.dto';
 
 import { SpecialDiscount } from '../discounts/entities/special-discount.entity';
 
@@ -40,7 +43,7 @@ export class ProductsService {
     private readonly cloudinaryService: CloudinaryService,
     private readonly sellerService: SellersService,
     private readonly productTypesService: ProductTypesService,
-  ) { }
+  ) {}
 
   async findStorefront(
     queryDto: QueryProductDto,
@@ -246,7 +249,11 @@ export class ProductsService {
     };
   }
 
-  async create(userId: string, createDto: CreateProductDto, files: Express.Multer.File[]): Promise<Product> {
+  async create(
+    userId: string,
+    createDto: CreateProductDto,
+    files: Express.Multer.File[],
+  ): Promise<Product> {
     // Verify store exists and belongs to seller
     const seller = await this.sellerService.findByUserId(userId);
     if (!seller) {
@@ -255,7 +262,7 @@ export class ProductsService {
 
     const store = await this.storesService.findBySeller(seller.sellerId);
     if (!store) {
-      throw new NotFoundException('Can\'t find the store of this seller acount')
+      throw new NotFoundException("Can't find the store of this seller acount");
     }
 
     const product = this.productRepository.create({
@@ -266,7 +273,7 @@ export class ProductsService {
     const savedProduct = await this.productRepository.save(product);
 
     // Increment store product count
-    await this.storesService.incrementProductCount(storeId);
+    await this.storesService.incrementProductCount(product.storeId);
 
     // Create images if provided
     if (files && files.length > 0) {
@@ -276,11 +283,12 @@ export class ProductsService {
 
           return this.imageRepository.create({
             productId: savedProduct.productId,
-            imageUrl: result.url,               // URL
+            imageUrl: result.url, // URL
             publicId: result.publicId,
-            displayOrder: index + 1
+            displayOrder: index + 1,
           });
-        }));
+        }),
+      );
       await this.imageRepository.save(images);
     }
     return await this.findOne(savedProduct.productId);
@@ -352,30 +360,9 @@ export class ProductsService {
 
     const store = await this.storesService.findBySeller(seller.sellerId);
     if (!store) {
-      throw new NotFoundException('Can\'t find the store of this seller account');
-    }
-
-    const product = await this.findOne(productId);
-    if (!product) {
-      throw new NotFoundException(`Product with ID ${productId} not found`);
-    }
-
-    if (product.storeId != store.storeId) {
-      throw new ForbiddenException(`You do not own this product`);
-    }
-
-    return product;
-  }
-
-  async getProductAfterVerification(userId: string, productId: string) {
-    const seller = await this.sellerService.findByUserId(userId);
-    if (!seller) {
-      throw new ForbiddenException('Not a seller role account');
-    }
-
-    const store = await this.storesService.findBySeller(seller.sellerId);
-    if (!store) {
-      throw new NotFoundException('Can\'t find the store of this seller account');
+      throw new NotFoundException(
+        "Can't find the store of this seller account",
+      );
     }
 
     const product = await this.findOne(productId);
@@ -395,18 +382,21 @@ export class ProductsService {
     id: string,
     updateDto: UpdateProductDto,
   ): Promise<Product> {
-
     const product = await this.getProductAfterVerification(userId, id);
 
     Object.assign(product, updateDto);
     return await this.productRepository.save(product);
   }
 
-  async addImages(userId: string, productId: string, files: Express.Multer.File[]): Promise<Product> {
+  async addImages(
+    userId: string,
+    productId: string,
+    files: Express.Multer.File[],
+  ): Promise<Product> {
     const product = await this.getProductAfterVerification(userId, productId);
     const currentMaxOrder =
       (product.images ?? []).length > 0
-        ? Math.max(...(product.images ?? []).map(img => img.displayOrder))
+        ? Math.max(...(product.images ?? []).map((img) => img.displayOrder))
         : 0;
 
     if (files && files.length > 0) {
@@ -420,7 +410,7 @@ export class ProductsService {
             publicId: result.publicId,
             displayOrder: currentMaxOrder + index + 1,
           });
-        })
+        }),
       );
 
       await this.imageRepository.save(newImages);
@@ -429,10 +419,14 @@ export class ProductsService {
     return await this.findOne(product.productId);
   }
 
-  async sortImages(userId: string, productId: string, sortImages: SortImagesDto): Promise<Product> {
+  async sortImages(
+    userId: string,
+    productId: string,
+    sortImages: SortImagesDto,
+  ): Promise<Product> {
     const product = await this.getProductAfterVerification(userId, productId);
     const productImageIds = new Set(
-      (product.images ?? []).map(img => img.imageId)
+      (product.images ?? []).map((img) => img.imageId),
     );
 
     console.log(productImageIds);
@@ -444,7 +438,7 @@ export class ProductsService {
       }
     }
 
-    const sortOrders = sortImages.images.map(i => i.order);
+    const sortOrders = sortImages.images.map((i) => i.order);
     const uniqueSortOrders = new Set(sortOrders);
 
     if (uniqueSortOrders.size !== sortOrders.length) {
@@ -473,9 +467,7 @@ export class ProductsService {
 
   async deleteImage(userId: string, productId: string, imageId: string) {
     const product = await this.getProductAfterVerification(userId, productId);
-    const image = (product.images ?? []).find(
-      img => img.imageId === imageId,
-    );
+    const image = (product.images ?? []).find((img) => img.imageId === imageId);
 
     if (!image) {
       throw new NotFoundException(
@@ -505,7 +497,7 @@ export class ProductsService {
     const product = await this.getProductAfterVerification(userId, id);
     await this.productRepository.softRemove(product);
     // Decrement store product count
-    await this.storesService.decrementProductCount(storeId);
+    await this.storesService.decrementProductCount(product.storeId);
   }
 
   async updateRating(productId: string, newRating: number): Promise<void> {

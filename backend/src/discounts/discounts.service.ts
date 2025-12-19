@@ -30,13 +30,12 @@ export class DiscountsService {
     private readonly shippingRepository: Repository<ShippingDiscount>,
     @InjectRepository(SpecialDiscount)
     private readonly specialRepository: Repository<SpecialDiscount>,
-  ) { }
+  ) {}
 
   async adminCreate(
     createDto: CreateDiscountDto,
     createdById: string,
   ): Promise<Discount> {
-
     // Check if discount code already exists
     const existing = await this.discountRepository.findOne({
       where: { discountCode: createDto.discountCode },
@@ -112,7 +111,6 @@ export class DiscountsService {
     createDto: CreateDiscountDto,
     createdById: string,
   ): Promise<Discount> {
-
     // Check if discount code already exists
     const existing = await this.discountRepository.findOne({
       where: { discountCode: createDto.discountCode },
@@ -142,9 +140,7 @@ export class DiscountsService {
 
     // Create type-specific discount
     if (!createDto.specialDetails) {
-      throw new BadRequestException(
-        'Special discount details are required',
-      );
+      throw new BadRequestException('Special discount details are required');
     }
     const special = this.specialRepository.create({
       discountId: savedDiscount.discountId,
@@ -220,9 +216,13 @@ export class DiscountsService {
     });
   }
 
-  async update(userId: string, id: string, updateDto: UpdateDiscountDto): Promise<Discount> {
+  async update(
+    userId: string,
+    id: string,
+    updateDto: UpdateDiscountDto,
+  ): Promise<Discount> {
     const discount = await this.discountRepository.findOne({
-      where: { discountId: id , createdById: userId},
+      where: { discountId: id, createdById: userId },
       relations: [
         'seasonalDiscount',
         'shippingDiscount',
@@ -230,9 +230,9 @@ export class DiscountsService {
         'specialDiscount.store',
         'specialDiscount.productType',
       ],
-    })
+    });
 
-    if(!discount){
+    if (!discount) {
       throw new NotFoundException(`Discount with ID ${id} not found`);
     }
 
@@ -248,7 +248,10 @@ export class DiscountsService {
     return await this.findOne(id);
   }
 
-  async adminUpdate(id: string, updateDto: UpdateDiscountDto): Promise<Discount> {
+  async adminUpdate(
+    id: string,
+    updateDto: UpdateDiscountDto,
+  ): Promise<Discount> {
     const discount = await this.findOne(id);
 
     if (updateDto.startDatetime && updateDto.endDatetime) {

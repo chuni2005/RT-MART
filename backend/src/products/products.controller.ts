@@ -25,7 +25,10 @@ import { UserRole } from '../users/entities/user.entity';
 import { AuthTokenResponseDto } from '@/auth/dto/auth-response.dto';
 import type { AuthRequest } from '../common/types';
 import { FilesInterceptor } from '@nestjs/platform-express';
-import { SortImagesDto, UpdateSortedImagesDto } from './dto/upate-sortedImages.dto';
+import {
+  SortImagesDto,
+  UpdateSortedImagesDto,
+} from './dto/upate-sortedImages.dto';
 
 @Controller('products')
 export class ProductsController {
@@ -38,7 +41,7 @@ export class ProductsController {
   async create(
     @Req() req: AuthRequest,
     @Body() createDto: CreateProductDto,
-    @UploadedFiles() files: Express.Multer.File[]
+    @UploadedFiles() files: Express.Multer.File[],
   ) {
     return await this.productsService.create(req.user.userId, createDto, files);
   }
@@ -105,7 +108,7 @@ export class ProductsController {
   ) {
     return await this.productsService.addImages(req.user.userId, id, files);
   }
-  
+
   @Roles(UserRole.SELLER)
   @UseGuards(JwtAccessGuard, RolesGuard)
   @Patch(':id/images/sort')
@@ -114,7 +117,11 @@ export class ProductsController {
     @Param('id') id: string,
     @Body() sortImages: SortImagesDto,
   ) {
-    return await this.productsService.sortImages(req.user.userId, id, sortImages);
+    return await this.productsService.sortImages(
+      req.user.userId,
+      id,
+      sortImages,
+    );
   }
 
   @Roles(UserRole.SELLER)
