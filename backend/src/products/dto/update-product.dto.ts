@@ -8,7 +8,6 @@ import {
   Length,
   ValidateNested,
 } from 'class-validator';
-import { ProductImageDto } from './create-product.dto';
 
 /**
  * UpdateProductDto - 更新商品資料
@@ -32,10 +31,4 @@ export class UpdateProductDto {
   @IsString()
   @IsOptional()
   productTypeId?: string;
-
-  @IsArray()
-  @ValidateNested({ each: true })
-  @Type(() => ProductImageDto)
-  @IsOptional()
-  images?: ProductImageDto[];
 }

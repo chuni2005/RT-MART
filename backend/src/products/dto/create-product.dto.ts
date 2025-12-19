@@ -12,17 +12,6 @@ import {
 } from 'class-validator';
 import { Type } from 'class-transformer';
 
-export class ProductImageDto {
-  @IsUrl()
-  @IsNotEmpty()
-  imageUrl: string;
-
-  @IsNumber()
-  @IsOptional()
-  @Min(1)
-  displayOrder?: number;
-}
-
 export class CreateProductDto {
   @IsString()
   @IsNotEmpty()
@@ -33,7 +22,7 @@ export class CreateProductDto {
   @IsOptional()
   description?: string;
 
-  @IsNumber()
+  @Type(() => Number)
   @IsPositive()
   price: number;
 
@@ -41,13 +30,7 @@ export class CreateProductDto {
   @IsNotEmpty()
   productTypeId: string;
 
-  @IsArray()
-  @ValidateNested({ each: true })
-  @Type(() => ProductImageDto)
-  @IsOptional()
-  images?: ProductImageDto[];
-
-  @IsNumber()
+  @Type(() => Number)
   @IsOptional()
   @Min(0)
   initialStock?: number;

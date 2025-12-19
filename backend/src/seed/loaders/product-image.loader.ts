@@ -32,6 +32,7 @@ export class ProductImageLoader extends BaseLoader<ProductImage> {
       const image = new ProductImage();
       image.productId = productId;
       image.imageUrl = data.image_url;
+      image.publicId = typeof data.public_id === 'string' ? data.public_id : '';
       image.displayOrder =
         typeof data.display_order === 'number'
           ? data.display_order

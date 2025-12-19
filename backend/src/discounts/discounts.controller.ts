@@ -8,25 +8,35 @@ import {
   Delete,
   Query,
   UseGuards,
+  Req,
 } from '@nestjs/common';
 import { DiscountsService } from './discounts.service';
-import { CreateDiscountDto } from './dto/create-discount.dto';
+import { CreateDiscountDto, SpecialDiscountDetailsDto } from './dto/create-discount.dto';
 import { UpdateDiscountDto } from './dto/update-discount.dto';
 import { QueryDiscountDto } from './dto/query-discount.dto';
 import { JwtAccessGuard } from '../auth/guards/jwt-auth.guard';
 import { RolesGuard } from '../auth/guards/roles.guard';
 import { Roles } from '../auth/decorators/roles.decorator';
 import { UserRole } from '../users/entities/user.entity';
+import { SpecialDiscount } from './entities/special-discount.entity';
+import type { AuthRequest } from '../common/types';
 
 @Controller('discounts')
 export class DiscountsController {
   constructor(private readonly discountsService: DiscountsService) {}
-
-  @Post()
+  
+  @Roles(UserRole.SELLER)
   @UseGuards(JwtAccessGuard, RolesGuard)
-  @Roles(UserRole.ADMIN, UserRole.SELLER)
-  async create(@Body() createDto: CreateDiscountDto) {
-    return await this.discountsService.create(createDto);
+  @Post()
+  async createSpecial(@Req() req, @Body() createDto: CreateDiscountDto) {
+    return await this.discountsService.sellerCreate(createDto, req.user);
+  }
+
+  @Roles(UserRole.ADMIN)
+  @UseGuards(JwtAccessGuard, RolesGuard)
+  @Post('admin')
+  async create(@Req() req, @Body() createDto: CreateDiscountDto) {
+    return await this.discountsService.adminCreate(createDto, req.user);
   }
 
   @Get()
@@ -40,15 +50,15 @@ export class DiscountsController {
     };
   }
 
-  @Get('active')
-  async findActive() {
-    return await this.discountsService.findActiveDiscounts();
-  }
+  // @Get('active')
+  // async findActive() {
+  //   return await this.discountsService.findActiveDiscounts();
+  // }
 
-  @Get(':id')
-  async findOne(@Param('id') id: string) {
-    return await this.discountsService.findOne(id);
-  }
+  // @Get(':id')
+  // async findOne(@Param('id') id: string) {
+  //   return await this.discountsService.findOne(id);
+  // }
 
   @Get('code/:code')
   async findByCode(@Param('code') code: string) {
@@ -63,16 +73,23 @@ export class DiscountsController {
     return await this.discountsService.validateDiscount(code, body.orderAmount);
   }
 
-  @Patch(':id')
+  @Roles(UserRole.SELLER)
   @UseGuards(JwtAccessGuard, RolesGuard)
-  @Roles(UserRole.ADMIN, UserRole.SELLER)
-  async update(@Param('id') id: string, @Body() updateDto: UpdateDiscountDto) {
-    return await this.discountsService.update(id, updateDto);
+  @Patch(':id')
+  async update(@Req() req: AuthRequest, @Param('id') id: string, @Body() updateDto: UpdateDiscountDto) {
+    return await this.discountsService.update(req.user.userId, id, updateDto);
   }
 
-  @Delete(':id')
-  @UseGuards(JwtAccessGuard, RolesGuard)
   @Roles(UserRole.ADMIN)
+  @UseGuards(JwtAccessGuard, RolesGuard)
+  @Patch('admin/:id')
+  async adminUpdate(@Param('id') id: string, @Body() updateDto: UpdateDiscountDto) {
+    return await this.discountsService.adminUpdate(id, updateDto);
+  }
+
+  @Roles(UserRole.ADMIN)
+  @UseGuards(JwtAccessGuard, RolesGuard)
+  @Delete(':id')
   async remove(@Param('id') id: string) {
     await this.discountsService.remove(id);
     return { message: 'Discount deleted successfully' };
