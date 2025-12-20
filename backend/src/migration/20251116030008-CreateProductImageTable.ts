@@ -9,6 +9,7 @@ export class CreateProductImageTable20251116030008
         image_id BIGINT AUTO_INCREMENT PRIMARY KEY,
         product_id BIGINT NOT NULL,
         image_url VARCHAR(500) NOT NULL,
+        public_id VARCHAR(50) NOT NULL,
         display_order INT NOT NULL DEFAULT 1,
         CONSTRAINT FK_productimage_product FOREIGN KEY (product_id) REFERENCES Product(product_id) ON DELETE CASCADE
       )

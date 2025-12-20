@@ -21,6 +21,9 @@ export class ProductImage {
   @Column({ name: 'image_url', type: 'varchar', length: 500 })
   imageUrl: string;
 
+  @Column({ name: 'public_id', type: 'varchar', length: 50 })
+  publicId: string;
+
   @Column({ name: 'display_order', type: 'int', default: 1 })
   displayOrder: number;
 

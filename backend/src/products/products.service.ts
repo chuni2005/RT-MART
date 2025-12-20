@@ -2,6 +2,7 @@ import {
   Injectable,
   NotFoundException,
   ForbiddenException,
+  BadRequestException,
 } from '@nestjs/common';
 import { InjectRepository } from '@nestjs/typeorm';
 import { Repository, Like, Between } from 'typeorm';
@@ -11,6 +12,9 @@ import { CreateProductDto } from './dto/create-product.dto';
 import { UpdateProductDto } from './dto/update-product.dto';
 import { QueryProductDto } from './dto/query-product.dto';
 import { StoresService } from '../stores/stores.service';
+import { CloudinaryService } from '../cloudinary/cloudinary.service';
+import { SellersService } from '../sellers/sellers.service';
+import { SortImagesDto, UpdateSortedImagesDto } from './dto/upate-sortedImages.dto';
 
 @Injectable()
 export class ProductsService {
@@ -20,31 +24,44 @@ export class ProductsService {
     @InjectRepository(ProductImage)
     private readonly imageRepository: Repository<ProductImage>,
     private readonly storesService: StoresService,
-  ) {}
+    private readonly cloudinaryService: CloudinaryService,
+    private readonly sellerService: SellersService
+  ) { }
 
-  async create(storeId: string, createDto: CreateProductDto): Promise<Product> {
+  async create(userId: string, createDto: CreateProductDto, files: Express.Multer.File[]): Promise<Product> {
     // Verify store exists and belongs to seller
-    await this.storesService.findOne(storeId);
+    const seller = await this.sellerService.findByUserId(userId);
+    if (!seller) {
+      throw new ForbiddenException('Not a seller role account');
+    }
+
+    const store = await this.storesService.findBySeller(seller.sellerId);
+    if (!store) {
+      throw new NotFoundException('Can\'t find the store of this seller acount')
+    }
 
     const product = this.productRepository.create({
       ...createDto,
-      storeId,
+      storeId: store.storeId,
     });
 
     const savedProduct = await this.productRepository.save(product);
 
     // Create images if provided
-    if (createDto.images && createDto.images.length > 0) {
-      const images = createDto.images.map((img, index) =>
-        this.imageRepository.create({
-          productId: savedProduct.productId,
-          imageUrl: img.imageUrl,
-          displayOrder: img.displayOrder || index + 1,
-        }),
-      );
+    if (files && files.length > 0) {
+      const images = await Promise.all(
+        files.map(async (file, index) => {
+          const result = await this.cloudinaryService.uploadImage(file);
+
+          return this.imageRepository.create({
+            productId: savedProduct.productId,
+            imageUrl: result.url,               // URL
+            publicId: result.publicId,
+            displayOrder: index + 1
+          });
+        }));
       await this.imageRepository.save(images);
     }
-
     return await this.findOne(savedProduct.productId);
   }
 
@@ -106,46 +123,142 @@ export class ProductsService {
     return product;
   }
 
+  async getProductAfterVerification(userId: string, productId: string) {
+    const seller = await this.sellerService.findByUserId(userId);
+    if (!seller) {
+      throw new ForbiddenException('Not a seller role account');
+    }
+
+    const store = await this.storesService.findBySeller(seller.sellerId);
+    if (!store) {
+      throw new NotFoundException('Can\'t find the store of this seller account');
+    }
+
+    const product = await this.findOne(productId);
+    if (!product) {
+      throw new NotFoundException(`Product with ID ${productId} not found`);
+    }
+
+    if (product.storeId != store.storeId) {
+      throw new ForbiddenException(`You do not own this product`);
+    }
+
+    return product;
+  }
+
   async update(
+    userId: string,
     id: string,
-    storeId: string,
     updateDto: UpdateProductDto,
   ): Promise<Product> {
-    const product = await this.findOne(id);
 
-    // Verify ownership
-    if (product.storeId !== storeId) {
-      throw new ForbiddenException('You can only update your own products');
-    }
-
-    // Handle images update
-    if (updateDto.images) {
-      // Remove old images
-      await this.imageRepository.delete({ productId: id });
-
-      // Add new images
-      const images = updateDto.images.map((img, index) =>
-        this.imageRepository.create({
-          productId: id,
-          imageUrl: img.imageUrl,
-          displayOrder: img.displayOrder || index + 1,
-        }),
-      );
-      await this.imageRepository.save(images);
-    }
+    const product = await this.getProductAfterVerification(userId, id);
 
     Object.assign(product, updateDto);
     return await this.productRepository.save(product);
   }
 
-  async remove(id: string, storeId: string): Promise<void> {
-    const product = await this.findOne(id);
+  async addImages(userId: string, productId: string, files: Express.Multer.File[]): Promise<Product> {
+    const product = await this.getProductAfterVerification(userId, productId);
+    const currentMaxOrder =
+      (product.images ?? []).length > 0
+        ? Math.max(...(product.images ?? []).map(img => img.displayOrder))
+        : 0;
 
-    // Verify ownership
-    if (product.storeId !== storeId) {
-      throw new ForbiddenException('You can only delete your own products');
+    if (files && files.length > 0) {
+      const newImages = await Promise.all(
+        files.map(async (file, index) => {
+          const result = await this.cloudinaryService.uploadImage(file);
+
+          return this.imageRepository.create({
+            productId: product.productId,
+            imageUrl: result.url,
+            publicId: result.publicId,
+            displayOrder: currentMaxOrder + index + 1,
+          });
+        })
+      );
+
+      await this.imageRepository.save(newImages);
     }
 
+    return await this.findOne(product.productId);
+  }
+
+  async sortImages(userId: string, productId: string, sortImages: SortImagesDto): Promise<Product> {
+    const product = await this.getProductAfterVerification(userId, productId);
+    const productImageIds = new Set(
+      (product.images ?? []).map(img => img.imageId)
+    );
+
+    console.log(productImageIds);
+    for (const item of sortImages.images) {
+      if (!productImageIds.has(item.imageId)) {
+        throw new BadRequestException(
+          `Image ID ${item.imageId} does not belong to product ${productId}`,
+        );
+      }
+    }
+
+    const sortOrders = sortImages.images.map(i => i.order);
+    const uniqueSortOrders = new Set(sortOrders);
+
+    if (uniqueSortOrders.size !== sortOrders.length) {
+      throw new BadRequestException('sortOrder values cannot be duplicated');
+    }
+
+    for (const item of sortImages.images) {
+      await this.imageRepository.update(
+        { imageId: item.imageId },
+        { displayOrder: item.order },
+      );
+    }
+
+    const updatedImages = await this.imageRepository.find({
+      where: { productId },
+      order: { displayOrder: 'ASC' },
+    });
+
+    updatedImages.forEach((img, index) => {
+      img.displayOrder = index + 1;
+    });
+
+    await this.imageRepository.save(updatedImages);
+    return await this.findOne(productId);
+  }
+
+  async deleteImage(userId: string, productId: string, imageId: string) {
+    const product = await this.getProductAfterVerification(userId, productId);
+    const image = (product.images ?? []).find(
+      img => img.imageId === imageId,
+    );
+
+    if (!image) {
+      throw new NotFoundException(
+        `Image ID ${imageId} does not belong to product ${productId}`,
+      );
+    }
+
+    if (image.publicId) {
+      await this.cloudinaryService.deleteImage(image.publicId);
+    }
+    await this.imageRepository.delete({ imageId: image.imageId });
+
+    const remainingImages = await this.imageRepository.find({
+      where: { productId },
+      order: { displayOrder: 'ASC' },
+    });
+
+    remainingImages.forEach((img, index) => {
+      img.displayOrder = index + 1;
+    });
+
+    await this.imageRepository.save(remainingImages);
+    return await this.findOne(productId);
+  }
+
+  async remove(userId: string, id: string): Promise<void> {
+    const product = await this.getProductAfterVerification(userId, id);
     await this.productRepository.softRemove(product);
   }
 

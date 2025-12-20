@@ -86,7 +86,7 @@ export class Product {
   @JoinColumn({ name: 'product_type_id' })
   productType: ProductType;
 
-  @OneToMany(() => ProductImage, (image) => image.product, { cascade: true })
+  @OneToMany(() => ProductImage, (image) => image.product, { cascade: false })
   images?: ProductImage[];
 
   @OneToOne(() => Inventory, (inventory) => inventory.product, {
