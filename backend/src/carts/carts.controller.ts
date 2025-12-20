@@ -18,7 +18,7 @@ import type { AuthRequest } from '../common/types';
 @Controller('carts')
 @UseGuards(JwtAccessGuard)
 export class CartsController {
-  constructor(private readonly cartsService: CartsService) {}
+  constructor(private readonly cartsService: CartsService) { }
 
   @Get()
   async getCart(@Req() req: AuthRequest) {
