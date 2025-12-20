@@ -20,8 +20,8 @@ function DiscountEdit() {
   const [saving, setSaving] = useState(false);
   const [productTypes, setProductTypes] = useState<ProductType[]>([]);
 
-  const { values, errors, handleChange, handleBlur, validate, setValue } = useForm({
-    initialValues: {
+  const form = useForm(
+    {
       discountCode: '',
       name: '',
       description: '',
@@ -33,18 +33,88 @@ function DiscountEdit() {
       discountRate: '',
       maxDiscountAmount: '',
     },
-    validationRules: {
-      discountCode: { required: true, minLength: 3, maxLength: 20 },
-      name: { required: true, minLength: 2, maxLength: 50 },
-      description: { maxLength: 200 },
-      minPurchaseAmount: { required: true, min: 0 },
-      startDatetime: { required: true },
-      endDatetime: { required: true },
-      usageLimit: { min: 1 },
-      discountRate: { required: true, min: 0.01, max: 1 },
-      maxDiscountAmount: { min: 0 },
-    },
-  });
+    async () => {},
+    {
+      discountCode: (value) => {
+        if (!value) return '請輸入折扣碼';
+        if (value.length < 3) return '折扣碼至少需要 3 個字元';
+        if (value.length > 20) return '折扣碼不可超過 20 個字元';
+        return null;
+      },
+      name: (value) => {
+        if (!value) return '請輸入折扣名稱';
+        if (value.length < 2) return '折扣名稱至少需要 2 個字元';
+        if (value.length > 50) return '折扣名稱不可超過 50 個字元';
+        return null;
+      },
+      description: (value) => {
+        if (value && value.length > 200) return '描述不可超過 200 個字元';
+        return null;
+      },
+      minPurchaseAmount: (value) => {
+        if (!value) return '請輸入最低消費金額';
+        if (Number(value) < 0) return '最低消費金額不可為負數';
+        return null;
+      },
+      startDatetime: (value) => {
+        if (!value) return '請選擇開始時間';
+        return null;
+      },
+      endDatetime: (value) => {
+        if (!value) return '請選擇結束時間';
+        return null;
+      },
+      usageLimit: (value) => {
+        if (value && Number(value) < 1) return '使用次數上限至少為 1';
+        return null;
+      },
+      discountRate: (value) => {
+        if (!value) return '請輸入折扣率';
+        if (Number(value) < 0.01) return '折扣率至少為 0.01';
+        if (Number(value) > 1) return '折扣率不可超過 1';
+        return null;
+      },
+      maxDiscountAmount: (value) => {
+        if (value && Number(value) < 0) return '最高折抵金額不可為負數';
+        return null;
+      },
+    }
+  );
+
+  const { values, errors, validateAll, setValue } = form;
+
+  // 包裝 handleChange 以支持直接傳值的方式
+  const handleChange = (nameOrEvent: string | React.ChangeEvent<HTMLInputElement>, value?: string) => {
+    if (typeof nameOrEvent === 'string') {
+      // 直接傳遞字段名和值
+      const name = nameOrEvent;
+      setValue(name as any, value);
+      if (form.touched[name]) {
+        form.validateField(name as any, value);
+      }
+    } else {
+      // 傳遞事件對象
+      form.handleChange(nameOrEvent);
+    }
+  };
+
+  // 包裝 handleBlur 以支持直接傳字段名的方式
+  const handleBlur = (nameOrEvent: string | React.FocusEvent<HTMLInputElement>) => {
+    if (typeof nameOrEvent === 'string') {
+      // 直接傳遞字段名 - 創建模擬事件對象
+      const name = nameOrEvent;
+      const mockEvent = {
+        target: {
+          name,
+          value: values[name as keyof typeof values],
+        },
+      } as React.FocusEvent<HTMLInputElement>;
+      form.handleBlur(mockEvent);
+    } else {
+      // 傳遞事件對象
+      form.handleBlur(nameOrEvent);
+    }
+  };
 
   useEffect(() => {
     loadProductTypes();
@@ -87,7 +157,7 @@ function DiscountEdit() {
   };
 
   const handleSave = async () => {
-    if (!validate()) {
+    if (!validateAll()) {
       return;
     }
 

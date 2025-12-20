@@ -12,8 +12,8 @@ function StoreSettings() {
   const [loading, setLoading] = useState(true);
   const [saveStatus, setSaveStatus] = useState<'idle' | 'saving' | 'success' | 'error'>('idle');
 
-  const { values, errors, handleChange, handleBlur, validate, setValue } = useForm({
-    initialValues: {
+  const form = useForm(
+    {
       storeName: '',
       storeDescription: '',
       storePhone: '',
@@ -21,15 +21,74 @@ function StoreSettings() {
       storeAddress: '',
       bankAccountReference: '',
     },
-    validationRules: {
-      storeName: { required: true, minLength: 2, maxLength: 50 },
-      storeDescription: { maxLength: 500 },
-      storePhone: { required: true, pattern: /^09\d{8}$/ },
-      storeEmail: { required: true, pattern: /^[^\s@]+@[^\s@]+\.[^\s@]+$/ },
-      storeAddress: { required: true },
-      bankAccountReference: { required: true, pattern: /^\d{10,16}$/ },
-    },
-  });
+    async () => {},
+    {
+      storeName: (value) => {
+        if (!value) return '請輸入商店名稱';
+        if (value.length < 2) return '商店名稱至少需要 2 個字元';
+        if (value.length > 50) return '商店名稱不可超過 50 個字元';
+        return null;
+      },
+      storeDescription: (value) => {
+        if (value && value.length > 500) return '商店描述不可超過 500 個字元';
+        return null;
+      },
+      storePhone: (value) => {
+        if (!value) return '請輸入聯絡電話';
+        if (!/^09\d{8}$/.test(value)) return '請輸入正確的手機號碼格式 (09xxxxxxxx)';
+        return null;
+      },
+      storeEmail: (value) => {
+        if (!value) return '請輸入 Email';
+        if (!/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(value)) return '請輸入正確的 Email 格式';
+        return null;
+      },
+      storeAddress: (value) => {
+        if (!value) return '請輸入實體地址';
+        return null;
+      },
+      bankAccountReference: (value) => {
+        if (!value) return '請輸入銀行帳戶';
+        if (!/^\d{10,16}$/.test(value)) return '銀行帳戶必須是 10-16 位數字';
+        return null;
+      },
+    }
+  );
+
+  const { values, errors, validateAll, setValue } = form;
+
+  // 包裝 handleChange 以支持直接傳值的方式
+  const handleChange = (nameOrEvent: string | React.ChangeEvent<HTMLInputElement>, value?: string) => {
+    if (typeof nameOrEvent === 'string') {
+      // 直接傳遞字段名和值
+      const name = nameOrEvent;
+      setValue(name as any, value);
+      if (form.touched[name]) {
+        form.validateField(name as any, value);
+      }
+    } else {
+      // 傳遞事件對象
+      form.handleChange(nameOrEvent);
+    }
+  };
+
+  // 包裝 handleBlur 以支持直接傳字段名的方式
+  const handleBlur = (nameOrEvent: string | React.FocusEvent<HTMLInputElement>) => {
+    if (typeof nameOrEvent === 'string') {
+      // 直接傳遞字段名 - 創建模擬事件對象
+      const name = nameOrEvent;
+      const mockEvent = {
+        target: {
+          name,
+          value: values[name as keyof typeof values],
+        },
+      } as React.FocusEvent<HTMLInputElement>;
+      form.handleBlur(mockEvent);
+    } else {
+      // 傳遞事件對象
+      form.handleBlur(nameOrEvent);
+    }
+  };
 
   useEffect(() => {
     loadStoreInfo();
@@ -41,11 +100,12 @@ function StoreSettings() {
       const data = await sellerService.getStoreInfo();
       setStoreInfo(data);
       // 填充表單數據
-      Object.keys(data).forEach((key) => {
-        if (key in values) {
-          setValue(key, data[key as keyof StoreInfo] || '');
-        }
-      });
+      if (data.storeName !== undefined) setValue('storeName', data.storeName);
+      if (data.storeDescription !== undefined) setValue('storeDescription', data.storeDescription || '');
+      if (data.storePhone !== undefined) setValue('storePhone', data.storePhone || '');
+      if (data.storeEmail !== undefined) setValue('storeEmail', data.storeEmail || '');
+      if (data.storeAddress !== undefined) setValue('storeAddress', data.storeAddress || '');
+      if (data.bankAccountReference !== undefined) setValue('bankAccountReference', data.bankAccountReference || '');
     } catch (error) {
       console.error('載入商店資料失敗:', error);
     } finally {
@@ -54,7 +114,7 @@ function StoreSettings() {
   };
 
   const handleSave = async () => {
-    if (!validate()) {
+    if (!validateAll()) {
       return;
     }
 

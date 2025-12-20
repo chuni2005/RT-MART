@@ -22,22 +22,78 @@ function ProductEdit() {
   const [images, setImages] = useState<ProductImage[]>([]);
   const [productTypes, setProductTypes] = useState<ProductType[]>([]);
 
-  const { values, errors, handleChange, handleBlur, validate, setValue } = useForm({
-    initialValues: {
+  const form = useForm(
+    {
       productName: '',
       description: '',
       price: '',
       stock: '',
       productTypeId: '',
     },
-    validationRules: {
-      productName: { required: true, minLength: 2, maxLength: 100 },
-      description: { required: true, maxLength: 1000 },
-      price: { required: true, min: 1 },
-      stock: { required: true, min: 0 },
-      productTypeId: { required: true },
-    },
-  });
+    async () => {},
+    {
+      productName: (value) => {
+        if (!value) return '請輸入商品名稱';
+        if (value.length < 2) return '商品名稱至少需要 2 個字元';
+        if (value.length > 100) return '商品名稱不可超過 100 個字元';
+        return null;
+      },
+      description: (value) => {
+        if (!value) return '請輸入商品描述';
+        if (value.length > 1000) return '商品描述不可超過 1000 個字元';
+        return null;
+      },
+      price: (value) => {
+        if (!value) return '請輸入商品價格';
+        if (Number(value) < 1) return '商品價格必須大於 0';
+        return null;
+      },
+      stock: (value) => {
+        if (value === '') return '請輸入庫存數量';
+        if (Number(value) < 0) return '庫存數量不可為負數';
+        return null;
+      },
+      productTypeId: (value) => {
+        if (!value) return '請選擇商品類型';
+        return null;
+      },
+    }
+  );
+
+  const { values, errors, validateAll, setValue } = form;
+
+  // 包裝 handleChange 以支持直接傳值的方式
+  const handleChange = (nameOrEvent: string | React.ChangeEvent<HTMLInputElement>, value?: string) => {
+    if (typeof nameOrEvent === 'string') {
+      // 直接傳遞字段名和值
+      const name = nameOrEvent;
+      setValue(name as any, value);
+      if (form.touched[name]) {
+        form.validateField(name as any, value);
+      }
+    } else {
+      // 傳遞事件對象
+      form.handleChange(nameOrEvent);
+    }
+  };
+
+  // 包裝 handleBlur 以支持直接傳字段名的方式
+  const handleBlur = (nameOrEvent: string | React.FocusEvent<HTMLInputElement>) => {
+    if (typeof nameOrEvent === 'string') {
+      // 直接傳遞字段名 - 創建模擬事件對象
+      const name = nameOrEvent;
+      const mockEvent = {
+        target: {
+          name,
+          value: values[name as keyof typeof values],
+        },
+      } as React.FocusEvent<HTMLInputElement>;
+      form.handleBlur(mockEvent);
+    } else {
+      // 傳遞事件對象
+      form.handleBlur(nameOrEvent);
+    }
+  };
 
   useEffect(() => {
     loadProductTypes();
@@ -73,7 +129,7 @@ function ProductEdit() {
   };
 
   const handleSave = async () => {
-    if (!validate() || images.length === 0) {
+    if (!validateAll() || images.length === 0) {
       if (images.length === 0) {
         alert('請至少上傳一張商品圖片');
       }
@@ -192,6 +248,7 @@ function ProductEdit() {
             <label className={styles.label}>
               商品類型 <span className={styles.required}>*</span>
             </label>
+            {/* TODO:導入 商品類型 */}
             <Select
               value={values.productTypeId}
               onChange={(value) => handleChange('productTypeId', value)}
