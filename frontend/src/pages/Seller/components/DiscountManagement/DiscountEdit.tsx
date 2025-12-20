@@ -206,7 +206,7 @@ function DiscountEdit() {
   return (
     <div className={styles.discountEdit}>
       <div className={styles.header}>
-        <Button variant="ghost" onClick={() => navigate('/seller/discounts')}>
+        <Button variant="ghost" onClick={() => navigate('/seller/discounts')} className={styles.backButton}>
           <Icon icon="arrow-left" />
           返回列表
         </Button>

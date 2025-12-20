@@ -8,8 +8,13 @@
 
 .header {
   @include flex-center;
-  gap: $spacing-md;
+  position: relative;
   margin-bottom: $spacing-lg;
+}
+
+.backButton {
+  position: absolute;
+  left: 0;
 }
 
 .pageTitle {
@@ -76,7 +81,7 @@
 }
 
 .noteBox {
-  @include flex-center;
+  @include flex(flex-start, center);
   gap: $spacing-md;
   margin-top: $spacing-lg;
   padding: $spacing-md;
@@ -104,6 +109,7 @@
 .addressBox {
   display: flex;
   flex-direction: column;
+  align-items: flex-start;
   gap: $spacing-md;
   padding: $spacing-lg;
   background: $bg-primary;

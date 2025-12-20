@@ -8,8 +8,13 @@
 
 .header {
   @include flex-center;
-  gap: $spacing-md;
+  position: relative;
   margin-bottom: $spacing-lg;
+}
+
+.backButton {
+  position: absolute;
+  left: 0;
 }
 
 .pageTitle {

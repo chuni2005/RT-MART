@@ -1,12 +1,15 @@
-import { useState, useEffect } from 'react';
-import { useNavigate, useParams } from 'react-router-dom';
-import Button from '@/shared/components/Button';
-import Icon from '@/shared/components/Icon';
-import Select from '@/shared/components/Select';
-import sellerService from '@/shared/services/sellerService';
-import { Order, OrderStatus } from '@/types/order';
-import { getOrderStatusText, getOrderStatusColor } from '@/shared/utils/orderUtils';
-import styles from './OrderDetail.module.scss';
+import { useState, useEffect } from "react";
+import { useNavigate, useParams } from "react-router-dom";
+import Button from "@/shared/components/Button";
+import Icon from "@/shared/components/Icon";
+import Select from "@/shared/components/Select";
+import sellerService from "@/shared/services/sellerService";
+import { Order, OrderStatus } from "@/types/order";
+import {
+  getOrderStatusText,
+  getOrderStatusColor,
+} from "@/shared/utils/orderUtils";
+import styles from "./OrderDetail.module.scss";
 
 function OrderDetail() {
   const navigate = useNavigate();
@@ -27,7 +30,7 @@ function OrderDetail() {
       const data = await sellerService.getOrder(id);
       setOrder(data);
     } catch (error) {
-      console.error('載入訂單失敗:', error);
+      console.error("載入訂單失敗:", error);
     } finally {
       setLoading(false);
     }
@@ -38,11 +41,11 @@ function OrderDetail() {
 
     setUpdating(true);
     try {
-      await sellerService.updateOrderStatus(order.orderId, newStatus, '');
+      await sellerService.updateOrderStatus(order.orderId, newStatus, "");
       setOrder({ ...order, status: newStatus });
     } catch (error) {
-      console.error('更新訂單狀態失敗:', error);
-      alert('更新失敗，請稍後再試');
+      console.error("更新訂單狀態失敗:", error);
+      alert("更新失敗，請稍後再試");
     } finally {
       setUpdating(false);
     }
@@ -58,28 +61,32 @@ function OrderDetail() {
 
   const getPaymentMethodText = (method: string) => {
     const methodMap: Record<string, string> = {
-      credit_card: '信用卡',
-      cash_on_delivery: '貨到付款',
-      debit_card: '金融卡',
-      bank_transfer: '銀行轉帳',
+      credit_card: "信用卡",
+      cash_on_delivery: "貨到付款",
+      debit_card: "金融卡",
+      bank_transfer: "銀行轉帳",
     };
     return methodMap[method] || method;
   };
 
   const statusOptions = [
-    { value: 'pending_payment', label: '待付款' },
-    { value: 'paid', label: '已付款' },
-    { value: 'processing', label: '處理中' },
-    { value: 'shipped', label: '已出貨' },
-    { value: 'delivered', label: '已送達' },
-    { value: 'completed', label: '已完成' },
-    { value: 'cancelled', label: '已取消' },
+    { value: "pending_payment", label: "待付款" },
+    { value: "paid", label: "已付款" },
+    { value: "processing", label: "處理中" },
+    { value: "shipped", label: "已出貨" },
+    { value: "delivered", label: "已送達" },
+    { value: "completed", label: "已完成" },
+    { value: "cancelled", label: "已取消" },
   ];
 
   return (
     <div className={styles.orderDetail}>
       <div className={styles.header}>
-        <Button variant="ghost" onClick={() => navigate('/seller/orders')}>
+        <Button
+          variant="ghost"
+          onClick={() => navigate("/seller/orders")}
+          className={styles.backButton}
+        >
           <Icon icon="arrow-left" />
           返回列表
         </Button>
@@ -107,7 +114,7 @@ function OrderDetail() {
             <div className={styles.infoItem}>
               <span className={styles.label}>下單時間</span>
               <span className={styles.value}>
-                {new Date(order.createdAt).toLocaleString('zh-TW')}
+                {new Date(order.createdAt).toLocaleString("zh-TW")}
               </span>
             </div>
             <div className={styles.infoItem}>
@@ -120,7 +127,7 @@ function OrderDetail() {
               <div className={styles.infoItem}>
                 <span className={styles.label}>付款時間</span>
                 <span className={styles.value}>
-                  {new Date(order.paidAt).toLocaleString('zh-TW')}
+                  {new Date(order.paidAt).toLocaleString("zh-TW")}
                 </span>
               </div>
             )}
@@ -166,7 +173,7 @@ function OrderDetail() {
             {order.items.map((item) => (
               <div key={item.id} className={styles.productItem}>
                 <img
-                  src={item.productImage || '/placeholder-product.png'}
+                  src={item.productImage || "/placeholder-product.png"}
                   alt={item.productName}
                   className={styles.productImage}
                 />
@@ -224,9 +231,7 @@ function OrderDetail() {
               options={statusOptions}
               disabled={updating}
             />
-            <p className={styles.hint}>
-              變更訂單狀態後，買家將收到通知
-            </p>
+            <p className={styles.hint}>變更訂單狀態後，買家將收到通知</p>
           </div>
         </section>
       </div>

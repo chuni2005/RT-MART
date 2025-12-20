@@ -169,7 +169,7 @@ function ProductEdit() {
   return (
     <div className={styles.productEdit}>
       <div className={styles.header}>
-        <Button variant="ghost" onClick={() => navigate('/seller/products')}>
+        <Button variant="ghost" onClick={() => navigate('/seller/products')} className={styles.backButton}>
           <Icon icon="arrow-left" />
           返回列表
         </Button>
