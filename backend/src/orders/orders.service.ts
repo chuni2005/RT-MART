@@ -127,10 +127,10 @@ export class OrdersService {
       // Return first order (or implement logic to return all orders)
       // return await this.findOne(orders[0].orderId, userId);
       // 使用交易內的 manager 來獲取完整訂單資訊，避免交易尚未 commit 導致 findOne 找不到資料
-      return await manager.findOne(Order, {
+      return (await manager.findOne(Order, {
         where: { orderId: orders[0].orderId, userId },
         relations: ['store', 'items', 'items.product'],
-      }) as Order;
+      })) as Order;
     });
   }
 
