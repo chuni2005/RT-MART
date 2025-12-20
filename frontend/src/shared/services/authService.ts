@@ -27,6 +27,7 @@ const mockUsers: MockUser[] = [
     phone: "0912-345-678",
     password: "Test1234",
     avatar: "https://media.tenor.com/fGLpFBW-QBoAAAAe/memecat.png",
+    role: 'buyer',
   },
 ];
 
@@ -46,6 +47,7 @@ const mapUserResponseToUser = (data: {
     email: data.email,
     phone: data.phone ?? '',
     avatar: "https://media.tenor.com/fGLpFBW-QBoAAAAe/memecat.png",
+    role: data.role as 'buyer' | 'seller' | 'admin',
   }
 }
 

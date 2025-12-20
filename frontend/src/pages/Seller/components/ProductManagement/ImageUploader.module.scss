@@ -1,0 +1,120 @@
+@use "sass:color";
+
+.imageUploader {
+  width: 100%;
+}
+
+.uploadZone {
+  position: relative;
+  border: 2px dashed $border-color;
+  border-radius: $border-radius-lg;
+  padding: $spacing-xl;
+  text-align: center;
+  cursor: pointer;
+  transition: $transition-fast;
+  background: $bg-primary;
+
+  &:hover {
+    border-color: $primary-color;
+    background: color.adjust($bg-primary, $lightness: 2%);
+  }
+
+  &.dragOver {
+    border-color: $primary-color;
+    background: color.change($primary-color, $alpha: 0.05);
+  }
+}
+
+.uploadIcon {
+  font-size: 48px;
+  color: $text-tertiary;
+  margin-bottom: $spacing-md;
+}
+
+.uploadText {
+  font-size: $font-md;
+  color: $text-primary;
+  margin-bottom: $spacing-sm;
+}
+
+.uploadHint {
+  font-size: $font-sm;
+  color: $text-tertiary;
+}
+
+.fileInput {
+  position: absolute;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  opacity: 0;
+  cursor: pointer;
+}
+
+.imageList {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(150px, 1fr));
+  gap: $spacing-md;
+  margin-top: $spacing-lg;
+}
+
+.imageItem {
+  position: relative;
+  aspect-ratio: 1;
+  border-radius: $border-radius-md;
+  overflow: hidden;
+  background: $bg-primary;
+  border: 2px solid $border-color;
+
+  img {
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+  }
+
+  &:hover .imageActions {
+    opacity: 1;
+  }
+}
+
+.mainBadge {
+  position: absolute;
+  top: $spacing-xs;
+  left: $spacing-xs;
+  padding: $spacing-xs $spacing-sm;
+  background: $primary-color;
+  color: white;
+  font-size: $font-xs;
+  font-weight: 600;
+  border-radius: $border-radius-sm;
+}
+
+.imageActions {
+  position: absolute;
+  bottom: 0;
+  left: 0;
+  right: 0;
+  display: flex;
+  gap: $spacing-xs;
+  padding: $spacing-xs;
+  background: rgba(0, 0, 0, 0.7);
+  opacity: 0;
+  transition: $transition-fast;
+}
+
+.actionButton {
+  flex: 1;
+  color: white;
+  padding: $spacing-xs;
+  min-width: unset;
+
+  &:hover {
+    background: rgba(255, 255, 255, 0.2);
+  }
+
+  &:disabled {
+    opacity: 0.3;
+    cursor: not-allowed;
+  }
+}

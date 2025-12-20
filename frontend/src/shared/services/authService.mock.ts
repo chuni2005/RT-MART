@@ -8,8 +8,8 @@ import {
   AuthResponse,
   ValidateTokenResponse,
   GetUserResponse,
-  LogoutResponse
-} from '@/types';
+  LogoutResponse,
+} from "@/types";
 
 interface MockUser extends User {
   password: string;
@@ -25,15 +25,29 @@ const mockUsers: MockUser[] = [
     phone: "0912-345-678",
     password: "Test1234",
     avatar: "https://media.tenor.com/fGLpFBW-QBoAAAAe/memecat.png",
+    role: "buyer",
   },
   {
     id: "2",
+    loginId: "seller01",
+    name: "賣家用戶",
+    email: "seller@rtmart.com",
+    phone: "0933-222-111",
+    password: "Seller1234",
+    avatar:
+      "https://i.pinimg.com/1200x/00/79/b7/0079b7d0d38bc285def998d2aacfb7e5.jpg",
+    role: "seller",
+  },
+  {
+    id: "3",
     loginId: "admin",
     name: "管理員",
     email: "admin@rtmart.com",
     phone: "0987-654-321",
     password: "Admin1234",
-    avatar: "https://media.tenor.com/fGLpFBW-QBoAAAAe/memecat.png",
+    avatar:
+      "https://i0.wp.com/suddenlycat.com/wp-content/uploads/2020/09/SC-Blog-Background-v1-1.jpg?w=1024&ssl=1",
+    role: "admin",
   },
 ];
 
@@ -55,17 +69,17 @@ export const mockLogin = async (
         const mockToken = `mock_token_${Date.now()}`;
 
         // 儲存到 localStorage 模擬登入狀態
-        localStorage.setItem('mockAuthToken', mockToken);
-        localStorage.setItem('mockUser', JSON.stringify(userWithoutPassword));
+        localStorage.setItem("mockAuthToken", mockToken);
+        localStorage.setItem("mockUser", JSON.stringify(userWithoutPassword));
 
         resolve({
           success: true,
-          message: '登入成功!',
+          message: "登入成功!",
           user: userWithoutPassword,
           token: mockToken,
         });
       } else {
-        reject(new Error('登入失敗，請檢查賬號密碼'));
+        reject(new Error("登入失敗，請檢查賬號密碼"));
       }
     }, 500); // 模擬網絡延遲
   });
@@ -89,7 +103,7 @@ export const mockRegister = async (
       );
 
       if (existingUser) {
-        reject(new Error('用戶已存在'));
+        reject(new Error("用戶已存在"));
         return;
       }
 
@@ -102,6 +116,7 @@ export const mockRegister = async (
         phone,
         password,
         avatar: "https://media.tenor.com/fGLpFBW-QBoAAAAe/memecat.png",
+        role: "buyer",
       };
 
       mockUsers.push(newUser);
@@ -109,12 +124,12 @@ export const mockRegister = async (
       const { password: _, ...userWithoutPassword } = newUser;
       const mockToken = `mock_token_${Date.now()}`;
 
-      localStorage.setItem('mockAuthToken', mockToken);
-      localStorage.setItem('mockUser', JSON.stringify(userWithoutPassword));
+      localStorage.setItem("mockAuthToken", mockToken);
+      localStorage.setItem("mockUser", JSON.stringify(userWithoutPassword));
 
       resolve({
         success: true,
-        message: '註冊成功!',
+        message: "註冊成功!",
         user: userWithoutPassword,
         token: mockToken,
       });
@@ -128,12 +143,12 @@ export const mockRegister = async (
 export const mockLogout = async (): Promise<LogoutResponse> => {
   return new Promise((resolve) => {
     setTimeout(() => {
-      localStorage.removeItem('mockAuthToken');
-      localStorage.removeItem('mockUser');
+      localStorage.removeItem("mockAuthToken");
+      localStorage.removeItem("mockUser");
 
       resolve({
         success: true,
-        message: '登出成功',
+        message: "登出成功",
       });
     }, 300);
   });
@@ -145,11 +160,11 @@ export const mockLogout = async (): Promise<LogoutResponse> => {
 export const mockGetCurrentUser = async (): Promise<GetUserResponse> => {
   return new Promise((resolve, reject) => {
     setTimeout(() => {
-      const token = localStorage.getItem('mockAuthToken');
-      const userStr = localStorage.getItem('mockUser');
+      const token = localStorage.getItem("mockAuthToken");
+      const userStr = localStorage.getItem("mockUser");
 
       if (!token || !userStr) {
-        reject(new Error('未登入'));
+        reject(new Error("未登入"));
         return;
       }
 
@@ -160,7 +175,7 @@ export const mockGetCurrentUser = async (): Promise<GetUserResponse> => {
           user,
         });
       } catch {
-        reject(new Error('取得用戶資訊失敗'));
+        reject(new Error("取得用戶資訊失敗"));
       }
     }, 300);
   });
@@ -172,8 +187,8 @@ export const mockGetCurrentUser = async (): Promise<GetUserResponse> => {
 export const mockValidateToken = async (): Promise<ValidateTokenResponse> => {
   return new Promise((resolve) => {
     setTimeout(() => {
-      const token = localStorage.getItem('mockAuthToken');
-      const userStr = localStorage.getItem('mockUser');
+      const token = localStorage.getItem("mockAuthToken");
+      const userStr = localStorage.getItem("mockUser");
 
       resolve({
         success: true,
