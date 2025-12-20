@@ -157,11 +157,15 @@ function DiscountList() {
                   <Icon icon="calendar" />
                   <div className={styles.periodText}>
                     <div>
-                      {new Date(discount.startDatetime).toLocaleDateString('zh-TW')}
+                      {new Date(discount.startDatetime).toLocaleDateString(
+                        "zh-TW"
+                      )}
                     </div>
                     <div>~</div>
                     <div>
-                      {new Date(discount.endDatetime).toLocaleDateString('zh-TW')}
+                      {new Date(discount.endDatetime).toLocaleDateString(
+                        "zh-TW"
+                      )}
                     </div>
                   </div>
                 </div>
@@ -173,8 +177,10 @@ function DiscountList() {
                       className={styles.usageProgress}
                       style={{
                         width: discount.usageLimit
-                          ? `${(discount.usageCount / discount.usageLimit) * 100}%`
-                          : '0%',
+                          ? `${
+                              (discount.usageCount / discount.usageLimit) * 100
+                            }%`
+                          : "0%",
                       }}
                     />
                   </div>
@@ -192,7 +198,7 @@ function DiscountList() {
                       navigate(`/seller/discount/edit/${discount.discountId}`)
                     }
                   >
-                    <Icon icon="edit" />
+                    <Icon icon="pen-to-square" />
                     編輯
                   </Button>
                   <Button
@@ -201,8 +207,10 @@ function DiscountList() {
                       handleToggleStatus(discount.discountId, discount.isActive)
                     }
                   >
-                    <Icon icon={discount.isActive ? 'toggle-on' : 'toggle-off'} />
-                    {discount.isActive ? '停用' : '啟用'}
+                    <Icon
+                      icon={discount.isActive ? "toggle-on" : "toggle-off"}
+                    />
+                    {discount.isActive ? "停用" : "啟用"}
                   </Button>
                   <Button
                     variant="outline"
