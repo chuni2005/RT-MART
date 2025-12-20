@@ -12,6 +12,7 @@ import {
 import { CartsService } from './carts.service';
 import { AddToCartDto } from './dto/add-to-cart.dto';
 import { UpdateCartItemDto } from './dto/update-cart-item.dto';
+import { BatchUpdateCartItemsDto } from './dto/batch-update-cart-items.dto';
 import { JwtAccessGuard } from '../auth/guards/jwt-auth.guard';
 import type { AuthRequest } from '../common/types';
 
@@ -35,6 +36,17 @@ export class CartsController {
     return await this.cartsService.addToCart(req.user.userId, addToCartDto);
   }
 
+  @Patch('items/batch')
+  async batchUpdateCartItems(
+    @Req() req: AuthRequest,
+    @Body() batchDto: BatchUpdateCartItemsDto,
+  ) {
+    return await this.cartsService.batchUpdateCartItems(
+      req.user.userId,
+      batchDto,
+    );
+  }
+
   @Patch('items/:cartItemId')
   async updateCartItem(
     @Req() req: AuthRequest,
@@ -54,6 +66,12 @@ export class CartsController {
     @Param('cartItemId') cartItemId: string,
   ) {
     return await this.cartsService.removeFromCart(req.user.userId, cartItemId);
+  }
+
+  @Delete('selected')
+  async removeSelectedItems(@Req() req: AuthRequest) {
+    await this.cartsService.removeSelectedItems(req.user.userId);
+    return { message: 'Selected items removed successfully' };
   }
 
   @Delete()

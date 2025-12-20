@@ -9,6 +9,7 @@ import { Cart } from './entities/cart.entity';
 import { CartItem } from './entities/cart-item.entity';
 import { AddToCartDto } from './dto/add-to-cart.dto';
 import { UpdateCartItemDto } from './dto/update-cart-item.dto';
+import { BatchUpdateCartItemsDto } from './dto/batch-update-cart-items.dto';
 import { InventoryService } from '../inventory/inventory.service';
 
 @Injectable()
@@ -29,6 +30,7 @@ export class CartsService {
         'items.product',
         'items.product.images',
         'items.product.store',
+        'items.product.inventory',
       ],
     });
 
@@ -61,8 +63,11 @@ export class CartsService {
     }
 
     if (existingItem) {
-      // Update quantity
+      // Update quantity and selected status
       existingItem.quantity += addToCartDto.quantity;
+      if (addToCartDto.selected !== undefined) {
+        existingItem.selected = addToCartDto.selected;
+      }
       await this.cartItemRepository.save(existingItem);
     } else {
       // Create new cart item
@@ -70,6 +75,7 @@ export class CartsService {
         cartId: cart.cartId,
         productId: addToCartDto.productId,
         quantity: addToCartDto.quantity,
+        selected: addToCartDto.selected ?? true, // Default to true if not provided
       });
       await this.cartItemRepository.save(cartItem);
     }
@@ -92,18 +98,45 @@ export class CartsService {
       throw new NotFoundException('Cart item not found');
     }
 
-    // Check stock availability
-    const isAvailable = await this.inventoryService.checkStockAvailability(
-      cartItem.productId,
-      updateDto.quantity,
-    );
+    // Check stock availability only if quantity is being updated
+    if (updateDto.quantity !== undefined) {
+      const isAvailable = await this.inventoryService.checkStockAvailability(
+        cartItem.productId,
+        updateDto.quantity,
+      );
 
-    if (!isAvailable) {
-      throw new BadRequestException('Insufficient stock for this product');
+      if (!isAvailable) {
+        throw new BadRequestException('Insufficient stock for this product');
+      }
+      cartItem.quantity = updateDto.quantity;
     }
 
-    cartItem.quantity = updateDto.quantity;
+    // Update selected status if provided
+    if (updateDto.selected !== undefined) {
+      cartItem.selected = updateDto.selected;
+    }
+
     await this.cartItemRepository.save(cartItem);
+
+    return await this.getOrCreateCart(userId);
+  }
+
+  async batchUpdateCartItems(
+    userId: string,
+    batchDto: BatchUpdateCartItemsDto,
+  ): Promise<Cart> {
+    const cart = await this.getOrCreateCart(userId);
+
+    for (const itemUpdate of batchDto.items) {
+      const cartItem = await this.cartItemRepository.findOne({
+        where: { cartItemId: itemUpdate.cartItemId, cartId: cart.cartId },
+      });
+
+      if (cartItem) {
+        cartItem.selected = itemUpdate.selected;
+        await this.cartItemRepository.save(cartItem);
+      }
+    }
 
     return await this.getOrCreateCart(userId);
   }
@@ -129,20 +162,35 @@ export class CartsService {
     await this.cartItemRepository.delete({ cartId: cart.cartId });
   }
 
+  async removeSelectedItems(userId: string): Promise<void> {
+    const cart = await this.getOrCreateCart(userId);
+    await this.cartItemRepository.delete({
+      cartId: cart.cartId,
+      selected: true,
+    });
+  }
+
   async getCartSummary(userId: string): Promise<{
     cart: Cart;
     totalItems: number;
     totalAmount: number;
+    selectedTotalAmount: number;
   }> {
     const cart = await this.getOrCreateCart(userId);
 
     let totalItems = 0;
     let totalAmount = 0;
+    let selectedTotalAmount = 0;
 
     if (cart.items) {
       for (const item of cart.items) {
+        const itemSubtotal = Number(item.product.price) * item.quantity;
         totalItems += item.quantity;
-        totalAmount += Number(item.product.price) * item.quantity;
+        totalAmount += itemSubtotal;
+
+        if (item.selected) {
+          selectedTotalAmount += itemSubtotal;
+        }
       }
     }
 
@@ -150,6 +198,7 @@ export class CartsService {
       cart,
       totalItems,
       totalAmount,
+      selectedTotalAmount,
     };
   }
 }
