@@ -1,8 +1,6 @@
 import { MigrationInterface, QueryRunner } from 'typeorm';
 
-export class CreateCartHistoryTable20251116030010
-  implements MigrationInterface
-{
+export class CreateCartHistoryTable20251116030010 implements MigrationInterface {
   public async up(queryRunner: QueryRunner): Promise<void> {
     await queryRunner.query(`
       CREATE TABLE CartHistory (

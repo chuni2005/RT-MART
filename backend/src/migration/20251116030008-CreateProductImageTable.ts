@@ -1,8 +1,6 @@
 import { MigrationInterface, QueryRunner } from 'typeorm';
 
-export class CreateProductImageTable20251116030008
-  implements MigrationInterface
-{
+export class CreateProductImageTable20251116030008 implements MigrationInterface {
   public async up(queryRunner: QueryRunner): Promise<void> {
     await queryRunner.query(`
       CREATE TABLE ProductImage (
