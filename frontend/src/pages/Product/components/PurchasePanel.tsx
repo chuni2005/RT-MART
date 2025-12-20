@@ -18,7 +18,7 @@ interface AlertState {
   message: string;
 }
 
-function PurchasePanel({ stock, productId, productData }: PurchasePanelProps) {
+function PurchasePanel({ stock, productId }: PurchasePanelProps) {
   const [quantity, setQuantity] = useState<number | string>(1);
   const [alert, setAlert] = useState<AlertState | null>(null);
   const [isAdding, setIsAdding] = useState(false);

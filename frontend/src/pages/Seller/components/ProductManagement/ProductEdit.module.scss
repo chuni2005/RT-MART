@@ -1,0 +1,122 @@
+.productEdit {
+  padding: $spacing-lg;
+
+  @include mobile {
+    padding: $spacing-md;
+  }
+}
+
+.header {
+  @include flex-center;
+  position: relative;
+  margin-bottom: $spacing-lg;
+}
+
+.backButton {
+  position: absolute;
+  left: 0;
+}
+
+.pageTitle {
+  font-size: $font-3xl;
+  font-weight: 700;
+  color: $text-primary;
+}
+
+.formContainer {
+  max-width: 900px;
+  background: $bg-secondary;
+  border-radius: $border-radius-lg;
+  padding: $spacing-xl;
+
+  @include mobile {
+    padding: $spacing-lg;
+  }
+}
+
+.section {
+  margin-bottom: $spacing-xl;
+
+  &:last-of-type {
+    margin-bottom: 0;
+  }
+}
+
+.sectionTitle {
+  font-size: $font-xl;
+  font-weight: 600;
+  color: $text-primary;
+  margin-bottom: $spacing-lg;
+  padding-bottom: $spacing-md;
+  border-bottom: 2px solid $border-color;
+}
+
+.formGroup {
+  margin-bottom: $spacing-lg;
+}
+
+.label {
+  display: block;
+  font-size: $font-sm;
+  font-weight: 500;
+  color: $text-primary;
+  margin-bottom: $spacing-sm;
+}
+
+.required {
+  color: $error-color;
+}
+
+.textarea {
+  width: 100%;
+  padding: $spacing-md;
+  border: 1px solid $border-color;
+  border-radius: $border-radius-md;
+  font-family: inherit;
+  font-size: $font-md;
+  color: $text-primary;
+  background: $bg-primary;
+  resize: vertical;
+  transition: $transition-fast;
+
+  &:focus {
+    outline: none;
+    border-color: $primary-color;
+  }
+
+  &::placeholder {
+    color: $text-tertiary;
+  }
+}
+
+.row {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: $spacing-md;
+
+  @include mobile {
+    grid-template-columns: 1fr;
+  }
+}
+
+.errorText {
+  display: block;
+  font-size: $font-xs;
+  color: $error-color;
+  margin-top: $spacing-xs;
+}
+
+.actions {
+  @include flex-center;
+  justify-content: flex-end;
+  gap: $spacing-md;
+  padding-top: $spacing-lg;
+  border-top: 1px solid $border-color;
+}
+
+.loading {
+  @include flex-center;
+  min-height: 400px;
+  font-size: $font-lg;
+  color: $text-secondary;
+}

@@ -1,0 +1,77 @@
+@use "sass:color";
+
+.ordersList {
+  overflow-x: auto;
+}
+
+.ordersTable {
+  width: 100%;
+  border-collapse: collapse;
+  background: $bg-primary;
+  border-radius: $border-radius-md;
+
+  thead {
+    background: color.adjust($bg-primary, $lightness: -3%);
+
+    th {
+      padding: $spacing-md;
+      text-align: left;
+      font-size: $font-sm;
+      font-weight: 600;
+      color: $text-secondary;
+      white-space: nowrap;
+    }
+  }
+
+  tbody {
+    tr {
+      cursor: pointer;
+      transition: $transition-fast;
+      border-bottom: 1px solid $border-color;
+
+      &:last-child {
+        border-bottom: none;
+      }
+
+      &:hover {
+        background: color.adjust($bg-primary, $lightness: -2%);
+      }
+
+      td {
+        padding: $spacing-md;
+        font-size: $font-sm;
+        color: $text-primary;
+      }
+    }
+  }
+}
+
+.orderId {
+  font-family: monospace;
+  color: $text-secondary;
+}
+
+.amount {
+  font-weight: 600;
+  color: $primary-color;
+}
+
+.status {
+  font-weight: 500;
+}
+
+.arrow {
+  color: $text-tertiary;
+}
+
+.empty {
+  @include flex-center;
+  flex-direction: column;
+  padding: $spacing-xl;
+  gap: $spacing-md;
+  color: $text-secondary;
+
+  svg {
+    font-size: $font-3xl;
+  }
+}

@@ -1,0 +1,228 @@
+.orderDetail {
+  padding: $spacing-lg;
+
+  @include mobile {
+    padding: $spacing-md;
+  }
+}
+
+.header {
+  @include flex-center;
+  position: relative;
+  margin-bottom: $spacing-lg;
+}
+
+.backButton {
+  position: absolute;
+  left: 0;
+}
+
+.pageTitle {
+  font-size: $font-3xl;
+  font-weight: 700;
+  color: $text-primary;
+}
+
+.content {
+  max-width: 900px;
+  display: flex;
+  flex-direction: column;
+  gap: $spacing-lg;
+}
+
+.section {
+  background: $bg-secondary;
+  border-radius: $border-radius-lg;
+  padding: $spacing-xl;
+
+  @include mobile {
+    padding: $spacing-lg;
+  }
+}
+
+.sectionHeader {
+  @include flex-between;
+  margin-bottom: $spacing-lg;
+}
+
+.sectionTitle {
+  font-size: $font-xl;
+  font-weight: 600;
+  color: $text-primary;
+  margin-bottom: $spacing-lg;
+}
+
+.status {
+  font-weight: 600;
+  font-size: $font-lg;
+}
+
+.infoGrid {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+  gap: $spacing-lg;
+}
+
+.infoItem {
+  display: flex;
+  flex-direction: column;
+  gap: $spacing-xs;
+}
+
+.label {
+  font-size: $font-sm;
+  color: $text-secondary;
+}
+
+.value {
+  font-size: $font-md;
+  font-weight: 500;
+  color: $text-primary;
+}
+
+.noteBox {
+  @include flex(flex-start, center);
+  gap: $spacing-md;
+  margin-top: $spacing-lg;
+  padding: $spacing-md;
+  background: $bg-primary;
+  border-radius: $border-radius-md;
+  border-left: 4px solid $primary-color;
+
+  svg {
+    color: $primary-color;
+    font-size: $font-xl;
+  }
+
+  strong {
+    display: block;
+    margin-bottom: $spacing-xs;
+    color: $text-primary;
+  }
+
+  p {
+    color: $text-secondary;
+    margin: 0;
+  }
+}
+
+.addressBox {
+  display: flex;
+  flex-direction: column;
+  align-items: flex-start;
+  gap: $spacing-md;
+  padding: $spacing-lg;
+  background: $bg-primary;
+  border-radius: $border-radius-md;
+}
+
+.addressItem {
+  @include flex-center;
+  gap: $spacing-md;
+  font-size: $font-md;
+  color: $text-primary;
+
+  svg {
+    color: $primary-color;
+    width: 20px;
+  }
+}
+
+.productList {
+  display: flex;
+  flex-direction: column;
+  gap: $spacing-md;
+}
+
+.productItem {
+  @include flex-center;
+  gap: $spacing-md;
+  padding: $spacing-md;
+  background: $bg-primary;
+  border-radius: $border-radius-md;
+}
+
+.productImage {
+  width: 80px;
+  height: 80px;
+  object-fit: cover;
+  border-radius: $border-radius-md;
+}
+
+.productInfo {
+  flex: 1;
+  min-width: 0;
+}
+
+.productName {
+  font-size: $font-md;
+  font-weight: 500;
+  color: $text-primary;
+  margin-bottom: $spacing-sm;
+}
+
+.productMeta {
+  @include flex-center;
+  gap: $spacing-md;
+  font-size: $font-sm;
+  color: $text-secondary;
+}
+
+.productTotal {
+  font-size: $font-lg;
+  font-weight: 600;
+  color: $primary-color;
+}
+
+.priceList {
+  display: flex;
+  flex-direction: column;
+  gap: $spacing-md;
+  padding: $spacing-lg;
+  background: $bg-primary;
+  border-radius: $border-radius-md;
+}
+
+.priceItem {
+  @include flex-between;
+  font-size: $font-md;
+  color: $text-secondary;
+}
+
+.discount {
+  color: $success-color;
+}
+
+.priceTotal {
+  @include flex-between;
+  padding-top: $spacing-md;
+  border-top: 2px solid $border-color;
+  font-size: $font-lg;
+  font-weight: 600;
+  color: $text-primary;
+}
+
+.totalAmount {
+  font-size: $font-2xl;
+  color: $primary-color;
+}
+
+.statusManagement {
+  display: flex;
+  flex-direction: column;
+  gap: $spacing-md;
+}
+
+.hint {
+  font-size: $font-sm;
+  color: $text-secondary;
+  margin: 0;
+}
+
+.loading,
+.error {
+  @include flex-center;
+  min-height: 400px;
+  font-size: $font-lg;
+  color: $text-secondary;
+}

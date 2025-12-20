@@ -17,6 +17,12 @@ import ProfilePage from "./pages/UserCenter/components/ProfilePage";
 import AddressPage from "./pages/UserCenter/components/AddressPage";
 import OrderListPage from "./pages/UserCenter/components/OrderListPage";
 import OrderDetailPage from "./pages/UserCenter/components/OrderDetailPage";
+import SellerCenter from "./pages/Seller";
+import Dashboard from "./pages/Seller/components/Dashboard";
+import StoreSettings from "./pages/Seller/components/StoreSettings";
+import { ProductList, ProductEdit } from "./pages/Seller/components/ProductManagement";
+import { OrderList as SellerOrderList, OrderDetail as SellerOrderDetail } from "./pages/Seller/components/OrderManagement";
+import { DiscountList, DiscountEdit } from "./pages/Seller/components/DiscountManagement";
 
 // Header Wrapper Component to handle conditional rendering
 function AppHeader() {
@@ -80,15 +86,34 @@ function AppContent() {
             <Route path="orders/:order_id" element={<OrderDetailPage />} />
           </Route>
 
-          {/* Seller Pages */}
-          <Route path="/seller/center" element={<h2>賣家中心首頁開發中...</h2>} />
-          <Route path="/seller/store-settings" element={<h2>商店設定頁面開發中...</h2>} />
-          <Route path="/seller/products" element={<h2>商品管理頁面開發中...</h2>} />
-          <Route path="/seller/product/new" element={<h2>新增商品頁面開發中...</h2>} />
-          <Route path="/seller/product/edit/:product_id" element={<h2>商品編輯頁面開發中...</h2>} />
-          <Route path="/seller/orders" element={<h2>賣家訂單管理頁面開發中...</h2>} />
-          <Route path="/seller/order/:order_id" element={<h2>賣家訂單詳情頁面開發中...</h2>} />
-          <Route path="/seller/discounts" element={<h2>折扣管理頁面開發中...</h2>} />
+          {/* Seller Center */}
+          <Route path="/seller/*"
+            element={
+              <ProtectedRoute>
+                <SellerCenter />
+              </ProtectedRoute>
+            }
+          >
+            {/* Dashboard */}
+            <Route path="center" element={<Dashboard />} />
+
+            {/* Store Management */}
+            <Route path="store-settings" element={<StoreSettings />} />
+
+            {/* Product Management */}
+            <Route path="products" element={<ProductList />} />
+            <Route path="product/new" element={<ProductEdit />} />
+            <Route path="product/edit/:productId" element={<ProductEdit />} />
+
+            {/* Order Management */}
+            <Route path="orders" element={<SellerOrderList />} />
+            <Route path="order/:orderId" element={<SellerOrderDetail />} />
+
+            {/* Discount Management */}
+            <Route path="discounts" element={<DiscountList />} />
+            <Route path="discount/new" element={<DiscountEdit />} />
+            <Route path="discount/edit/:discountId" element={<DiscountEdit />} />
+          </Route>
 
           {/* Admin Pages */}
           <Route path="/admin" element={<h2>管理員首頁開發中...</h2>} />

@@ -1,0 +1,186 @@
+@use "sass:color";
+.orderList {
+  padding: $spacing-lg;
+
+  @include mobile {
+    padding: $spacing-md;
+  }
+}
+
+.pageTitle {
+  font-size: $font-3xl;
+  font-weight: 700;
+  color: $text-primary;
+  margin-bottom: $spacing-lg;
+}
+
+.filters {
+  @include flex-between;
+  gap: $spacing-md;
+  margin-bottom: $spacing-lg;
+
+  @include mobile {
+    flex-direction: column;
+  }
+}
+
+.searchBox {
+  position: relative;
+  flex: 1;
+  max-width: 400px;
+
+  @include mobile {
+    max-width: 100%;
+  }
+}
+
+.searchIcon {
+  position: absolute;
+  left: $spacing-md;
+  top: 50%;
+  transform: translateY(-50%);
+  color: $text-tertiary;
+}
+
+.searchInput {
+  width: 100%;
+  padding: $spacing-sm $spacing-md $spacing-sm calc($spacing-md * 2 + 16px);
+  border: 1px solid $border-color;
+  border-radius: $border-radius-md;
+  font-size: $font-md;
+  color: $text-primary;
+  background: $bg-secondary;
+
+  &:focus {
+    outline: none;
+    border-color: $primary-color;
+  }
+
+  &::placeholder {
+    color: $text-tertiary;
+  }
+}
+
+.ordersContainer {
+  display: flex;
+  flex-direction: column;
+  gap: $spacing-lg;
+}
+
+.orderCard {
+  background: $bg-secondary;
+  border-radius: $border-radius-lg;
+  overflow: hidden;
+  transition: $transition-fast;
+
+  &:hover {
+    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
+  }
+}
+
+.orderHeader {
+  @include flex-between;
+  padding: $spacing-lg;
+  border-bottom: 1px solid $border-color;
+}
+
+.orderInfo {
+  display: flex;
+  flex-direction: column;
+  gap: $spacing-xs;
+}
+
+.orderNumber {
+  font-family: monospace;
+  font-size: $font-lg;
+  font-weight: 600;
+  color: $text-primary;
+}
+
+.orderDate {
+  font-size: $font-sm;
+  color: $text-secondary;
+}
+
+.status {
+  font-weight: 600;
+  font-size: $font-md;
+}
+
+.orderItems {
+  padding: $spacing-lg;
+  display: flex;
+  flex-direction: column;
+  gap: $spacing-md;
+}
+
+.orderItem {
+  @include flex-center;
+  gap: $spacing-md;
+}
+
+.productImage {
+  width: 60px;
+  height: 60px;
+  object-fit: cover;
+  border-radius: $border-radius-md;
+}
+
+.productInfo {
+  flex: 1;
+  min-width: 0;
+}
+
+.productName {
+  font-size: $font-md;
+  font-weight: 500;
+  color: $text-primary;
+  margin-bottom: $spacing-xs;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+
+.productMeta {
+  @include flex-center;
+  gap: $spacing-md;
+  font-size: $font-sm;
+  color: $text-secondary;
+}
+
+.orderFooter {
+  @include flex-between;
+  padding: $spacing-lg;
+  border-top: 1px solid $border-color;
+  background: color.adjust($bg-secondary, $lightness: 2%);
+
+  @include mobile {
+    flex-direction: column;
+    align-items: flex-start;
+    gap: $spacing-md;
+  }
+}
+
+.totalAmount {
+  font-size: $font-md;
+  color: $text-primary;
+
+  .amount {
+    font-size: $font-xl;
+    font-weight: 700;
+    color: $primary-color;
+    margin-left: $spacing-sm;
+  }
+}
+
+.orderActions {
+  @include flex-center;
+  gap: $spacing-md;
+}
+
+.loading {
+  @include flex-center;
+  min-height: 400px;
+  font-size: $font-lg;
+  color: $text-secondary;
+}

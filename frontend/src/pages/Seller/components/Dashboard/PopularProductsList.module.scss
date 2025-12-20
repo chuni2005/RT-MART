@@ -1,0 +1,74 @@
+@use "sass:color";
+.productsList {
+  display: flex;
+  flex-direction: column;
+  gap: $spacing-sm;
+}
+
+.productItem {
+  @include flex-center;
+  gap: $spacing-md;
+  padding: $spacing-md;
+  background: $bg-primary;
+  border-radius: $border-radius-md;
+  cursor: pointer;
+  transition: $transition-fast;
+
+  &:hover {
+    background: color.adjust($bg-primary, $lightness: -2%);
+    transform: translateX(4px);
+  }
+}
+
+.rank {
+  font-size: $font-xl;
+  font-weight: 700;
+  color: $primary-color;
+  min-width: 40px;
+  text-align: center;
+}
+
+.productImage {
+  width: 60px;
+  height: 60px;
+  object-fit: cover;
+  border-radius: $border-radius-md;
+}
+
+.productInfo {
+  flex: 1;
+  min-width: 0;
+}
+
+.productName {
+  font-size: $font-md;
+  font-weight: 600;
+  color: $text-primary;
+  margin-bottom: $spacing-xs;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+
+.productStats {
+  @include flex-center;
+  gap: $spacing-md;
+  font-size: $font-sm;
+  color: $text-secondary;
+}
+
+.arrow {
+  color: $text-tertiary;
+}
+
+.empty {
+  @include flex-center;
+  flex-direction: column;
+  padding: $spacing-xl;
+  gap: $spacing-md;
+  color: $text-secondary;
+
+  svg {
+    font-size: $font-3xl;
+  }
+}

@@ -1,12 +1,12 @@
 // User related types
 export interface User {
-  id: string;
   userId: string;
   loginId: string;
   name: string;
   email: string;
   phone: string;
   avatar?: string;
+  role: 'buyer' | 'seller' | 'admin';  
 }
 
 // Auth API response types
