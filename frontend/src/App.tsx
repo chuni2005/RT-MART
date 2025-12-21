@@ -23,6 +23,7 @@ import StoreSettings from "./pages/Seller/components/StoreSettings";
 import { ProductList, ProductEdit } from "./pages/Seller/components/ProductManagement";
 import { OrderList as SellerOrderList, OrderDetail as SellerOrderDetail } from "./pages/Seller/components/OrderManagement";
 import { DiscountList, DiscountEdit } from "./pages/Seller/components/DiscountManagement";
+import AdminCenter from "./pages/Admin";
 
 // Header Wrapper Component to handle conditional rendering
 function AppHeader() {
@@ -115,13 +116,17 @@ function AppContent() {
             <Route path="discount/edit/:discountId" element={<DiscountEdit />} />
           </Route>
 
-          {/* Admin Pages */}
-          <Route path="/admin" element={<h2>管理員首頁開發中...</h2>} />
-          <Route path="/admin/users" element={<h2>使用者管理頁面開發中...</h2>} />
-          <Route path="/admin/sellers" element={<h2>賣家審核頁面開發中...</h2>} />
-          <Route path="/admin/products" element={<h2>商品審核頁面開發中...</h2>} />
-          <Route path="/admin/disputes" element={<h2>訂單爭議處理頁面開發中...</h2>} />
-          <Route path="/admin/discounts" element={<h2>系統折扣設定頁面開發中...</h2>} />
+          {/* Admin Center */}
+          <Route
+            path="/admin/*"
+            element={
+              <ProtectedRoute>
+                <AdminCenter />
+              </ProtectedRoute>
+            }
+          >
+            
+          </Route>
         </Routes>
       </main>
     </div>

@@ -1,0 +1,34 @@
+.adminCenter {
+  max-width: 1400px;
+  margin: 0 auto;
+  padding: $spacing-lg;
+  display: flex;
+  gap: $spacing-lg;
+
+  @include mobile {
+    flex-direction: column;
+    padding: $spacing-md;
+  }
+}
+
+.mainContent {
+  flex: 1;
+  min-width: 0;
+}
+
+.accessDenied {
+  @include flex-center;
+  flex-direction: column;
+  min-height: 400px;
+  text-align: center;
+  gap: $spacing-md;
+
+  h2 {
+    font-size: $font-2xl;
+    color: $text-primary;
+  }
+
+  p {
+    color: $text-secondary;
+  }
+}
