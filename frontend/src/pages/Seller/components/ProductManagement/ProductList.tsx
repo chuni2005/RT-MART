@@ -1,26 +1,29 @@
-import { useState, useEffect } from 'react';
-import { useNavigate } from 'react-router-dom';
-import Button from '@/shared/components/Button';
-import Icon from '@/shared/components/Icon';
-import Select from '@/shared/components/Select';
-import Dialog from '@/shared/components/Dialog';
-import EmptyState from '@/shared/components/EmptyState';
-import sellerService from '@/shared/services/sellerService';
-import { SellerProduct } from '@/types/seller';
-import styles from './ProductList.module.scss';
+import { useState, useEffect } from "react";
+import { useNavigate } from "react-router-dom";
+import Button from "@/shared/components/Button";
+import Icon from "@/shared/components/Icon";
+import Select from "@/shared/components/Select";
+import Dialog from "@/shared/components/Dialog";
+import EmptyState from "@/shared/components/EmptyState";
+import sellerService from "@/shared/services/sellerService";
+import { SellerProduct } from "@/types/seller";
+import styles from "./ProductList.module.scss";
 
 function ProductList() {
   const navigate = useNavigate();
   const [products, setProducts] = useState<SellerProduct[]>([]);
   const [filteredProducts, setFilteredProducts] = useState<SellerProduct[]>([]);
   const [loading, setLoading] = useState(true);
-  const [searchQuery, setSearchQuery] = useState('');
-  const [statusFilter, setStatusFilter] = useState<'all' | 'active' | 'inactive'>('all');
+  const [searchQuery, setSearchQuery] = useState("");
+  const [statusFilter, setStatusFilter] = useState<
+    "all" | "active" | "inactive"
+  >("all");
   const [deleteDialog, setDeleteDialog] = useState<{
     isOpen: boolean;
     productId: string;
     productName: string;
-  }>({ isOpen: false, productId: '', productName: '' });
+    isSubmitting: boolean;
+  }>({ isOpen: false, productId: "", productName: "", isSubmitting: false });
 
   useEffect(() => {
     loadProducts();
@@ -36,7 +39,7 @@ function ProductList() {
       const data = await sellerService.getProducts();
       setProducts(data);
     } catch (error) {
-      console.error('載入商品失敗:', error);
+      console.error("載入商品失敗:", error);
     } finally {
       setLoading(false);
     }
@@ -53,9 +56,9 @@ function ProductList() {
     }
 
     // 狀態篩選
-    if (statusFilter !== 'all') {
+    if (statusFilter !== "all") {
       filtered = filtered.filter((p) =>
-        statusFilter === 'active' ? !p.deletedAt : !!p.deletedAt
+        statusFilter === "active" ? p.isActive : !p.isActive
       );
     }
 
@@ -71,17 +74,29 @@ function ProductList() {
       }
       loadProducts();
     } catch (error) {
-      console.error('更新商品狀態失敗:', error);
+      console.error("更新商品狀態失敗:", error);
     }
   };
 
   const handleDelete = async () => {
+    if (deleteDialog.isSubmitting) return;
+
+    setDeleteDialog((prev) => ({ ...prev, isSubmitting: true }));
     try {
       await sellerService.deleteProduct(deleteDialog.productId);
-      setProducts(products.filter((p) => p.productId !== deleteDialog.productId));
-      setDeleteDialog({ isOpen: false, productId: '', productName: '' });
+      setProducts(
+        products.filter((p) => p.productId !== deleteDialog.productId)
+      );
+      setDeleteDialog({
+        isOpen: false,
+        productId: "",
+        productName: "",
+        isSubmitting: false,
+      });
     } catch (error) {
-      console.error('刪除商品失敗:', error);
+      console.error("刪除商品失敗:", error);
+      setDeleteDialog((prev) => ({ ...prev, isSubmitting: false }));
+      alert("刪除商品失敗，請稍後再試");
     }
   };
 
@@ -89,13 +104,19 @@ function ProductList() {
     return <div className={styles.loading}>載入中...</div>;
   }
 
-  const isActive = (product: SellerProduct) => !product.deletedAt;
+  const isActive = (product: SellerProduct) => product.isActive;
+
+  products.forEach(product => {
+    product.images = [...product.images].sort(
+      (a, b) => a.displayOrder - b.displayOrder
+    );
+  });
 
   return (
     <div className={styles.productList}>
       <div className={styles.header}>
         <h1 className={styles.pageTitle}>商品管理</h1>
-        <Button onClick={() => navigate('/seller/product/new')}>
+        <Button onClick={() => navigate("/seller/product/new")}>
           <Icon icon="plus" />
           新增商品
         </Button>
@@ -116,11 +137,13 @@ function ProductList() {
 
         <Select
           value={statusFilter}
-          onChange={(value) => setStatusFilter(value as 'all' | 'active' | 'inactive')}
+          onChange={(value) =>
+            setStatusFilter(value as "all" | "active" | "inactive")
+          }
           options={[
-            { value: 'all', label: '全部' },
-            { value: 'active', label: '上架中' },
-            { value: 'inactive', label: '已下架' },
+            { value: "all", label: "全部" },
+            { value: "active", label: "上架中" },
+            { value: "inactive", label: "已下架" },
           ]}
         />
       </div>
@@ -138,14 +161,16 @@ function ProductList() {
             <div key={product.productId} className={styles.productCard}>
               <div className={styles.productImage}>
                 <img
-                  src={product.images[0]?.imageUrl || '/placeholder-product.png'}
+                  src={
+                    product.images[0]?.imageUrl || "/placeholder-product.png"
+                  }
                   alt={product.productName}
                 />
                 <div
                   className={styles.statusBadge}
-                  data-status={isActive(product) ? 'active' : 'inactive'}
+                  data-status={isActive(product) ? "active" : "inactive"}
                 >
-                  {isActive(product) ? '上架中' : '已下架'}
+                  {isActive(product) ? "上架中" : "已下架"}
                 </div>
               </div>
 
@@ -162,17 +187,21 @@ function ProductList() {
               <div className={styles.productActions}>
                 <Button
                   variant="outline"
-                  onClick={() => navigate(`/seller/product/edit/${product.productId}`)}
+                  onClick={() =>
+                    navigate(`/seller/product/edit/${product.productId}`)
+                  }
                 >
                   <Icon icon="edit" />
                   編輯
                 </Button>
                 <Button
                   variant="outline"
-                  onClick={() => handleToggleStatus(product.productId, isActive(product))}
+                  onClick={() =>
+                    handleToggleStatus(product.productId, isActive(product))
+                  }
                 >
-                  <Icon icon={isActive(product) ? 'eye-slash' : 'eye'} />
-                  {isActive(product) ? '下架' : '上架'}
+                  <Icon icon={isActive(product) ? "eye-slash" : "eye"} />
+                  {isActive(product) ? "下架" : "上架"}
                 </Button>
                 <Button
                   variant="outline"
@@ -181,6 +210,7 @@ function ProductList() {
                       isOpen: true,
                       productId: product.productId,
                       productName: product.productName,
+                      isSubmitting: false,
                     })
                   }
                 >
@@ -197,27 +227,42 @@ function ProductList() {
       <Dialog
         isOpen={deleteDialog.isOpen}
         onClose={() =>
-          setDeleteDialog({ isOpen: false, productId: '', productName: '' })
+          !deleteDialog.isSubmitting &&
+          setDeleteDialog({
+            isOpen: false,
+            productId: "",
+            productName: "",
+            isSubmitting: false,
+          })
         }
+        onConfirm={handleDelete}
+        variant="warning"
+        message={`確定要刪除商品「${deleteDialog.productName}」嗎？`}
         title="確認刪除"
       >
         <div className={styles.deleteDialog}>
-          <p>確定要刪除商品「{deleteDialog.productName}」嗎？</p>
-          <p className={styles.warning}>此操作無法復原。</p>
           <div className={styles.dialogActions}>
             <Button
               variant="outline"
+              disabled={deleteDialog.isSubmitting}
               onClick={() =>
                 setDeleteDialog({
                   isOpen: false,
-                  productId: '',
-                  productName: '',
+                  productId: "",
+                  productName: "",
+                  isSubmitting: false,
                 })
               }
             >
               取消
             </Button>
-            <Button onClick={handleDelete}>確認刪除</Button>
+            <Button
+              variant="primary"
+              disabled={deleteDialog.isSubmitting}
+              onClick={handleDelete}
+            >
+              {deleteDialog.isSubmitting ? "刪除中..." : "確認刪除"}
+            </Button>
           </div>
         </div>
       </Dialog>
