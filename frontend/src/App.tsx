@@ -24,6 +24,7 @@ import { ProductList, ProductEdit } from "./pages/Seller/components/ProductManag
 import { OrderList as SellerOrderList, OrderDetail as SellerOrderDetail } from "./pages/Seller/components/OrderManagement";
 import { DiscountList, DiscountEdit } from "./pages/Seller/components/DiscountManagement";
 import AdminCenter from "./pages/Admin";
+import AdminDashboard from "./pages/Admin/Dashboard";
 
 // Header Wrapper Component to handle conditional rendering
 function AppHeader() {
@@ -125,7 +126,8 @@ function AppContent() {
               </ProtectedRoute>
             }
           >
-            
+            {/* Dashboard */}
+            <Route path="dashboard" element={<AdminDashboard />} />
           </Route>
         </Routes>
       </main>

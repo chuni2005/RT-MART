@@ -1,0 +1,188 @@
+@use "sass:color";
+
+.dashboard {
+  padding: $spacing-lg;
+}
+
+.pageTitle {
+  font-size: $font-3xl;
+  font-weight: 600;
+  color: $text-primary;
+  margin-bottom: $spacing-xl;
+}
+
+.loading,
+.error {
+  @include flex-center;
+  min-height: 400px;
+  font-size: $font-lg;
+  color: $text-secondary;
+}
+
+// Stats Grid (4 columns, responsive)
+.statsGrid {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
+  gap: $spacing-lg;
+  margin-bottom: $spacing-xxl;
+
+  @include mobile {
+    grid-template-columns: 1fr;
+  }
+}
+
+.statCard {
+  background: $bg-secondary;
+  border-radius: $border-radius-md;
+  padding: $spacing-lg;
+  display: flex;
+  align-items: center;
+  gap: $spacing-lg;
+  border-left: 4px solid;
+  transition: $transition-base;
+
+  &[data-color='blue'] {
+    border-left-color: #3b82f6;
+    .statIcon {
+      color: #3b82f6;
+    }
+  }
+
+  &[data-color='green'] {
+    border-left-color: #10b981;
+    .statIcon {
+      color: #10b981;
+    }
+  }
+
+  &[data-color='purple'] {
+    border-left-color: #8b5cf6;
+    .statIcon {
+      color: #8b5cf6;
+    }
+  }
+
+  &[data-color='orange'] {
+    border-left-color: #f59e0b;
+    .statIcon {
+      color: #f59e0b;
+    }
+  }
+
+  &:hover {
+    box-shadow: $shadow-md;
+    transform: translateY(-2px);
+  }
+}
+
+.statIcon {
+  font-size: $font-3xl;
+}
+
+.statContent {
+  flex: 1;
+}
+
+.statLabel {
+  font-size: $font-sm;
+  color: $text-secondary;
+  margin-bottom: $spacing-xs;
+}
+
+.statValue {
+  font-size: $font-2xl;
+  font-weight: 600;
+  color: $text-primary;
+}
+
+// Charts Section
+.chartsSection {
+  margin-bottom: $spacing-xxl;
+}
+
+.chartsGrid {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(500px, 1fr));
+  gap: $spacing-lg;
+
+  @include mobile {
+    grid-template-columns: 1fr;
+  }
+}
+
+.chartCard {
+  background: $bg-secondary;
+  border-radius: $border-radius-md;
+  padding: $spacing-lg;
+  box-shadow: $shadow-sm;
+  transition: $transition-base;
+
+  &:hover {
+    box-shadow: $shadow-md;
+  }
+}
+
+// Recent Activities
+.recentActivities {
+  background: $bg-secondary;
+  border-radius: $border-radius-md;
+  padding: $spacing-lg;
+}
+
+.sectionTitle {
+  font-size: $font-xl;
+  font-weight: 600;
+  color: $text-primary;
+  margin-bottom: $spacing-lg;
+}
+
+.activitiesList {
+  display: flex;
+  flex-direction: column;
+  gap: $spacing-md;
+}
+
+.activityCard {
+  display: flex;
+  align-items: center;
+  gap: $spacing-md;
+  padding: $spacing-md;
+  background: $bg-tertiary;
+  border-radius: $border-radius-sm;
+  transition: $transition-fast;
+
+  &:hover {
+    background: color.adjust($bg-tertiary, $lightness: -2%);
+  }
+}
+
+.activityIcon {
+  font-size: $font-xl;
+  color: $primary-color;
+}
+
+.activityContent {
+  flex: 1;
+}
+
+.activityMessage {
+  font-size: $font-md;
+  color: $text-primary;
+  margin-bottom: $spacing-xs;
+}
+
+.activityCount {
+  display: inline-block;
+  margin-left: $spacing-sm;
+  padding: 2px 8px;
+  background: $primary-color;
+  color: $text-white;
+  border-radius: $border-radius-sm;
+  font-size: $font-xs;
+  font-weight: 600;
+}
+
+.activityTime {
+  font-size: $font-sm;
+  color: $text-tertiary;
+}
