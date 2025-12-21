@@ -5,6 +5,10 @@ export interface DashboardStats {
   activeSellers: number;
   pendingReviews: number;
   recentActivities: RecentActivity[];
+  // Chart data
+  revenueChartData: ChartDataPoint[];
+  userGrowthChartData: ChartDataPoint[];
+  orderStatusChartData: ChartDataPoint[];
 }
 
 export interface RecentActivity {
@@ -13,6 +17,11 @@ export interface RecentActivity {
   message: string;
   count: number;
   timestamp: string;
+}
+
+export interface ChartDataPoint {
+  label: string;
+  value: number;
 }
 
 // User Type (with admin-specific fields)

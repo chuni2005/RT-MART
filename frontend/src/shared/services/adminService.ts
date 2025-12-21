@@ -372,6 +372,44 @@ const mockDashboardStats: DashboardStats = {
       timestamp: '2025-01-15 18:45',
     },
   ],
+  // 交易額趨勢數據（最近12個月）
+  revenueChartData: [
+    { label: '2024-02', value: 320000 },
+    { label: '2024-03', value: 380000 },
+    { label: '2024-04', value: 420000 },
+    { label: '2024-05', value: 450000 },
+    { label: '2024-06', value: 480000 },
+    { label: '2024-07', value: 510000 },
+    { label: '2024-08', value: 490000 },
+    { label: '2024-09', value: 530000 },
+    { label: '2024-10', value: 560000 },
+    { label: '2024-11', value: 590000 },
+    { label: '2024-12', value: 620000 },
+    { label: '2025-01', value: 650000 },
+  ],
+  // 用戶增長數據（最近12個月）
+  userGrowthChartData: [
+    { label: '2024-02', value: 850 },
+    { label: '2024-03', value: 920 },
+    { label: '2024-04', value: 1050 },
+    { label: '2024-05', value: 980 },
+    { label: '2024-06', value: 1120 },
+    { label: '2024-07', value: 1280 },
+    { label: '2024-08', value: 1150 },
+    { label: '2024-09', value: 1300 },
+    { label: '2024-10', value: 1400 },
+    { label: '2024-11', value: 1520 },
+    { label: '2024-12', value: 1680 },
+    { label: '2025-01', value: 1800 },
+  ],
+  // 訂單狀態分布數據
+  orderStatusChartData: [
+    { label: '已完成', value: 7200 },
+    { label: '配送中', value: 1500 },
+    { label: '處理中', value: 800 },
+    { label: '已取消', value: 350 },
+    { label: '退款中', value: 150 },
+  ],
 };
 
 // 使用者數據
