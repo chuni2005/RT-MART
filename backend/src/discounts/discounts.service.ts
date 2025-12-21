@@ -6,7 +6,7 @@ import {
   ForbiddenException,
 } from '@nestjs/common';
 import { InjectRepository } from '@nestjs/typeorm';
-import { Repository, LessThan, MoreThan } from 'typeorm';
+import { Repository, LessThan, MoreThan, FindOptionsWhere } from 'typeorm';
 import {
   Discount,
   DiscountType,
@@ -46,13 +46,21 @@ export class DiscountsService {
     }
 
     // Validate dates
-    if (createDto.startDatetime >= createDto.endDatetime) {
+    if (new Date(createDto.startDatetime) >= new Date(createDto.endDatetime)) {
       throw new BadRequestException('End date must be after start date');
     }
 
+    // Separate base discount data from specific details
+    const {
+      seasonalDetails,
+      shippingDetails,
+      specialDetails,
+      ...baseDiscountData
+    } = createDto;
+
     // Create base discount
     const discount = this.discountRepository.create({
-      ...createDto,
+      ...baseDiscountData,
       createdByType: CreatedByType.SYSTEM,
       createdById,
     });
@@ -62,42 +70,42 @@ export class DiscountsService {
     // Create type-specific discount
     switch (createDto.discountType) {
       case DiscountType.SEASONAL: {
-        if (!createDto.seasonalDetails) {
+        if (!seasonalDetails) {
           throw new BadRequestException(
             'Seasonal discount details are required',
           );
         }
         const seasonal = this.seasonalRepository.create({
           discountId: savedDiscount.discountId,
-          ...createDto.seasonalDetails,
+          ...seasonalDetails,
         });
         await this.seasonalRepository.save(seasonal);
         break;
       }
 
       case DiscountType.SHIPPING: {
-        if (!createDto.shippingDetails) {
+        if (!shippingDetails) {
           throw new BadRequestException(
             'Shipping discount details are required',
           );
         }
         const shipping = this.shippingRepository.create({
           discountId: savedDiscount.discountId,
-          ...createDto.shippingDetails,
+          ...shippingDetails,
         });
         await this.shippingRepository.save(shipping);
         break;
       }
 
       case DiscountType.SPECIAL: {
-        if (!createDto.specialDetails) {
+        if (!specialDetails) {
           throw new BadRequestException(
             'Special discount details are required',
           );
         }
         const special = this.specialRepository.create({
           discountId: savedDiscount.discountId,
-          ...createDto.specialDetails,
+          ...specialDetails,
         });
         await this.specialRepository.save(special);
         break;
@@ -121,7 +129,7 @@ export class DiscountsService {
     }
 
     // Validate dates
-    if (createDto.startDatetime >= createDto.endDatetime) {
+    if (new Date(createDto.startDatetime) >= new Date(createDto.endDatetime)) {
       throw new BadRequestException('End date must be after start date');
     }
 
@@ -129,9 +137,12 @@ export class DiscountsService {
       throw new ForbiddenException('Seller can only create special discount');
     }
 
+    // Separate base discount data from specific details
+    const { specialDetails, ...baseDiscountData } = createDto;
+
     // Create base discount
     const discount = this.discountRepository.create({
-      ...createDto,
+      ...baseDiscountData,
       createdByType: CreatedByType.SELLER,
       createdById,
     });
@@ -139,12 +150,12 @@ export class DiscountsService {
     const savedDiscount = await this.discountRepository.save(discount);
 
     // Create type-specific discount
-    if (!createDto.specialDetails) {
+    if (!specialDetails) {
       throw new BadRequestException('Special discount details are required');
     }
     const special = this.specialRepository.create({
       discountId: savedDiscount.discountId,
-      ...createDto.specialDetails,
+      ...specialDetails,
     });
     await this.specialRepository.save(special);
     return await this.findOne(savedDiscount.discountId);
@@ -157,7 +168,7 @@ export class DiscountsService {
     const limit = parseInt(queryDto.limit || '10', 10);
     const skip = (page - 1) * limit;
 
-    const where: Record<string, string | boolean> = {};
+    const where: FindOptionsWhere<Discount> = {};
 
     if (queryDto.discountType) {
       where.discountType = queryDto.discountType;
@@ -165,6 +176,14 @@ export class DiscountsService {
 
     if (queryDto.isActive !== undefined) {
       where.isActive = queryDto.isActive;
+    }
+
+    if (queryDto.createdById) {
+      where.createdById = queryDto.createdById;
+    }
+
+    if (queryDto.storeId) {
+      where.specialDiscount = { storeId: queryDto.storeId };
     }
 
     const [data, total] = await this.discountRepository.findAndCount({
@@ -237,13 +256,39 @@ export class DiscountsService {
     }
 
     if (updateDto.startDatetime && updateDto.endDatetime) {
-      if (updateDto.startDatetime >= updateDto.endDatetime) {
+      if (
+        new Date(updateDto.startDatetime) >= new Date(updateDto.endDatetime)
+      ) {
         throw new BadRequestException('End date must be after start date');
       }
     }
 
-    Object.assign(discount, updateDto);
+    // Separate base discount data from specific details
+    const {
+      seasonalDetails,
+      shippingDetails,
+      specialDetails,
+      ...baseDiscountData
+    } = updateDto;
+
+    Object.assign(discount, baseDiscountData);
     await this.discountRepository.save(discount);
+
+    // Update type-specific discount if provided
+    if (seasonalDetails && discount.seasonalDiscount) {
+      Object.assign(discount.seasonalDiscount, seasonalDetails);
+      await this.seasonalRepository.save(discount.seasonalDiscount);
+    }
+
+    if (shippingDetails && discount.shippingDiscount) {
+      Object.assign(discount.shippingDiscount, shippingDetails);
+      await this.shippingRepository.save(discount.shippingDiscount);
+    }
+
+    if (specialDetails && discount.specialDiscount) {
+      Object.assign(discount.specialDiscount, specialDetails);
+      await this.specialRepository.save(discount.specialDiscount);
+    }
 
     return await this.findOne(id);
   }
@@ -252,16 +297,55 @@ export class DiscountsService {
     id: string,
     updateDto: UpdateDiscountDto,
   ): Promise<Discount> {
-    const discount = await this.findOne(id);
+    const discount = await this.discountRepository.findOne({
+      where: { discountId: id },
+      relations: [
+        'seasonalDiscount',
+        'shippingDiscount',
+        'specialDiscount',
+        'specialDiscount.store',
+        'specialDiscount.productType',
+      ],
+    });
+
+    if (!discount) {
+      throw new NotFoundException(`Discount with ID ${id} not found`);
+    }
 
     if (updateDto.startDatetime && updateDto.endDatetime) {
-      if (updateDto.startDatetime >= updateDto.endDatetime) {
+      if (
+        new Date(updateDto.startDatetime) >= new Date(updateDto.endDatetime)
+      ) {
         throw new BadRequestException('End date must be after start date');
       }
     }
 
-    Object.assign(discount, updateDto);
+    // Separate base discount data from specific details
+    const {
+      seasonalDetails,
+      shippingDetails,
+      specialDetails,
+      ...baseDiscountData
+    } = updateDto;
+
+    Object.assign(discount, baseDiscountData);
     await this.discountRepository.save(discount);
+
+    // Update type-specific discount if provided
+    if (seasonalDetails && discount.seasonalDiscount) {
+      Object.assign(discount.seasonalDiscount, seasonalDetails);
+      await this.seasonalRepository.save(discount.seasonalDiscount);
+    }
+
+    if (shippingDetails && discount.shippingDiscount) {
+      Object.assign(discount.shippingDiscount, shippingDetails);
+      await this.shippingRepository.save(discount.shippingDiscount);
+    }
+
+    if (specialDetails && discount.specialDiscount) {
+      Object.assign(discount.specialDiscount, specialDetails);
+      await this.specialRepository.save(discount.specialDiscount);
+    }
 
     return await this.findOne(id);
   }

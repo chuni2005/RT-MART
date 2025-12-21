@@ -11,17 +11,13 @@ import {
   Req,
 } from '@nestjs/common';
 import { DiscountsService } from './discounts.service';
-import {
-  CreateDiscountDto,
-  SpecialDiscountDetailsDto,
-} from './dto/create-discount.dto';
+import { CreateDiscountDto } from './dto/create-discount.dto';
 import { UpdateDiscountDto } from './dto/update-discount.dto';
 import { QueryDiscountDto } from './dto/query-discount.dto';
 import { JwtAccessGuard } from '../auth/guards/jwt-auth.guard';
 import { RolesGuard } from '../auth/guards/roles.guard';
 import { Roles } from '../auth/decorators/roles.decorator';
 import { UserRole } from '../users/entities/user.entity';
-import { SpecialDiscount } from './entities/special-discount.entity';
 import type { AuthRequest } from '../common/types';
 
 @Controller('discounts')
@@ -32,18 +28,27 @@ export class DiscountsController {
   @UseGuards(JwtAccessGuard, RolesGuard)
   @Post()
   async createSpecial(@Req() req, @Body() createDto: CreateDiscountDto) {
-    return await this.discountsService.sellerCreate(createDto, req.user);
+    return await this.discountsService.sellerCreate(createDto, req.user.userId);
   }
 
   @Roles(UserRole.ADMIN)
   @UseGuards(JwtAccessGuard, RolesGuard)
   @Post('admin')
   async create(@Req() req, @Body() createDto: CreateDiscountDto) {
-    return await this.discountsService.adminCreate(createDto, req.user);
+    return await this.discountsService.adminCreate(createDto, req.user.userId);
   }
 
   @Get()
-  async findAll(@Query() queryDto: QueryDiscountDto) {
+  @UseGuards(JwtAccessGuard)
+  async findAll(@Req() req: AuthRequest, @Query() queryDto: QueryDiscountDto) {
+    // If user is a seller, only show their own discounts
+    if (
+      req.user &&
+      (req.user.role as unknown as UserRole) === UserRole.SELLER
+    ) {
+      queryDto.createdById = req.user.userId;
+    }
+
     const { data, total } = await this.discountsService.findAll(queryDto);
     return {
       data,
@@ -58,10 +63,10 @@ export class DiscountsController {
   //   return await this.discountsService.findActiveDiscounts();
   // }
 
-  // @Get(':id')
-  // async findOne(@Param('id') id: string) {
-  //   return await this.discountsService.findOne(id);
-  // }
+  @Get(':id')
+  async findOne(@Param('id') id: string) {
+    return await this.discountsService.findOne(id);
+  }
 
   @Get('code/:code')
   async findByCode(@Param('code') code: string) {
@@ -86,6 +91,13 @@ export class DiscountsController {
   ) {
     return await this.discountsService.update(req.user.userId, id, updateDto);
   }
+
+  // @Roles(UserRole.SELLER)
+  // @UseGuards(JwtAccessGuard, RolesGuard)
+  // @Delete(':id')
+  // async sellerRemove(@Req() req: AuthRequest, @Param('id') id: string) {
+  //   return await this.discountsService.sellerRemove(req.user.userId, id);
+  // }
 
   @Roles(UserRole.ADMIN)
   @UseGuards(JwtAccessGuard, RolesGuard)
