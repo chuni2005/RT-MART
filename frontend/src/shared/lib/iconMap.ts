@@ -6,8 +6,10 @@
 
 import { IconProp, IconDefinition } from "@fortawesome/fontawesome-svg-core";
 import {
+  faAddressBook,
   faArrowRotateRight,
   faBars,
+  faBolt,
   faBoxOpen,
   faCalendar,
   faChartLine,
@@ -18,10 +20,13 @@ import {
   faChevronRight,
   faChevronUp,
   faCircleExclamation,
+  faClipboardList,
+  faDollarSign,
   faEnvelope,
   faEye,
   faEyeSlash,
   faGlobe,
+  faHouseCircleCheck,
   faInfoCircle,
   faMagnifyingGlassChart,
   faMapMarkerAlt,
@@ -41,6 +46,7 @@ import {
   faTriangleExclamation,
   faTruckFast,
   faUser,
+  faUsers,
 } from "@fortawesome/free-solid-svg-icons";
 
 /**
@@ -48,8 +54,10 @@ import {
  * 用於 FontAwesome library.add() 批量註冊
  */
 const icons: IconDefinition[] = [
+  faAddressBook,
   faArrowRotateRight,
   faBars,
+  faBolt,
   faBoxOpen,
   faCalendar,
   faChartLine,
@@ -60,10 +68,13 @@ const icons: IconDefinition[] = [
   faChevronRight,
   faChevronUp,
   faCircleExclamation,
+  faClipboardList,
+  faDollarSign,
   faEnvelope,
   faEye,
   faEyeSlash,
   faGlobe,
+  faHouseCircleCheck,
   faInfoCircle,
   faMagnifyingGlassChart,
   faMapMarkerAlt,
@@ -83,6 +94,7 @@ const icons: IconDefinition[] = [
   faTriangleExclamation,
   faTruckFast,
   faUser,
+  faUsers,
 ];
 
 /**
@@ -94,8 +106,10 @@ const icons: IconDefinition[] = [
  * - 外部組件可以傳遞字符串: <Icon icon="search" />
  */
 export const iconMap: Record<string, IconProp> = {
+  "address-book": faAddressBook,
   "arrow-rotate-right": faArrowRotateRight,
   "bars": faBars,
+  "bolt": faBolt,
   "box-open": faBoxOpen,
   "calendar": faCalendar,
   "chart-line": faChartLine,
@@ -106,10 +120,13 @@ export const iconMap: Record<string, IconProp> = {
   "chevron-right": faChevronRight,
   "chevron-up": faChevronUp,
   "circle-exclamation": faCircleExclamation,
+  "clipboard-list": faClipboardList,
+  "dollar-sign": faDollarSign,
   "envelope": faEnvelope,
   "eye": faEye,
   "eye-slash": faEyeSlash,
   "globe": faGlobe,
+  "house-circle-check": faHouseCircleCheck,
   "info-circle": faInfoCircle,
   "magnifying-glass-chart": faMagnifyingGlassChart,
   "map-marker-alt": faMapMarkerAlt,
@@ -129,6 +146,7 @@ export const iconMap: Record<string, IconProp> = {
   "triangle-exclamation": faTriangleExclamation,
   "truck-fast": faTruckFast,
   "user": faUser,
+  "users": faUsers,
 };
 
 /**
