@@ -16,12 +16,13 @@ interface RequestOptions extends RequestInit {
  * @returns API 回應
  */
 const apiRequest = async <T = any>(endpoint: string, options: RequestOptions = {}): Promise<T> => {
+  const isFormData = options.body instanceof FormData;
 
   const config: RequestOptions = {
     ...options,
     credentials: 'include',
     headers: {
-      'Content-Type': 'application/json',
+      ...(isFormData ? {} : { 'Content-Type': 'application/json' }),
       ...options.headers,
     },
   };
@@ -61,7 +62,7 @@ export const get = <T = any>(endpoint: string, options: RequestOptions = {}): Pr
 export const post = <T = any>(endpoint: string, data?: any, options: RequestOptions = {}): Promise<T> => {
   return apiRequest<T>(endpoint, {
     method: 'POST',
-    body: JSON.stringify(data),
+    body: data instanceof FormData ? data : JSON.stringify(data),
     ...options,
   });
 };
@@ -72,7 +73,7 @@ export const post = <T = any>(endpoint: string, data?: any, options: RequestOpti
 export const put = <T = any>(endpoint: string, data?: any, options: RequestOptions = {}): Promise<T> => {
   return apiRequest<T>(endpoint, {
     method: 'PUT',
-    body: JSON.stringify(data),
+    body: data instanceof FormData ? data : JSON.stringify(data),
     ...options,
   });
 };
@@ -83,7 +84,7 @@ export const put = <T = any>(endpoint: string, data?: any, options: RequestOptio
 export const patch = <T = any>(endpoint: string, data?: any, options: RequestOptions = {}): Promise<T> => {
   return apiRequest<T>(endpoint, {
     method: 'PATCH',
-    body: JSON.stringify(data),
+    body: data instanceof FormData ? data : JSON.stringify(data),
     ...options,
   });
 };
@@ -94,7 +95,7 @@ export const patch = <T = any>(endpoint: string, data?: any, options: RequestOpt
 export const del = <T = any>(endpoint: string, data?: any, options: RequestOptions = {}): Promise<T> => {
   return apiRequest<T>(endpoint, {
     method: 'DELETE',
-    body: data ? JSON.stringify(data) : undefined,
+    body: data ? (data instanceof FormData ? data : JSON.stringify(data)) : undefined,
     ...options,
   });
 };

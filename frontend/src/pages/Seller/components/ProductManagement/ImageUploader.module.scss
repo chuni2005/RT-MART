@@ -76,6 +76,20 @@
   &:hover .imageActions {
     opacity: 1;
   }
+
+  &.dragging {
+    opacity: 0.5;
+    border-style: dashed;
+    cursor: move;
+  }
+
+  &[draggable="true"] {
+    cursor: grab;
+
+    &:active {
+      cursor: grabbing;
+    }
+  }
 }
 
 .mainBadge {

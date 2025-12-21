@@ -4,7 +4,6 @@ export class UpdateSortedImagesDto {
   @IsString()
   imageId: string;
 
-  @IsString()
   @IsPositive()
   order: number;
 }
