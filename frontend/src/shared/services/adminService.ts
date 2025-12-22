@@ -138,15 +138,9 @@ export const getSellerApplications = async (params?: {
 
   let filtered = [...mockSellerApplications];
 
-  if (params?.status && params.status !== 'all') {
-    filtered = filtered.filter((app) => {
-      if (params.status === 'pending') return !app.verified && !app.rejected_at;
-      if (params.status === 'approved') return app.verified;
-      if (params.status === 'rejected') return !!app.rejected_at;
-      return true;
-    });
+  if (params?.status && params.status !== "all") {
+    filtered = filtered.filter((app) => app.status === params.status);
   }
-
   return filtered;
 };
 
@@ -155,37 +149,42 @@ export const getSellerApplications = async (params?: {
  * TODO: 替換為 POST /api/v1/admin/seller-applications/:sellerId/approve
  */
 export const approveSellerApplication = async (
-  sellerId: string
+  applicationId: string
 ): Promise<{ success: boolean; message: string }> => {
   await delay(500);
 
-  const application = mockSellerApplications.find((a) => a.seller_id === sellerId);
-  if (!application) throw new Error('申請不存在');
+  const application = mockSellerApplications.find(
+    (a) => a.application_id === applicationId
+  );
+  if (!application) throw new Error("申請不存在");
 
-  application.verified = true;
-  application.verified_at = new Date().toISOString();
-  application.verified_by = 'admin001'; // 當前管理員 ID
+  application.status = "approved";
+  application.reviewed_by = "admin001";
+  application.reviewed_at = new Date().toISOString();
 
   return {
     success: true,
-    message: '賣家申請已批准',
+    message: "賣家申請已批准",
   };
 };
+
 
 /**
  * 拒絕賣家申請
  * TODO: 替換為 POST /api/v1/admin/seller-applications/:sellerId/reject
  */
 export const rejectSellerApplication = async (
-  sellerId: string,
+  applicationId: string,
   reason: string
 ): Promise<{ success: boolean; message: string }> => {
   await delay(500);
 
-  const application = mockSellerApplications.find((a) => a.seller_id === sellerId);
+  const application = mockSellerApplications.find((a) => a.application_id === applicationId);
   if (!application) throw new Error('申請不存在');
 
-  application.rejected_at = new Date().toISOString();
+  application.status = "rejected";
+  application.reviewed_by = "admin001";
+  application.reviewed_at = new Date().toISOString();
   application.rejection_reason = reason;
 
   return {
@@ -439,25 +438,27 @@ let mockUsers: AdminUser[] = [
 // 賣家申請數據
 let mockSellerApplications: SellerApplication[] = [
   {
-    seller_id: '1',
-    user_id: '3',
-    user_name: '張大賣',
-    email: 'seller001@example.com',
-    phone: '0912345678',
-    store_name: '大賣商店',
-    store_description: '專營電子產品',
-    store_address: '台北市信義區忠孝東路100號',
-    store_email: 'store@example.com',
-    store_phone: '02-1234-5678',
-    bank_account_reference: '123-456-789',
-    bank_account_name: '張大賣',
-    bank_name: 'XX銀行',
-    verified: false,
-    verified_at: null,
-    verified_by: null,
-    created_at: '2025-01-15T10:30:00Z',
+    application_id: "app_001",
+
+    user_id: "3",
+    user_name: "張大賣",
+    email: "seller001@example.com",
+    phone_number: "0912345678",
+
+    store_name: "大賣商店",
+    store_description: "專營電子產品",
+    store_address: "台北市信義區忠孝東路100號",
+    store_email: "store@example.com",
+    store_phone: "02-1234-5678",
+
+    bank_account_reference: "123-456-789",
+
+    status: "pending",
+
+    application_created_at: "2025-01-15T10:30:00Z",
   },
 ];
+
 
 // 訂單爭議數據
 let mockDisputes: Dispute[] = [

@@ -35,31 +35,29 @@ export interface AdminUser {
 
 // Seller Application Type
 export interface SellerApplication {
-  login_id: string;
+  application_id: string;
+
   user_id: string;
-  seller_id: string;
   user_name: string;
   email: string;
   phone_number: string;
-  user_created_at: string;
-  bank_account_reference: string;
-  verified: boolean;
-  verified_at: string | null;
-  verified_by: string | null; // admin user_id
 
-  // Store table
-  store_id: string;
   store_name: string;
   store_description: string;
   store_address: string;
   store_email: string;
   store_phone: string;
-  store_created_at: string;
 
-  // For rejection tracking (may need custom implementation)
-  rejected_at?: string | null;
-  rejection_reason?: string | null;
+  bank_account_reference: string;
+
+  status: "pending" | "approved" | "rejected";
+  reviewed_by?: string;
+  reviewed_at?: string;
+  rejection_reason?: string;
+
+  application_created_at: string;
 }
+
 
 // Dispute Type
 export interface Dispute {
