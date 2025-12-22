@@ -6,6 +6,9 @@ import Tab from '@/shared/components/Tab';
 import adminService from '@/shared/services/adminService';
 import { SellerApplication } from '@/types/admin';
 import { AlertType } from '@/types';
+import SellerDetailDialog from './components/SellerDetailDialog';
+import ApproveDialog from './components/ApproveDialog';
+import RejectDialog from './components/RejectDialog';
 import styles from './Sellers.module.scss';
 
 function Sellers() {
@@ -13,6 +16,13 @@ function Sellers() {
   const [loading, setLoading] = useState(false);
   const [activeTab, setActiveTab] = useState('pending');
   const [alert, setAlert] = useState<{ type: AlertType; message: string } | null>(null);
+
+  // Dialog states
+  const [selectedApplication, setSelectedApplication] = useState<SellerApplication | null>(null);
+  const [showDetailDialog, setShowDetailDialog] = useState(false);
+  const [showApproveDialog, setShowApproveDialog] = useState(false);
+  const [showRejectDialog, setShowRejectDialog] = useState(false);
+  const [actionLoading, setActionLoading] = useState(false);
 
   // Tab items
   const tabItems = [
@@ -45,6 +55,70 @@ function Sellers() {
   useEffect(() => {
     fetchApplications('pending');
   }, []);
+
+  // Dialog handlers
+  const handleViewDetail = (application: SellerApplication) => {
+    setSelectedApplication(application);
+    setShowDetailDialog(true);
+  };
+
+  const handleApproveClick = (application: SellerApplication) => {
+    setSelectedApplication(application);
+    setShowApproveDialog(true);
+  };
+
+  const handleRejectClick = (application: SellerApplication) => {
+    setSelectedApplication(application);
+    setShowRejectDialog(true);
+  };
+
+  const handleApproveFromDetail = () => {
+    setShowDetailDialog(false);
+    setShowApproveDialog(true);
+  };
+
+  const handleRejectFromDetail = () => {
+    setShowDetailDialog(false);
+    setShowRejectDialog(true);
+  };
+
+  // Approve application
+  const handleApproveConfirm = async () => {
+    if (!selectedApplication) return;
+
+    setActionLoading(true);
+    try {
+      await adminService.approveSellerApplication(selectedApplication.seller_id);
+      setAlert({ type: 'success', message: '賣家申請已批准' });
+      setShowApproveDialog(false);
+      setSelectedApplication(null);
+      await fetchApplications(activeTab as 'pending' | 'approved' | 'rejected');
+    } catch (error) {
+      console.error('批准賣家申請失敗:', error);
+      setAlert({ type: 'error', message: '批准賣家申請失敗' });
+    } finally {
+      setActionLoading(false);
+    }
+  };
+
+  // Reject application
+  const handleRejectConfirm = async (reason: string) => {
+    if (!selectedApplication) return;
+
+    setActionLoading(true);
+    try {
+      await adminService.rejectSellerApplication(selectedApplication.seller_id, reason);
+      setAlert({ type: 'success', message: '賣家申請已拒絕' });
+      setShowRejectDialog(false);
+      setSelectedApplication(null);
+      await fetchApplications(activeTab as 'pending' | 'approved' | 'rejected');
+    } catch (error) {
+      console.error('拒絕賣家申請失敗:', error);
+      setAlert({ type: 'error', message: '拒絕賣家申請失敗' });
+    } finally {
+      setActionLoading(false);
+    }
+  };
 
   const getStatusBadge = (application: SellerApplication) => {
     if (application.rejected_at) {
@@ -115,15 +189,15 @@ function Sellers() {
                   <td>{getStatusBadge(app)}</td>
                   <td>
                     <div className={styles.actionButtons}>
-                      <Button size="sm" variant="outline">
+                      <Button size="sm" variant="outline" onClick={() => handleViewDetail(app)}>
                         查看詳情
                       </Button>
                       {!app.verified && !app.rejected_at && (
                         <>
-                          <Button size="sm" className={styles.btnSuccess}>
+                          <Button size="sm" className={styles.btnSuccess} onClick={() => handleApproveClick(app)}>
                             批准
                           </Button>
-                          <Button size="sm" className={styles.btnDanger}>
+                          <Button size="sm" className={styles.btnDanger} onClick={() => handleRejectClick(app)}>
                             拒絕
                           </Button>
                         </>
@@ -136,6 +210,31 @@ function Sellers() {
           </table>
         </div>
       )}
+
+      {/* Dialogs */}
+      <SellerDetailDialog
+        isOpen={showDetailDialog}
+        onClose={() => setShowDetailDialog(false)}
+        application={selectedApplication}
+        onApprove={handleApproveFromDetail}
+        onReject={handleRejectFromDetail}
+      />
+
+      <ApproveDialog
+        isOpen={showApproveDialog}
+        onClose={() => setShowApproveDialog(false)}
+        application={selectedApplication}
+        onConfirm={handleApproveConfirm}
+        loading={actionLoading}
+      />
+
+      <RejectDialog
+        isOpen={showRejectDialog}
+        onClose={() => setShowRejectDialog(false)}
+        application={selectedApplication}
+        onConfirm={handleRejectConfirm}
+        loading={actionLoading}
+      />
     </div>
   );
 }

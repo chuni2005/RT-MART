@@ -1,0 +1,149 @@
+.dialogContent {
+  display: flex;
+  flex-direction: column;
+  gap: $spacing-xl;
+  padding: $spacing-md 0;
+  max-height: 70vh;
+  overflow-y: auto;
+}
+
+// Sections
+.section {
+  padding-bottom: $spacing-lg;
+  border-bottom: 1px solid $border-color;
+
+  &:last-of-type {
+    border-bottom: none;
+  }
+}
+
+.sectionTitle {
+  font-size: $font-lg;
+  font-weight: 600;
+  color: $text-primary;
+  margin-bottom: $spacing-md;
+  text-transform: uppercase;
+  letter-spacing: 0.5px;
+  font-size: $font-sm;
+  color: $text-secondary;
+}
+
+// Info Grid
+.infoGrid {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+  gap: $spacing-lg;
+}
+
+.infoItem {
+  display: flex;
+  flex-direction: column;
+  gap: $spacing-xs;
+
+  label {
+    font-size: $font-xs;
+    font-weight: 600;
+    color: $text-secondary;
+    text-transform: uppercase;
+    letter-spacing: 0.5px;
+  }
+
+  p {
+    font-size: $font-sm;
+    color: $text-primary;
+    word-break: break-word;
+  }
+}
+
+// Status Info
+.statusInfo {
+  display: flex;
+  flex-direction: column;
+  gap: $spacing-md;
+}
+
+.statusDetails {
+  margin-top: $spacing-sm;
+  padding: $spacing-md;
+  background: $bg-tertiary;
+  border-radius: $border-radius-sm;
+
+  p {
+    font-size: $font-sm;
+    color: $text-primary;
+    margin-bottom: $spacing-xs;
+
+    &:last-child {
+      margin-bottom: 0;
+    }
+
+    strong {
+      color: $text-secondary;
+      font-weight: 600;
+    }
+  }
+}
+
+// Status Badges
+.statusPending {
+  display: inline-block;
+  padding: 6px 16px;
+  border-radius: $border-radius-sm;
+  font-size: $font-sm;
+  font-weight: 600;
+  background: #fef3c7;
+  color: #92400e;
+  width: fit-content;
+}
+
+.statusApproved {
+  display: inline-block;
+  padding: 6px 16px;
+  border-radius: $border-radius-sm;
+  font-size: $font-sm;
+  font-weight: 600;
+  background: #d1fae5;
+  color: #065f46;
+  width: fit-content;
+}
+
+.statusRejected {
+  display: inline-block;
+  padding: 6px 16px;
+  border-radius: $border-radius-sm;
+  font-size: $font-sm;
+  font-weight: 600;
+  background: #fee2e2;
+  color: #991b1b;
+  width: fit-content;
+}
+
+// Actions
+.actions {
+  display: flex;
+  justify-content: flex-end;
+  gap: $spacing-md;
+  padding-top: $spacing-md;
+  border-top: 1px solid $border-color;
+}
+
+// Custom Button Styles
+.btnSuccess {
+  background: #10b981;
+  color: white;
+  border: none;
+
+  &:hover:not(:disabled) {
+    background: #059669;
+  }
+}
+
+.btnDanger {
+  background: #ef4444;
+  color: white;
+  border: none;
+
+  &:hover:not(:disabled) {
+    background: #dc2626;
+  }
+}

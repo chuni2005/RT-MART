@@ -1,0 +1,177 @@
+.dialogContent {
+  display: flex;
+  flex-direction: column;
+  gap: $spacing-lg;
+  padding: $spacing-md 0;
+}
+
+// Applicant Info
+.applicantInfo {
+  padding: $spacing-md;
+  background: $bg-tertiary;
+  border-radius: $border-radius-sm;
+}
+
+.infoRow {
+  display: flex;
+  align-items: baseline;
+  margin-bottom: $spacing-xs;
+
+  &:last-child {
+    margin-bottom: 0;
+  }
+}
+
+.label {
+  font-size: $font-sm;
+  color: $text-secondary;
+  font-weight: 600;
+  min-width: 110px;
+}
+
+.value {
+  font-size: $font-sm;
+  color: $text-primary;
+}
+
+// Quick Reasons
+.quickReasons {
+  display: flex;
+  flex-direction: column;
+  gap: $spacing-sm;
+}
+
+.quickReasonsLabel {
+  font-size: $font-sm;
+  font-weight: 600;
+  color: $text-secondary;
+}
+
+.quickReasonButtons {
+  display: flex;
+  flex-wrap: wrap;
+  gap: $spacing-sm;
+}
+
+.quickReasonBtn {
+  padding: $spacing-xs $spacing-md;
+  background: $bg-secondary;
+  border: 1px solid $border-color;
+  border-radius: $border-radius-sm;
+  font-size: $font-sm;
+  color: $text-primary;
+  cursor: pointer;
+  transition: $transition-fast;
+
+  &:hover:not(:disabled) {
+    background: $bg-tertiary;
+    border-color: $primary-color;
+    color: $primary-color;
+  }
+
+  &:disabled {
+    opacity: 0.6;
+    cursor: not-allowed;
+  }
+}
+
+// Reason Input
+.reasonInput {
+  display: flex;
+  flex-direction: column;
+  gap: $spacing-xs;
+
+  label {
+    font-size: $font-sm;
+    font-weight: 600;
+    color: $text-primary;
+  }
+
+  .required {
+    color: #ef4444;
+  }
+
+  textarea {
+    padding: $spacing-md;
+    border: 2px solid $border-color;
+    border-radius: $border-radius-sm;
+    font-size: $font-sm;
+    font-family: inherit;
+    resize: vertical;
+    transition: $transition-fast;
+
+    &:focus {
+      outline: none;
+      border-color: $primary-color;
+    }
+
+    &.invalid {
+      border-color: #ef4444;
+    }
+
+    &::placeholder {
+      color: $text-tertiary;
+    }
+
+    &:disabled {
+      background: $bg-tertiary;
+      cursor: not-allowed;
+    }
+  }
+}
+
+.charCount {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  font-size: $font-xs;
+  color: $text-secondary;
+
+  .error {
+    color: $error-color;
+    font-weight: 600;
+  }
+
+  .hint {
+    color: $error-color;
+    font-style: italic;
+  }
+}
+
+// Warning
+.warning {
+  padding: $spacing-md;
+  background: #fef3c7;
+  border-left: 4px solid #f59e0b;
+  border-radius: $border-radius-sm;
+  font-size: $font-sm;
+  color: #92400e;
+
+  strong {
+    font-weight: 600;
+  }
+}
+
+// Actions
+.actions {
+  display: flex;
+  justify-content: flex-end;
+  gap: $spacing-md;
+  padding-top: $spacing-md;
+  border-top: 1px solid $border-color;
+}
+
+.btnDanger {
+  background: #ef4444;
+  color: white;
+  border: none;
+
+  &:hover:not(:disabled) {
+    background: #dc2626;
+  }
+
+  &:disabled {
+    opacity: 0.6;
+    cursor: not-allowed;
+  }
+}
