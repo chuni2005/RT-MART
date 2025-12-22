@@ -24,8 +24,8 @@ export class ProductsService {
     private readonly productRepository: Repository<Product>,
     @InjectRepository(ProductImage)
     private readonly imageRepository: Repository<ProductImage>,
-    @InjectRepository(Inventory)
-    private readonly inventoryRepository: Repository<Inventory>,
+    @InjectRepository(ProductType)
+    private readonly productTypeRepository: Repository<ProductType>,
     private readonly storesService: StoresService,
     private readonly cloudinaryService: CloudinaryService,
     private readonly sellerService: SellersService
