@@ -1,0 +1,139 @@
+.sellers {
+  padding: $spacing-lg;
+}
+
+.pageTitle {
+  font-size: $font-3xl;
+  font-weight: 600;
+  color: $text-primary;
+  margin-bottom: $spacing-xl;
+}
+
+// Tabs
+.tabs {
+  margin-bottom: $spacing-xl;
+}
+
+// Loading & Empty States
+.loading,
+.emptyState {
+  @include flex-center;
+  flex-direction: column;
+  min-height: 300px;
+  font-size: $font-lg;
+  color: $text-secondary;
+  gap: $spacing-md;
+
+  svg {
+    font-size: $font-4xl;
+  }
+}
+
+// Table
+.tableContainer {
+  background: $bg-secondary;
+  border-radius: $border-radius-md;
+  overflow-x: auto;
+  box-shadow: $shadow-sm;
+}
+
+.table {
+  width: 100%;
+  border-collapse: collapse;
+  text-align: center;
+
+  thead {
+    background: $bg-tertiary;
+
+    th {
+      padding: $spacing-md;
+      font-size: $font-sm;
+      font-weight: 600;
+      color: $text-secondary;
+      border-bottom: 2px solid $border-color;
+      white-space: nowrap;
+    }
+  }
+
+  tbody {
+    tr {
+      border-bottom: 1px solid $border-color;
+      transition: $transition-fast;
+
+      &:hover {
+        background: $bg-tertiary;
+      }
+
+      &:last-child {
+        border-bottom: none;
+      }
+    }
+
+    td {
+      padding: $spacing-md;
+      font-size: $font-sm;
+      color: $text-primary;
+      white-space: nowrap;
+    }
+  }
+}
+
+// Status Badges
+.statusPending {
+  display: inline-block;
+  padding: 4px 12px;
+  border-radius: $border-radius-sm;
+  font-size: $font-xs;
+  font-weight: 600;
+  background: #fef3c7;
+  color: #92400e;
+}
+
+.statusApproved {
+  display: inline-block;
+  padding: 4px 12px;
+  border-radius: $border-radius-sm;
+  font-size: $font-xs;
+  font-weight: 600;
+  background: #d1fae5;
+  color: #065f46;
+}
+
+.statusRejected {
+  display: inline-block;
+  padding: 4px 12px;
+  border-radius: $border-radius-sm;
+  font-size: $font-xs;
+  font-weight: 600;
+  background: #fee2e2;
+  color: #991b1b;
+}
+
+// Action Buttons
+.actionButtons {
+  display: flex;
+  gap: $spacing-sm;
+  justify-content: center;
+  white-space: nowrap;
+}
+
+// Custom Button Styles
+.btnSuccess {
+  background: #10b981;
+  color: white;
+  border: none;
+
+  &:hover:not(:disabled) {
+    background: #059669;
+  }
+}
+
+.btnDanger {
+  background: #ef4444;
+  color: white;
+  border: none;
+
+  &:hover:not(:disabled) {
+    background: #dc2626;
+  }
+}
