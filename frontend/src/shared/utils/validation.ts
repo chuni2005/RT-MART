@@ -153,10 +153,10 @@ export const validateUsername = (username: string): ValidationError => {
     return '帳號不能超過 20 個字元'; // TODO: i18n
   }
 
-  // 只允許英數字（a-z, A-Z, 0-9）
-  const usernameRegex = /^[a-zA-Z0-9]+$/;
+  // 允許英數字及安全符號（a-z, A-Z, 0-9, _, -, .）
+  const usernameRegex = /^[a-zA-Z0-9._-]+$/;
   if (!usernameRegex.test(username)) {
-    return '帳號只能包含英文字母和數字'; // TODO: i18n
+    return '帳號只能包含英文字母、數字及符號（_ - .）'; // TODO: i18n
   }
 
   return null;
