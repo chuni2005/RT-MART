@@ -285,3 +285,10 @@ export interface LanguageMenuProps {
     optionActive?: string;
   };
 }
+
+// ProtectedRoute types
+export interface ProtectedRouteProps {
+  children: React.ReactElement;
+  requiredRole?: 'buyer' | 'seller' | 'admin';
+  excludeRoles?: Array<'buyer' | 'seller' | 'admin'>;
+}

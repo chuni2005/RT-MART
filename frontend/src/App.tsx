@@ -1,5 +1,11 @@
-import { BrowserRouter as Router, Routes, Route, Navigate, useLocation } from "react-router-dom";
-import { AuthProvider } from "./shared/contexts/AuthContext";
+import {
+  BrowserRouter as Router,
+  Routes,
+  Route,
+  Navigate,
+  useLocation,
+} from "react-router-dom";
+import { AuthProvider, useAuth } from "./shared/contexts/AuthContext";
 import { CartProvider } from "./shared/contexts/CartContext";
 import Header from "./shared/components/Header";
 import ProtectedRoute from "./shared/components/ProtectedRoute";
@@ -20,9 +26,18 @@ import OrderDetailPage from "./pages/UserCenter/components/OrderDetailPage";
 import SellerCenter from "./pages/Seller";
 import Dashboard from "./pages/Seller/components/Dashboard";
 import StoreSettings from "./pages/Seller/components/StoreSettings";
-import { ProductList, ProductEdit } from "./pages/Seller/components/ProductManagement";
-import { OrderList as SellerOrderList, OrderDetail as SellerOrderDetail } from "./pages/Seller/components/OrderManagement";
-import { DiscountList, DiscountEdit } from "./pages/Seller/components/DiscountManagement";
+import {
+  ProductList,
+  ProductEdit,
+} from "./pages/Seller/components/ProductManagement";
+import {
+  OrderList as SellerOrderList,
+  OrderDetail as SellerOrderDetail,
+} from "./pages/Seller/components/OrderManagement";
+import {
+  DiscountList,
+  DiscountEdit,
+} from "./pages/Seller/components/DiscountManagement";
 import AdminCenter from "./pages/Admin";
 import AdminDashboard from "./pages/Admin/Dashboard";
 import AdminUsers from "./pages/Admin/Users";
@@ -30,6 +45,19 @@ import AdminSellers from "./pages/Admin/Sellers";
 import AdminDisputes from "./pages/Admin/Disputes";
 import AdminDiscounts from "./pages/Admin/Discounts";
 import AdminDiscountEdit from "./pages/Admin/Discounts/DiscountEdit";
+
+// Role-based Home Redirect Component
+function RoleBasedHome() {
+  const { user } = useAuth();
+
+  // Admin 用户自动重定向到 admin 后台
+  if (user?.role === "admin") {
+    return <Navigate to="/admin" replace />;
+  }
+
+  // 买賣家或未登录用户显示正常首页
+  return <Home />;
+}
 
 // Header Wrapper Component to handle conditional rendering
 function AppHeader() {
@@ -39,7 +67,10 @@ function AppHeader() {
     return <Header variant="simple" />;
   }
 
-  if (location.pathname.startsWith("/seller") || location.pathname.startsWith("/admin")) {
+  if (
+    location.pathname.startsWith("/seller") ||
+    location.pathname.startsWith("/admin")
+  ) {
     return <Header variant="admin" />;
   }
 
@@ -53,7 +84,7 @@ function AppContent() {
       <main>
         <Routes>
           {/* Buyer Pages */}
-          <Route path="/" element={<Home />} />
+          <Route path="/" element={<RoleBasedHome />} />
           <Route path="/auth" element={<Auth />} />
           <Route path="/search" element={<Search />} />
           <Route path="/product/:product_id" element={<ProductDetail />} />
@@ -97,9 +128,10 @@ function AppContent() {
           </Route>
 
           {/* Seller Center */}
-          <Route path="/seller/*"
+          <Route
+            path="/seller/*"
             element={
-              <ProtectedRoute>
+              <ProtectedRoute excludeRoles={['buyer', 'admin']}>
                 <SellerCenter />
               </ProtectedRoute>
             }
@@ -125,14 +157,17 @@ function AppContent() {
             {/* Discount Management */}
             <Route path="discounts" element={<DiscountList />} />
             <Route path="discount/new" element={<DiscountEdit />} />
-            <Route path="discount/edit/:discountId" element={<DiscountEdit />} />
+            <Route
+              path="discount/edit/:discountId"
+              element={<DiscountEdit />}
+            />
           </Route>
 
           {/* Admin Center */}
           <Route
             path="/admin/*"
             element={
-              <ProtectedRoute>
+              <ProtectedRoute requiredRole="admin">
                 <AdminCenter />
               </ProtectedRoute>
             }
@@ -146,7 +181,10 @@ function AppContent() {
             <Route path="disputes" element={<AdminDisputes />} />
             <Route path="discounts" element={<AdminDiscounts />} />
             <Route path="discount/new" element={<AdminDiscountEdit />} />
-            <Route path="discount/edit/:discountId" element={<AdminDiscountEdit />} />
+            <Route
+              path="discount/edit/:discountId"
+              element={<AdminDiscountEdit />}
+            />
           </Route>
         </Routes>
       </main>

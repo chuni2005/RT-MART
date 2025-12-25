@@ -14,9 +14,6 @@ import type {
  * 提供所有管理員相關的 API 調用
  */
 
-/**
- * 模擬網路延遲
- */
 const delay = (ms: number) => new Promise((resolve) => setTimeout(resolve, ms));
 
 // ========== Dashboard ==========
