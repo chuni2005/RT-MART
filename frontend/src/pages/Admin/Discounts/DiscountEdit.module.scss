@@ -87,7 +87,7 @@
   transition: $transition-fast;
 
   svg {
-    font-size: 2rem;
+    font-size: $font-2xl;
     color: $text-secondary;
   }
 
@@ -174,8 +174,8 @@
   cursor: pointer;
 
   input[type='checkbox'] {
-    width: 18px;
-    height: 18px;
+    width: 1.125rem;
+    height: 1.125rem;
     cursor: pointer;
   }
 

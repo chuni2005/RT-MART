@@ -31,11 +31,11 @@
 
   .searchBar {
     flex: 1;
-    min-width: 300px;
+    min-width: 18.75rem;
   }
 
   .statusFilter {
-    min-width: 180px;
+    min-width: 11.25rem;
   }
 }
 
@@ -72,7 +72,7 @@
     &:focus {
       outline: none;
       border-color: $primary-color;
-      box-shadow: 0 0 0 3px color.change($primary-color, $alpha: 0.1);
+      box-shadow: 0 0 0 0.1875rem color.change($primary-color, $alpha: 0.1);
     }
   }
 }
@@ -85,7 +85,7 @@
   gap: $spacing-md;
 
   .spinner {
-    font-size: 2rem;
+    font-size: $font-2xl;
     color: $primary-color;
     animation: spin 1s linear infinite;
   }
@@ -131,7 +131,7 @@
       font-weight: 300;
       color: $text-secondary;
       text-transform: uppercase;
-      letter-spacing: 0.5px;
+      letter-spacing: 0.03125rem;
     }
   }
 
@@ -170,7 +170,7 @@
 
   .flagIcon {
     color: $error-color;
-    font-size: font-lg;
+    font-size: $font-lg;
   }
 }
 
@@ -210,7 +210,7 @@
   font-size: font-xs;
   font-weight: 300;
   text-transform: uppercase;
-  letter-spacing: 0.5px;
+  letter-spacing: 0.03125rem;
 
   &.pending {
     background: color.change($warning-color, $alpha: 0.1);
@@ -261,7 +261,7 @@
 
 // Order Detail Dialog
 .detailDialog {
-  max-width: 900px;
+  max-width: 56.25rem;
   max-height: 90vh;
   overflow-y: auto;
 }
@@ -291,7 +291,7 @@
 
 .infoGrid {
   display: grid;
-  grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+  grid-template-columns: repeat(auto-fit, minmax(12.5rem, 1fr));
   gap: $spacing-md;
 
   .infoItem {
@@ -331,8 +331,8 @@
   border-radius: $border-radius-md;
 
   .itemImage {
-    width: 60px;
-    height: 60px;
+    width: 3.75rem;
+    height: 3.75rem;
     object-fit: cover;
     border-radius: $border-radius-sm;
     border: 1px solid $border-color;
@@ -398,13 +398,13 @@
   padding: $spacing-md;
   background: $bg-tertiary;
   border-radius: $border-radius-md;
-  border-left: 3px solid $primary-color;
+  border-left: 0.1875rem solid $primary-color;
   color: $text-primary;
   line-height: 1.6;
 }
 
 .adminNote {
-  border-left-color: $warning-color;
+  border-left: 0.1875rem solid $warning-color;
   background: color.change($warning-color, $alpha: 0.05);
 }
 
@@ -417,7 +417,7 @@
   .warningText {
     padding: $spacing-md;
     background: color.change($warning-color, $alpha: 0.1);
-    border-left: 3px solid $warning-color;
+    border-left: 0.1875rem solid $warning-color;
     border-radius: $border-radius-md;
     color: $text-primary;
     line-height: 1.6;
@@ -477,7 +477,7 @@
   }
 
   .ordersTable {
-    min-width: 1000px;
+    min-width: 62.5rem;
   }
 
   .detailDialog {

@@ -23,7 +23,7 @@
 .emptyState {
   @include flex-center;
   flex-direction: column;
-  min-height: 300px;
+  min-height: 18.75rem;
   font-size: $font-lg;
   color: $text-secondary;
   gap: $spacing-md;
@@ -86,19 +86,19 @@
 // Role Badge
 .roleBadge {
   display: inline-block;
-  padding: 4px 12px;
+  padding: 0.25rem 0.75rem;
   border-radius: $border-radius-sm;
   font-size: $font-xs;
   font-weight: 600;
 
   &.buyer {
-    background: #dbeafe;
-    color: #1e40af;
+    background: color.change($info-color, $alpha: 0.1);
+    color: color.adjust($info-color, $lightness: -30%);
   }
 
   &.seller {
-    background: #d1fae5;
-    color: #065f46;
+    background: color.change($success-color, $alpha: 0.15);
+    color: color.adjust($success-color, $lightness: -40%);
   }
 
   &.admin {

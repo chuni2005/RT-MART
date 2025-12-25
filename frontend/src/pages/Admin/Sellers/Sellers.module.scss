@@ -1,3 +1,5 @@
+@use "sass:color";
+
 .sellers {
   padding: $spacing-lg;
 }
@@ -19,7 +21,7 @@
 .emptyState {
   @include flex-center;
   flex-direction: column;
-  min-height: 300px;
+  min-height: 18.75rem;
   font-size: $font-lg;
   color: $text-secondary;
   gap: $spacing-md;
@@ -81,7 +83,7 @@
 // Status Badges
 .statusPending {
   display: inline-block;
-  padding: 4px 12px;
+  padding: 0.25rem 0.75rem;
   border-radius: $border-radius-sm;
   font-size: $font-xs;
   font-weight: 600;
@@ -91,7 +93,7 @@
 
 .statusApproved {
   display: inline-block;
-  padding: 4px 12px;
+  padding: 0.25rem 0.75rem;
   border-radius: $border-radius-sm;
   font-size: $font-xs;
   font-weight: 600;
@@ -101,7 +103,7 @@
 
 .statusRejected {
   display: inline-block;
-  padding: 4px 12px;
+  padding: 0.25rem 0.75rem;
   border-radius: $border-radius-sm;
   font-size: $font-xs;
   font-weight: 600;
@@ -119,21 +121,21 @@
 
 // Custom Button Styles
 .btnSuccess {
-  background: #10b981;
+  background: $success-color;
   color: white;
   border: none;
 
   &:hover:not(:disabled) {
-    background: #059669;
+    background: color.adjust($success-color, $lightness: -10%);
   }
 }
 
 .btnDanger {
-  background: #ef4444;
+  background: $error-color;
   color: white;
   border: none;
 
   &:hover:not(:disabled) {
-    background: #dc2626;
+    background: color.adjust($error-color, $lightness: -10%);
   }
 }

@@ -42,16 +42,16 @@
   transition: $transition-base;
 
   &[data-color='blue'] {
-    border-left-color: #3b82f6;
+    border-left-color: $info-color;
     .statIcon {
-      color: #3b82f6;
+      color: $info-color;
     }
   }
 
   &[data-color='green'] {
-    border-left-color: #10b981;
+    border-left-color: $success-color;
     .statIcon {
-      color: #10b981;
+      color: $success-color;
     }
   }
 
@@ -63,9 +63,9 @@
   }
 
   &[data-color='orange'] {
-    border-left-color: #f59e0b;
+    border-left-color: $warning-color;
     .statIcon {
-      color: #f59e0b;
+      color: $warning-color;
     }
   }
 

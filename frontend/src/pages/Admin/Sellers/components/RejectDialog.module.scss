@@ -1,3 +1,5 @@
+@use "sass:color";
+
 .dialogContent {
   display: flex;
   flex-direction: column;
@@ -26,7 +28,7 @@
   font-size: $font-sm;
   color: $text-secondary;
   font-weight: 600;
-  min-width: 110px;
+  min-width: 6.875rem;
 }
 
 .value {
@@ -88,7 +90,7 @@
   }
 
   .required {
-    color: #ef4444;
+    color: $error-color;
   }
 
   textarea {
@@ -106,7 +108,7 @@
     }
 
     &.invalid {
-      border-color: #ef4444;
+      border-color: $error-color;
     }
 
     &::placeholder {
@@ -141,11 +143,11 @@
 // Warning
 .warning {
   padding: $spacing-md;
-  background: #fef3c7;
-  border-left: 4px solid #f59e0b;
+  background: color.change($warning-color, $alpha: 0.1);
+  border-left: 0.25rem solid $warning-color;
   border-radius: $border-radius-sm;
   font-size: $font-sm;
-  color: #92400e;
+  color: color.adjust($warning-color, $lightness: -40%);
 
   strong {
     font-weight: 600;
@@ -162,12 +164,12 @@
 }
 
 .btnDanger {
-  background: #ef4444;
+  background: $error-color;
   color: white;
   border: none;
 
   &:hover:not(:disabled) {
-    background: #dc2626;
+    background: color.adjust($error-color, $lightness: -10%);
   }
 
   &:disabled {

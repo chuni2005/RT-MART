@@ -1,3 +1,5 @@
+@use "sass:color";
+
 .dialogContent {
   display: flex;
   flex-direction: column;
@@ -37,7 +39,7 @@
   font-size: $font-sm;
   color: $text-secondary;
   font-weight: 600;
-  min-width: 100px;
+  min-width: 6.25rem;
 }
 
 .value {
@@ -51,7 +53,7 @@
   color: $text-secondary;
   font-style: italic;
   padding: $spacing-sm $spacing-md;
-  background: #dbeafe;
+  background: color.change($info-color, $alpha: 0.1);
   border-radius: $border-radius-sm;
 }
 
@@ -64,12 +66,12 @@
 }
 
 .btnSuccess {
-  background: #10b981;
+  background: $success-color;
   color: white;
   border: none;
 
   &:hover:not(:disabled) {
-    background: #059669;
+    background: color.adjust($success-color, $lightness: -10%);
   }
 
   &:disabled {

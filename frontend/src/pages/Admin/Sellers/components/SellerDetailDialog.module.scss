@@ -1,3 +1,5 @@
+@use "sass:color";
+
 .dialogContent {
   display: flex;
   flex-direction: column;
@@ -23,7 +25,7 @@
   color: $text-primary;
   margin-bottom: $spacing-md;
   text-transform: uppercase;
-  letter-spacing: 0.5px;
+  letter-spacing: 0.03125rem;
   font-size: $font-sm;
   color: $text-secondary;
 }
@@ -31,7 +33,7 @@
 // Info Grid
 .infoGrid {
   display: grid;
-  grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+  grid-template-columns: repeat(auto-fit, minmax(12.5rem, 1fr));
   gap: $spacing-lg;
 }
 
@@ -45,7 +47,7 @@
     font-weight: 600;
     color: $text-secondary;
     text-transform: uppercase;
-    letter-spacing: 0.5px;
+    letter-spacing: 0.03125rem;
   }
 
   p {
@@ -87,34 +89,34 @@
 // Status Badges
 .statusPending {
   display: inline-block;
-  padding: 6px 16px;
+  padding: 0.375rem 1rem;
   border-radius: $border-radius-sm;
   font-size: $font-sm;
   font-weight: 600;
-  background: #fef3c7;
-  color: #92400e;
+  background: color.change($warning-color, $alpha: 0.15);
+  color: color.adjust($warning-color, $lightness: -40%);
   width: fit-content;
 }
 
 .statusApproved {
   display: inline-block;
-  padding: 6px 16px;
+  padding: 0.375rem 1rem;
   border-radius: $border-radius-sm;
   font-size: $font-sm;
   font-weight: 600;
-  background: #d1fae5;
-  color: #065f46;
+  background: color.change($success-color, $alpha: 0.15);
+  color: color.adjust($success-color, $lightness: -40%);
   width: fit-content;
 }
 
 .statusRejected {
   display: inline-block;
-  padding: 6px 16px;
+  padding: 0.375rem 1rem;
   border-radius: $border-radius-sm;
   font-size: $font-sm;
   font-weight: 600;
-  background: #fee2e2;
-  color: #991b1b;
+  background: color.change($error-color, $alpha: 0.15);
+  color: color.adjust($error-color, $lightness: -30%);
   width: fit-content;
 }
 
@@ -129,21 +131,21 @@
 
 // Custom Button Styles
 .btnSuccess {
-  background: #10b981;
+  background: $success-color;
   color: white;
   border: none;
 
   &:hover:not(:disabled) {
-    background: #059669;
+    background: color.adjust($success-color, $lightness: -10%);
   }
 }
 
 .btnDanger {
-  background: #ef4444;
+  background: $error-color;
   color: white;
   border: none;
 
   &:hover:not(:disabled) {
-    background: #dc2626;
+    background: color.adjust($error-color, $lightness: -10%);
   }
 }
