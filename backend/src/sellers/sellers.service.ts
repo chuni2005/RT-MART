@@ -35,16 +35,41 @@ export class SellersService {
     }
 
     const existingSeller = await this.findByUserId(createSellerDto.userId);
-    // console.log(existingSeller);
+
+    // If existing seller found
     if (existingSeller) {
+      // If rejected, check if 30 days have passed
+      if (existingSeller.rejectedAt) {
+        const daysSinceRejection = Math.floor(
+          (Date.now() - new Date(existingSeller.rejectedAt).getTime()) /
+            (1000 * 60 * 60 * 24),
+        );
+
+        if (daysSinceRejection < 30) {
+          throw new BadRequestException(
+            `您的申請已被拒絕，請於 ${30 - daysSinceRejection} 天後重新申請`,
+          );
+        }
+
+        // Reuse existing record - reset status
+        existingSeller.verified = false;
+        existingSeller.verifiedAt = null;
+        existingSeller.verifiedBy = null;
+        existingSeller.rejectedAt = null;
+        existingSeller.bankAccountReference =
+          createSellerDto.bankAccountReference || null;
+        existingSeller.updatedAt = new Date();
+
+        return await this.sellerRepository.save(existingSeller);
+      }
+
+      // Already has active application
       throw new ConflictException('User is already a seller');
     }
 
+    // Create new seller
     const seller = this.sellerRepository.create(createSellerDto);
     const savedSeller = await this.sellerRepository.save(seller);
-
-    // Update user role to seller using internal method
-    await this.usersService.updateRole(createSellerDto.userId, UserRole.SELLER);
 
     return savedSeller;
   }
@@ -59,7 +84,7 @@ export class SellersService {
     const query = this.sellerRepository
       .createQueryBuilder('seller')
       .leftJoinAndSelect('seller.user', 'user')
-      .orderBy('seller.sellerId', 'DESC')
+      .orderBy('seller.createdAt', 'DESC')
       .skip(skip)
       .take(limit);
 
@@ -67,6 +92,19 @@ export class SellersService {
       query.andWhere('user.loginId = :loginId', { loginId: queryDto.loginId });
     }
 
+    // Filter by status
+    if (queryDto.status) {
+      if (queryDto.status === 'pending') {
+        query.andWhere('seller.verified = :verified', { verified: false });
+        query.andWhere('seller.rejectedAt IS NULL');
+      } else if (queryDto.status === 'approved') {
+        query.andWhere('seller.verified = :verified', { verified: true });
+      } else if (queryDto.status === 'rejected') {
+        query.andWhere('seller.rejectedAt IS NOT NULL');
+      }
+    }
+
+    // Legacy support for verified parameter
     if (queryDto.verified !== undefined) {
       query.andWhere('seller.verified = :verified', {
         verified: queryDto.verified,
@@ -114,10 +152,15 @@ export class SellersService {
       throw new ConflictException('Seller is already verified');
     }
 
+    if (seller.rejectedAt) {
+      throw new ConflictException('Seller application has been rejected');
+    }
+
     user.role = UserRole.SELLER;
     seller.verified = true;
     seller.verifiedAt = new Date();
     seller.verifiedBy = verifier;
+    seller.updatedAt = new Date();
 
     // 创建默认商店
     const storeName = `${user.name}'s Store`;
@@ -136,6 +179,25 @@ export class SellersService {
     await this.sellerRepository.save(seller);
     await this.userRepository.save(user);
     return await this.storeRepository.save(defaultStore);
+  }
+
+  async reject(sellerId: string): Promise<Seller> {
+    const seller = await this.findOne(sellerId);
+
+    if (seller.verified) {
+      throw new ConflictException('Seller is already verified');
+    }
+
+    if (seller.rejectedAt) {
+      throw new ConflictException('Seller is already rejected');
+    }
+
+    seller.rejectedAt = new Date();
+    seller.updatedAt = new Date();
+
+    // TODO: Send rejection email via NodeMail (future implementation)
+
+    return await this.sellerRepository.save(seller);
   }
 
   async remove(sellerId: string): Promise<void> {

@@ -85,6 +85,13 @@ export class SellersController {
 
   @Roles(UserRole.ADMIN)
   @UseGuards(JwtAccessGuard, RolesGuard)
+  @Post(':sellerId/reject')
+  async reject(@Param('sellerId') sellerId: string) {
+    return await this.sellersService.reject(sellerId);
+  }
+
+  @Roles(UserRole.ADMIN)
+  @UseGuards(JwtAccessGuard, RolesGuard)
   @Delete(':sellerId')
   async remove(@Param('sellerId') sellerId: string) {
     await this.sellersService.remove(sellerId);
