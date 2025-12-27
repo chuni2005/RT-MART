@@ -505,8 +505,7 @@ export const getAnomalyOrders = async (): Promise<AdminOrder[]> => {
     shipped_at: order.shippedAt,
     delivered_at: order.deliveredAt,
     completed_at: order.completedAt,
-    cancelled_at: order.cancelledAt,
-    is_flagged: true, // Anomaly orders are flagged by default
+    cancelled_at: order.cancelledAt
   }));
 };
 

@@ -125,9 +125,6 @@ export interface AdminOrder {
   delivered_at?: string;
   completed_at?: string;
   cancelled_at?: string;
-  // Admin-specific fields
-  is_flagged?: boolean; // 標記異常
-  admin_notes?: string; // 管理員備註
 }
 
 // Order Filter Parameters

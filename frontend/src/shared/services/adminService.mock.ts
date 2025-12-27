@@ -119,8 +119,7 @@ export const mockAdminOrders: AdminOrder[] = [
     updated_at: "2025-01-22T15:45:00Z",
     paid_at: "2025-01-22T10:35:00Z",
     shipped_at: "2025-01-22T14:00:00Z",
-    delivered_at: "2025-01-22T15:45:00Z",
-    is_flagged: false,
+    delivered_at: "2025-01-22T15:45:00Z"
   },
   {
     order_id: "2",
@@ -160,7 +159,6 @@ export const mockAdminOrders: AdminOrder[] = [
     created_at: "2025-01-22T09:15:00Z",
     updated_at: "2025-01-22T09:20:00Z",
     paid_at: "2025-01-22T09:20:00Z",
-    is_flagged: false,
   },
   {
     order_id: "3",
@@ -198,9 +196,7 @@ export const mockAdminOrders: AdminOrder[] = [
     discount: 0,
     total_amount: 16040,
     created_at: "2025-01-21T16:20:00Z",
-    updated_at: "2025-01-21T16:20:00Z",
-    is_flagged: true,
-    admin_notes: "付款逾期超過24小時，需關注",
+    updated_at: "2025-01-21T16:20:00Z"
   },
   {
     order_id: "4",
@@ -248,8 +244,7 @@ export const mockAdminOrders: AdminOrder[] = [
     created_at: "2025-01-21T11:00:00Z",
     updated_at: "2025-01-22T08:30:00Z",
     paid_at: "2025-01-21T11:05:00Z",
-    shipped_at: "2025-01-22T08:30:00Z",
-    is_flagged: false,
+    shipped_at: "2025-01-22T08:30:00Z"
   },
   {
     order_id: "5",
@@ -291,8 +286,7 @@ export const mockAdminOrders: AdminOrder[] = [
     paid_at: "2025-01-20T14:35:00Z",
     shipped_at: "2025-01-20T18:00:00Z",
     delivered_at: "2025-01-21T10:30:00Z",
-    completed_at: "2025-01-21T16:00:00Z",
-    is_flagged: false,
+    completed_at: "2025-01-21T16:00:00Z"
   },
 ];
 
