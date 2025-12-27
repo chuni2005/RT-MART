@@ -1,5 +1,5 @@
 import { BaseLoader } from './base.loader';
-import { CartItem } from '../../carts/entities/cart-item.entity';
+import { CartItem } from '../../carts-item/entities/cart-item.entity';
 
 export class CartItemLoader extends BaseLoader<CartItem> {
   protected entityName = 'CartItem';

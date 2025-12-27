@@ -11,7 +11,6 @@ import { ProductTypeLoader } from './loaders/product-type.loader';
 import { ProductLoader } from './loaders/product.loader';
 import { InventoryLoader } from './loaders/inventory.loader';
 import { ProductImageLoader } from './loaders/product-image.loader';
-import { CartLoader } from './loaders/cart.loader';
 import { CartItemLoader } from './loaders/cart-item.loader';
 import { DiscountLoader } from './loaders/discount.loader';
 import { SeasonalDiscountLoader } from './loaders/seasonal-discount.loader';
@@ -57,7 +56,6 @@ export class SeedService {
       new ProductLoader(entityManager, idMapping, this.logger),
       new InventoryLoader(entityManager, idMapping, this.logger),
       new ProductImageLoader(entityManager, idMapping, this.logger),
-      new CartLoader(entityManager, idMapping, this.logger),
       new CartItemLoader(entityManager, idMapping, this.logger),
       new DiscountLoader(entityManager, idMapping, this.logger),
       new SeasonalDiscountLoader(entityManager, idMapping, this.logger),

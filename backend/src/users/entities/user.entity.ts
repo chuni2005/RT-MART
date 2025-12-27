@@ -12,7 +12,8 @@ import {
 import { Seller } from '../../sellers/entities/seller.entity';
 import { ShippingAddress } from '../../shipping-addresses/entities/shipping-address.entity';
 import { UserToken } from '../../auth/entities/user-token.entity';
-import { Cart } from '../../carts/entities/cart.entity';
+// import { Cart } from '../../carts-item/entities/cart.entity';
+import { CartItem } from '../../carts-item/entities/cart-item.entity';
 import { Order } from '../../orders/entities/order.entity';
 import { CartHistory } from '../../cart-history/entities/cart-history.entity';
 import { AuditLog } from '../../audit-logs/entities/audit-log.entity';
@@ -83,8 +84,8 @@ export class User {
   @OneToMany(() => UserToken, (token) => token.user)
   tokens?: UserToken[];
 
-  @OneToOne(() => Cart, (cart) => cart.user)
-  cart?: Cart;
+  @OneToMany(() => CartItem, (cartItem) => cartItem.user)
+  cartItems?: CartItem[];
 
   @OneToMany(() => Order, (order) => order.user)
   orders?: Order[];

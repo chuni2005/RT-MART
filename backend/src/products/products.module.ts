@@ -1,4 +1,4 @@
-import { Module } from '@nestjs/common';
+import { forwardRef, Module } from '@nestjs/common';
 import { TypeOrmModule } from '@nestjs/typeorm';
 import { ProductsService } from './products.service';
 import { ProductsController } from './products.controller';
@@ -19,7 +19,7 @@ import { InventoryModule } from '../inventory/inventory.module';
     ProductTypesModule,
     SellersModule,
     CloudinaryModule,
-    InventoryModule,
+    forwardRef(() => InventoryModule),
   ],
   controllers: [ProductsController],
   providers: [ProductsService, CloudinaryService],

@@ -9,7 +9,7 @@ import {
   UseGuards,
   Req,
 } from '@nestjs/common';
-import { CartsService } from './carts.service';
+import { CartItemsService } from './cart-items.service';
 import { AddToCartDto } from './dto/add-to-cart.dto';
 import { UpdateCartItemDto } from './dto/update-cart-item.dto';
 import { BatchUpdateCartItemsDto } from './dto/batch-update-cart-items.dto';
@@ -18,22 +18,22 @@ import type { AuthRequest } from '../common/types';
 
 @Controller('carts')
 @UseGuards(JwtAccessGuard)
-export class CartsController {
-  constructor(private readonly cartsService: CartsService) { }
+export class CartItemsController {
+  constructor(private readonly cartsService: CartItemsService) { }
 
   @Get()
   async getCart(@Req() req: AuthRequest) {
-    return await this.cartsService.getOrCreateCart(req.user.userId);
+    // return await this.cartsService.getOrCreateCart(req.user.userId);
   }
 
   @Get('summary')
   async getCartSummary(@Req() req: AuthRequest) {
-    return await this.cartsService.getCartSummary(req.user.userId);
+    // return await this.cartsService.getCartSummary(req.user.userId);
   }
 
   @Post('items')
   async addToCart(@Req() req: AuthRequest, @Body() addToCartDto: AddToCartDto) {
-    return await this.cartsService.addToCart(req.user.userId, addToCartDto);
+    // return await this.cartsService.addToCart(req.user.userId, addToCartDto);
   }
 
   @Patch('items/batch')
@@ -41,10 +41,10 @@ export class CartsController {
     @Req() req: AuthRequest,
     @Body() batchDto: BatchUpdateCartItemsDto,
   ) {
-    return await this.cartsService.batchUpdateCartItems(
-      req.user.userId,
-      batchDto,
-    );
+    // return await this.cartsService.batchUpdateCartItems(
+    //   req.user.userId,
+    //   batchDto,
+    // );
   }
 
   @Patch('items/:cartItemId')
@@ -53,11 +53,11 @@ export class CartsController {
     @Param('cartItemId') cartItemId: string,
     @Body() updateDto: UpdateCartItemDto,
   ) {
-    return await this.cartsService.updateCartItem(
-      req.user.userId,
-      cartItemId,
-      updateDto,
-    );
+    // return await this.cartsService.updateCartItem(
+    //   req.user.userId,
+    //   cartItemId,
+    //   updateDto,
+    // );
   }
 
   @Delete('items/:cartItemId')
@@ -65,19 +65,19 @@ export class CartsController {
     @Req() req: AuthRequest,
     @Param('cartItemId') cartItemId: string,
   ) {
-    return await this.cartsService.removeFromCart(req.user.userId, cartItemId);
+    // return await this.cartsService.removeFromCart(req.user.userId, cartItemId);
   }
 
   @Delete('selected')
   async removeSelectedItems(@Req() req: AuthRequest) {
-    await this.cartsService.removeSelectedItems(req.user.userId);
-    return { message: 'Selected items removed successfully' };
+    // await this.cartsService.removeSelectedItems(req.user.userId);
+    // return { message: 'Selected items removed successfully' };
   }
 
   @Delete()
   async clearCart(@Req() req: AuthRequest) {
-    await this.cartsService.clearCart(req.user.userId);
-    return { message: 'Cart cleared successfully' };
+    // await this.cartsService.clearCart(req.user.userId);
+    // return { message: 'Cart cleared successfully' };
   }
 
   @Get('test/health')

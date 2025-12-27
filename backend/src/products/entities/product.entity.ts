@@ -15,7 +15,7 @@ import { Store } from '../../stores/entities/store.entity';
 import { ProductType } from '../../product-types/entities/product-type.entity';
 import { ProductImage } from './product-image.entity';
 import { Inventory } from '../../inventory/entities/inventory.entity';
-import { CartItem } from '../../carts/entities/cart-item.entity';
+import { CartItem } from '../../carts-item/entities/cart-item.entity';
 import { OrderItem } from '../../orders/entities/order-item.entity';
 
 @Entity('Product')
