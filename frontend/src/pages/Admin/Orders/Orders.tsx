@@ -1,41 +1,61 @@
-import { useState, useEffect } from 'react';
-import Icon from '@/shared/components/Icon';
-import Button from '@/shared/components/Button';
-import Select from '@/shared/components/Select';
-import SearchBar from '@/shared/components/Header/SearchBar';
-import EmptyState from '@/shared/components/EmptyState';
-import Alert from '@/shared/components/Alert';
-import Dialog from '@/shared/components/Dialog';
-import FormInput from '@/shared/components/FormInput';
-import adminService from '@/shared/services/adminService.index';
-import { AdminOrder, AdminOrderFilters } from '@/types/admin';
-import { AlertType, SelectOption } from '@/types';
-import { OrderStatus } from '@/types/order';
-import styles from './Orders.module.scss';
+import { useState, useEffect } from "react";
+import Icon from "@/shared/components/Icon";
+import Button from "@/shared/components/Button";
+import Select from "@/shared/components/Select";
+import SearchBar from "@/shared/components/Header/SearchBar";
+import EmptyState from "@/shared/components/EmptyState";
+import Alert from "@/shared/components/Alert";
+import Dialog from "@/shared/components/Dialog";
+import FormInput from "@/shared/components/FormInput";
+import adminService from "@/shared/services/adminService.index";
+import { AdminOrder, AdminOrderFilters } from "@/types/admin";
+import { AlertType, SelectOption } from "@/types";
+import { OrderStatus } from "@/types/order";
+import styles from "./Orders.module.scss";
 
-// 訂單狀態選項
+// 訂單狀態選項（用於篩選）
 const STATUS_OPTIONS: SelectOption[] = [
-  { value: 'all', label: '全部狀態' },
-  { value: 'pending_payment', label: '待付款' },
-  { value: 'paid', label: '已付款' },
-  { value: 'processing', label: '處理中' },
-  { value: 'shipped', label: '已出貨' },
-  { value: 'delivered', label: '已送達' },
-  { value: 'completed', label: '已完成' },
-  { value: 'cancelled', label: '已取消' },
+  { value: "all", label: "全部狀態" },
+  { value: "pending_payment", label: "待付款" },
+  { value: "paid", label: "已付款" },
+  { value: "processing", label: "處理中" },
+  { value: "shipped", label: "已出貨" },
+  { value: "delivered", label: "已送達" },
+  { value: "completed", label: "已完成" },
+  { value: "cancelled", label: "已取消" },
+];
+
+// 可修改的訂單狀態選項（不包含 "all"）
+const EDITABLE_STATUS_OPTIONS: SelectOption[] = [
+  { value: "pending_payment", label: "待付款" },
+  { value: "payment_failed", label: "付款失敗" },
+  { value: "paid", label: "已付款" },
+  { value: "processing", label: "處理中" },
+  { value: "shipped", label: "已出貨" },
+  { value: "delivered", label: "已送達" },
+  { value: "completed", label: "已完成" },
+  { value: "cancelled", label: "已取消" },
+];
+
+// 常見取消原因
+const COMMON_CANCEL_REASONS = [
+  "買家要求取消",
+  "商品缺貨",
+  "付款問題",
+  "地址無法配送",
 ];
 
 // 訂單狀態標籤
 const getStatusLabel = (status: OrderStatus): string => {
   const statusMap: Record<OrderStatus, string> = {
-    pending_payment: '待付款',
-    payment_failed: '付款失敗',
-    paid: '已付款',
-    processing: '處理中',
-    shipped: '已出貨',
-    delivered: '已送達',
-    completed: '已完成',
-    cancelled: '已取消',
+    pending_payment: "待付款",
+    payment_failed: "付款失敗",
+    paid: "已付款",
+    processing: "處理中",
+    shipped: "已出貨",
+    delivered: "已送達",
+    completed: "已完成",
+    cancelled: "已取消",
   };
   return statusMap[status] || status;
 };
@@ -43,25 +63,25 @@ const getStatusLabel = (status: OrderStatus): string => {
 // 訂單狀態樣式類別
 const getStatusClass = (status: OrderStatus): string => {
   const statusClassMap: Record<OrderStatus, string> = {
-    pending_payment: 'pending',
-    payment_failed: 'failed',
-    paid: 'paid',
-    processing: 'processing',
-    shipped: 'shipped',
-    delivered: 'delivered',
-    completed: 'completed',
-    cancelled: 'cancelled',
+    pending_payment: "pending",
+    payment_failed: "failed",
+    paid: "paid",
+    processing: "processing",
+    shipped: "shipped",
+    delivered: "delivered",
+    completed: "completed",
+    cancelled: "cancelled",
   };
-  return statusClassMap[status] || 'pending';
+  return statusClassMap[status] || "pending";
 };
 
 // 付款方式標籤
 const getPaymentMethodLabel = (method: string): string => {
   const paymentMap: Record<string, string> = {
-    credit_card: '信用卡',
-    cash_on_delivery: '貨到付款',
-    debit_card: '金融卡',
-    bank_transfer: '銀行轉帳',
+    credit_card: "信用卡",
+    cash_on_delivery: "貨到付款",
+    debit_card: "金融卡",
+    bank_transfer: "銀行轉帳",
   };
   return paymentMap[method] || method;
 };
@@ -70,21 +90,25 @@ function Orders() {
   const [orders, setOrders] = useState<AdminOrder[]>([]);
   const [loading, setLoading] = useState(false);
   const [searched, setSearched] = useState(false);
-  const [alert, setAlert] = useState<{ type: AlertType; message: string } | null>(null);
+  const [alert, setAlert] = useState<{
+    type: AlertType;
+    message: string;
+  } | null>(null);
 
   // 篩選狀態
   const [filters, setFilters] = useState<AdminOrderFilters>({
-    search: '',
-    status: 'all',
-    startDate: '',
-    endDate: '',
+    search: "",
+    status: "all",
+    startDate: "",
+    endDate: "",
   });
 
   // Dialog states
   const [selectedOrder, setSelectedOrder] = useState<AdminOrder | null>(null);
   const [showDetailDialog, setShowDetailDialog] = useState(false);
-  const [showCancelDialog, setShowCancelDialog] = useState(false);
-  const [cancelReason, setCancelReason] = useState('');
+  const [showStatusDialog, setShowStatusDialog] = useState(false);
+  const [newStatus, setNewStatus] = useState<OrderStatus>("pending_payment");
+  const [cancelReason, setCancelReason] = useState("");
 
   // 初始載入最新訂單
   useEffect(() => {
@@ -103,8 +127,8 @@ function Orders() {
       setOrders(fetchedOrders);
       setSearched(true);
     } catch (error) {
-      console.error('載入訂單失敗:', error);
-      setAlert({ type: 'error', message: '載入訂單失敗' });
+      console.error("載入訂單失敗:", error);
+      setAlert({ type: "error", message: "載入訂單失敗" });
     } finally {
       setLoading(false);
     }
@@ -117,12 +141,12 @@ function Orders() {
   };
 
   const handleStatusChange = (value: string) => {
-    const newFilters = { ...filters, status: value as OrderStatus | 'all' };
+    const newFilters = { ...filters, status: value as OrderStatus | "all" };
     setFilters(newFilters);
     loadOrders(newFilters);
   };
 
-  const handleDateChange = (field: 'startDate' | 'endDate', value: string) => {
+  const handleDateChange = (field: "startDate" | "endDate", value: string) => {
     const newFilters = { ...filters, [field]: value };
     setFilters(newFilters);
     loadOrders(newFilters);
@@ -134,44 +158,55 @@ function Orders() {
       setSelectedOrder(fullOrder);
       setShowDetailDialog(true);
     } catch (error) {
-      console.error('載入訂單詳情失敗:', error);
-      setAlert({ type: 'error', message: '載入訂單詳情失敗' });
+      console.error("載入訂單詳情失敗:", error);
+      setAlert({ type: "error", message: "載入訂單詳情失敗" });
     }
   };
 
-  const handleCancelOrder = async (order: AdminOrder) => {
+  const handleUpdateStatus = async (order: AdminOrder) => {
     setSelectedOrder(order);
-    setCancelReason('');
-    setShowCancelDialog(true);
+    setNewStatus(order.status);
+    setCancelReason("");
+    setShowStatusDialog(true);
   };
 
-  const handleConfirmCancel = async () => {
+  const handleConfirmUpdateStatus = async () => {
     if (!selectedOrder) return;
-    if (!cancelReason.trim()) {
-      setAlert({ type: 'warning', message: '請輸入取消原因' });
+
+    // 如果選擇取消狀態，需要檢查取消原因
+    if (newStatus === "cancelled" && !cancelReason.trim()) {
+      setAlert({ type: "warning", message: "請輸入取消原因" });
       return;
     }
 
     try {
-      await adminService.cancelAdminOrder(selectedOrder.order_id, cancelReason);
-      setAlert({ type: 'success', message: '訂單已取消' });
-      setShowCancelDialog(false);
-      setCancelReason('');
+      if (newStatus === "cancelled") {
+        // 使用取消訂單 API（會發送取消原因給買家和賣家）
+        await adminService.cancelAdminOrder(selectedOrder.order_id, cancelReason);
+        setAlert({ type: "success", message: "訂單已取消" });
+      } else {
+        // 使用更新狀態 API
+        await adminService.updateAdminOrderStatus(selectedOrder.order_id, newStatus);
+        setAlert({ type: "success", message: "訂單狀態已更新" });
+      }
+
+      setShowStatusDialog(false);
       setSelectedOrder(null);
+      setCancelReason("");
       loadOrders();
     } catch (error) {
-      console.error('取消訂單失敗:', error);
-      setAlert({ type: 'error', message: '取消訂單失敗' });
+      console.error("更新訂單狀態失敗:", error);
+      setAlert({ type: "error", message: "更新訂單狀態失敗" });
     }
   };
 
   const formatDate = (dateString: string) => {
-    return new Date(dateString).toLocaleString('zh-TW', {
-      year: 'numeric',
-      month: '2-digit',
-      day: '2-digit',
-      hour: '2-digit',
-      minute: '2-digit',
+    return new Date(dateString).toLocaleString("zh-TW", {
+      year: "numeric",
+      month: "2-digit",
+      day: "2-digit",
+      hour: "2-digit",
+      minute: "2-digit",
     });
   };
 
@@ -316,10 +351,9 @@ function Orders() {
                       <Button
                         variant="ghost"
                         size="sm"
-                        icon="xmark"
-                        onClick={() => handleCancelOrder(order)}
-                        ariaLabel="取消訂單"
-                        disabled={order.status === 'cancelled'}
+                        icon="pen-to-square"
+                        onClick={() => handleUpdateStatus(order)}
+                        ariaLabel="修改狀態"
                       />
                     </div>
                   </td>
@@ -525,39 +559,102 @@ function Orders() {
         )}
       </Dialog>
 
-      {/* 取消訂單 Dialog */}
+      {/* 修改訂單狀態 Dialog */}
       <Dialog
-        isOpen={showCancelDialog}
+        isOpen={showStatusDialog}
         onClose={() => {
-          setShowCancelDialog(false);
-          setCancelReason("");
+          setShowStatusDialog(false);
           setSelectedOrder(null);
-        }}
-        title="取消訂單"
-        type="confirm"
-        variant="warning"
-        confirmText="確認取消"
-        cancelText="返回"
-        onConfirm={handleConfirmCancel}
-        onCancel={() => {
-          setShowCancelDialog(false);
           setCancelReason("");
-          setSelectedOrder(null);
         }}
+        title="修改訂單狀態"
+        type="custom"
+        textAlign="left"
       >
         {selectedOrder && (
-          <div className={styles.flagDialogContent}>
-            <p className={styles.warningText}>
-              您正在取消訂單 <strong>{selectedOrder.order_number}</strong>
+          <div className={styles.statusDialogContent}>
+            <p>
+              訂單編號：<strong>{selectedOrder.order_number}</strong>
             </p>
-            <FormInput
-              name="cancelReason"
-              label="取消原因"
-              value={cancelReason}
-              onChange={(e) => setCancelReason(e.target.value)}
-              placeholder="請輸入取消原因"
-              required
-            />
+            <p>
+              目前狀態：
+              <span
+                className={`${styles.statusBadge} ${
+                  styles[getStatusClass(selectedOrder.status)]
+                }`}
+              >
+                {getStatusLabel(selectedOrder.status)}
+              </span>
+            </p>
+            <div className={styles.statusSelectWrapper}>
+              <label htmlFor="newStatus">新狀態：</label>
+              <div className={styles.selectWrapper}>
+                <Select
+                  options={EDITABLE_STATUS_OPTIONS}
+                  value={newStatus}
+                  onChange={(value) => setNewStatus(value as OrderStatus)}
+                  ariaLabel="選擇新狀態"
+                />
+              </div>
+            </div>
+
+            {/* 如果選擇取消狀態，顯示取消原因輸入 */}
+            {newStatus === "cancelled" && (
+              <div className={styles.cancelReasonSection}>
+                <div className={styles.quickReasons}>
+                  <label className={styles.quickReasonsLabel}>
+                    常見取消原因：
+                  </label>
+                  <div className={styles.quickReasonButtons}>
+                    {COMMON_CANCEL_REASONS.map((reason) => (
+                      <button
+                        key={reason}
+                        type="button"
+                        className={styles.quickReasonBtn}
+                        onClick={() => setCancelReason(reason)}
+                      >
+                        {reason}
+                      </button>
+                    ))}
+                  </div>
+                </div>
+
+                <FormInput
+                  name="cancelReason"
+                  label="取消原因"
+                  value={cancelReason}
+                  onChange={(e) => setCancelReason(e.target.value)}
+                  placeholder="請輸入取消原因"
+                  required
+                />
+
+                <div className={styles.warning}>
+                  <strong>注意：</strong>
+                  取消原因將發送給買家和賣家，請謹慎填寫。
+                </div>
+              </div>
+            )}
+
+            {/* 操作按鈕 */}
+            <div className={styles.actions}>
+              <Button
+                variant="outline"
+                onClick={() => {
+                  setShowStatusDialog(false);
+                  setSelectedOrder(null);
+                  setCancelReason("");
+                }}
+              >
+                取消
+              </Button>
+              <Button
+                variant="primary"
+                onClick={handleConfirmUpdateStatus}
+                disabled={newStatus === "cancelled" && !cancelReason.trim()}
+              >
+                確認修改
+              </Button>
+            </div>
           </div>
         )}
       </Dialog>
