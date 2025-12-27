@@ -547,14 +547,6 @@ function Orders() {
                 <p className={styles.note}>{selectedOrder.note}</p>
               </div>
             )}
-
-            {/* 管理員備註 */}
-            {selectedOrder.admin_notes && (
-              <div className={styles.section}>
-                <h3>管理員備註</h3>
-                <p className={styles.adminNote}>{selectedOrder.admin_notes}</p>
-              </div>
-            )}
           </div>
         )}
       </Dialog>
