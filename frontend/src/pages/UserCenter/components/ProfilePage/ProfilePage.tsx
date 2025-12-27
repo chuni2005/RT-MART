@@ -192,7 +192,7 @@ function ProfilePage() {
     });
   };
 
-  const handleDeletePasswordChange = (e: ChangeEvent<HTMLInputElement>) => {
+  const handleDeletePasswordChange = (e: ChangeEvent<HTMLInputElement | HTMLTextAreaElement>) => {
     setDeleteDialog(prev => ({
       ...prev,
       password: e.target.value,
