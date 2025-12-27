@@ -128,7 +128,7 @@ export const deleteUser = async (
 
 /**
  * 獲取賣家申請列表
- * TODO: 替換為 GET /api/v1/admin/seller-applications
+ * TODO: 替換為 GET /api/v1/sellers?status=pending
  */
 export const getSellerApplications = async (params?: {
   status?: "pending" | "approved" | "rejected" | "all";
@@ -138,28 +138,37 @@ export const getSellerApplications = async (params?: {
   let filtered = [...mockSellerApplications];
 
   if (params?.status && params.status !== "all") {
-    filtered = filtered.filter((app) => app.status === params.status);
+    if (params.status === "pending") {
+      filtered = filtered.filter(
+        (app) => !app.verified && !app.rejected_at
+      );
+    } else if (params.status === "approved") {
+      filtered = filtered.filter((app) => app.verified);
+    } else if (params.status === "rejected") {
+      filtered = filtered.filter((app) => app.rejected_at);
+    }
   }
   return filtered;
 };
 
 /**
  * 批准賣家申請
- * TODO: 替換為 POST /api/v1/admin/seller-applications/:sellerId/approve
+ * TODO: 替換為 POST /api/v1/sellers/:sellerId/verify
  */
 export const approveSellerApplication = async (
-  applicationId: string
+  sellerId: string
 ): Promise<{ success: boolean; message: string }> => {
   await delay(500);
 
   const application = mockSellerApplications.find(
-    (a) => a.application_id === applicationId
+    (a) => a.seller_id === sellerId
   );
   if (!application) throw new Error("申請不存在");
 
-  application.status = "approved";
-  application.reviewed_by = "admin001";
-  application.reviewed_at = new Date().toISOString();
+  application.verified = true;
+  application.verified_at = new Date().toISOString();
+  application.verified_by = "admin001";
+  application.updated_at = new Date().toISOString();
 
   return {
     success: true,
@@ -169,23 +178,23 @@ export const approveSellerApplication = async (
 
 /**
  * 拒絕賣家申請
- * TODO: 替換為 POST /api/v1/admin/seller-applications/:sellerId/reject
+ * TODO: 替換為 POST /api/v1/sellers/:sellerId/reject
  */
 export const rejectSellerApplication = async (
-  applicationId: string,
-  reason: string
+  sellerId: string,
+  reason?: string
 ): Promise<{ success: boolean; message: string }> => {
   await delay(500);
 
   const application = mockSellerApplications.find(
-    (a) => a.application_id === applicationId
+    (a) => a.seller_id === sellerId
   );
   if (!application) throw new Error("申請不存在");
 
-  application.status = "rejected";
-  application.reviewed_by = "admin001";
-  application.reviewed_at = new Date().toISOString();
-  application.rejection_reason = reason;
+  application.rejected_at = new Date().toISOString();
+  application.updated_at = new Date().toISOString();
+
+  // Note: reason is not stored in database, will be sent via email (future implementation)
 
   return {
     success: true,
@@ -600,24 +609,67 @@ let mockUsers: AdminUser[] = [
 // 賣家申請數據
 let mockSellerApplications: SellerApplication[] = [
   {
-    application_id: "app_001",
-
+    seller_id: "1",
     user_id: "3",
+
+    // User 資訊
+    login_id: "seller001",
     user_name: "張大賣",
     email: "seller001@example.com",
     phone_number: "0912345678",
 
-    store_name: "大賣商店",
-    store_description: "專營電子產品",
-    store_address: "台北市信義區忠孝東路100號",
-    store_email: "store@example.com",
-    store_phone: "02-1234-5678",
-
+    // Seller 資訊
     bank_account_reference: "123-456-789",
+    verified: false,
+    verified_at: null,
+    verified_by: null,
+    rejected_at: null,
 
-    status: "pending",
+    // Timestamps
+    created_at: "2025-01-15T10:30:00Z",
+    updated_at: "2025-01-15T10:30:00Z",
+  },
+  {
+    seller_id: "2",
+    user_id: "4",
 
-    application_created_at: "2025-01-15T10:30:00Z",
+    // User 資訊
+    login_id: "seller002",
+    user_name: "李小華",
+    email: "seller002@example.com",
+    phone_number: "0923456789",
+
+    // Seller 資訊
+    bank_account_reference: "987-654-321",
+    verified: true,
+    verified_at: "2025-01-10T14:20:00Z",
+    verified_by: "admin001",
+    rejected_at: null,
+
+    // Timestamps
+    created_at: "2025-01-08T09:15:00Z",
+    updated_at: "2025-01-10T14:20:00Z",
+  },
+  {
+    seller_id: "3",
+    user_id: "5",
+
+    // User 資訊
+    login_id: "seller003",
+    user_name: "王小明",
+    email: "seller003@example.com",
+    phone_number: "0934567890",
+
+    // Seller 資訊
+    bank_account_reference: "555-666-777",
+    verified: false,
+    verified_at: null,
+    verified_by: null,
+    rejected_at: "2025-01-12T16:45:00Z",
+
+    // Timestamps
+    created_at: "2025-01-11T11:00:00Z",
+    updated_at: "2025-01-12T16:45:00Z",
   },
 ];
 
