@@ -86,6 +86,17 @@ export const put = <T = any>(endpoint: string, data?: any, options: RequestOptio
 };
 
 /**
+ * PATCH 請求
+ */
+export const patch = <T = any>(endpoint: string, data?: any, options: RequestOptions = {}): Promise<T> => {
+  return apiRequest<T>(endpoint, {
+    method: 'PATCH',
+    body: JSON.stringify(data),
+    ...options,
+  });
+};
+
+/**
  * DELETE 請求
  */
 export const del = <T = any>(endpoint: string, options: RequestOptions = {}): Promise<T> => {
@@ -99,5 +110,6 @@ export default {
   get,
   post,
   put,
+  patch,
   delete: del,
 };
