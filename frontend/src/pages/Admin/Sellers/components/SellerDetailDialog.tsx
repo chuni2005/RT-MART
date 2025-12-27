@@ -30,7 +30,6 @@ function SellerDetailDialog({
       onClose={onClose}
       title="賣家申請詳情"
       type="custom"
-      size="large"
     >
       <div className={styles.dialogContent}>
         {/* Section 1: 賣家資訊 */}
@@ -107,17 +106,14 @@ function SellerDetailDialog({
 
         {/* Action Buttons */}
         <div className={styles.actions}>
-          <Button variant="outline" onClick={onClose}>
-            關閉
-          </Button>
-          {isPending && onReject && (
-            <Button className={styles.btnDanger} onClick={onReject}>
-              拒絕
-            </Button>
-          )}
           {isPending && onApprove && (
             <Button className={styles.btnSuccess} onClick={onApprove}>
               批准
+            </Button>
+          )}
+          {isPending && onReject && (
+            <Button className={styles.btnDanger} onClick={onReject}>
+              拒絕
             </Button>
           )}
         </div>
