@@ -97,8 +97,13 @@ function DiscountEdit() {
 
   const { values, errors, validateAll, setValue } = form;
 
-  const handleChange = (nameOrEvent: string | React.ChangeEvent<HTMLInputElement>, value?: string) => {
-    if (typeof nameOrEvent === 'string') {
+  const handleChange = (
+    nameOrEvent:
+      | string
+      | React.ChangeEvent<HTMLInputElement | HTMLTextAreaElement>,
+    value?: string
+  ) => {
+    if (typeof nameOrEvent === "string") {
       const name = nameOrEvent;
       setValue(name as any, value);
       if (form.touched[name]) {
@@ -109,7 +114,7 @@ function DiscountEdit() {
     }
   };
 
-  const handleBlur = (nameOrEvent: string | React.FocusEvent<HTMLInputElement>) => {
+  const handleBlur = (nameOrEvent: string | React.FocusEvent<HTMLInputElement | HTMLTextAreaElement>) => {
     if (typeof nameOrEvent === 'string') {
       const name = nameOrEvent;
       const mockEvent = {
