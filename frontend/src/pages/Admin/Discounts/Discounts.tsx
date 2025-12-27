@@ -5,7 +5,7 @@ import Icon from '@/shared/components/Icon';
 import Dialog from '@/shared/components/Dialog';
 import Alert from '@/shared/components/Alert';
 import Tab from '@/shared/components/Tab';
-import adminService from '@/shared/services/adminService';
+import adminService from '@/shared/services/adminService.index';
 import { SystemDiscount } from '@/types/admin';
 import { AlertType } from '@/types';
 import styles from './Discounts.module.scss';

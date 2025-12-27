@@ -7,7 +7,7 @@ import EmptyState from '@/shared/components/EmptyState';
 import Alert from '@/shared/components/Alert';
 import Dialog from '@/shared/components/Dialog';
 import FormInput from '@/shared/components/FormInput';
-import adminService from '@/shared/services/adminService';
+import adminService from '@/shared/services/adminService.index';
 import { AdminOrder, AdminOrderFilters } from '@/types/admin';
 import { AlertType, SelectOption } from '@/types';
 import { OrderStatus } from '@/types/order';

@@ -3,7 +3,7 @@ import Icon from "@/shared/components/Icon";
 import Button from "@/shared/components/Button";
 import Alert from "@/shared/components/Alert";
 import Tab from "@/shared/components/Tab";
-import adminService from "@/shared/services/adminService";
+import adminService from "@/shared/services/adminService.index";
 import { SellerApplication } from "@/types/admin";
 import { AlertType } from "@/types";
 import SellerDetailDialog from "./components/SellerDetailDialog";

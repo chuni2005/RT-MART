@@ -1,6 +1,6 @@
 import { useState, useEffect } from 'react';
 import Icon from '@/shared/components/Icon';
-import adminService from '@/shared/services/adminService';
+import adminService from '@/shared/services/adminService.index';
 import { DashboardStats } from '@/types/admin';
 import RevenueLineChart from './components/RevenueLineChart';
 import UserGrowthBarChart from './components/UserGrowthBarChart';

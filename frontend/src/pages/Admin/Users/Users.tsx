@@ -5,7 +5,7 @@ import FormInput from '@/shared/components/FormInput';
 import Dialog from '@/shared/components/Dialog';
 import Alert from '@/shared/components/Alert';
 import SearchBar from '@/shared/components/Header/SearchBar';
-import adminService from '@/shared/services/adminService';
+import adminService from '@/shared/services/adminService.index';
 import { AdminUser } from '@/types/admin';
 import { AlertType } from '@/types';
 import styles from './Users.module.scss';
