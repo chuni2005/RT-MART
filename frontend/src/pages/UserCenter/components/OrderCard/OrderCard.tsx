@@ -6,7 +6,7 @@ import styles from './OrderCard.module.scss';
 
 import { OrderCardProps, OrderAction } from '@/types/userCenter';
 
-function OrderCard({ order, onViewDetail, onAction }: OrderCardProps) {
+function OrderCard({ order, onViewDetail, onAction, isProcessing = false }: OrderCardProps) {
   const navigate = useNavigate();
   
   // 根據訂單狀態顯示操作按鈕
@@ -106,6 +106,7 @@ function OrderCard({ order, onViewDetail, onAction }: OrderCardProps) {
               variant={action === "pay" ? "primary" : "outline"}
               onClick={() => onAction(order.orderId, action)}
               className={styles.actionsBtn}
+              disabled={isProcessing}
             >
               {actionLabels[action]}
             </Button>

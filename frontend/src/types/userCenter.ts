@@ -42,4 +42,5 @@ export interface OrderCardProps {
   order: OrderListItem;
   onViewDetail: (orderId: string) => void;
   onAction: (orderId: string, action: OrderAction) => void;
+  isProcessing?: boolean;
 }
