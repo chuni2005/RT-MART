@@ -1,30 +1,50 @@
 /**
- * Store Service - Mock API
+ * Store Service - API Integration
  */
 
 import { get } from './api';
 import type { Store } from '@/types';
 
 // ============================================
-// 介面定義 (API Response Types)
+// 設定與環境變數
+// ============================================
+
+const USE_MOCK_API = (import.meta as any).env.VITE_USE_MOCK_API === 'true';
+
+console.log(`[StoreService] Current Mode: ${USE_MOCK_API ? 'MOCK' : 'REAL API'}`);
+
+// ============================================
+// 介面定義 (Backend API Response Types)
 // ============================================
 
 /**
- * 後端 API 回應的商店資料結構
- * 對應後端 GET /api/stores/:id 回應格式
+ * 後端 Store Entity 結構 (對應 backend/src/stores/entities/store.entity.ts)
  */
-interface StoreApiResponse {
+interface BackendStore {
   storeId: string;
+  sellerId: string;
   storeName: string;
-  storeDescription: string;
-  storeAddress: string;
-  storeEmail: string;
-  storePhone: string;
-  averageRating: number;
+  storeDescription: string | null;
+  storeAddress: string | null;
+  storeEmail: string | null;
+  storePhone: string | null;
+  avatar: string | null;
+  averageRating: string; // Decimal is often returned as string
   totalRatings: number;
   createdAt: string;
-  storeAvatar?: string;
+  updatedAt: string;
+  deletedAt: string | null;
   productCount?: number;
+}
+
+/**
+ * 後端列表 API 回應結構
+ */
+interface BackendStoreListResponse {
+  data: BackendStore[];
+  total: number;
+  page: number;
+  limit: number;
 }
 
 /**
@@ -98,23 +118,27 @@ const mockDelay = (ms = 800): Promise<void> =>
   new Promise(resolve => setTimeout(resolve, ms));
 
 /**
- * 將後端 API 回應轉換為前端 Store 類型
- * 未來整合真實 API 時使用
+ * 將後端 Store Entity 轉換為前端 Store 介面
  */
-const mapApiResponseToStore = (apiData: StoreApiResponse): Store => {
+const transformStore = (backendStore: BackendStore): Store => {
   return {
-    id: apiData.storeId,
-    name: apiData.storeName,
-    description: apiData.storeDescription,
-    address: apiData.storeAddress,
-    email: apiData.storeEmail,
-    phone: apiData.storePhone,
-    rating: apiData.averageRating,
-    totalRatings: apiData.totalRatings,
-    joinDate: new Date(apiData.createdAt).toLocaleDateString('zh-TW', { year: 'numeric', month: '2-digit' }).replace(/\//g, '/'),
-    // 以下欄位後端可能未提供，需要預設值或另外取得
-    avatar: apiData.storeAvatar || 'https://i.pravatar.cc/150?img=1',
-    productCount: apiData.productCount || 0,
+    id: backendStore.storeId,
+    name: backendStore.storeName,
+    description: backendStore.storeDescription || '',
+    address: backendStore.storeAddress || '',
+    email: backendStore.storeEmail || '',
+    phone: backendStore.storePhone || '',
+    rating: Number(backendStore.averageRating) || 0,
+    totalRatings: backendStore.totalRatings || 0,
+    // 格式化日期
+    joinDate: new Date(backendStore.createdAt).toLocaleDateString('zh-TW', { 
+      year: 'numeric', 
+      month: '2-digit' 
+    }).replace(/\//g, '/'),
+    // 處理 Avatar 空值
+    avatar: backendStore.avatar || 'https://i.pravatar.cc/150?img=1',
+    // 處理 Product Count
+    productCount: backendStore.productCount || 0, 
   };
 };
 
@@ -123,54 +147,57 @@ const mapApiResponseToStore = (apiData: StoreApiResponse): Store => {
 // ============================================
 
 /**
- * 根據 ID 取得商店詳情 (Mock 版本)
- * @param storeId - 商店 ID
- * @returns 商店詳情回應
- * @throws {Error} 當商店不存在時拋出錯誤
+ * 根據 ID 取得商店詳情
  */
 export const getStoreById = async (storeId: string): Promise<GetStoreResponse> => {
-  // TODO: 待後端 API 完成後，替換為真實 API 呼叫
-  // const response = await get<StoreApiResponse>(`/stores/${storeId}`);
-  // const store = mapApiResponseToStore(response);
-  // return { success: true, store };
-
-  console.log('[Mock API] Get store by ID:', storeId);
-
-  // 模擬網路延遲
-  await mockDelay(800);
-
-  // 查找商店
-  const store = mockStores.find(s => s.id === storeId);
-
-  if (!store) {
-    throw new Error(`商店不存在 (ID: ${storeId})`); // TODO: i18n
+  // Real API Mode
+  if (!USE_MOCK_API) {
+    try {
+      // 直接呼叫後端標準 CRUD 端點
+      const backendStore = await get<BackendStore>(`/stores/${storeId}`);
+      
+      return {
+        success: true,
+        message: '成功取得商店資訊',
+        store: transformStore(backendStore),
+      };
+    } catch (error) {
+      console.error('[API Error] getStoreById:', error);
+      throw error;
+    }
   }
 
-  return {
-    success: true,
-    message: '成功取得商店資訊',
-    store,
-  };
+  // Mock Mode
+  console.log('[Mock API] Get store by ID:', storeId);
+  await mockDelay(800);
+  const store = mockStores.find(s => s.id === storeId);
+  if (!store) throw new Error(`商店不存在 (ID: ${storeId})`);
+  return { success: true, message: '成功取得商店資訊', store };
 };
 
 /**
- * 取得所有商店列表 (Mock 版本)
- * 未來可用於商店列表頁
+ * 取得所有商店列表
  */
 export const getAllStores = async (): Promise<Store[]> => {
-  // TODO: 待後端 API 完成後，替換為真實 API 呼叫
-  // return get<Store[]>('/stores');
+  // Real API Mode
+  if (!USE_MOCK_API) {
+    try {
+      // 後端回傳分頁格式 { data, total }，這裡我們只取 data
+      // 注意：這裡可能需要考慮是否要傳入分頁參數，目前先取預設 (page=1, limit=100)
+      const response = await get<BackendStoreListResponse>('/stores?limit=100'); 
+      return response.data.map(transformStore);
+    } catch (error) {
+      console.error('[API Error] getAllStores:', error);
+      // 發生錯誤時回傳空陣列或拋出錯誤，視 UX 決定
+      return []; 
+    }
+  }
 
+  // Mock Mode
   console.log('[Mock API] Get all stores');
-
   await mockDelay(600);
-
   return mockStores;
 };
-
-// ============================================
-// 預設匯出
-// ============================================
 
 export default {
   getStoreById,

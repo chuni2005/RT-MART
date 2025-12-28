@@ -19,7 +19,7 @@ import { UserRole } from '../users/entities/user.entity';
 
 @Controller('product-types')
 export class ProductTypesController {
-  constructor(private readonly productTypesService: ProductTypesService) { }
+  constructor(private readonly productTypesService: ProductTypesService) {}
 
   @Roles(UserRole.ADMIN)
   @UseGuards(JwtAccessGuard, RolesGuard)
@@ -38,6 +38,11 @@ export class ProductTypesController {
   @Get('admin')
   async adminFindAll() {
     return await this.productTypesService.adminFindAll();
+  }
+
+  @Get(':id/descendant-ids')
+  async getDescendantIds(@Param('id') id: string) {
+    return await this.productTypesService.getDescendantIds(id);
   }
 
   @Get(':id')

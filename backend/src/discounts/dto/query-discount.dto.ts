@@ -16,6 +16,10 @@ export class QueryDiscountDto {
 
   @IsString()
   @IsOptional()
+  createdById?: string;
+
+  @IsString()
+  @IsOptional()
   page?: string;
 
   @IsString()

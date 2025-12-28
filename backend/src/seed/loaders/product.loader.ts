@@ -45,7 +45,7 @@ export class ProductLoader extends BaseLoader<Product> {
       product.description =
         typeof data.description === 'string' ? data.description : null;
       product.price = Number(data.price);
-      product.viewCount =
+      product.soldCount =
         typeof data.sold_count === 'number'
           ? data.sold_count
           : Number(data.sold_count) || 0;
@@ -57,6 +57,8 @@ export class ProductLoader extends BaseLoader<Product> {
         typeof data.total_reviews === 'number'
           ? data.total_reviews
           : Number(data.total_reviews) || 0;
+      product.isActive =
+        typeof data.is_active === 'boolean' ? data.is_active : true;
       product.deletedAt = DataMapper.parseDate(
         typeof data.deleted_at === 'string' ? data.deleted_at : null,
       );

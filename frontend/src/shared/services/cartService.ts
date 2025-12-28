@@ -1,7 +1,73 @@
+/**
+ * Cart Service - API Integration
+ */
+
+import { get, post, patch, del } from './api';
 import type { CartItem, GetCartResponse } from '@/types';
 
-// TODO: Replace with real backend API calls
-// Mock data for development (4 items across 3 stores)
+// ============================================
+// 設定與環境變數
+// ============================================
+
+const USE_MOCK_API = (import.meta as any).env.VITE_USE_MOCK_API === 'true';
+
+console.log(`[CartService] Current Mode: ${USE_MOCK_API ? 'MOCK' : 'REAL API'}`);
+
+// ============================================
+// 介面定義 (Backend API Response Types)
+// ============================================
+
+/**
+ * 後端 CartItem Entity 結構 (對應 backend/src/carts/entities/cart-item.entity.ts)
+ */
+interface BackendCartItem {
+  cartItemId: string;
+  cartId: string;
+  productId: string;
+  quantity: number;
+  selected: boolean;
+  addedAt: string;
+  updatedAt: string;
+  product: {
+    productId: string;
+    productName: string;
+    price: string | number;
+    images?: Array<{ imageUrl: string }>;
+    storeId: string;
+    store: {
+      storeName: string;
+    };
+    inventory?: {
+      quantity: number;
+    };
+  };
+}
+
+/**
+ * 後端 Cart Entity 結構 (對應 backend/src/carts/entities/cart.entity.ts)
+ */
+interface BackendCart {
+  cartId: string;
+  userId: string;
+  createdAt: string;
+  updatedAt: string;
+  items: BackendCartItem[];
+}
+
+/**
+ * 後端 Summary API 回應結構
+ */
+interface BackendCartSummaryResponse {
+  cart: BackendCart;
+  totalItems: number;
+  totalAmount: number;
+  selectedTotalAmount: number;
+}
+
+// ============================================
+// Mock 資料 (開發測試用)
+// ============================================
+
 const mockCartItems: CartItem[] = [
   {
     id: 'cart_001',
@@ -53,242 +119,296 @@ const mockCartItems: CartItem[] = [
   },
 ];
 
-// Helper function to simulate network delay
+// ============================================
+// 輔助函數
+// ============================================
+
 const delay = (ms: number) => new Promise((resolve) => setTimeout(resolve, ms));
 
 /**
- * Get all cart items for current user
- * TODO: Replace with GET /api/v1/cart
+ * 將後端 CartItem Entity 轉換為前端 CartItem 介面
  */
-export const getCartItems = async (): Promise<GetCartResponse> => {
-  await delay(400);
-
+const transformCartItem = (backendItem: BackendCartItem): CartItem => {
   return {
-    success: true,
-    items: [...mockCartItems],
-    total: mockCartItems.length,
+    id: backendItem.cartItemId,
+    productId: backendItem.productId,
+    productName: backendItem.product.productName,
+    productImage: backendItem.product.images?.[0]?.imageUrl || 'https://via.placeholder.com/300',
+    price: Number(backendItem.product.price),
+    quantity: backendItem.quantity,
+    stock: backendItem.product.inventory?.quantity || 0,
+    selected: backendItem.selected,
+    storeId: backendItem.product.storeId,
+    storeName: backendItem.product.store.storeName,
   };
 };
 
+// ============================================
+// Service 函數
+// ============================================
+
 /**
- * Add item to cart
- * TODO: Replace with POST /api/v1/cart
+ * 取得當前使用者的購物車項目
  */
-export const addToCart = async (
-  productId: string,
-  quantity: number
-): Promise<{ success: boolean; message: string }> => {
-  await delay(300);
-
-  // Check if item already exists in cart
-  const existingItem = mockCartItems.find((item) => item.productId === productId);
-
-  if (existingItem) {
-    existingItem.quantity += quantity;
+export const getCartItems = async (): Promise<GetCartResponse> => {
+  if (USE_MOCK_API) {
+    await delay(400);
     return {
       success: true,
-      message: '商品數量已更新',
+      items: [...mockCartItems],
+      total: mockCartItems.length,
     };
   }
 
-  // TODO: Fetch product details from productService
-  const newItem: CartItem = {
-    id: `cart_${Date.now()}`,
-    productId,
-    productName: '新商品', // TODO: Get from product API
-    productImage: 'https://picsum.photos/300/300',
-    price: 999,
-    quantity,
-    stock: 50,
-    selected: true,
-    // Default store info (TODO: Get from product API)
-    storeId: 'store_001',
-    storeName: '科技生活旗艦店',
-  };
-
-  mockCartItems.push(newItem);
-
-  return {
-    success: true,
-    message: '已加入購物車',
-  };
+  try {
+    const cart = await get<BackendCart>('/carts');
+    const items = cart.items.map(transformCartItem);
+    return {
+      success: true,
+      items,
+      total: items.length,
+    };
+  } catch (error) {
+    console.error('[CartService] getCartItems error:', error);
+    throw error;
+  }
 };
 
 /**
- * Update cart item quantity
- * TODO: Replace with PUT /api/v1/cart/:itemId
+ * 加入商品至購物車
  */
-export const updateCartItemQuantity = async (
-  itemId: string,
-  quantity: number
+export const addToCart = async (
+  productId: string,
+  quantity: number,
+  selected?: boolean
 ): Promise<{ success: boolean; message: string }> => {
-  await delay(300);
-
-  const item = mockCartItems.find((item) => item.id === itemId);
-
-  if (!item) {
-    throw new Error('購物車項目不存在');
+  if (USE_MOCK_API) {
+    await delay(300);
+    const existingItem = mockCartItems.find((item) => item.productId === productId);
+    if (existingItem) {
+      existingItem.quantity += quantity;
+      if (selected !== undefined) existingItem.selected = selected;
+    } else {
+      mockCartItems.push({
+        id: `cart_${Date.now()}`,
+        productId,
+        productName: '新商品',
+        productImage: 'https://picsum.photos/300/300',
+        price: 999,
+        quantity,
+        stock: 50,
+        selected: selected ?? true,
+        storeId: 'store_001',
+        storeName: '科技生活旗艦店',
+      });
+    }
+    return { success: true, message: '已加入購物車' };
   }
 
-  if (quantity <= 0) {
-    throw new Error('數量必須大於 0');
+  try {
+    await post('/carts/items', { productId, quantity, selected });
+    return { success: true, message: '已加入購物車' };
+  } catch (error: any) {
+    console.error('[CartService] addToCart error:', error);
+    return { success: false, message: error.message || '加入購物車失敗' };
   }
-
-  if (quantity > item.stock) {
-    throw new Error(`庫存不足，目前僅剩 ${item.stock} 件`);
-  }
-
-  item.quantity = quantity;
-
-  return {
-    success: true,
-    message: '數量已更新',
-  };
 };
 
 /**
- * Remove item from cart
- * TODO: Replace with DELETE /api/v1/cart/:itemId
+ * 更新購物車項目數量或選取狀態
+ */
+export const updateCartItem = async (
+  itemId: string,
+  updates: { quantity?: number; selected?: boolean }
+): Promise<{ success: boolean; message: string }> => {
+  if (USE_MOCK_API) {
+    await delay(300);
+    const item = mockCartItems.find((item) => item.id === itemId);
+    if (!item) throw new Error('購物車項目不存在');
+    
+    if (updates.quantity !== undefined) item.quantity = updates.quantity;
+    if (updates.selected !== undefined) item.selected = updates.selected;
+    
+    return { success: true, message: '更新成功' };
+  }
+
+  try {
+    await patch(`/carts/items/${itemId}`, updates);
+    return { success: true, message: '更新成功' };
+  } catch (error: any) {
+    console.error('[CartService] updateCartItem error:', error);
+    return { success: false, message: error.message || '更新失敗' };
+  }
+};
+
+/**
+ * 批次更新購物車項目選取狀態
+ */
+export const batchUpdateCartItems = async (
+  items: Array<{ cartItemId: string; selected: boolean }>
+): Promise<{ success: boolean; message: string }> => {
+  if (USE_MOCK_API) {
+    await delay(300);
+    items.forEach(update => {
+      const item = mockCartItems.find(m => m.id === update.cartItemId);
+      if (item) item.selected = update.selected;
+    });
+    return { success: true, message: '更新成功' };
+  }
+
+  try {
+    await patch('/carts/items/batch', { items });
+    return { success: true, message: '更新成功' };
+  } catch (error: any) {
+    console.error('[CartService] batchUpdateCartItems error:', error);
+    return { success: false, message: error.message || '批次更新失敗' };
+  }
+};
+
+/**
+ * 從購物車移除項目
  */
 export const removeFromCart = async (
   itemId: string
 ): Promise<{ success: boolean; message: string }> => {
-  await delay(300);
-
-  const index = mockCartItems.findIndex((item) => item.id === itemId);
-
-  if (index === -1) {
-    throw new Error('購物車項目不存在');
+  if (USE_MOCK_API) {
+    await delay(300);
+    const index = mockCartItems.findIndex((item) => item.id === itemId);
+    if (index === -1) throw new Error('購物車項目不存在');
+    mockCartItems.splice(index, 1);
+    return { success: true, message: '已從購物車移除' };
   }
 
-  mockCartItems.splice(index, 1);
-
-  return {
-    success: true,
-    message: '已從購物車移除',
-  };
+  try {
+    await del(`/carts/items/${itemId}`);
+    return { success: true, message: '已從購物車移除' };
+  } catch (error: any) {
+    console.error('[CartService] removeFromCart error:', error);
+    return { success: false, message: error.message || '移除失敗' };
+  }
 };
 
 /**
- * Clear all items from cart
- * TODO: Replace with DELETE /api/v1/cart
+ * 清空購物車
  */
 export const clearCart = async (): Promise<{ success: boolean; message: string }> => {
-  await delay(300);
-
-  mockCartItems.length = 0;
-
-  return {
-    success: true,
-    message: '購物車已清空',
-  };
-};
-
-/**
- * Toggle cart item selection status
- * TODO: Replace with PUT /api/v1/cart/:itemId/select
- */
-export const toggleCartItemSelection = async (
-  itemId: string,
-  selected: boolean
-): Promise<{ success: boolean; message: string }> => {
-  await delay(200);
-
-  const item = mockCartItems.find((item) => item.id === itemId);
-
-  if (!item) {
-    throw new Error('購物車項目不存在');
+  if (USE_MOCK_API) {
+    await delay(300);
+    mockCartItems.length = 0;
+    return { success: true, message: '購物車已清空' };
   }
 
-  item.selected = selected;
-
-  return {
-    success: true,
-    message: selected ? '已選取' : '已取消選取',
-  };
+  try {
+    await del('/carts');
+    return { success: true, message: '購物車已清空' };
+  } catch (error: any) {
+    console.error('[CartService] clearCart error:', error);
+    return { success: false, message: error.message || '清空購物車失敗' };
+  }
 };
 
 /**
- * Select/deselect all cart items
- * TODO: Replace with PUT /api/v1/cart/select-all
+ * 移除已選取的項目
  */
-export const selectAllCartItems = async (
-  selected: boolean
-): Promise<{ success: boolean; message: string }> => {
-  await delay(200);
-
-  mockCartItems.forEach((item) => {
-    item.selected = selected;
-  });
-
-  return {
-    success: true,
-    message: selected ? '已全選' : '已取消全選',
-  };
-};
-
-/**
- * Select/deselect all items from a specific store
- * TODO: Replace with PUT /api/v1/cart/select-store/:storeId
- */
-export const selectStoreItems = async (
-  storeId: string,
-  selected: boolean
-): Promise<{ success: boolean; message: string }> => {
-  await delay(200);
-
-  let affectedCount = 0;
-  mockCartItems.forEach((item) => {
-    if (item.storeId === storeId) {
-      item.selected = selected;
-      affectedCount++;
+export const removeSelectedItems = async (): Promise<{ success: boolean; message: string }> => {
+  if (USE_MOCK_API) {
+    await delay(300);
+    for (let i = mockCartItems.length - 1; i >= 0; i--) {
+      if (mockCartItems[i].selected) {
+        mockCartItems.splice(i, 1);
+      }
     }
-  });
+    return { success: true, message: '已移除選取商品' };
+  }
 
-  return {
-    success: true,
-    message: `已${selected ? '選取' : '取消選取'} ${affectedCount} 個商品`,
-  };
+  try {
+    // 這裡可以使用後端新增的 removeSelectedItems 功能
+    // 雖然後端只有在 OrderService 內部呼叫，但我們可以視需要開放 API
+    // 目前後端 Controller 尚未開放這個端點，若需要前端主動呼叫需另補端點
+    // 暫時以 clearCart 或循環呼叫作為替代方案，或是直接呼叫後端未來可能開放的端點
+    // 此處假設後端未來可能開放 DELETE /carts/selected
+    await del('/carts/selected'); 
+    return { success: true, message: '已移除選取商品' };
+  } catch (error: any) {
+    console.error('[CartService] removeSelectedItems error:', error);
+    return { success: false, message: error.message || '移除失敗' };
+  }
 };
 
 /**
- * Get cart summary (total items count and total amount)
- * Lightweight API for header badge display
- *
- * Real API call (commented out):
- * ```typescript
- * const response = await fetch('/api/v1/carts/summary', {
- *   method: 'GET',
- *   headers: {
- *     'Authorization': `Bearer ${token}`,
- *     'Content-Type': 'application/json',
- *   },
- * });
- * const data = await response.json();
- * return {
- *   success: true,
- *   totalItems: data.totalItems,
- *   totalAmount: data.totalAmount,
- * };
- * ```
+ * 取得購物車摘要
  */
 export const getCartSummary = async (): Promise<{
   success: boolean;
   totalItems: number;
   totalAmount: number;
+  selectedTotalAmount: number;
 }> => {
-  await delay(300);
+  if (USE_MOCK_API) {
+    await delay(300);
+    const totalItems = mockCartItems.reduce((sum, item) => sum + item.quantity, 0);
+    const totalAmount = mockCartItems.reduce((sum, item) => sum + item.price * item.quantity, 0);
+    const selectedTotalAmount = mockCartItems
+      .filter(item => item.selected)
+      .reduce((sum, item) => sum + item.price * item.quantity, 0);
 
-  // Mock implementation: calculate from mockCartItems
-  const totalItems = mockCartItems.reduce((sum, item) => sum + item.quantity, 0);
-  const totalAmount = mockCartItems.reduce(
-    (sum, item) => sum + item.price * item.quantity,
-    0
-  );
+    return {
+      success: true,
+      totalItems,
+      totalAmount,
+      selectedTotalAmount,
+    };
+  }
 
-  return {
-    success: true,
-    totalItems,
-    totalAmount,
-  };
+  try {
+    const data = await get<BackendCartSummaryResponse>('/carts/summary');
+    return {
+      success: true,
+      totalItems: data.totalItems,
+      totalAmount: data.totalAmount,
+      selectedTotalAmount: data.selectedTotalAmount,
+    };
+  } catch (error) {
+    console.error('[CartService] getCartSummary error:', error);
+    throw error;
+  }
+};
+
+// ============================================
+// 為了相容性保留舊的函數名稱並導向新函數
+// ============================================
+
+export const updateCartItemQuantity = (itemId: string, quantity: number) => 
+  updateCartItem(itemId, { quantity });
+
+export const toggleCartItemSelection = (itemId: string, selected: boolean) => 
+  updateCartItem(itemId, { selected });
+
+export const selectAllCartItems = async (selected: boolean) => {
+  const { items } = await getCartItems();
+  return batchUpdateCartItems(items.map(i => ({ cartItemId: i.id, selected })));
+};
+
+export const selectStoreItems = async (storeId: string, selected: boolean) => {
+  const { items } = await getCartItems();
+  const storeItems = items
+    .filter(i => i.storeId === storeId)
+    .map(i => ({ cartItemId: i.id, selected }));
+  return batchUpdateCartItems(storeItems);
+};
+
+export default {
+  getCartItems,
+  addToCart,
+  updateCartItem,
+  batchUpdateCartItems,
+  removeFromCart,
+  clearCart,
+  removeSelectedItems,
+  getCartSummary,
+  // 相容性導出
+  updateCartItemQuantity,
+  toggleCartItemSelection,
+  selectAllCartItems,
+  selectStoreItems,
 };

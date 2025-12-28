@@ -12,50 +12,46 @@ import * as ProductTypesPostTest from './../functions/product-types/product-type
 import * as ProductTypesPatchTest from './../functions/product-types/product-types_patch';
 import * as ProductTypesGetTest from './../functions/product-types/product-types_get';
 import * as SellerGetTest from './../functions/sellers/sellers_get';
-import { buyerUser, sellerUser, adminUser, adminTester, buyerUser_sellerCase } from './../variables';
-
+import {
+  buyerUser,
+  sellerUser,
+  adminUser,
+  adminTester,
+  buyerUser_sellerCase,
+} from './../variables';
 
 describe('DiscountsController (e2e)', () => {
-    let app: INestApplication;
+  let app: INestApplication;
 
-    beforeAll(async () => {
-        app = await createTestApp();
-    }, 15000);
+  beforeAll(async () => {
+    app = await createTestApp();
+  }, 15000);
 
-    afterAll(async () => {
-        await app.close();
-    });
+  afterAll(async () => {
+    await app.close();
+  });
 
-    it('setup', async () => {
-        await AuthPostTest.loginUser(app, adminTester);
-        await UserPostTest.createUser(app, buyerUser);
-        await UserPostTest.createUser(app, sellerUser);
-        await UserPostTest.createUser(app, adminUser);
-        await AuthPostTest.loginUser(app, buyerUser);
-        await AuthPostTest.loginUser(app, sellerUser);
-        await AuthPostTest.loginUser(app, adminUser);
-    }, 25000);
+  it('setup', async () => {
+    await AuthPostTest.loginUser(app, adminTester);
+    await UserPostTest.createUser(app, buyerUser);
+    await UserPostTest.createUser(app, sellerUser);
+    await UserPostTest.createUser(app, adminUser);
+    await AuthPostTest.loginUser(app, buyerUser);
+    await AuthPostTest.loginUser(app, sellerUser);
+    await AuthPostTest.loginUser(app, adminUser);
+  }, 25000);
 
-    it(`/discounts (POST) → Create special discounts (seller's)`, async () => {
+  it(`/discounts (POST) → Create special discounts (seller's)`, async () => {});
 
-    });
+  it(`/discounts/admin (POST) → Create discounts (admin's)`, async () => {});
 
-    it(`/discounts/admin (POST) → Create discounts (admin's)`, async () => {
+  it(`/discounts (Get) → Find all discounts with filter (public)`, async () => {});
 
-    });
+  it(`/discounts (Get) → Find all discounts with filter (public)`, async () => {});
 
-    it(`/discounts (Get) → Find all discounts with filter (public)`, async () => {
-
-    });
-
-    it(`/discounts (Get) → Find all discounts with filter (public)`, async () => {
-
-    });
-
-    it(`teardown`, async () => {
-        await UserDeleteTest.permanentlyDeleteUserById(app, buyerUser.userId);
-        await UserDeleteTest.permanentlyDeleteUserById(app, sellerUser.userId);
-        await UserDeleteTest.permanentlyDeleteUserById(app, adminUser.userId);
-    });
-
+  it(`teardown`, async () => {
+    await UserDeleteTest.permanentlyDeleteUserById(app, buyerUser.userId);
+    await UserDeleteTest.permanentlyDeleteUserById(app, sellerUser.userId);
+    await UserDeleteTest.permanentlyDeleteUserById(app, adminUser.userId);
+  });
 });

@@ -8,6 +8,7 @@ export class CreateCartItemTable20251116030012 implements MigrationInterface {
         cart_id BIGINT NOT NULL,
         product_id BIGINT NOT NULL,
         quantity INT NOT NULL,
+        selected BOOLEAN DEFAULT TRUE,
         added_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
         updated_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,
         CONSTRAINT FK_cartitem_cart FOREIGN KEY (cart_id) REFERENCES Cart(cart_id) ON DELETE CASCADE,

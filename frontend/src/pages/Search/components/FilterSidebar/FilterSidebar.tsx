@@ -1,4 +1,3 @@
-import React from "react";
 import Select from "@/shared/components/Select";
 import Button from "@/shared/components/Button";
 import PriceRangeFilter from "../PriceRangeFilter";
@@ -25,9 +24,10 @@ export interface FilterSidebarProps {
     productTypeId: string;
     typeName: string;
     count: number;
+    parentTypeId?: string | null;
   }>;
-  totalProductCount?: number;  // 全部商品的數量
-  showAllCategoryOption?: boolean;  // 是否顯示「全部商品」選項
+  totalProductCount?: number; // 全部商品的數量
+  showAllCategoryOption?: boolean; // 是否顯示「全部商品」選項
 
   // 排序
   sortBy: string;

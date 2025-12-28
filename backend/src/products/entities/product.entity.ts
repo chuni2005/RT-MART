@@ -44,7 +44,7 @@ export class Product {
   price: number;
 
   @Column({ name: 'sold_count', type: 'bigint', default: 0 })
-  viewCount: number;
+  soldCount: number;
 
   @Column({
     name: 'average_rating',
@@ -57,10 +57,9 @@ export class Product {
 
   @Column({ name: 'total_reviews', type: 'int', default: 0 })
   totalReviews: number;
-  
+
   @Column({ name: 'is_active', type: 'boolean', default: true })
   isActive: boolean;
-
 
   @DeleteDateColumn({ type: 'timestamp', name: 'deleted_at', nullable: true })
   deletedAt: Date | null;

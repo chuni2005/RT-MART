@@ -1,16 +1,19 @@
-import { useState, useEffect } from 'react';
-import AddressCard from '@/pages/Checkout/components/AddressCard';
-import AddressFormDialog, { AddressFormData } from '@/pages/Checkout/components/AddressFormDialog';
-import Dialog from '@/shared/components/Dialog';
-import Button from '@/shared/components/Button';
-import { Address } from '@/types/common';
+import { useState, useEffect } from "react";
+import AddressCard from "@/pages/Checkout/components/AddressCard";
+import AddressFormDialog, {
+  AddressFormData,
+} from "@/pages/Checkout/components/AddressFormDialog";
+import Dialog from "@/shared/components/Dialog";
+import Button from "@/shared/components/Button";
+import { Address } from "@/types/common";
 import {
   getAddresses,
   addAddress,
   updateAddress,
   deleteAddress,
-} from '@/shared/services/addressService';
-import styles from './AddressPage.module.scss';
+  setDefaultAddress,
+} from "@/shared/services/addressService";
+import styles from "./AddressPage.module.scss";
 
 /**
  * 收件地址管理頁面
@@ -25,7 +28,7 @@ function AddressPage() {
   const [showDeleteDialog, setShowDeleteDialog] = useState(false);
 
   // Dialog mode and selected address
-  const [dialogMode, setDialogMode] = useState<'add' | 'edit'>('add');
+  const [dialogMode, setDialogMode] = useState<"add" | "edit">("add");
   const [selectedAddress, setSelectedAddress] = useState<Address | null>(null);
 
   // Fetch addresses on mount
@@ -42,7 +45,7 @@ function AddressPage() {
       const data = await getAddresses();
       setAddresses(data);
     } catch (error) {
-      console.error('Failed to fetch addresses:', error);
+      console.error("Failed to fetch addresses:", error);
       // TODO: Show error toast/alert
     } finally {
       setIsLoading(false);
@@ -53,7 +56,7 @@ function AddressPage() {
    * Open dialog to add new address
    */
   const handleAddAddress = () => {
-    setDialogMode('add');
+    setDialogMode("add");
     setSelectedAddress(null);
     setShowFormDialog(true);
   };
@@ -62,7 +65,7 @@ function AddressPage() {
    * Open dialog to edit existing address
    */
   const handleEditAddress = (address: Address) => {
-    setDialogMode('edit');
+    setDialogMode("edit");
     setSelectedAddress(address);
     setShowFormDialog(true);
   };
@@ -80,11 +83,11 @@ function AddressPage() {
    */
   const handleSetDefault = async (addressId: string) => {
     try {
-      await updateAddress(addressId, { isDefault: true });
+      await setDefaultAddress(addressId);
       await fetchAddresses(); // Refresh list
       // TODO: Show success message
     } catch (error) {
-      console.error('Failed to set default:', error);
+      console.error("Failed to set default:", error);
       // TODO: Show error alert
     }
   };
@@ -99,7 +102,7 @@ function AddressPage() {
       await fetchAddresses(); // Refresh list
       // TODO: Show success message
     } catch (error) {
-      console.error('Failed to add address:', error);
+      console.error("Failed to add address:", error);
       // TODO: Show error alert
     }
   };
@@ -116,7 +119,7 @@ function AddressPage() {
       await fetchAddresses(); // Refresh list
       // TODO: Show success message
     } catch (error) {
-      console.error('Failed to update address:', error);
+      console.error("Failed to update address:", error);
       // TODO: Show error alert
     }
   };
@@ -134,7 +137,7 @@ function AddressPage() {
       await fetchAddresses(); // Refresh list
       // TODO: Show success message
     } catch (error) {
-      console.error('Failed to delete address:', error);
+      console.error("Failed to delete address:", error);
       // TODO: Show error alert
     }
   };
@@ -144,11 +147,7 @@ function AddressPage() {
       {/* Page Header */}
       <div className={styles.pageHeader}>
         <h2 className={styles.pageTitle}>收件地址管理</h2>
-        <Button
-          variant="primary"
-          icon="plus"
-          onClick={handleAddAddress}
-        >
+        <Button variant="primary" icon="plus" onClick={handleAddAddress}>
           新增地址
         </Button>
       </div>
@@ -167,10 +166,7 @@ function AddressPage() {
         <div className={styles.addressGrid}>
           {addresses.map((address) => (
             <div key={address.id} className={styles.addressItem}>
-              <AddressCard
-                address={address}
-                isDefault={address.isDefault}
-              />
+              <AddressCard address={address} isDefault={address.isDefault} />
               <div className={styles.addressActions}>
                 {!address.isDefault && (
                   <Button
@@ -205,7 +201,11 @@ function AddressPage() {
       <AddressFormDialog
         isOpen={showFormDialog}
         onClose={() => setShowFormDialog(false)}
-        onSubmit={dialogMode === 'add' ? handleSubmitNewAddress : handleSubmitEditAddress}
+        onSubmit={
+          dialogMode === "add"
+            ? handleSubmitNewAddress
+            : handleSubmitEditAddress
+        }
         mode={dialogMode}
         initialData={selectedAddress || undefined}
       />

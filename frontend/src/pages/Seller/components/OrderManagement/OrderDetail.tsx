@@ -160,7 +160,8 @@ function OrderDetail() {
               <Icon icon="location-dot" />
               <span>
                 {order.shippingAddress.postalCode} {order.shippingAddress.city}
-                {order.shippingAddress.district} {order.shippingAddress.detail}
+                {order.shippingAddress.district} {order.shippingAddress.addressLine1}
+                {order.shippingAddress.addressLine2 ? `, ${order.shippingAddress.addressLine2}` : ''}
               </span>
             </div>
           </div>

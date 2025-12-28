@@ -1,22 +1,15 @@
-import { useState, useEffect, useMemo } from 'react';
-import { useNavigate } from 'react-router-dom';
-import styles from './Cart.module.scss';
-import ItemListCard from '@/shared/components/ItemListCard';
-import CheckoutSummary from '@/shared/components/CheckoutSummary';
-import EmptyState from '@/shared/components/EmptyState';
-import StoreGroupHeader from '@/shared/components/StoreGroupHeader';
-import Dialog from '@/shared/components/Dialog';
-import type { CartItem } from '@/types';
-import type { StoreGroup } from '@/types/cart';
-import {
-  getCartItems,
-  updateCartItemQuantity,
-  removeFromCart,
-  toggleCartItemSelection,
-  selectAllCartItems,
-  selectStoreItems,
-} from '@/shared/services/cartService';
-import { groupOrdersByStore } from '@/shared/utils/groupOrdersByStore';
+import { useMemo, useState } from "react";
+import { useNavigate } from "react-router-dom";
+import styles from "./Cart.module.scss";
+import ItemListCard from "@/shared/components/ItemListCard";
+import CheckoutSummary from "@/shared/components/CheckoutSummary";
+import EmptyState from "@/shared/components/EmptyState";
+import StoreGroupHeader from "@/shared/components/StoreGroupHeader";
+import Dialog from "@/shared/components/Dialog";
+import type { CartItem } from "@/types";
+import type { StoreGroup } from "@/types/cart";
+import { useCart } from "@/shared/contexts/CartContext";
+import { groupOrdersByStore } from "@/shared/utils/groupOrdersByStore";
 
 /**
  * Group cart items by store
@@ -51,8 +44,15 @@ const groupItemsByStore = (items: CartItem[]): StoreGroup[] => {
 
 function Cart() {
   const navigate = useNavigate();
-  const [cartItems, setCartItems] = useState<CartItem[]>([]);
-  const [isLoading, setIsLoading] = useState(true);
+  const {
+    items: cartItems,
+    isInitialLoading,
+    updateQuantity,
+    updateSelection,
+    batchUpdateSelection,
+    removeFromCart,
+  } = useCart();
+
   const [showDeleteDialog, setShowDeleteDialog] = useState(false);
   const [deleteItemId, setDeleteItemId] = useState<string | null>(null);
 
@@ -73,7 +73,10 @@ function Cart() {
     return {
       subtotal: storeGroups.reduce((sum, group) => sum + group.subtotal, 0),
       shipping: storeGroups.reduce((sum, group) => sum + group.shipping, 0),
-      shippingDiscount: storeGroups.reduce((sum, group) => sum + group.shippingDiscount, 0),
+      shippingDiscount: storeGroups.reduce(
+        (sum, group) => sum + group.shippingDiscount,
+        0
+      ),
       total: storeGroups.reduce((sum, group) => sum + group.total, 0),
     };
   }, [selectedItems]);
@@ -82,72 +85,52 @@ function Cart() {
   const allSelected =
     cartItems.length > 0 && cartItems.every((item) => item.selected);
 
-  // 載入購物車數據
-  useEffect(() => {
-    const fetchCart = async () => {
-      try {
-        setIsLoading(true);
-        const response = await getCartItems();
-        setCartItems(response.items);
-      } catch (error) {
-        console.error('Failed to load cart:', error);
-      } finally {
-        setIsLoading(false);
-      }
-    };
-
-    fetchCart();
-  }, []);
-
   // 全選/取消全選
   const handleSelectAll = async () => {
     try {
-      await selectAllCartItems(!allSelected);
-      setCartItems((prev) =>
-        prev.map((item) => ({ ...item, selected: !allSelected }))
-      );
+      const updates = cartItems.map((item) => ({
+        cartItemId: item.id,
+        selected: !allSelected,
+      }));
+      await batchUpdateSelection(updates);
     } catch (error) {
-      console.error('Failed to select all:', error);
+      console.error("Failed to select all:", error);
     }
   };
 
   // Handle store-level selection
   const handleSelectStore = async (storeId: string, selected: boolean) => {
     try {
-      await selectStoreItems(storeId, selected);
-      setCartItems((prev) =>
-        prev.map((item) =>
-          item.storeId === storeId ? { ...item, selected } : item
-        )
-      );
+      const storeItems = cartItems
+        .filter((item) => item.storeId === storeId)
+        .map((item) => ({
+          cartItemId: item.id,
+          selected,
+        }));
+      await batchUpdateSelection(storeItems);
     } catch (error) {
-      console.error('Failed to select store items:', error);
+      console.error("Failed to select store items:", error);
     }
   };
 
   // 切換單個項目選取
   const handleSelectItem = async (id: string, selected: boolean) => {
     try {
-      await toggleCartItemSelection(id, selected);
-      setCartItems((prev) =>
-        prev.map((item) => (item.id === id ? { ...item, selected } : item))
-      );
+      await updateSelection(id, selected);
     } catch (error) {
-      console.error('Failed to toggle selection:', error);
+      console.error("Failed to toggle selection:", error);
     }
   };
 
   // 更新數量
   const handleQuantityChange = async (id: string, quantity: number) => {
+    
     if (quantity < 1) return;
 
     try {
-      await updateCartItemQuantity(id, quantity);
-      setCartItems((prev) =>
-        prev.map((item) => (item.id === id ? { ...item, quantity } : item))
-      );
+      await updateQuantity(id, quantity);
     } catch (error) {
-      alert(error instanceof Error ? error.message : '更新失敗');
+      alert(error instanceof Error ? error.message : "更新失敗");
     }
   };
 
@@ -163,9 +146,8 @@ function Cart() {
 
     try {
       await removeFromCart(deleteItemId);
-      setCartItems((prev) => prev.filter((item) => item.id !== deleteItemId));
     } catch (error) {
-      console.error('Failed to remove item:', error);
+      console.error("Failed to remove item:", error);
     } finally {
       setShowDeleteDialog(false);
       setDeleteItemId(null);
@@ -175,17 +157,17 @@ function Cart() {
   // 前往結帳
   const handleCheckout = () => {
     if (selectedItems.length === 0) {
-      alert('請至少選擇一個商品');
+      alert("請至少選擇一個商品");
       return;
     }
     // TODO: 實作結帳頁面
-    navigate('/checkout', {
+    navigate("/checkout", {
       state: { items: selectedItems },
     });
   };
 
   // Loading 狀態
-  if (isLoading) {
+  if (isInitialLoading) {
     return (
       <div className={styles.loading}>
         <p>載入中...</p>
@@ -221,7 +203,9 @@ function Cart() {
 
             {/* Image Placeholder with Product Label */}
             <div className={styles.imagePlaceholder}>
-              <span>商品 ({selectedItems.length}/{cartItems.length})</span>
+              <span>
+                商品 ({selectedItems.length}/{cartItems.length})
+              </span>
             </div>
 
             {/* Column Headers matching productInfo grid */}
@@ -254,9 +238,7 @@ function Cart() {
                   {storeGroup.items.map((item, index) => {
                     const isLast = index === storeGroup.items.length - 1;
 
-                    const itemClassName = isLast
-                          ? styles.lastItem
-                          : '';
+                    const itemClassName = isLast ? styles.lastItem : "";
 
                     return (
                       <ItemListCard
@@ -267,7 +249,9 @@ function Cart() {
                         editable
                         deletable
                         className={itemClassName}
-                        onSelect={(selected) => handleSelectItem(item.id, selected)}
+                        onSelect={(selected) =>
+                          handleSelectItem(item.id, selected)
+                        }
                         onQuantityChange={(qty) =>
                           handleQuantityChange(item.id, qty)
                         }

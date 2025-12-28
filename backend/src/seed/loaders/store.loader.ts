@@ -1,3 +1,5 @@
+/* eslint-disable @typescript-eslint/restrict-template-expressions */
+/* eslint-disable @typescript-eslint/no-base-to-string */
 import { IsNull } from 'typeorm';
 import { BaseLoader } from './base.loader';
 import { Store } from '../../stores/entities/store.entity';
@@ -43,6 +45,11 @@ export class StoreLoader extends BaseLoader<Store> {
         typeof data.store_email === 'string' ? data.store_email : null;
       store.storePhone =
         typeof data.store_phone === 'string' ? data.store_phone : null;
+
+      // Generate avatar URL based on script_store_id (which is used as temporary ID in seed data)
+      const tempId = data.script_store_id || Math.floor(Math.random() * 100);
+      store.avatar = `https://i.pravatar.cc/150?img=${tempId}`;
+
       store.averageRating =
         typeof data.average_rating === 'number'
           ? data.average_rating
@@ -51,6 +58,7 @@ export class StoreLoader extends BaseLoader<Store> {
         typeof data.total_ratings === 'number'
           ? data.total_ratings
           : Number(data.total_ratings) || 0;
+      store.productCount = 0;
       store.deletedAt = null;
 
       return Promise.resolve(store);
@@ -98,8 +106,10 @@ export class StoreLoader extends BaseLoader<Store> {
               : Number(data.seller_id),
           );
           if (sellerId && typeof data.store_name === 'string') {
-            const store = stores.find((s) => s.sellerId === sellerId);
-            if (store && store.storeName === data.store_name) {
+            const store = stores.find(
+              (s) => s.sellerId === sellerId && s.storeName === data.store_name,
+            );
+            if (store) {
               this.idMapping.setMapping(
                 'Store',
                 typeof data.script_store_id === 'number'

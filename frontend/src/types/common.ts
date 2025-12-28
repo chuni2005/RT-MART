@@ -175,7 +175,8 @@ export interface Address {
   city: string;
   district: string;
   postalCode: string;
-  detail: string;
+  addressLine1: string;
+  addressLine2?: string;
   isDefault: boolean;
 }
 

@@ -1,3 +1,4 @@
+import { useNavigate } from 'react-router-dom';
 import { OrderListItem, OrderStatus } from '@/types/order';
 import Button from '@/shared/components/Button';
 import ItemListCard from '@/shared/components/ItemListCard';
@@ -6,6 +7,8 @@ import styles from './OrderCard.module.scss';
 import { OrderCardProps, OrderAction } from '@/types/userCenter';
 
 function OrderCard({ order, onViewDetail, onAction }: OrderCardProps) {
+  const navigate = useNavigate();
+  
   // 根據訂單狀態顯示操作按鈕
   const getActionButtons = (status: OrderStatus): OrderAction[] => {
     switch (status) {
@@ -71,8 +74,7 @@ function OrderCard({ order, onViewDetail, onAction }: OrderCardProps) {
             variant="order-list"
             item={item}
             onClick={() => {
-              // TODO: 導航到商品頁面
-              console.log("Navigate to product:", item.productId);
+              navigate(`/product/${item.productId}`);
             }}
           />
         ))}

@@ -1,13 +1,11 @@
 import {
   IsEmail,
   IsOptional,
-  IsEnum,
   IsString,
   Length,
   Matches,
   MinLength,
 } from 'class-validator';
-import { UserRole } from '../entities/user.entity';
 
 /**
  * UpdateUserDto - 更新使用者資料
@@ -29,6 +27,10 @@ export class UpdateUserDto {
 
   @IsString()
   @IsOptional()
+  currentPassword?: string;
+
+  @IsString()
+  @IsOptional()
   @Length(1, 100)
   name?: string;
 
@@ -41,5 +43,5 @@ export class UpdateUserDto {
   @Matches(/^[0-9+\-() ]+$/, {
     message: 'phoneNumber must be a valid phone number format',
   })
-  phone?: string;
+  phoneNumber?: string;
 }

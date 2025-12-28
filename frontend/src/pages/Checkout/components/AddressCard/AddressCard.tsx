@@ -1,5 +1,5 @@
-import type { Address } from '@/types';
-import styles from './AddressCard.module.scss';
+import type { Address } from "@/types";
+import styles from "./AddressCard.module.scss";
 
 interface AddressCardProps {
   address: Address;
@@ -15,13 +15,15 @@ interface AddressCardProps {
  * @param isDefault - 是否為預設地址
  * @param className - 額外的 CSS class
  */
-function AddressCard({ address, isDefault = false, className = '' }: AddressCardProps) {
+function AddressCard({
+  address,
+  isDefault = false,
+  className = "",
+}: AddressCardProps) {
   return (
     <div className={`${styles.addressCard} ${className}`}>
       {/* 預設標籤 */}
-      {isDefault && (
-        <span className={styles.defaultBadge}>預設</span>
-      )}
+      {isDefault && <span className={styles.defaultBadge}>預設</span>}
 
       {/* 收件人資訊 */}
       <div className={styles.recipientInfo}>
@@ -33,7 +35,7 @@ function AddressCard({ address, isDefault = false, className = '' }: AddressCard
       <p className={styles.address}>
         {address.city} {address.district} {address.postalCode}
         <br />
-        {address.detail}
+        {address.addressLine1} {address.addressLine2 || ""}
       </p>
     </div>
   );

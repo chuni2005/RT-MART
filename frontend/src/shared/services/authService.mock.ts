@@ -18,7 +18,7 @@ interface MockUser extends User {
 // Mock 用戶資料庫
 const mockUsers: MockUser[] = [
   {
-    id: "1",
+    userId: "1",
     loginId: "hahahai0816",
     name: "測試用戶",
     email: "test@rtmart.com",
@@ -28,7 +28,7 @@ const mockUsers: MockUser[] = [
     role: "buyer",
   },
   {
-    id: "2",
+    userId: "2",
     loginId: "seller01",
     name: "賣家用戶",
     email: "seller@rtmart.com",
@@ -39,7 +39,7 @@ const mockUsers: MockUser[] = [
     role: "seller",
   },
   {
-    id: "3",
+    userId: "3",
     loginId: "admin",
     name: "管理員",
     email: "admin@rtmart.com",
@@ -109,7 +109,7 @@ export const mockRegister = async (
 
       // 創建新用戶
       const newUser: MockUser = {
-        id: String(mockUsers.length + 1),
+        userId: String(mockUsers.length + 1),
         loginId,
         name,
         email,

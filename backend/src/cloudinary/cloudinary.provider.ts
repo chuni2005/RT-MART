@@ -1,3 +1,6 @@
+/* eslint-disable  @typescript-eslint/no-unsafe-assignment */
+/* eslint-disable  @typescript-eslint/no-unsafe-call */
+/* eslint-disable  @typescript-eslint/no-unsafe-return */
 import { v2 as cloudinary } from 'cloudinary';
 import { ConfigService } from '@nestjs/config';
 import { ConfigModule } from '@nestjs/config';

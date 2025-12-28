@@ -14,7 +14,7 @@ import {
   UploadedFiles,
   UseInterceptors,
 } from '@nestjs/common';
-import { ProductsService } from './products.service';
+import { ProductsService, EnrichedProduct } from './products.service';
 import { CreateProductDto } from './dto/create-product.dto';
 import { UpdateProductDto } from './dto/update-product.dto';
 import { QueryProductDto } from './dto/query-product.dto';
@@ -25,7 +25,10 @@ import { UserRole } from '../users/entities/user.entity';
 import { AuthTokenResponseDto } from '@/auth/dto/auth-response.dto';
 import type { AuthRequest } from '../common/types';
 import { FilesInterceptor } from '@nestjs/platform-express';
-import { SortImagesDto, UpdateSortedImagesDto } from './dto/upate-sortedImages.dto';
+import {
+  SortImagesDto,
+  UpdateSortedImagesDto,
+} from './dto/upate-sortedImages.dto';
 
 @Controller('products')
 export class ProductsController {
@@ -38,9 +41,33 @@ export class ProductsController {
   async create(
     @Req() req: AuthRequest,
     @Body() createDto: CreateProductDto,
-    @UploadedFiles() files: Express.Multer.File[]
+    @UploadedFiles() files: Express.Multer.File[],
   ) {
     return await this.productsService.create(req.user.userId, createDto, files);
+  }
+
+  @Get('storefront')
+  async findStorefront(@Query() queryDto: QueryProductDto) {
+    const { data, total } = await this.productsService.findStorefront(queryDto);
+    return {
+      success: true,
+      message: 'Storefront products retrieved successfully',
+      products: data,
+      total,
+      page: parseInt(queryDto.page || '1', 10),
+      limit: parseInt(queryDto.limit || '20', 10),
+    };
+  }
+
+  @Get('storefront/:id')
+  async findStorefrontDetail(@Param('id') id: string) {
+    const product: EnrichedProduct =
+      await this.productsService.findStorefrontDetail(id);
+    return {
+      success: true,
+      message: 'Product detail retrieved successfully',
+      product,
+    };
   }
 
   @Get()
@@ -71,7 +98,11 @@ export class ProductsController {
   @UseGuards(JwtAccessGuard, RolesGuard)
   @Get('admin')
   async findAllByAdmin(@Query() queryDto: QueryProductDto) {
-    const { data, total } = await this.productsService.findAll(queryDto, true, true);
+    const { data, total } = await this.productsService.findAll(
+      queryDto,
+      true,
+      true,
+    );
     return {
       data,
       total,
@@ -121,7 +152,7 @@ export class ProductsController {
   ) {
     return await this.productsService.addImages(req.user.userId, id, files);
   }
-  
+
   @Roles(UserRole.SELLER)
   @UseGuards(JwtAccessGuard, RolesGuard)
   @Patch(':id/images/sort')
@@ -130,7 +161,11 @@ export class ProductsController {
     @Param('id') id: string,
     @Body() sortImages: SortImagesDto,
   ) {
-    return await this.productsService.sortImages(req.user.userId, id, sortImages);
+    return await this.productsService.sortImages(
+      req.user.userId,
+      id,
+      sortImages,
+    );
   }
 
   @Roles(UserRole.SELLER)

@@ -1,6 +1,6 @@
 // User related types
 export interface User {
-  id: string;
+  userId: string;
   loginId: string;
   name: string;
   email: string;

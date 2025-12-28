@@ -74,7 +74,10 @@ export async function loginUserWithInvalidCredentials(
   expect(res.body).toHaveProperty('message');
 }
 
-export async function refreshAccessTokenWithCookie(app: INestApplication, user: any): Promise<void> {
+export async function refreshAccessTokenWithCookie(
+  app: INestApplication,
+  user: any,
+): Promise<void> {
   // console.log(
   //   'Using cookies for refresh token:',
   //   buyerUser.cookie.refreshToken,

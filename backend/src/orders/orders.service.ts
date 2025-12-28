@@ -28,6 +28,7 @@ export class OrdersService {
     private readonly dataSource: DataSource,
   ) {}
 
+  // TODO: 付款等待 清空購物車邏輯
   async create(userId: string, createDto: CreateOrderDto): Promise<Order> {
     // Get cart with items (outside transaction)
     const { cart } = await this.cartsService.getCartSummary(userId);
@@ -44,8 +45,13 @@ export class OrdersService {
 
     // Use transaction for order creation
     return await this.dataSource.transaction(async (manager) => {
-      // Group items by store
-      const cartItems = cart.items!; // Safe because we checked above
+      // Filter only selected items and group items by store
+      const cartItems = cart.items!.filter((item) => item.selected);
+
+      if (cartItems.length === 0) {
+        throw new BadRequestException('No items selected for checkout');
+      }
+
       const itemsByStore = new Map<string, typeof cartItems>();
       for (const item of cartItems) {
         const storeId = item.product.storeId;
@@ -116,11 +122,16 @@ export class OrdersService {
         orders.push(savedOrder);
       }
 
-      // Clear cart after successful order creation (within transaction)
-      await this.cartsService.clearCart(userId);
+      // Clear only selected items after successful order creation (within transaction)
+      await this.cartsService.removeSelectedItems(userId);
 
       // Return first order (or implement logic to return all orders)
-      return await this.findOne(orders[0].orderId, userId);
+      // return await this.findOne(orders[0].orderId, userId);
+      // 使用交易內的 manager 來獲取完整訂單資訊，避免交易尚未 commit 導致 findOne 找不到資料
+      return (await manager.findOne(Order, {
+        where: { orderId: orders[0].orderId, userId },
+        relations: ['store', 'items', 'items.product'],
+      })) as Order;
     });
   }
 

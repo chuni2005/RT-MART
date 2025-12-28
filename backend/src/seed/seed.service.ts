@@ -1,5 +1,7 @@
 import { Injectable, Logger } from '@nestjs/common';
 import { EntityManager } from 'typeorm';
+import { Store } from '../stores/entities/store.entity';
+import { Product } from '../products/entities/product.entity';
 import { IdMapping } from './utils/id-mapping';
 import { UserLoader } from './loaders/user.loader';
 import { SellerLoader } from './loaders/seller.loader';
@@ -97,11 +99,30 @@ export class SeedService {
       }
     }
 
-    // 在所有基本資料載入完成後，生成 UserToken 和 AuditLog
     this.logger.log('Generating UserToken and AuditLog from seed data...');
 
     const userTokenLoader = new UserTokenLoader(entityManager, this.logger);
     const auditLogLoader = new AuditLogLoader(entityManager, this.logger);
+
+    // Synchronize product counts for all stores
+    this.logger.log('Synchronizing product counts for all stores...');
+    try {
+      const stores = await entityManager.find(Store);
+      for (const store of stores) {
+        const count = await entityManager.getRepository(Product).count({
+          where: { storeId: store.storeId },
+        });
+        await entityManager.update(Store, store.storeId, {
+          productCount: count,
+        });
+      }
+      this.logger.log('Product counts synchronized.');
+    } catch (error) {
+      this.logger.error(
+        'Failed to synchronize product counts',
+        error instanceof Error ? error.stack : String(error),
+      );
+    }
 
     try {
       const userTokenResult = await userTokenLoader.load(force);

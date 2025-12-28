@@ -65,9 +65,10 @@ export interface StoreInfo {
 
 // ========== Product Types ==========
 export interface ProductImage {
-  imageId?: string; // ProductImage.image_id (bigint)
-  imageUrl: string; // ProductImage.image_url
-  displayOrder: number; // ProductImage.display_order
+  imageId?: string;              // ProductImage.image_id (bigint)
+  imageUrl: string;              // ProductImage.image_url
+  displayOrder: number;          // ProductImage.display_order
+  file?: File;                   // 用於上傳的新檔案
 }
 
 export interface SellerProduct {
@@ -83,10 +84,11 @@ export interface SellerProduct {
   reserved?: number; // Inventory.reserved (預留庫存)
 
   // 統計資訊
-  soldCount?: number; // Product.sold_count (銷售數量)
-  totalStars?: number; // Product.total_stars (所有評價的星星總數)
-  averageRating?: number; // Product.average_rating (快取欄位)
-  totalReviews?: number; // Product.total_reviews (評價總次數)
+  soldCount?: number;            // Product.sold_count (銷售數量)
+  totalStars?: number;           // Product.total_stars (所有評價的星星總數)
+  averageRating?: number;        // Product.average_rating (快取欄位)
+  totalReviews?: number;         // Product.total_reviews (評價總次數)
+  isActive: boolean;             // Product.is_active
 
   // 軟刪除標記
   deletedAt?: string | null; // Product.deleted_at
@@ -97,12 +99,13 @@ export interface SellerProduct {
 }
 
 export interface ProductFormData {
-  productName: string; // Product.product_name
-  description: string; // Product.description
-  price: number; // Product.price
-  productTypeId: string; // Product.product_type_id (改為 productTypeId)
-  stock: number; // Inventory.quantity (初始庫存)
-  images: ProductImage[]; // ProductImage[] (包含 imageUrl 和 displayOrder)
+  productName: string;           // Product.product_name
+  description: string;           // Product.description
+  price: number;                 // Product.price
+  productTypeId: string;         // Product.product_type_id (改為 productTypeId)
+  stock: number;                 // Inventory.quantity (初始庫存)
+  images: ProductImage[];        // ProductImage[] (包含 imageUrl 和 displayOrder)
+  removedImageIds?: string[];    // 待刪除的圖片 ID 列表
 }
 
 // ========== Discount Types ==========

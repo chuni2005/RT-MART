@@ -6,7 +6,6 @@ import {
   Matches,
 } from 'class-validator';
 
-
 export class UpdateStoreDto {
   @IsString()
   @IsOptional()
@@ -31,4 +30,8 @@ export class UpdateStoreDto {
     message: 'storePhone must be a valid phone number format',
   })
   storePhone?: string;
+
+  @IsString()
+  @IsOptional()
+  bankAccountReference?: string;
 }

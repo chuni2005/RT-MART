@@ -18,10 +18,10 @@ export class ProductImage {
   @Column({ name: 'product_id', type: 'bigint' })
   productId: string;
 
-  @Column({ name: 'image_url', type: 'varchar', length: 500, nullable:true})
+  @Column({ name: 'image_url', type: 'varchar', length: 500, nullable: true })
   imageUrl: string;
 
-  @Column({ name: 'public_id', type: 'varchar', length: 50, nullable:true })
+  @Column({ name: 'public_id', type: 'varchar', length: 50, nullable: true })
   publicId: string;
 
   @Column({ name: 'display_order', type: 'int', default: 1 })

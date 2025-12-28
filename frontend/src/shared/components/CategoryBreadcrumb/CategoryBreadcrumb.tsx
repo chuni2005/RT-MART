@@ -10,7 +10,7 @@ interface CategoryBreadcrumbProps {
 
 function CategoryBreadcrumb({
   productType,
-  platform = "蝦皮購物",
+  platform = "大潤發 RT-MART",
 }: CategoryBreadcrumbProps) {
   const navigate = useNavigate();
   // Build the category path from root to current

@@ -5,12 +5,12 @@ import Button from "@/shared/components/Button/Button";
 import Alert from "@/shared/components/Alert/Alert";
 import QuantitySelector from "@/shared/components/QuantitySelector";
 import { useAuth } from "@/shared/hooks/useAuth";
+import { useCart } from "@/shared/contexts/CartContext";
 import { Product } from "@/types";
 
 interface PurchasePanelProps {
   stock: number;
   productId: number | string;
-  productData: Product;
 }
 
 interface AlertState {
@@ -18,11 +18,13 @@ interface AlertState {
   message: string;
 }
 
-function PurchasePanel({ stock, productId, productData }: PurchasePanelProps) {
+function PurchasePanel({ stock, productId }: PurchasePanelProps) {
   const [quantity, setQuantity] = useState<number | string>(1);
   const [alert, setAlert] = useState<AlertState | null>(null);
+  const [isAdding, setIsAdding] = useState(false);
   const navigate = useNavigate();
   const { isAuthenticated } = useAuth();
+  const { addToCart } = useCart();
 
   // 顯示 Alert 提示
   const showAlert = (type: AlertState["type"], message: string) => {
@@ -43,7 +45,7 @@ function PurchasePanel({ stock, productId, productData }: PurchasePanelProps) {
   };
 
   // 加入購物車
-  const handleAddToCart = () => {
+  const handleAddToCart = async () => {
     // 檢查是否登入
     if (!isAuthenticated) {
       navigate("/auth", { state: { from: `/product/${productId}` } });
@@ -56,18 +58,33 @@ function PurchasePanel({ stock, productId, productData }: PurchasePanelProps) {
       return;
     }
 
-    // TODO: 實際的 API 請求加入購物車
-    // await cartService.addToCart(productId, quantity);
+    const qty =
+      typeof quantity === "string" ? parseInt(quantity, 10) : quantity;
+    if (isNaN(qty) || qty <= 0) {
+      showAlert("error", "請輸入有效的數量");
+      return;
+    }
 
-    // 模擬成功
-    showAlert("success", `成功加入 ${quantity} 件商品到購物車`);
+    try {
+      setIsAdding(true);
+      // 使用 CartContext 的 addToCart，它會自動更新 Header 的購物車數量
+      // 使用者要求 handleAddToCart 時，selected 為 false
+      await addToCart(productId.toString(), qty, false);
 
-    // 重置數量為1
-    setQuantity(1);
+      showAlert("success", `成功加入 ${qty} 件商品到購物車`);
+
+      // 重置數量為1
+      setQuantity(1);
+    } catch (error: any) {
+      console.error("Add to cart failed:", error);
+      showAlert("error", error.message || "加入購物車失敗，請稍後再試");
+    } finally {
+      setIsAdding(false);
+    }
   };
 
-  // 立即購買
-  const handleBuyNow = () => {
+  // 立即購買：加入購物車並勾選，然後跳轉到購物車頁面
+  const handleBuyNow = async () => {
     // 檢查是否登入
     if (!isAuthenticated) {
       navigate("/auth", { state: { from: `/product/${productId}` } });
@@ -80,18 +97,26 @@ function PurchasePanel({ stock, productId, productData }: PurchasePanelProps) {
       return;
     }
 
-    // 跳轉到結帳頁面，攜帶商品資訊
-    navigate("/checkout", {
-      state: {
-        products: [
-          {
-            ...productData,
-            quantity:
-              typeof quantity === "string" ? parseInt(quantity, 10) : quantity,
-          },
-        ],
-      },
-    });
+    const qty =
+      typeof quantity === "string" ? parseInt(quantity, 10) : quantity;
+    if (isNaN(qty) || qty <= 0) {
+      showAlert("error", "請輸入有效的數量");
+      return;
+    }
+
+    try {
+      setIsAdding(true);
+      // 立即購買時，selected 為 true
+      await addToCart(productId.toString(), qty, true);
+
+      // 跳轉到購物車頁面
+      navigate("/cart");
+    } catch (error: any) {
+      console.error("Buy now failed:", error);
+      showAlert("error", error.message || "立即購買失敗，請稍後再試");
+    } finally {
+      setIsAdding(false);
+    }
   };
 
   return (
@@ -116,22 +141,22 @@ function PurchasePanel({ stock, productId, productData }: PurchasePanelProps) {
         <Button
           variant="outline"
           onClick={handleAddToCart}
-          disabled={stock === 0}
-          icon="shopping-cart"
+          disabled={stock === 0 || isAdding}
+          icon={isAdding ? undefined : "shopping-cart"}
           fullWidth
           className={styles.addToCartButton}
         >
-          加入購物車
+          {isAdding ? "加入中..." : "加入購物車"}
         </Button>
 
         <Button
           variant="primary"
           onClick={handleBuyNow}
-          disabled={stock === 0}
+          disabled={stock === 0 || isAdding}
           fullWidth
           className={styles.buyNowButton}
         >
-          立即購買
+          {isAdding ? "處理中..." : "立即購買"}
         </Button>
       </div>
 

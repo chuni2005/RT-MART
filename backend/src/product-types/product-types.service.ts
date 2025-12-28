@@ -4,7 +4,7 @@ import {
   ConflictException,
 } from '@nestjs/common';
 import { InjectRepository } from '@nestjs/typeorm';
-import { TreeRepository } from 'typeorm';
+import { Repository } from 'typeorm';
 import { ProductType } from './entities/product-type.entity';
 import { CreateProductTypeDto } from './dto/create-product-type.dto';
 import { UpdateProductTypeDto } from './dto/update-product-type.dto';
@@ -13,8 +13,8 @@ import { UpdateProductTypeDto } from './dto/update-product-type.dto';
 export class ProductTypesService {
   constructor(
     @InjectRepository(ProductType)
-    private readonly productTypeRepository: TreeRepository<ProductType>,
-  ) { }
+    private readonly productTypeRepository: Repository<ProductType>,
+  ) {}
 
   async create(createDto: CreateProductTypeDto): Promise<ProductType> {
     // Check if typeCode already exists
@@ -45,11 +45,15 @@ export class ProductTypesService {
     });
 
     if (queryDto.typeName) {
-      return productTypes.filter(pt => pt.typeName.includes(queryDto.typeName));
+      return productTypes.filter((pt) =>
+        pt.typeName.includes(queryDto.typeName),
+      );
     }
 
     if (queryDto.typeCode) {
-      return productTypes.filter(pt => pt.typeCode.includes(queryDto.typeCode));
+      return productTypes.filter((pt) =>
+        pt.typeCode.includes(queryDto.typeCode),
+      );
     }
 
     return productTypes;
@@ -75,21 +79,84 @@ export class ProductTypesService {
     return productType;
   }
 
-  // async findTree(): Promise<ProductType[]> {
-  //   return await this.productTypeRepository.findTrees();
-  // }
-
+  /**
+   * 取得單一分類，並遞迴取得所有父級分類 (疊代實現以防止堆疊溢出)
+   */
   async findOne(id: string): Promise<ProductType> {
+    const MAX_DEPTH = 10;
+    const visited = new Set<string>([id]);
+
     const productType = await this.productTypeRepository.findOne({
       where: { productTypeId: id, isActive: true },
-      relations: ['parent', 'children'],
+      relations: ['parent'],
     });
 
     if (!productType) {
       throw new NotFoundException(`Product type with ID ${id} not found`);
     }
 
+    let current = productType;
+    let depth = 0;
+
+    while (current.parent && depth < MAX_DEPTH) {
+      const parentId = current.parent.productTypeId;
+
+      if (visited.has(parentId)) {
+        // 偵測到循環引用，中斷關聯以防止無限循環
+        current.parent = undefined;
+        break;
+      }
+      visited.add(parentId);
+
+      const parent = await this.productTypeRepository.findOne({
+        where: { productTypeId: parentId, isActive: true },
+        relations: ['parent'],
+      });
+
+      if (!parent) {
+        current.parent = undefined;
+        break;
+      }
+
+      current.parent = parent;
+      current = parent;
+      depth++;
+    }
+
+    // 若達到最大深度仍有父級，則切斷關聯以避免過深
+    if (current.parent && depth >= MAX_DEPTH) {
+      current.parent = undefined;
+    }
+
     return productType;
+  }
+
+  /**
+   * 獲取所有子分類的 ID (包含自己) (疊代實現以防止堆疊溢出)
+   */
+  async getDescendantIds(id: string): Promise<string[]> {
+    const ids: string[] = [];
+    const stack: string[] = [id];
+    const visited = new Set<string>();
+
+    while (stack.length > 0) {
+      const currentId = stack.pop()!;
+
+      if (visited.has(currentId)) continue;
+      visited.add(currentId);
+      ids.push(currentId);
+
+      const children = await this.productTypeRepository.find({
+        where: { parentTypeId: currentId, isActive: true },
+        select: ['productTypeId'],
+      });
+
+      for (const child of children) {
+        stack.push(child.productTypeId);
+      }
+    }
+
+    return ids;
   }
 
   async findByCode(code: string): Promise<ProductType | null> {
@@ -99,8 +166,19 @@ export class ProductTypesService {
   }
 
   async findChildren(id: string): Promise<ProductType[]> {
-    const productType = await this.findOne(id);
-    return await this.productTypeRepository.findDescendants(productType);
+    // 檢查該分類是否存在，但不使用遞迴或抓取過多關聯
+    const productType = await this.productTypeRepository.findOne({
+      where: { productTypeId: id },
+      select: ['productTypeId'],
+    });
+
+    if (!productType) {
+      throw new NotFoundException(`Product type with ID ${id} not found`);
+    }
+
+    return await this.productTypeRepository.find({
+      where: { parentTypeId: id, isActive: true },
+    });
   }
 
   async update(

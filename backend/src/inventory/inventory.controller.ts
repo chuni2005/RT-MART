@@ -9,9 +9,7 @@ import {
   Req,
 } from '@nestjs/common';
 import { InventoryService } from './inventory.service';
-import {
-  UpdateInventoryDto,
-} from './dto/update-inventory.dto';
+import { UpdateInventoryDto } from './dto/update-inventory.dto';
 import { JwtAccessGuard } from '../auth/guards/jwt-auth.guard';
 import { RolesGuard } from '../auth/guards/roles.guard';
 import { Roles } from '../auth/decorators/roles.decorator';
@@ -41,7 +39,11 @@ export class InventoryController {
     @Param('productId') productId: string,
     @Body() updateDto: UpdateInventoryDto,
   ) {
-    return await this.inventoryService.updateQuantity(req.user.userId, productId, updateDto);
+    return await this.inventoryService.updateQuantity(
+      req.user.userId,
+      productId,
+      updateDto,
+    );
   }
 
   // @UseGuards(JwtAccessGuard)

@@ -1,21 +1,30 @@
+/* eslint-disable @typescript-eslint/no-unused-vars */
+/* eslint-disable  @typescript-eslint/no-unsafe-assignment */
+/* eslint-disable  @typescript-eslint/no-unsafe-call */
 import { Injectable } from '@nestjs/common';
-import { UploadApiResponse, UploadApiErrorResponse, v2 as cloudinary } from 'cloudinary';
+import {
+  UploadApiResponse,
+  UploadApiErrorResponse,
+  v2 as cloudinary,
+} from 'cloudinary';
 import * as streamifier from 'streamifier';
 
 @Injectable()
 export class CloudinaryService {
-
-  uploadImage(file: Express.Multer.File): Promise<{ url: string; publicId: string }> {
+  uploadImage(
+    file: Express.Multer.File,
+  ): Promise<{ url: string; publicId: string }> {
     return new Promise((resolve, reject) => {
       const uploadStream = cloudinary.uploader.upload_stream(
         { folder: 'products' },
         (error, result) => {
           if (error) return reject(error);
-          if (!result) return reject(new Error('Cloudinary result is undefined'));
+          if (!result)
+            return reject(new Error('Cloudinary result is undefined'));
 
           resolve({
             url: result.secure_url,
-            publicId: result.public_id
+            publicId: result.public_id,
           });
         },
       );

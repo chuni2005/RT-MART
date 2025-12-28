@@ -1,11 +1,14 @@
-import { useEffect } from 'react';
-import Dialog from '@/shared/components/Dialog';
-import FormInput from '@/shared/components/FormInput';
-import Select from '@/shared/components/Select';
-import Button from '@/shared/components/Button';
-import { useForm } from '@/shared/hooks/useForm';
-import { cityOptions, getDistrictsByCity } from '@/shared/utils/taiwanAddressData';
-import styles from './AddressFormDialog.module.scss';
+import { useEffect } from "react";
+import Dialog from "@/shared/components/Dialog";
+import FormInput from "@/shared/components/FormInput";
+import Select from "@/shared/components/Select";
+import Button from "@/shared/components/Button";
+import { useForm } from "@/shared/hooks/useForm";
+import {
+  cityOptions,
+  getDistrictsByCity,
+} from "@/shared/utils/taiwanAddressData";
+import styles from "./AddressFormDialog.module.scss";
 
 export interface AddressFormData {
   recipientName: string;
@@ -22,7 +25,7 @@ interface AddressFormDialogProps {
   onClose: () => void;
   onSubmit: (data: AddressFormData) => void;
   initialData?: Partial<AddressFormData>;
-  mode?: 'add' | 'edit';
+  mode?: "add" | "edit";
 }
 
 /**
@@ -40,66 +43,78 @@ function AddressFormDialog({
   onClose,
   onSubmit,
   initialData,
-  mode = 'add',
+  mode = "add",
 }: AddressFormDialogProps) {
-  const { values, errors, handleChange, handleSubmit, reset, setValue, clearFieldError } =
-    useForm<AddressFormData>(
-      {
-        recipientName: initialData?.recipientName || '',
-        phone: initialData?.phone || '',
-        city: initialData?.city || '',
-        district: initialData?.district || '',
-        postalCode: initialData?.postalCode || '',
-        detail: initialData?.detail || '',
-        isDefault: initialData?.isDefault || false,
+  const {
+    values,
+    errors,
+    handleChange,
+    handleSubmit,
+    reset,
+    setValue,
+    clearFieldError,
+  } = useForm<AddressFormData>(
+    {
+      recipientName: initialData?.recipientName || "",
+      phone: initialData?.phone || "",
+      city: initialData?.city || "",
+      district: initialData?.district || "",
+      postalCode: initialData?.postalCode || "",
+      detail: initialData?.detail || "",
+      isDefault: initialData?.isDefault || false,
+    },
+    async (formValues) => {
+      onSubmit(formValues);
+      onClose();
+      reset();
+    },
+    {
+      recipientName: (value) => (!value.trim() ? "請輸入收件人姓名" : null),
+      phone: (value) => {
+        if (!value.trim()) return "請輸入聯絡電話";
+        if (!/^09\d{8}$/.test(value))
+          return "請輸入有效的手機號碼（例：0912345678）";
+        return null;
       },
-      async (formValues) => {
-        onSubmit(formValues);
-        onClose();
-        reset();
+      city: (value) => (!value ? "請選擇城市" : null),
+      district: (value) => (!value ? "請選擇區域" : null),
+      postalCode: (value) => {
+        if (!value.trim()) return "請輸入郵遞區號";
+        if (!/^\d{3,5}$/.test(value)) return "請輸入有效的郵遞區號";
+        return null;
       },
-      {
-        recipientName: (value) =>
-          !value.trim() ? '請輸入收件人姓名' : null,
-        phone: (value) => {
-          if (!value.trim()) return '請輸入聯絡電話';
-          if (!/^09\d{8}$/.test(value)) return '請輸入有效的手機號碼（例：0912345678）';
-          return null;
-        },
-        city: (value) => (!value ? '請選擇城市' : null),
-        district: (value) => (!value ? '請選擇區域' : null),
-        postalCode: (value) => {
-          if (!value.trim()) return '請輸入郵遞區號';
-          if (!/^\d{3,5}$/.test(value)) return '請輸入有效的郵遞區號';
-          return null;
-        },
-        detail: (value) => (!value.trim() ? '請輸入詳細地址' : null),
-      }
-    );
+      detail: (value) => (!value.trim() ? "請輸入詳細地址" : null),
+    }
+  );
 
   // 當 initialData 變化時更新表單
   useEffect(() => {
     if (isOpen && initialData) {
-      setValue('recipientName', initialData.recipientName || '');
-      setValue('phone', initialData.phone || '');
-      setValue('city', initialData.city || '');
-      setValue('district', initialData.district || '');
-      setValue('postalCode', initialData.postalCode || '');
-      setValue('detail', initialData.detail || '');
-      setValue('isDefault', initialData.isDefault || false);
+      setValue("recipientName", initialData.recipientName || "");
+      setValue("phone", initialData.phone || "");
+      setValue("city", initialData.city || "");
+      setValue("district", initialData.district || "");
+      setValue("postalCode", initialData.postalCode || "");
+      setValue("detail", initialData.detail || "");
+      setValue("isDefault", initialData.isDefault || false);
     }
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [isOpen, initialData]);
 
   const handleCityChange = (value: string) => {
-    setValue('city', value);
-    setValue('district', '');
-    clearFieldError('city');
+    setValue("city", value);
+    setValue("district", ""); // 清空區域選擇
+    clearFieldError("city");
   };
 
   const handleDistrictChange = (value: string) => {
-    setValue('district', value);
-    clearFieldError('district');
+    setValue("district", value);
+    clearFieldError("district");
+  };
+
+  const handleDetailChange = (e: React.ChangeEvent<HTMLTextAreaElement>) => {
+    setValue("detail", e.target.value);
+    clearFieldError("detail");
   };
 
   const districtOptions = getDistrictsByCity(values.city);
@@ -108,7 +123,7 @@ function AddressFormDialog({
     <Dialog
       isOpen={isOpen}
       onClose={onClose}
-      title={mode === 'add' ? '新增收件地址' : '編輯收件地址'}
+      title={mode === "add" ? "新增收件地址" : "編輯收件地址"}
       type="custom"
     >
       <form className={styles.form} onSubmit={handleSubmit}>
@@ -188,9 +203,9 @@ function AddressFormDialog({
           </label>
           <textarea
             name="detail"
-            className={`${styles.textarea} ${errors.detail ? styles.error : ''}`}
+            className={`${styles.textarea} ${errors.detail ? styles.error : ""}`}
             value={values.detail}
-            onChange={handleChange}
+            onChange={handleDetailChange}
             placeholder="請輸入街道、巷弄、樓層等詳細資訊"
             rows={3}
           />
@@ -217,7 +232,7 @@ function AddressFormDialog({
             取消
           </Button>
           <Button variant="primary" type="submit">
-            {mode === 'add' ? '新增' : '儲存'}
+            {mode === "add" ? "新增" : "儲存"}
           </Button>
         </div>
       </form>

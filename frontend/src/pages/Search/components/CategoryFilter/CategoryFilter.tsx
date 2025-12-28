@@ -1,4 +1,3 @@
-import React from "react";
 import styles from "./CategoryFilter.module.scss";
 
 export interface CategoryFilterProps {
@@ -8,12 +7,19 @@ export interface CategoryFilterProps {
     productTypeId: string;
     typeName: string;
     count: number;
+    parentTypeId?: string | null;
   }>;
-  totalCount?: number;  // 全部商品的數量
-  showAllOption?: boolean;  // 是否顯示「全部商品」選項（預設為 true）
+  totalCount?: number; // 全部商品的數量
+  showAllOption?: boolean; // 是否顯示「全部商品」選項（預設為 true）
 }
 
-function CategoryFilter({ value, onChange, categories, totalCount, showAllOption = true }: CategoryFilterProps) {
+function CategoryFilter({
+  value,
+  onChange,
+  categories,
+  totalCount,
+  showAllOption = true,
+}: CategoryFilterProps) {
   const handleChange = (categoryId: string | null) => {
     onChange(categoryId);
   };
@@ -52,6 +58,7 @@ function CategoryFilter({ value, onChange, categories, totalCount, showAllOption
         {categories.map((category) => {
           const isChecked = value === category.productTypeId;
           const optionId = `category-${category.productTypeId}`;
+          const isSubCategory = !!category.parentTypeId;
 
           return (
             <label
@@ -59,7 +66,7 @@ function CategoryFilter({ value, onChange, categories, totalCount, showAllOption
               htmlFor={optionId}
               className={`${styles.categoryOption} ${
                 isChecked ? styles.active : ""
-              }`}
+              } ${isSubCategory ? styles.subCategory : ""}`}
             >
               <input
                 type="radio"

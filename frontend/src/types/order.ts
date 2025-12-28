@@ -54,6 +54,7 @@ export interface CreateMultipleOrdersResponse {
   message: string;
   orders: Array<{
     orderId: string;
+    orderNumber?: string;
     storeId: string;
     storeName: string;
     totalAmount: number;

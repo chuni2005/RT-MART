@@ -7,6 +7,14 @@ export class QueryProductDto {
 
   @IsString()
   @IsOptional()
+  keyword?: string; // Alias for search
+
+  @IsString()
+  @IsOptional()
+  minRating?: string;
+
+  @IsString()
+  @IsOptional()
   storeId?: string;
 
   @IsString()

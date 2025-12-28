@@ -26,6 +26,9 @@ export class CartItem {
   @Column({ type: 'int' })
   quantity: number;
 
+  @Column({ type: 'boolean', default: true })
+  selected: boolean;
+
   @CreateDateColumn({
     name: 'added_at',
     type: 'timestamp',

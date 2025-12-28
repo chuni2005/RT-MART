@@ -6,27 +6,71 @@ import { get } from './api';
 import type { Product, ProductType, Store } from '@/types';
 
 // ============================================
+// 設定與環境變數
+// ============================================
+
+// 從環境變數控制是否使用 Mock API (預設為 false)
+// 在 .env 檔案中設定 VITE_USE_MOCK_API=true 來開啟 Mock 模式
+const USE_MOCK_API = (import.meta as any).env.VITE_USE_MOCK_API === 'true';
+
+console.log(`[ProductService] Current Mode: ${USE_MOCK_API ? 'MOCK' : 'REAL API'}`);
+
+// ============================================
 // 介面定義 (API Response Types)
 // ============================================
 
 /**
- * 後端 API 回應的商品資料結構
- * 對應後端 GET /api/products/:id 回應格式
+ * 後端 Storefront API 回應的單一商品結構
  */
-interface ProductApiResponse {
-  productId: number;
+interface BackendStorefrontProduct {
+  productId: string;
   productName: string;
-  productDescription: string;
-  productPrice: number;
-  productOriginalPrice: number | null;
-  productStock: number;
-  averageRating: number;
-  reviewCount: number;
-  soldCount: number;
-  productImages: string[];
-  storeId: string;
-  productTypeId: string;
+  description: string;
+  price: string;        // 後端 decimal 類型通常轉為 string 回傳
+  currentPrice: number; // 計算後的現價
+  discountRate: number; // 折扣率
+  isActive: boolean;
+  averageRating: string; // decimal string
+  soldCount: string;    // bigint string
+  totalReviews: number;
+  images: { imageUrl: string; displayOrder: number }[];
+  store: {
+    storeId: string;
+    storeName: string;
+    storeDescription?: string;
+    storeAddress?: string;
+    storeEmail?: string;
+    storePhone?: string;
+    averageRating: string;
+    totalRatings: number;
+    createdAt: string;
+    avatar?: string;
+    productCount?: number;
+  };
+  productType: {
+    productTypeId: string;
+    typeName: string;
+    typeCode: string;
+    parentTypeId: string | null;
+    isActive: boolean;
+  };
+  inventory: {
+    quantity: number;
+  };
 }
+
+/**
+ * 後端 Storefront API 回應結構
+ */
+interface BackendStorefrontResponse {
+  success: boolean;
+  message: string;
+  products: BackendStorefrontProduct[];
+  total: number;
+  page: number;
+  limit: number;
+}
+
 
 /**
  * 取得商品詳情的 API 回應
@@ -195,55 +239,86 @@ const mockProducts = generateMockProducts();
 // ============================================
 
 /**
+ * 將後端商品類型資料轉換為前端使用的格式
+ */
+const mapBackendProductType = (data: any): ProductType => {
+  if (!data) return {} as ProductType;
+  return {
+    productTypeId: data.productTypeId,
+    typeName: data.typeName,
+    typeCode: data.typeCode || 'UNKNOWN',
+    parentTypeId: data.parentTypeId,
+    isActive: data.isActive ?? true,
+    // 支援遞迴結構
+    parent: data.parent ? mapBackendProductType(data.parent) : undefined,
+  };
+};
+
+/**
  * 模擬 API 延遲
  * @param ms - 延遲毫秒數，預設 500ms
  */
 const mockDelay = (ms = 500): Promise<void> =>
   new Promise(resolve => setTimeout(resolve, ms));
 
-/**
- * 將後端 API 回應轉換為前端 Product 類型
- * 未來整合真實 API 時使用
- */
-const mapApiResponseToProduct = (
-  apiData: ProductApiResponse,
-  store: Store,
-  productType?: ProductType
-): Product => {
-  return {
-    id: apiData.productId,
-    name: apiData.productName,
-    description: apiData.productDescription,
-    currentPrice: apiData.productPrice,
-    originalPrice: apiData.productOriginalPrice,
-    stock: apiData.productStock,
-    rating: apiData.averageRating,
-    reviewCount: apiData.reviewCount,
-    soldCount: apiData.soldCount,
-    images: apiData.productImages,
-    store,
-    productType,
-  };
-};
-
 // ============================================
 // Service 函數
 // ============================================
 
+
 /**
- * 根據 ID 取得商品詳情 (Mock 版本)
- * @param productId - 商品 ID
- * @returns 商品詳情回應
- * @throws {Error} 當商品不存在時拋出錯誤
+ * 根據 ID 取得商品詳情
  */
 export const getProductById = async (
   productId: string | number
 ): Promise<GetProductResponse> => {
-  // TODO: 待後端 API 完成後，替換為真實 API 呼叫
-  // const response = await get<ProductApiResponse>(`/products/${productId}`);
-  // const product = mapApiResponseToProduct(response, store, productType);
-  // return { success: true, product };
+  // Real API Mode
+  if (!USE_MOCK_API) {
+    try {
+      const response = await get<{ success: boolean; message: string; product: BackendStorefrontProduct }>(
+        `/products/storefront/${productId}`
+      );
+      
+      const p = response.product;
+      const product: Product = {
+        id: Number(p.productId),
+        name: p.productName,
+        description: p.description || '',
+        currentPrice: Number(p.currentPrice),
+        originalPrice: Number(p.price) !== Number(p.currentPrice) ? Number(p.price) : null,
+        stock: p.inventory?.quantity || 0,
+        rating: Number(p.averageRating) || 0,
+        reviewCount: p.totalReviews || 0,
+        soldCount: Number(p.soldCount) || 0,
+        images: p.images?.sort((a, b) => a.displayOrder - b.displayOrder).map(img => img.imageUrl) || [],
+        store: {
+          id: p.store.storeId,
+          name: p.store.storeName,
+          avatar: p.store.avatar || "https://i.pravatar.cc/150?img=10",
+          rating: Number(p.store.averageRating) || 0,
+          productCount: p.store.productCount || 0,
+          totalRatings: p.store.totalRatings || 0,
+          joinDate: p.store.createdAt || "",
+          description: p.store.storeDescription || "",
+          address: p.store.storeAddress || "",
+          email: p.store.storeEmail || "",
+          phone: p.store.storePhone || ""
+        },
+        productType: mapBackendProductType(p.productType)
+      };
 
+      return {
+        success: true,
+        message: '成功取得商品資訊',
+        product,
+      };
+    } catch (error) {
+      console.error('[API Error] getProductById:', error);
+      throw error;
+    }
+  }
+
+  // Mock Mode
   console.log('[Mock API] Get product by ID:', productId);
 
   // 模擬網路延遲
@@ -264,13 +339,80 @@ export const getProductById = async (
 };
 
 /**
- * 根據條件查詢商品列表 (Mock 版本)
- * @param params - 查詢參數
- * @returns 商品列表回應
+ * 根據條件查詢商品列表
  */
 export const getProducts = async (
   params: GetProductsParams = {}
 ): Promise<GetProductsResponse> => {
+
+  // ------------------------------------------------
+  // Real API Mode
+  // ------------------------------------------------
+  if (!USE_MOCK_API) {
+    try {
+      const queryParams: any = {
+        page: params.page,
+        limit: params.limit,
+        keyword: params.keyword, // 新 API 使用 keyword
+        storeId: params.storeId,
+        productTypeId: params.productTypeId,
+        minPrice: params.minPrice,
+        maxPrice: params.maxPrice,
+        minRating: params.minRating, // 新 API 支援 minRating
+        sortBy: params.sortBy,
+        sortOrder: params.order?.toUpperCase(),
+      };
+
+      const queryString = new URLSearchParams(
+        Object.entries(queryParams).filter(([_, v]) => v != null) as [string, string][]
+      ).toString();
+
+      // 改為呼叫 storefront 專用 API
+      const response = await get<BackendStorefrontResponse>(`/products/storefront?${queryString}`);
+
+      return {
+        success: true,
+        message: '成功取得商品列表',
+        products: response.products.map(p => ({
+          id: Number(p.productId),
+          name: p.productName,
+          description: p.description || '',
+          currentPrice: Number(p.currentPrice), // 使用後端計算好的現價
+          // 如果原價與現價不同，則設定原價；否則為 null
+          originalPrice: Number(p.price) !== Number(p.currentPrice) ? Number(p.price) : null,
+          stock: p.inventory?.quantity || 0,
+          rating: Number(p.averageRating) || 0,
+          reviewCount: p.totalReviews || 0,
+          soldCount: Number(p.soldCount) || 0,
+          // 確保圖片按順序排列
+          images: p.images?.sort((a, b) => a.displayOrder - b.displayOrder).map(img => img.imageUrl) || [],
+          store: {
+            id: p.store.storeId,
+            name: p.store.storeName,
+            // TODO: 後端 Storefront API 目前可能未回傳以下欄位，暫時使用預設值或從 Store 物件中取值
+            avatar: "https://i.pravatar.cc/150?img=10", // Placeholder
+            rating: Number(p.store.averageRating) || 0,
+          productCount: p.store.productCount || 0,
+          totalRatings: p.store.totalRatings || 0,
+          joinDate: p.store.createdAt || "",
+          description: p.store.storeDescription || "",
+          address: p.store.storeAddress || "",
+          email: p.store.storeEmail || "",
+          phone: p.store.storePhone || ""
+        },
+        productType: mapBackendProductType(p.productType)
+      })),
+        total: response.total,
+      };
+    } catch (error) {
+      console.error('[API Error] getProducts:', error);
+      throw error;
+    }
+  }
+
+  // ------------------------------------------------
+  // Mock Mode
+  // ------------------------------------------------
   // TODO: 待後端 API 完成後，替換為真實 API 呼叫
   // const queryString = new URLSearchParams(params as any).toString();
   // return get<GetProductsResponse>(`/products?${queryString}`);
@@ -374,20 +516,55 @@ export const getProductsByType = async (
 };
 
 /**
- * 取得所有商品類型 (Mock 版本)
- * @returns 商品類型列表
+ * 取得單一商品類型
+ */
+export const getProductTypeById = async (
+  productTypeId: string
+): Promise<ProductType | undefined> => {
+  // Real API Mode
+  if (!USE_MOCK_API) {
+    try {
+      const response = await get<any>(`/product-types/${productTypeId}`);
+      return mapBackendProductType(response);
+    } catch (error) {
+      console.error("[API Error] getProductTypes:", error);
+      throw error;
+    }
+  }
+
+  // Mock Mode
+  console.log("[Mock API] Get product type by ID:", productTypeId);
+
+  // 模擬網路延遲
+  await mockDelay(300);
+
+  // 返回特定分類 (可能為 undefined)
+  return mockProductTypes[productTypeId];
+};
+
+/**
+ * 取得所有商品類型
  */
 export const getProductTypes = async (): Promise<ProductType[]> => {
-  // TODO: 待後端 API 完成後，替換為真實 API 呼叫
-  // return get<ProductType[]>('/product-types');
+  // Real API Mode
+  if (!USE_MOCK_API) {
+    try {
+      const response = await get<any[]>('/product-types');
+      return response.map(mapBackendProductType);
+    } catch (error) {
+      console.error('[API Error] getProductTypes:', error);
+      throw error;
+    }
+  }
 
+  // Mock Mode
   console.log('[Mock API] Get all product types');
 
   // 模擬網路延遲
   await mockDelay(300);
 
   // 返回所有分類
-  return Object.values(mockProductTypes);
+  return Object.values(mockProductTypes).map(mapBackendProductType);
 };
 
 // ============================================

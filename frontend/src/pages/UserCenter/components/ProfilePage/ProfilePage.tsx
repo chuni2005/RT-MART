@@ -6,26 +6,30 @@
  * 3. 帳號設定 (刪除帳號)
  */
 
-import { useState, useEffect, ChangeEvent } from 'react';
-import { useNavigate } from 'react-router-dom';
-import { useAuth } from '@/shared/hooks/useAuth';
-import { useForm } from '@/shared/hooks/useForm';
-import FormInput from '@/shared/components/FormInput';
-import Button from '@/shared/components/Button';
-import Icon from '@/shared/components/Icon';
-import Alert from '@/shared/components/Alert';
-import Dialog from '@/shared/components/Dialog';
+import { useState, useEffect, ChangeEvent } from "react";
+import { useNavigate } from "react-router-dom";
+import { useAuth } from "@/shared/hooks/useAuth";
+import { useForm } from "@/shared/hooks/useForm";
+import FormInput from "@/shared/components/FormInput";
+import Button from "@/shared/components/Button";
+import Icon from "@/shared/components/Icon";
+import Alert from "@/shared/components/Alert";
+import Dialog from "@/shared/components/Dialog";
 import {
   validateName,
   validateEmail,
   validatePhone,
   validatePassword,
   validatePasswordStrength,
-  validateConfirmPassword
-} from '@/shared/utils/validation';
-import { updateProfile, updatePassword, deleteAccount } from '@/shared/services/userService';
-import type { AlertType } from '@/types';
-import styles from './ProfilePage.module.scss';
+  validateConfirmPassword,
+} from "@/shared/utils/validation";
+import {
+  updateProfile,
+  updatePassword,
+  deleteAccount,
+} from "@/shared/services/userService";
+import type { AlertType } from "@/types";
+import styles from "./ProfilePage.module.scss";
 
 // Type Definitions
 interface ProfileFormData {
@@ -41,7 +45,7 @@ interface PasswordFormData {
 }
 
 interface AlertState {
-  type: AlertType | '';
+  type: AlertType | "";
   message: string;
 }
 
@@ -58,21 +62,21 @@ interface SuccessDialogState {
 }
 
 function ProfilePage() {
-  const { user, updateUser, checkAuth } = useAuth();
+  const { user, updateUser, checkAuth, logout } = useAuth();
   const navigate = useNavigate();
 
-  const [profileAlert, setProfileAlert] = useState<AlertState>({ type: '', message: '' });
-  const [passwordAlert, setPasswordAlert] = useState<AlertState>({ type: '', message: '' });
+  const [profileAlert, setProfileAlert] = useState<AlertState>({ type: "", message: "" });
+  const [passwordAlert, setPasswordAlert] = useState<AlertState>({ type: "", message: "" });
 
   // Profile Form
   const profileForm = useForm<ProfileFormData>(
     {
-      name: user?.name || '',
-      email: user?.email || '',
-      phone: user?.phone || '',
+      name: user?.name || "",
+      email: user?.email || "",
+      phone: user?.phone || "",
     },
     async (formValues) => {
-      setProfileAlert({ type: '', message: '' });
+      setProfileAlert({ type: "", message: "" });
 
       try {
         const updatedUser = await updateProfile(formValues);
@@ -80,18 +84,18 @@ function ProfilePage() {
         await checkAuth();
 
         setProfileAlert({
-          type: 'success',
-          message: '個人資料已更新成功',
+          type: "success",
+          message: "個人資料已更新成功",
         });
 
         setTimeout(() => {
-          setProfileAlert({ type: '', message: '' });
+          setProfileAlert({ type: "", message: "" });
         }, 3000);
       } catch (error) {
-        console.error('Profile update failed:', error);
+        console.error("Profile update failed:", error);
         setProfileAlert({
-          type: 'error',
-          message: error instanceof Error ? error.message : '更新失敗,請稍後再試',
+          type: "error",
+          message: error instanceof Error ? error.message : "更新失敗,請稍後再試",
         });
       }
     },
@@ -105,12 +109,12 @@ function ProfilePage() {
   // Password Form
   const passwordForm = useForm<PasswordFormData>(
     {
-      currentPassword: '',
-      newPassword: '',
-      confirmPassword: '',
+      currentPassword: "",
+      newPassword: "",
+      confirmPassword: "",
     },
     async (formValues) => {
-      setPasswordAlert({ type: '', message: '' });
+      setPasswordAlert({ type: "", message: "" });
 
       try {
         const response = await updatePassword({
@@ -122,19 +126,19 @@ function ProfilePage() {
           passwordForm.reset();
 
           setPasswordAlert({
-            type: 'success',
-            message: '密碼已更新成功',
+            type: "success",
+            message: "密碼已更新成功",
           });
 
           setTimeout(() => {
-            setPasswordAlert({ type: '', message: '' });
+            setPasswordAlert({ type: "", message: "" });
           }, 3000);
         }
       } catch (error) {
-        console.error('Password update failed:', error);
+        console.error("Password update failed:", error);
         setPasswordAlert({
-          type: 'error',
-          message: error instanceof Error ? error.message : '密碼更新失敗,請稍後再試',
+          type: "error",
+          message: error instanceof Error ? error.message : "密碼更新失敗,請稍後再試",
         });
       }
     },
@@ -149,9 +153,9 @@ function ProfilePage() {
   // Sync user data to profile form
   useEffect(() => {
     if (user) {
-      profileForm.setValue('name', user.name || '');
-      profileForm.setValue('email', user.email || '');
-      profileForm.setValue('phone', user.phone || '');
+      profileForm.setValue("name", user.name || "");
+      profileForm.setValue("email", user.email || "");
+      profileForm.setValue("phone", user.phone || "");
     }
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [user]);
@@ -159,15 +163,15 @@ function ProfilePage() {
   // Delete Dialog State
   const [deleteDialog, setDeleteDialog] = useState<DeleteDialogState>({
     isOpen: false,
-    password: '',
-    error: '',
-    isDeleting: false
+    password: "",
+    error: "",
+    isDeleting: false,
   });
 
   // Success Dialog State (for account deletion)
   const [successDialog, setSuccessDialog] = useState<SuccessDialogState>({
     isOpen: false,
-    countdown: 5
+    countdown: 5,
   });
 
   // ===========================
@@ -177,41 +181,41 @@ function ProfilePage() {
   const handleOpenDeleteDialog = () => {
     setDeleteDialog({
       isOpen: true,
-      password: '',
-      error: '',
-      isDeleting: false
+      password: "",
+      error: "",
+      isDeleting: false,
     });
   };
 
   const handleCloseDeleteDialog = () => {
     setDeleteDialog({
       isOpen: false,
-      password: '',
-      error: '',
-      isDeleting: false
+      password: "",
+      error: "",
+      isDeleting: false,
     });
   };
 
   const handleDeletePasswordChange = (e: ChangeEvent<HTMLInputElement | HTMLTextAreaElement>) => {
-    setDeleteDialog(prev => ({
+    setDeleteDialog((prev) => ({
       ...prev,
       password: e.target.value,
-      error: '' // Clear error when typing
+      error: "", // Clear error when typing
     }));
   };
 
   const handleConfirmDelete = async () => {
     // Validate password is entered
     if (!deleteDialog.password.trim()) {
-      setDeleteDialog(prev => ({
+      setDeleteDialog((prev) => ({
         ...prev,
-        error: '請輸入密碼以確認刪除'
+        error: "請輸入密碼以確認刪除",
       }));
       return;
     }
 
     try {
-      setDeleteDialog(prev => ({ ...prev, isDeleting: true }));
+      setDeleteDialog((prev) => ({ ...prev, isDeleting: true }));
 
       // Call API to delete account
       const response = await deleteAccount(deleteDialog.password);
@@ -223,46 +227,55 @@ function ProfilePage() {
         // Open success dialog with countdown
         setSuccessDialog({
           isOpen: true,
-          countdown: 5
+          countdown: 5,
         });
 
         // Start countdown timer
         startSuccessCountdown();
       }
-
     } catch (error) {
-      console.error('Account deletion failed:', error);
-      setDeleteDialog(prev => ({
+      console.error("Account deletion failed:", error);
+      setDeleteDialog((prev) => ({
         ...prev,
-        error: error instanceof Error ? error.message : '刪除失敗,請檢查密碼是否正確',
-        isDeleting: false
+        error:
+          error instanceof Error
+            ? error.message
+            : "刪除失敗,請檢查密碼是否正確",
+        isDeleting: false,
       }));
     }
   };
 
   const startSuccessCountdown = () => {
-    const timer = setInterval(() => {
-      setSuccessDialog(prev => {
+    const timer = setInterval(async () => {
+      let isZero = false;
+      setSuccessDialog((prev) => {
         const newCountdown = prev.countdown - 1;
 
         if (newCountdown <= 0) {
-          clearInterval(timer);
-          // Redirect to home page
-          navigate('/');
+          isZero = true;
           return prev;
         }
 
         return {
           ...prev,
-          countdown: newCountdown
+          countdown: newCountdown,
         };
       });
+
+      if (isZero) {
+        clearInterval(timer);
+        // 執行登出並跳轉
+        await logout();
+        navigate("/");
+      }
     }, 1000);
   };
 
-  const handleCloseSuccessDialog = () => {
+  const handleCloseSuccessDialog = async () => {
     setSuccessDialog({ isOpen: false, countdown: 0 });
-    navigate('/');
+    await logout();
+    navigate("/");
   };
 
   // ===========================

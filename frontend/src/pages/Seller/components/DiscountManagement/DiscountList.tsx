@@ -14,9 +14,10 @@ function DiscountList() {
   const [loading, setLoading] = useState(true);
   const [deleteDialog, setDeleteDialog] = useState<{
     isOpen: boolean;
+    isSubmitting: boolean;
     discountId: string;
     discountName: string;
-  }>({ isOpen: false, discountId: '', discountName: '' });
+  }>({ isOpen: false, isSubmitting: false, discountId: '', discountName: '' });
 
   useEffect(() => {
     loadDiscounts();
@@ -51,7 +52,7 @@ function DiscountList() {
     try {
       await sellerService.deleteDiscount(deleteDialog.discountId);
       setDiscounts(discounts.filter((d) => d.discountId !== deleteDialog.discountId));
-      setDeleteDialog({ isOpen: false, discountId: '', discountName: '' });
+      setDeleteDialog({ isOpen: false, isSubmitting: false, discountId: '', discountName: '' });
     } catch (error) {
       console.error('刪除折扣失敗:', error);
     }
@@ -217,6 +218,7 @@ function DiscountList() {
                     onClick={() =>
                       setDeleteDialog({
                         isOpen: true,
+                        isSubmitting: false,
                         discountId: discount.discountId,
                         discountName: discount.name,
                       })
@@ -236,14 +238,23 @@ function DiscountList() {
       <Dialog
         isOpen={deleteDialog.isOpen}
         onClose={() =>
-          setDeleteDialog({ isOpen: false, discountId: '', discountName: '' })
+          !deleteDialog.isSubmitting &&
+          setDeleteDialog({
+            isOpen: false,
+            discountId: '',
+            discountName: '',
+            isSubmitting: false,
+          })
         }
+        onConfirm={handleDelete}
+        variant="warning"
+        message={`確定要刪除折扣「${deleteDialog.discountName}」嗎？`}
         title="確認刪除"
       >
         <div className={styles.deleteDialog}>
           <p>確定要刪除折扣「{deleteDialog.discountName}」嗎？</p>
           <p className={styles.warning}>此操作無法復原。</p>
-          <div className={styles.dialogActions}>
+          {/* <div className={styles.dialogActions}>
             <Button
               variant="outline"
               onClick={() =>
@@ -253,7 +264,7 @@ function DiscountList() {
               取消
             </Button>
             <Button onClick={handleDelete}>確認刪除</Button>
-          </div>
+          </div> */}
         </div>
       </Dialog>
     </div>

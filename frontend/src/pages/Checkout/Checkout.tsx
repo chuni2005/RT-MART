@@ -334,7 +334,8 @@ function Checkout() {
               <div style={{ marginTop: "0.75rem" }}>
                 {orderResponse.orders.map((order) => (
                   <div key={order.orderId} style={{ marginBottom: "0.5rem" }}>
-                    <b>{order.storeName}</b>: {order.orderId}
+                    <b>{order.storeName}</b>:{" "}
+                    {order.orderNumber || order.orderId}
                   </div>
                 ))}
               </div>

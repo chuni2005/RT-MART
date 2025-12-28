@@ -42,6 +42,8 @@ export class CartItemLoader extends BaseLoader<CartItem> {
         typeof data.quantity === 'number'
           ? data.quantity
           : Number(data.quantity);
+      cartItem.selected =
+        data.selected !== undefined ? Boolean(data.selected) : true;
 
       return Promise.resolve(cartItem);
     } catch {
