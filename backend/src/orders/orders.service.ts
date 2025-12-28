@@ -14,6 +14,7 @@ import { QueryAdminOrderDto } from './dto/query-admin-order.dto';
 import { CartsService } from '../carts/carts.service';
 import { ShippingAddressesService } from '../shipping-addresses/shipping-addresses.service';
 import { InventoryService } from '../inventory/inventory.service';
+import { DiscountsService } from '../discounts/discounts.service';
 
 @Injectable()
 export class OrdersService {
@@ -25,6 +26,7 @@ export class OrdersService {
     private readonly cartsService: CartsService,
     private readonly shippingAddressesService: ShippingAddressesService,
     private readonly inventoryService: InventoryService,
+    private readonly discountsService: DiscountsService,
     private readonly dataSource: DataSource,
   ) {}
 
