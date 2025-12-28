@@ -366,7 +366,47 @@ export const getOrder = getOrderDetail;
  * 更新訂單狀態
  */
 export const updateOrderStatus = async (id: string, status: string, note?: string): Promise<void> => {
-  await api.patch(`/orders/seller/orders/${id}/status`, { status, note });
+  try {
+    await api.patch(`/orders/seller/orders/${id}/status`, { status, note });
+  } catch (error: any) {
+    console.error('更新訂單狀態失敗:', error);
+
+    const errorMessage = error.message || '';
+
+    // 根據後端錯誤訊息映射到前端友善訊息
+    // 1. 訂單不存在
+    if (errorMessage.includes('not found')) {
+      throw new Error('訂單不存在，請重新整理頁面後再試。');
+    }
+
+    // 2. 權限不足
+    if (errorMessage.includes('permission')) {
+      throw new Error('您沒有權限修改此訂單。');
+    }
+
+    // 3. 賣家無法標記為已完成
+    if (errorMessage.includes('cannot mark orders as completed')) {
+      throw new Error('賣家無法將訂單標記為已完成，只有買家可以確認收貨。');
+    }
+
+    // 4. 無效的狀態轉換
+    if (errorMessage.includes('cannot transition')) {
+      throw new Error('此狀態無法轉換到選擇的狀態，請確認訂單當前狀態。');
+    }
+
+    // 5. 賣家帳號問題
+    if (errorMessage.includes('Seller not found')) {
+      throw new Error('賣家帳號異常，請重新登入。');
+    }
+
+    // 6. 網路問題
+    if (errorMessage.includes('fetch') || errorMessage.includes('network')) {
+      throw new Error('網路連線異常，請檢查網路後重試。');
+    }
+
+    // 如果沒有匹配到特定錯誤，使用通用訊息
+    throw new Error('更新訂單狀態失敗，請稍後再試。');
+  }
 };
 
 // ========== Discounts ==========
