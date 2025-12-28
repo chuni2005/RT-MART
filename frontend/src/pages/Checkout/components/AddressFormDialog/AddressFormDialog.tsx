@@ -16,7 +16,8 @@ export interface AddressFormData {
   city: string;
   district: string;
   postalCode: string;
-  detail: string;
+  addressLine1: string;
+  addressLine2?: string;
   isDefault: boolean;
 }
 
@@ -60,7 +61,8 @@ function AddressFormDialog({
       city: initialData?.city || "",
       district: initialData?.district || "",
       postalCode: initialData?.postalCode || "",
-      detail: initialData?.detail || "",
+      addressLine1: initialData?.addressLine1 || "",
+      addressLine2: initialData?.addressLine2 || "",
       isDefault: initialData?.isDefault || false,
     },
     async (formValues) => {
@@ -83,7 +85,7 @@ function AddressFormDialog({
         if (!/^\d{3,5}$/.test(value)) return "請輸入有效的郵遞區號";
         return null;
       },
-      detail: (value) => (!value.trim() ? "請輸入詳細地址" : null),
+      addressLine1: (value) => (!value.trim() ? "請輸入詳細地址" : null),
     }
   );
 
@@ -95,7 +97,8 @@ function AddressFormDialog({
       setValue("city", initialData.city || "");
       setValue("district", initialData.district || "");
       setValue("postalCode", initialData.postalCode || "");
-      setValue("detail", initialData.detail || "");
+      setValue("addressLine1", initialData.addressLine1 || "");
+      setValue("addressLine2", initialData.addressLine2 || "");
       setValue("isDefault", initialData.isDefault || false);
     }
     // eslint-disable-next-line react-hooks/exhaustive-deps
@@ -110,11 +113,6 @@ function AddressFormDialog({
   const handleDistrictChange = (value: string) => {
     setValue("district", value);
     clearFieldError("district");
-  };
-
-  const handleDetailChange = (e: React.ChangeEvent<HTMLTextAreaElement>) => {
-    setValue("detail", e.target.value);
-    clearFieldError("detail");
   };
 
   const districtOptions = getDistrictsByCity(values.city);
@@ -197,22 +195,26 @@ function AddressFormDialog({
         />
 
         {/* 詳細地址 */}
-        <div className={styles.formGroup}>
-          <label>
-            詳細地址 <span className={styles.required}>*</span>
-          </label>
-          <textarea
-            name="detail"
-            className={`${styles.textarea} ${errors.detail ? styles.error : ""}`}
-            value={values.detail}
-            onChange={handleDetailChange}
-            placeholder="請輸入街道、巷弄、樓層等詳細資訊"
-            rows={3}
-          />
-          {errors.detail && (
-            <span className={styles.errorMessage}>{errors.detail}</span>
-          )}
-        </div>
+        <FormInput
+          label="詳細地址"
+          name="addressLine1"
+          value={values.addressLine1}
+          onChange={handleChange}
+          placeholder="路名、門牌、巷弄等"
+          error={errors.addressLine1}
+          required
+          fieldName="詳細地址"
+        />
+
+        {/* 樓層/室 (選填) */}
+        <FormInput
+          label="樓層/室 (選填)"
+          name="addressLine2"
+          value={values.addressLine2 || ""}
+          onChange={handleChange}
+          placeholder="5 樓、B 室等"
+          fieldName="樓層/室"
+        />
 
         {/* 設為預設地址 */}
         <div className={styles.checkboxGroup}>

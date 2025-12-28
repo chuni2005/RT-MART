@@ -1,7 +1,4 @@
-import type {
-  DashboardStats,
-  AdminOrder,
-} from "@/types/admin";
+import type { DashboardStats, AdminOrder } from "@/types/admin";
 
 /**
  * Mock data for testing adminService functions
@@ -107,7 +104,7 @@ export const mockAdminOrders: AdminOrder[] = [
       city: "台北市",
       district: "信義區",
       postalCode: "110",
-      detail: "忠孝東路100號",
+      addressLine1: "忠孝東路100號",
       isDefault: true,
     },
     note: "請小心包裝",
@@ -119,7 +116,7 @@ export const mockAdminOrders: AdminOrder[] = [
     updated_at: "2025-01-22T15:45:00Z",
     paid_at: "2025-01-22T10:35:00Z",
     shipped_at: "2025-01-22T14:00:00Z",
-    delivered_at: "2025-01-22T15:45:00Z"
+    delivered_at: "2025-01-22T15:45:00Z",
   },
   {
     order_id: "2",
@@ -149,7 +146,7 @@ export const mockAdminOrders: AdminOrder[] = [
       city: "新北市",
       district: "板橋區",
       postalCode: "220",
-      detail: "中山路200號",
+      addressLine1: "中山路200號",
       isDefault: true,
     },
     subtotal: 59900,
@@ -188,7 +185,7 @@ export const mockAdminOrders: AdminOrder[] = [
       city: "台中市",
       district: "西屯區",
       postalCode: "407",
-      detail: "台灣大道300號",
+      addressLine1: "台灣大道300號",
       isDefault: true,
     },
     subtotal: 15980,
@@ -196,7 +193,7 @@ export const mockAdminOrders: AdminOrder[] = [
     discount: 0,
     total_amount: 16040,
     created_at: "2025-01-21T16:20:00Z",
-    updated_at: "2025-01-21T16:20:00Z"
+    updated_at: "2025-01-21T16:20:00Z",
   },
   {
     order_id: "4",
@@ -234,7 +231,7 @@ export const mockAdminOrders: AdminOrder[] = [
       city: "高雄市",
       district: "左營區",
       postalCode: "813",
-      detail: "博愛路400號",
+      addressLine1: "博愛路400號",
       isDefault: true,
     },
     subtotal: 3970,
@@ -244,7 +241,7 @@ export const mockAdminOrders: AdminOrder[] = [
     created_at: "2025-01-21T11:00:00Z",
     updated_at: "2025-01-22T08:30:00Z",
     paid_at: "2025-01-21T11:05:00Z",
-    shipped_at: "2025-01-22T08:30:00Z"
+    shipped_at: "2025-01-22T08:30:00Z",
   },
   {
     order_id: "5",
@@ -274,7 +271,7 @@ export const mockAdminOrders: AdminOrder[] = [
       city: "台南市",
       district: "東區",
       postalCode: "701",
-      detail: "大學路500號",
+      addressLine1: "大學路500號",
       isDefault: true,
     },
     subtotal: 4500,
@@ -286,11 +283,12 @@ export const mockAdminOrders: AdminOrder[] = [
     paid_at: "2025-01-20T14:35:00Z",
     shipped_at: "2025-01-20T18:00:00Z",
     delivered_at: "2025-01-21T10:30:00Z",
-    completed_at: "2025-01-21T16:00:00Z"
+    completed_at: "2025-01-21T16:00:00Z",
   },
 ];
 
 /**
  * Delay utility for simulating API calls in tests
  */
-export const delay = (ms: number) => new Promise((resolve) => setTimeout(resolve, ms));
+export const delay = (ms: number) =>
+  new Promise((resolve) => setTimeout(resolve, ms));

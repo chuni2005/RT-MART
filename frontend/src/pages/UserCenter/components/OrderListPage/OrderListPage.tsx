@@ -35,7 +35,8 @@ function OrderListPage() {
   const fetchOrders = async () => {
     try {
       setIsLoading(true);
-      const params = activeTab === "all" ? {} : { status: activeTab as OrderStatus };
+      const params =
+        activeTab === "all" ? {} : { status: activeTab as OrderStatus };
       const response = await getOrders(params);
       setOrders(response.orders);
     } catch (error) {
@@ -47,7 +48,7 @@ function OrderListPage() {
 
   // 處理查看詳情
   const handleViewDetail = (orderId: string) => {
-    console.log("View order detail:", orderId);
+    console.log("View order addressLine1:", orderId);
     navigate(`/user/orders/${orderId}`);
   };
 

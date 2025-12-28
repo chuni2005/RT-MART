@@ -123,14 +123,14 @@ function Dialog({
       onClick={handleOverlayClick}
       role="dialog"
       aria-modal="true"
-      aria-labelledby={title ? 'dialog-title' : undefined}
-      aria-describedby={message ? 'dialog-message' : undefined}
+      aria-labelledby={title ? "dialog-title" : undefined}
+      aria-describedby={message ? "dialog-message" : undefined}
     >
       <div
         ref={dialogRef}
-        className={`${styles.dialogContent} ${
-          className ? className : ''
-        } ${styles[variant]} ${getTextAlignClass()}`}
+        className={`${styles.dialogContent} ${className ? className : ""} ${
+          styles[variant]
+        } ${getTextAlignClass()}`}
         tabIndex={-1}
       >
         {/* Header */}
@@ -155,14 +155,14 @@ function Dialog({
 
         {/* Body */}
         <div className={styles.dialogBody}>
-          {type === 'custom' ? (
+          {type === "custom" ? (
             children
           ) : (
             <>
               {/* 優先顯示媒體，其次顯示圖標 */}
               {mediaUrl ? (
                 <div className={styles.mediaWrapper}>
-                  {detectedMediaType === 'video' ? (
+                  {detectedMediaType === "video" ? (
                     <video
                       src={mediaUrl}
                       className={styles.media}
@@ -195,13 +195,8 @@ function Dialog({
         </div>
 
         {/* Footer */}
-        {type !== 'custom' && (
+        {type !== "custom" && (
           <div className={styles.dialogFooter}>
-            {type === 'confirm' && (
-              <Button variant="outline" onClick={handleCancel}>
-                {cancelText}
-              </Button>
-            )}
             <Button
               variant="primary"
               onClick={handleConfirm}
@@ -209,6 +204,11 @@ function Dialog({
             >
               {confirmText}
             </Button>
+            {type === "confirm" && (
+              <Button variant="outline" onClick={handleCancel}>
+                {cancelText}
+              </Button>
+            )}
           </div>
         )}
       </div>

@@ -67,13 +67,28 @@ export class OrdersService {
       for (const [storeId, items] of itemsByStore.entries()) {
         let subtotal = 0;
 
-        // Reserve inventory for all items
-        // for (const item of items) {
-        //   await this.inventoryService.reserveStock(item.productId, {
-        //     quantity: item.quantity,
-        //   });
-        //   subtotal += Number(item.product.price) * item.quantity;
-        // }
+        // Calculate subtotal and reserve inventory for all items
+        for (const item of items) {
+          // Check stock availability
+          const isAvailable = await this.inventoryService.checkStockAvailability(
+            item.productId,
+            item.quantity,
+          );
+
+          if (!isAvailable) {
+            throw new BadRequestException(
+              `Insufficient stock for product: ${item.product.productName}`,
+            );
+          }
+
+          // Reserve inventory (decrease quantity, increase reserved)
+          await this.inventoryService.orderCreated(
+            item.productId,
+            item.quantity,
+          );
+
+          subtotal += Number(item.product.price) * item.quantity;
+        }
 
         const shippingFee = 60; // Default shipping fee
         const totalAmount = subtotal + shippingFee;
@@ -195,18 +210,19 @@ export class OrdersService {
       switch (updateDto.status) {
         case OrderStatus.PAID:
           order.paidAt = new Date();
-          // Commit reserved inventory
-          for (const item of order.items || []) {
-            if (item.productId) {
-              // await this.inventoryService.commitReserved(
-              //   item.productId,
-              //   item.quantity,
-              // );
-            }
-          }
+          // Payment confirmed, inventory already reserved
           break;
         case OrderStatus.SHIPPED:
           order.shippedAt = new Date();
+          // Release reserved inventory when shipped
+          for (const item of order.items || []) {
+            if (item.productId) {
+              await this.inventoryService.orderShipped(
+                item.productId,
+                item.quantity,
+              );
+            }
+          }
           break;
         case OrderStatus.DELIVERED:
           order.deliveredAt = new Date();
@@ -216,12 +232,13 @@ export class OrdersService {
           break;
         case OrderStatus.CANCELLED:
           order.cancelledAt = new Date();
-          // Release reserved inventory
+          // Release reserved inventory (restore quantity, decrease reserved)
           for (const item of order.items || []) {
             if (item.productId) {
-              // await this.inventoryService.releaseReserved(item.productId, {
-              //   quantity: item.quantity,
-              // });
+              await this.inventoryService.orderCancel(
+                item.productId,
+                item.quantity,
+              );
             }
           }
           break;
@@ -429,12 +446,10 @@ export class OrdersService {
       order.orderStatus = OrderStatus.CANCELLED;
       order.cancelledAt = new Date();
 
-      // Release inventory (if implemented)
+      // Release reserved inventory (restore quantity, decrease reserved)
       for (const item of order.items || []) {
         if (item.productId) {
-          // await this.inventoryService.releaseReserved(item.productId, {
-          //   quantity: item.quantity,
-          // });
+          await this.inventoryService.orderCancel(item.productId, item.quantity);
         }
       }
 
@@ -479,14 +494,15 @@ export class OrdersService {
           break;
         case OrderStatus.CANCELLED:
           order.cancelledAt = new Date();
-          // Release inventory (if implemented)
-          // for (const item of order.items || []) {
-          //   if (item.productId) {
-          //     await this.inventoryService.releaseReserved(item.productId, {
-          //       quantity: item.quantity,
-          //     });
-          //   }
-          // }
+          // Release reserved inventory (restore quantity, decrease reserved)
+          for (const item of order.items || []) {
+            if (item.productId) {
+              await this.inventoryService.orderCancel(
+                item.productId,
+                item.quantity,
+              );
+            }
+          }
           break;
       }
 
