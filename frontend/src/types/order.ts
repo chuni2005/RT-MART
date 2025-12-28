@@ -99,11 +99,12 @@ export interface Order {
 }
 
 // Order List Item (訂單列表項目 - 簡化版)
+// List endpoint returns basic info only, use detail endpoint for items
 export interface OrderListItem {
   orderId: string;
   orderNumber: string;
   status: OrderStatus;
-  items: OrderItemDetail[];
+  items?: OrderItemDetail[]; // Optional - not included in list for performance
   totalAmount: number;
   createdAt: string;
 }

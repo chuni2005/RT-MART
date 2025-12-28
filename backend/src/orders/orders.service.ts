@@ -170,12 +170,13 @@ export class OrdersService {
       where.storeId = queryDto.storeId;
     }
 
+    // Order list should only return basic info without items for performance
     const [data, total] = await this.orderRepository.findAndCount({
       where,
       skip,
       take: limit,
       order: { createdAt: 'DESC' },
-      relations: ['store', 'items', 'items.product'],
+      relations: ['store'], // Removed 'items' and 'items.product' for performance
     });
 
     return { data, total };
@@ -277,8 +278,8 @@ export class OrdersService {
       [OrderStatus.PAYMENT_FAILED]: [OrderStatus.PAID, OrderStatus.CANCELLED],
       [OrderStatus.PAID]: [OrderStatus.PROCESSING, OrderStatus.CANCELLED],
       [OrderStatus.PROCESSING]: [OrderStatus.SHIPPED, OrderStatus.CANCELLED],
-      [OrderStatus.SHIPPED]: [OrderStatus.DELIVERED],
-      [OrderStatus.DELIVERED]: [OrderStatus.COMPLETED],
+      [OrderStatus.SHIPPED]: [OrderStatus.DELIVERED, OrderStatus.CANCELLED],
+      [OrderStatus.DELIVERED]: [OrderStatus.COMPLETED, OrderStatus.CANCELLED],
       [OrderStatus.COMPLETED]: [],
       [OrderStatus.CANCELLED]: [],
     };
@@ -544,5 +545,168 @@ export class OrdersService {
       completedAt: order.completedAt,
       cancelledAt: order.cancelledAt,
     }));
+  }
+
+  // ========== Seller Methods ==========
+
+  /**
+   * Get orders for a specific seller's store
+   * Returns basic order info without items for performance
+   */
+  async findSellerOrders(
+    sellerId: string,
+    queryDto: QueryOrderDto,
+  ): Promise<{ data: Order[]; total: number }> {
+    const page = parseInt(queryDto.page || '1', 10);
+    const limit = parseInt(queryDto.limit || '10', 10);
+    const skip = (page - 1) * limit;
+
+    // Build query - removed items and product relations for performance
+    const query = this.orderRepository
+      .createQueryBuilder('order')
+      .leftJoinAndSelect('order.store', 'store')
+      .leftJoinAndSelect('store.seller', 'seller')
+      .leftJoinAndSelect('order.user', 'user')
+      // Removed items and product joins - use findSellerOrder() for details
+      .where('seller.sellerId = :sellerId', { sellerId })
+      .orderBy('order.createdAt', 'DESC')
+      .skip(skip)
+      .take(limit);
+
+    // Apply status filter if provided
+    if (queryDto.status) {
+      query.andWhere('order.orderStatus = :status', {
+        status: queryDto.status,
+      });
+    }
+
+    // Apply store filter if provided (seller might have multiple stores in future)
+    if (queryDto.storeId) {
+      query.andWhere('order.storeId = :storeId', { storeId: queryDto.storeId });
+    }
+
+    const [data, total] = await query.getManyAndCount();
+
+    return { data, total };
+  }
+
+  /**
+   * Get single order detail for seller
+   */
+  async findSellerOrder(sellerId: string, orderId: string): Promise<Order> {
+    const order = await this.orderRepository.findOne({
+      where: { orderId },
+      relations: ['store', 'store.seller', 'user', 'items', 'items.product'],
+    });
+
+    if (!order) {
+      throw new NotFoundException(`Order with ID ${orderId} not found`);
+    }
+
+    // Verify order belongs to seller's store
+    if (order.store?.seller?.sellerId !== sellerId) {
+      throw new BadRequestException(
+        'You do not have permission to access this order',
+      );
+    }
+
+    return order;
+  }
+
+  /**
+   * Update order status by seller
+   * Sellers can only update to: PROCESSING, SHIPPED, DELIVERED, CANCELLED
+   * Sellers cannot mark orders as COMPLETED (user-only action)
+   */
+  async updateSellerOrderStatus(
+    sellerId: string,
+    orderId: string,
+    status: OrderStatus,
+    note?: string,
+  ): Promise<Order> {
+    // Get order and verify ownership
+    const order = await this.findSellerOrder(sellerId, orderId);
+
+    // Validate seller can make this status transition
+    this.validateSellerStatusTransition(order.orderStatus, status);
+
+    // Use transaction for status update with inventory changes
+    return await this.dataSource.transaction(async (manager) => {
+      order.orderStatus = status;
+      if (note) {
+        order.notes = note;
+      }
+
+      // Update timestamps based on status
+      switch (status) {
+        case OrderStatus.SHIPPED:
+          order.shippedAt = new Date();
+          // Release reserved inventory when shipped
+          for (const item of order.items || []) {
+            if (item.productId) {
+              await this.inventoryService.orderShipped(
+                item.productId,
+                item.quantity,
+              );
+            }
+          }
+          break;
+        case OrderStatus.DELIVERED:
+          order.deliveredAt = new Date();
+          break;
+        case OrderStatus.CANCELLED:
+          order.cancelledAt = new Date();
+          // Release reserved inventory (restore quantity, decrease reserved)
+          for (const item of order.items || []) {
+            if (item.productId) {
+              await this.inventoryService.orderCancel(
+                item.productId,
+                item.quantity,
+              );
+            }
+          }
+          break;
+      }
+
+      return await manager.save(Order, order);
+    });
+  }
+
+  /**
+   * Validate seller can make this status transition
+   * Sellers can transition:
+   * - PAID → PROCESSING, CANCELLED
+   * - PROCESSING → SHIPPED, CANCELLED
+   * - SHIPPED → DELIVERED, CANCELLED
+   * - DELIVERED → CANCELLED (but NOT to COMPLETED)
+   */
+  private validateSellerStatusTransition(
+    currentStatus: OrderStatus,
+    newStatus: OrderStatus,
+  ): void {
+    // Sellers cannot mark orders as COMPLETED
+    if (newStatus === OrderStatus.COMPLETED) {
+      throw new BadRequestException(
+        'Sellers cannot mark orders as completed. Only customers can confirm delivery.',
+      );
+    }
+
+    // Define valid transitions for sellers
+    const validSellerTransitions: Record<OrderStatus, OrderStatus[]> = {
+      [OrderStatus.PENDING_PAYMENT]: [],
+      [OrderStatus.PAYMENT_FAILED]: [],
+      [OrderStatus.PAID]: [OrderStatus.PROCESSING, OrderStatus.CANCELLED],
+      [OrderStatus.PROCESSING]: [OrderStatus.SHIPPED, OrderStatus.CANCELLED],
+      [OrderStatus.SHIPPED]: [OrderStatus.DELIVERED, OrderStatus.CANCELLED],
+      [OrderStatus.DELIVERED]: [OrderStatus.CANCELLED],
+      [OrderStatus.COMPLETED]: [],
+      [OrderStatus.CANCELLED]: [],
+    };
+
+    if (!validSellerTransitions[currentStatus]?.includes(newStatus)) {
+      throw new BadRequestException(
+        `Sellers cannot transition order from ${currentStatus} to ${newStatus}`,
+      );
+    }
   }
 }

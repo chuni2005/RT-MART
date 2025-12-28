@@ -16,16 +16,21 @@ import { QueryOrderDto } from './dto/query-order.dto';
 import { QueryAdminOrderDto } from './dto/query-admin-order.dto';
 import { UpdateAdminOrderStatusDto } from './dto/update-admin-order-status.dto';
 import { AdminCancelOrderDto } from './dto/admin-cancel-order.dto';
+import { UpdateSellerOrderStatusDto } from './dto/update-seller-order-status.dto';
 import { JwtAccessGuard } from '../auth/guards/jwt-auth.guard';
 import { RolesGuard } from '../auth/guards/roles.guard';
 import { Roles } from '../auth/decorators/roles.decorator';
 import { UserRole } from '../users/entities/user.entity';
+import { SellersService } from '../sellers/sellers.service';
 import type { AuthRequest } from '../common/types';
 
 @Controller('orders')
 @UseGuards(JwtAccessGuard)
 export class OrdersController {
-  constructor(private readonly ordersService: OrdersService) {}
+  constructor(
+    private readonly ordersService: OrdersService,
+    private readonly sellersService: SellersService,
+  ) {}
 
   @Post()
   async create(@Req() req: AuthRequest, @Body() createDto: CreateOrderDto) {
@@ -114,6 +119,72 @@ export class OrdersController {
   @Get('admin/anomalies')
   async findAnomalies() {
     return await this.ordersService.findAnomalies();
+  }
+
+  // ========== Seller Endpoints ==========
+
+  @Roles(UserRole.SELLER)
+  @UseGuards(JwtAccessGuard, RolesGuard)
+  @Get('seller/orders')
+  async findSellerOrders(
+    @Req() req: AuthRequest,
+    @Query() queryDto: QueryOrderDto,
+  ) {
+    const userId = req.user.userId;
+    const seller = await this.sellersService.findByUserId(userId);
+
+    if (!seller) {
+      throw new Error('Seller not found');
+    }
+
+    const { data, total } = await this.ordersService.findSellerOrders(
+      seller.sellerId,
+      queryDto,
+    );
+
+    return {
+      data,
+      total,
+      page: parseInt(queryDto.page || '1', 10),
+      limit: parseInt(queryDto.limit || '10', 10),
+    };
+  }
+
+  @Roles(UserRole.SELLER)
+  @UseGuards(JwtAccessGuard, RolesGuard)
+  @Get('seller/orders/:id')
+  async findSellerOrder(@Req() req: AuthRequest, @Param('id') id: string) {
+    const userId = req.user.userId;
+    const seller = await this.sellersService.findByUserId(userId);
+
+    if (!seller) {
+      throw new Error('Seller not found');
+    }
+
+    return await this.ordersService.findSellerOrder(seller.sellerId, id);
+  }
+
+  @Roles(UserRole.SELLER)
+  @UseGuards(JwtAccessGuard, RolesGuard)
+  @Patch('seller/orders/:id/status')
+  async updateSellerOrderStatus(
+    @Req() req: AuthRequest,
+    @Param('id') id: string,
+    @Body() updateDto: UpdateSellerOrderStatusDto,
+  ) {
+    const userId = req.user.userId;
+    const seller = await this.sellersService.findByUserId(userId);
+
+    if (!seller) {
+      throw new Error('Seller not found');
+    }
+
+    return await this.ordersService.updateSellerOrderStatus(
+      seller.sellerId,
+      id,
+      updateDto.status,
+      updateDto.note,
+    );
   }
 
   @Get('test/health')

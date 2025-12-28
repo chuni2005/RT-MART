@@ -9,6 +9,7 @@ import { CartsModule } from '../carts/carts.module';
 import { ShippingAddressesModule } from '../shipping-addresses/shipping-addresses.module';
 import { InventoryModule } from '../inventory/inventory.module';
 import { DiscountsModule } from '../discounts/discounts.module';
+import { SellersModule } from '../sellers/sellers.module';
 
 @Module({
   imports: [
@@ -17,6 +18,7 @@ import { DiscountsModule } from '../discounts/discounts.module';
     ShippingAddressesModule,
     InventoryModule,
     DiscountsModule,
+    SellersModule,
   ],
   controllers: [OrdersController],
   providers: [OrdersService],
