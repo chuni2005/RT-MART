@@ -51,7 +51,7 @@
   gap: $spacing-xs;
 
   label {
-    font-size: font-sm;
+    font-size: $font-sm;
     font-weight: 500;
     color: $text-secondary;
   }
@@ -60,7 +60,7 @@
     padding: $spacing-sm $spacing-md;
     border: 1px solid $border-color;
     border-radius: $border-radius-md;
-    font-size: font-base;
+    font-size: $font-md;
     color: $text-primary;
     background: $bg-primary;
     transition: all $transition-base;
@@ -92,7 +92,7 @@
 
   p {
     color: $text-secondary;
-    font-size: font-base;
+    font-size: $font-md;
   }
 }
 
@@ -127,7 +127,7 @@
     th {
       padding: $spacing-md $spacing-lg;
       text-align: left;
-      font-size: font-sm;
+      font-size: $font-sm;
       font-weight: 300;
       color: $text-secondary;
       text-transform: uppercase;
@@ -155,7 +155,7 @@
 
     td {
       padding: $spacing-md $spacing-lg;
-      font-size: font-base;
+      font-size: $font-xxs;
       color: $text-primary;
     }
   }
@@ -188,7 +188,7 @@
 
   .userEmail,
   .storeName {
-    font-size: font-sm;
+    font-size: $font-sm;
     color: $text-secondary;
   }
 }
@@ -200,14 +200,14 @@
 
 .date {
   color: $text-secondary;
-  font-size: font-sm;
+  font-size: $font-sm;
 }
 
 .statusBadge {
   display: inline-block;
   padding: $spacing-xs $spacing-sm;
   border-radius: $border-radius-xl;
-  font-size: font-xs;
+  font-size: $font-xs;
   font-weight: 300;
   text-transform: uppercase;
   letter-spacing: 0.03125rem;
@@ -281,7 +281,7 @@
     }
 
     h3 {
-      font-size: font-lg;
+      font-size: $font-lg;
       font-weight: 300;
       color: $text-primary;
       margin-bottom: $spacing-md;
@@ -304,13 +304,13 @@
     }
 
     label {
-      font-size: font-sm;
+      font-size: $font-sm;
       font-weight: 500;
       color: $text-secondary;
     }
 
     span {
-      font-size: font-base;
+      font-size: $font-md;
       color: $text-primary;
     }
   }
@@ -350,7 +350,7 @@
     }
 
     .itemPrice {
-      font-size: font-sm;
+      font-size: $font-sm;
       color: $text-secondary;
       font-family: 'Courier New', monospace;
     }
@@ -375,7 +375,7 @@
     display: flex;
     justify-content: space-between;
     align-items: center;
-    font-size: font-base;
+    font-size: $font-md;
     color: $text-primary;
 
     &.total {
@@ -383,7 +383,7 @@
       padding-top: $spacing-sm;
       border-top: 2px solid $border-color;
       font-weight: 600;
-      font-size: font-lg;
+      font-size: $font-lg;
       color: $primary-color;
     }
 
@@ -532,7 +532,7 @@
 // Responsive
 @media (max-width: 1200px) {
   .ordersTable {
-    font-size: font-sm;
+    font-size: $font-sm;
 
     thead th,
     tbody td {
@@ -547,7 +547,7 @@
   }
 
   .pageTitle {
-    font-size: font-xl;
+    font-size: $font-xl;
   }
 
   .toolbar {

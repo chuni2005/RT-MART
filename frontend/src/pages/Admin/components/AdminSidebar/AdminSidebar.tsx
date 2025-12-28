@@ -21,7 +21,7 @@ const ADMIN_NAV_SECTIONS: NavSection[] = [
     ],
   },
   {
-    label: "賣家管理",
+    label: "申請管理",
     icon: "house-circle-check",
     items: [{ path: "/admin/sellers", label: "賣家審核" }],
   },
