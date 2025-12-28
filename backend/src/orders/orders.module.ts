@@ -8,6 +8,7 @@ import { OrderDiscount } from './entities/order-discount.entity';
 import { CartsModule } from '../carts/carts.module';
 import { ShippingAddressesModule } from '../shipping-addresses/shipping-addresses.module';
 import { InventoryModule } from '../inventory/inventory.module';
+import { DiscountsModule } from '../discounts/discounts.module';
 
 @Module({
   imports: [
@@ -15,6 +16,7 @@ import { InventoryModule } from '../inventory/inventory.module';
     CartsModule,
     ShippingAddressesModule,
     InventoryModule,
+    DiscountsModule,
   ],
   controllers: [OrdersController],
   providers: [OrdersService],
