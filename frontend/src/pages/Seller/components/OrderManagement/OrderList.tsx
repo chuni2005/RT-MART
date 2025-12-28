@@ -19,6 +19,17 @@ function OrderList() {
   const [loading, setLoading] = useState(true);
   const [statusFilter, setStatusFilter] = useState<OrderStatus | 'all'>('all');
   const [searchQuery, setSearchQuery] = useState('');
+  const [alert, setAlert] = useState<{ type: AlertType; message: string } | null>(null);
+
+  // Custom setAlert with scroll behavior
+  const showAlert = (alertData: { type: AlertType; message: string } | null) => {
+    setAlert(alertData);
+    if (alertData && alertRef.current) {
+      setTimeout(() => {
+        alertRef.current?.scrollIntoView({ behavior: 'smooth', block: 'center' });
+      }, 100);
+    }
+  };
 
   useEffect(() => {
     loadOrders();
@@ -91,18 +102,6 @@ function OrderList() {
     { value: 'completed', label: '已完成' },
     { value: 'cancelled', label: '已取消' },
   ];
-
-  const [alert, setAlert] = useState<{ type: AlertType; message: string } | null>(null);
-  
-    // Custom setAlert with scroll behavior
-    const showAlert = (alertData: { type: AlertType; message: string } | null) => {
-      setAlert(alertData);
-      if (alertData && alertRef.current) {
-        setTimeout(() => {
-          alertRef.current?.scrollIntoView({ behavior: 'smooth', block: 'center' });
-        }, 100);
-      }
-    };
 
   return (
     <div className={styles.orderList}>
