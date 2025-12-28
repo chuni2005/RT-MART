@@ -1,9 +1,11 @@
-import { useState, useEffect } from "react";
+import { useState, useEffect, useRef } from "react";
 import { useNavigate, useParams } from "react-router-dom";
 import Button from "@/shared/components/Button";
 import Icon from "@/shared/components/Icon";
+import Alert from "@/shared/components/Alert";
 import Select from "@/shared/components/Select";
 import sellerService from "@/shared/services/sellerService";
+import { AlertType } from "@/types";
 import { Order, OrderStatus } from "@/types/order";
 import {
   getOrderStatusText,
@@ -14,9 +16,21 @@ import styles from "./OrderDetail.module.scss";
 function OrderDetail() {
   const navigate = useNavigate();
   const { orderId } = useParams<{ orderId: string }>();
+  const alertRef = useRef<HTMLDivElement>(null);
   const [order, setOrder] = useState<Order | null>(null);
   const [loading, setLoading] = useState(true);
   const [updating, setUpdating] = useState(false);
+  const [alert, setAlert] = useState<{ type: AlertType; message: string } | null>(null);
+
+  // Custom setAlert with scroll behavior
+  const showAlert = (alertData: { type: AlertType; message: string } | null) => {
+    setAlert(alertData);
+    if (alertData && alertRef.current) {
+      setTimeout(() => {
+        alertRef.current?.scrollIntoView({ behavior: 'smooth', block: 'center' });
+      }, 100);
+    }
+  };
 
   useEffect(() => {
     if (orderId) {
@@ -43,9 +57,16 @@ function OrderDetail() {
     try {
       await sellerService.updateOrderStatus(order.orderId, newStatus, "");
       setOrder({ ...order, status: newStatus });
+      showAlert({
+        type: 'success',
+        message: '訂單狀態更新成功',
+      });
     } catch (error) {
       console.error("更新訂單狀態失敗:", error);
-      alert("更新失敗，請稍後再試");
+      showAlert({
+        type: 'error',
+        message: error instanceof Error ? error.message : '更新訂單狀態失敗，請稍後再試。',
+      });
     } finally {
       setUpdating(false);
     }
@@ -94,6 +115,17 @@ function OrderDetail() {
       </div>
 
       <div className={styles.content}>
+        {/* Alert */}
+        {alert && (
+          <div ref={alertRef}>
+            <Alert
+              type={alert.type}
+              message={alert.message}
+              onClose={() => setAlert(null)}
+            />
+          </div>
+        )}
+
         {/* 訂單資訊卡片 */}
         <section className={styles.section}>
           <div className={styles.sectionHeader}>
