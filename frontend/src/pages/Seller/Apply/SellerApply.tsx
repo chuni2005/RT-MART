@@ -58,11 +58,10 @@ function SellerApply() {
               message: "申請提交失敗，請稍後再試",
             });
           }
-        } catch (error) {
-          console.error("申請失敗:", error);
+        } catch (error: any) {
           setAlert({
             type: "error",
-            message: "申請提交失敗，請檢查網路連接後重試",
+            message: error?.message || "申請提交失敗，請檢查網路連接後重試",
           });
         }
       },

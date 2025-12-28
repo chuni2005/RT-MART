@@ -28,6 +28,10 @@ export class SellersService {
   ) {}
 
   async create(createSellerDto: CreateSellerDto): Promise<Seller> {
+    if (!createSellerDto.userId) {
+      throw new BadRequestException('User ID is required');
+    }
+
     const user = await this.usersService.findOne(createSellerDto.userId);
 
     if (!user || user.role == UserRole.ADMIN || user.role == UserRole.SELLER) {
@@ -38,6 +42,11 @@ export class SellersService {
 
     // If existing seller found
     if (existingSeller) {
+      // If already verified, can't apply again
+      if (existingSeller.verified) {
+        throw new ConflictException('您已經是賣家了');
+      }
+
       // If rejected, check if 30 days have passed
       if (existingSeller.rejectedAt) {
         const daysSinceRejection = Math.floor(
@@ -63,8 +72,8 @@ export class SellersService {
         return await this.sellerRepository.save(existingSeller);
       }
 
-      // Already has active application
-      throw new ConflictException('User is already a seller');
+      // Already has pending application
+      throw new ConflictException('您已經有一個待審核的申請，請等待審核結果');
     }
 
     // Create new seller
