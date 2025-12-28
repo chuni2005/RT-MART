@@ -394,12 +394,17 @@ export const updateOrderStatus = async (id: string, status: string, note?: strin
       throw new Error('此狀態無法轉換到選擇的狀態，請確認訂單當前狀態。');
     }
 
-    // 5. 賣家帳號問題
+    // 5. 庫存保留數量不足
+    if (errorMessage.includes('Reserved quantity is not enougth') || errorMessage.includes('Reserved quantity')) {
+      throw new Error('庫存保留數量不足，無法完成此操作。請聯繫技術支援。');
+    }
+
+    // 6. 賣家帳號問題
     if (errorMessage.includes('Seller not found')) {
       throw new Error('賣家帳號異常，請重新登入。');
     }
 
-    // 6. 網路問題
+    // 7. 網路問題
     if (errorMessage.includes('fetch') || errorMessage.includes('network')) {
       throw new Error('網路連線異常，請檢查網路後重試。');
     }
