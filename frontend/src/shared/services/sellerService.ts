@@ -293,26 +293,63 @@ export const deactivateProduct = async (id: string): Promise<void> => {
 // ========== Orders ==========
 
 /**
- * 獲取訂單列表
- * 目前暫時保留 Mock，待 Order API 完成賣家過濾
+ * 轉換後端訂單項目數據為前端格式
  */
-export const getOrders = async (_status?: string): Promise<any[]> => {
-  return new Promise((resolve) => {
-    setTimeout(() => {
-      // 這裡目前回傳空陣列，等待後端 API
-      resolve([]);
-    }, 500);
-  });
+const transformOrderItem = (item: any) => ({
+  id: item.orderItemId,
+  productId: item.productId || item.productSnapshot?.productId,
+  productName: item.productSnapshot?.product_name || item.productSnapshot?.productName || 'Unknown Product',
+  productImage: item.productSnapshot?.images?.[0]?.imageUrl || '',
+  quantity: item.quantity || 0,
+  price: Number(item.unitPrice || item.price || 0),
+});
+
+/**
+ * 轉換後端訂單數據為前端格式
+ */
+const transformOrder = (order: any) => ({
+  orderId: order.orderId,
+  orderNumber: order.orderNumber,
+  userId: order.userId,
+  storeId: order.storeId,
+  storeName: order.store?.storeName || 'Unknown Store',
+  status: order.orderStatus,
+  items: order.items?.map(transformOrderItem) || [],
+  shippingAddress: order.shippingAddressSnapshot,
+  paymentMethod: order.paymentMethod,
+  note: order.notes || '',
+  subtotal: Number(order.subtotal || 0),
+  shipping: Number(order.shippingFee || 0),
+  discount: Number(order.totalDiscount || 0),
+  totalAmount: Number(order.totalAmount || 0),
+  createdAt: order.createdAt,
+  updatedAt: order.updatedAt,
+  paidAt: order.paidAt,
+  shippedAt: order.shippedAt,
+  deliveredAt: order.deliveredAt,
+  completedAt: order.completedAt,
+  cancelledAt: order.cancelledAt,
+});
+
+/**
+ * 獲取訂單列表
+ */
+export const getOrders = async (status?: string): Promise<any[]> => {
+  const params = new URLSearchParams();
+  if (status && status !== 'all') {
+    params.append('status', status);
+  }
+
+  const response = await api.get<{ data: any[] }>(`/orders/seller/orders?${params.toString()}`);
+  return response.data.map(transformOrder);
 };
 
 /**
  * 獲取訂單詳情
  */
-export const getOrderDetail = async (_id: string): Promise<any> => {
-  // TODO: return api.get(`/seller/orders/${_id}`);
-  return new Promise((resolve) => {
-    setTimeout(() => resolve({ /* mock */ }), 300);
-  });
+export const getOrderDetail = async (id: string): Promise<any> => {
+  const order = await api.get(`/orders/seller/orders/${id}`);
+  return transformOrder(order);
 };
 
 export const getOrder = getOrderDetail;
@@ -320,8 +357,8 @@ export const getOrder = getOrderDetail;
 /**
  * 更新訂單狀態
  */
-export const updateOrderStatus = async (_id: string, _status: string, _note?: string): Promise<void> => {
-  // TODO: api.patch(`/orders/${_id}/status`, { status, note });
+export const updateOrderStatus = async (id: string, status: string, note?: string): Promise<void> => {
+  await api.patch(`/orders/seller/orders/${id}/status`, { status, note });
 };
 
 // ========== Discounts ==========
