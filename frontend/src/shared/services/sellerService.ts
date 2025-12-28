@@ -307,29 +307,37 @@ const transformOrderItem = (item: any) => ({
 /**
  * 轉換後端訂單數據為前端格式
  */
-const transformOrder = (order: any) => ({
-  orderId: order.orderId,
-  orderNumber: order.orderNumber,
-  userId: order.userId,
-  storeId: order.storeId,
-  storeName: order.store?.storeName || 'Unknown Store',
-  status: order.orderStatus,
-  items: order.items?.map(transformOrderItem) || [],
-  shippingAddress: order.shippingAddressSnapshot,
-  paymentMethod: order.paymentMethod,
-  note: order.notes || '',
-  subtotal: Number(order.subtotal || 0),
-  shipping: Number(order.shippingFee || 0),
-  discount: Number(order.totalDiscount || 0),
-  totalAmount: Number(order.totalAmount || 0),
-  createdAt: order.createdAt,
-  updatedAt: order.updatedAt,
-  paidAt: order.paidAt,
-  shippedAt: order.shippedAt,
-  deliveredAt: order.deliveredAt,
-  completedAt: order.completedAt,
-  cancelledAt: order.cancelledAt,
-});
+const transformOrder = (order: any) => {
+  const transformed: any = {
+    orderId: order.orderId,
+    orderNumber: order.orderNumber,
+    userId: order.userId,
+    storeId: order.storeId,
+    storeName: order.store?.storeName || 'Unknown Store',
+    status: order.orderStatus,
+    shippingAddress: order.shippingAddressSnapshot,
+    paymentMethod: order.paymentMethod,
+    note: order.notes || '',
+    subtotal: Number(order.subtotal || 0),
+    shipping: Number(order.shippingFee || 0),
+    discount: Number(order.totalDiscount || 0),
+    totalAmount: Number(order.totalAmount || 0),
+    createdAt: order.createdAt,
+    updatedAt: order.updatedAt,
+    paidAt: order.paidAt,
+    shippedAt: order.shippedAt,
+    deliveredAt: order.deliveredAt,
+    completedAt: order.completedAt,
+    cancelledAt: order.cancelledAt,
+  };
+
+  // Only include items if they exist (detail endpoint returns items, list endpoint doesn't)
+  if (order.items && order.items.length > 0) {
+    transformed.items = order.items.map(transformOrderItem);
+  }
+
+  return transformed;
+};
 
 /**
  * 獲取訂單列表
