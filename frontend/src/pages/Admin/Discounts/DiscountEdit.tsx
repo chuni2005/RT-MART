@@ -192,7 +192,6 @@ function DiscountEdit() {
     setSaving(true);
     try {
       const baseData = {
-        discount_code: `SYSTEM_${values.discountType.toUpperCase()}_${Date.now()}`,
         discount_type: values.discountType,
         name: values.name,
         description: values.description || '',
@@ -220,12 +219,15 @@ function DiscountEdit() {
       if (isEditMode && discountId) {
         await adminService.updateSystemDiscount(discountId, discountData as any);
         showAlert({ type: 'success', message: '折扣已更新' });
+        setTimeout(() => navigate('/admin/discounts'), 1500);
       } else {
-        await adminService.createSystemDiscount(discountData as any);
-        showAlert({ type: 'success', message: '折扣已創建' });
+        const createdDiscount = await adminService.createSystemDiscount(discountData as any);
+        showAlert({
+          type: 'success',
+          message: `折扣已創建！折扣碼：${createdDiscount.discount_code}`
+        });
+        setTimeout(() => navigate('/admin/discounts'), 2500);
       }
-
-      setTimeout(() => navigate('/admin/discounts'), 1500);
     } catch (error) {
       console.error('儲存折扣失敗:', error);
 
