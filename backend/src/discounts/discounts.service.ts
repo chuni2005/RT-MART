@@ -6,7 +6,7 @@ import {
   ForbiddenException,
 } from '@nestjs/common';
 import { InjectRepository } from '@nestjs/typeorm';
-import { Repository, LessThan, MoreThan, FindOptionsWhere } from 'typeorm';
+import { Repository, LessThan, MoreThan, LessThanOrEqual, FindOptionsWhere } from 'typeorm';
 import {
   Discount,
   DiscountType,
@@ -461,5 +461,90 @@ export class DiscountsService {
     }
 
     return maxDiscount;
+  }
+
+  /**
+   * Get recommended discount combination
+   * Returns the best shipping and product discount for the given order
+   */
+  async getRecommendedDiscounts(
+    subtotal: number,
+    storeIds: string[],
+  ): Promise<{
+    shipping: { code: string; name: string; amount: number } | null;
+    product: { code: string; name: string; amount: number; type: string } | null;
+    totalSavings: number;
+  }> {
+    const now = new Date();
+
+    // Get all active discounts meeting minimum purchase
+    const activeDiscounts = await this.discountRepository.find({
+      where: {
+        isActive: true,
+        startDatetime: LessThan(now),
+        endDatetime: MoreThan(now),
+        minPurchaseAmount: LessThanOrEqual(subtotal),
+      },
+      relations: ['seasonalDiscount', 'shippingDiscount', 'specialDiscount', 'specialDiscount.store'],
+    });
+
+    // Filter by usage limits
+    const available = activeDiscounts.filter(d =>
+      !d.usageLimit || d.usageCount < d.usageLimit
+    );
+
+    // Find best shipping discount (highest amount)
+    const shippingDiscounts = available.filter(d => d.discountType === DiscountType.SHIPPING);
+    const bestShipping = shippingDiscounts.reduce((best, current) => {
+      const currentAmount = Number(current.shippingDiscount?.discountAmount || 0);
+      const bestAmount = Number(best?.shippingDiscount?.discountAmount || 0);
+      return currentAmount > bestAmount ? current : best;
+    }, null);
+
+    // Calculate best product discount
+    const productDiscounts = available.filter(d =>
+      d.discountType === DiscountType.SEASONAL ||
+      (d.discountType === DiscountType.SPECIAL && storeIds.includes(d.specialDiscount?.storeId))
+    );
+
+    let bestProduct = null;
+    let bestProductAmount = 0;
+
+    for (const discount of productDiscounts) {
+      let amount = 0;
+
+      if (discount.discountType === DiscountType.SEASONAL) {
+        const rate = Number(discount.seasonalDiscount?.discountRate || 0);
+        const max = Number(discount.seasonalDiscount?.maxDiscountAmount || Infinity);
+        amount = Math.min(subtotal * rate, max);
+      } else if (discount.discountType === DiscountType.SPECIAL) {
+        // For SPECIAL, we approximate with full subtotal (frontend will calculate per-store)
+        const rate = Number(discount.specialDiscount?.discountRate || 0);
+        const max = Number(discount.specialDiscount?.maxDiscountAmount || Infinity);
+        amount = Math.min(subtotal * rate, max);
+      }
+
+      if (amount > bestProductAmount) {
+        bestProduct = discount;
+        bestProductAmount = amount;
+      }
+    }
+
+    const shippingAmount = bestShipping ? Number(bestShipping.shippingDiscount?.discountAmount || 0) : 0;
+
+    return {
+      shipping: bestShipping ? {
+        code: bestShipping.discountCode,
+        name: bestShipping.name,
+        amount: shippingAmount,
+      } : null,
+      product: bestProduct ? {
+        code: bestProduct.discountCode,
+        name: bestProduct.name,
+        amount: bestProductAmount,
+        type: bestProduct.discountType.toLowerCase(),
+      } : null,
+      totalSavings: shippingAmount + bestProductAmount,
+    };
   }
 }
