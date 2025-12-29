@@ -63,6 +63,15 @@ export class DiscountsController {
   //   return await this.discountsService.findActiveDiscounts();
   // }
 
+  @Get('available')
+  async getAvailableDiscounts(
+    @Query('subtotal') subtotal: number,
+    @Query('storeIds') storeIds: string,
+  ) {
+    const storeIdArray = storeIds.split(',');
+    return await this.discountsService.getAvailableDiscounts(subtotal, storeIdArray);
+  }
+
   @Get('recommended')
   async getRecommendedDiscounts(
     @Query('subtotal') subtotal: number,

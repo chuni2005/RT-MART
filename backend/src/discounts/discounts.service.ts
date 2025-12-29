@@ -464,6 +464,41 @@ export class DiscountsService {
   }
 
   /**
+   * Get all available discounts for the given order
+   * Returns all active discounts that meet the minimum purchase requirement
+   */
+  async getAvailableDiscounts(
+    subtotal: number,
+    storeIds: string[],
+  ): Promise<Discount[]> {
+    const now = new Date();
+
+    // Get all active discounts meeting minimum purchase
+    const activeDiscounts = await this.discountRepository.find({
+      where: {
+        isActive: true,
+        startDatetime: LessThan(now),
+        endDatetime: MoreThan(now),
+        minPurchaseAmount: LessThanOrEqual(subtotal),
+      },
+      relations: ['seasonalDiscount', 'shippingDiscount', 'specialDiscount', 'specialDiscount.store'],
+    });
+
+    // Filter by usage limits
+    const available = activeDiscounts.filter(d =>
+      !d.usageLimit || d.usageCount < d.usageLimit
+    );
+
+    // Filter special discounts (only return those matching current cart stores)
+    return available.filter(d => {
+      if (d.discountType === DiscountType.SPECIAL) {
+        return d.specialDiscount?.storeId && storeIds.includes(d.specialDiscount.storeId);
+      }
+      return true;
+    });
+  }
+
+  /**
    * Get recommended discount combination
    * Returns the best shipping and product discount for the given order
    */
@@ -516,12 +551,12 @@ export class DiscountsService {
       if (discount.discountType === DiscountType.SEASONAL) {
         const rate = Number(discount.seasonalDiscount?.discountRate || 0);
         const max = Number(discount.seasonalDiscount?.maxDiscountAmount || Infinity);
-        amount = Math.min(subtotal * rate, max);
+        amount = Math.floor(Math.min(subtotal * rate, max));
       } else if (discount.discountType === DiscountType.SPECIAL) {
         // For SPECIAL, we approximate with full subtotal (frontend will calculate per-store)
         const rate = Number(discount.specialDiscount?.discountRate || 0);
         const max = Number(discount.specialDiscount?.maxDiscountAmount || Infinity);
-        amount = Math.min(subtotal * rate, max);
+        amount = Math.floor(Math.min(subtotal * rate, max));
       }
 
       if (amount > bestProductAmount) {
