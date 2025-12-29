@@ -155,7 +155,7 @@ function Stores() {
                     <div className={styles.rating}>
                       <Icon icon="star" className={styles.starIcon} />
                       <span>
-                        {store.rating.toFixed(1)} ({store.total_ratings})
+                        {typeof store.rating === 'number' ? store.rating.toFixed(1) : '0.0'} ({store.total_ratings})
                       </span>
                     </div>
                   </td>

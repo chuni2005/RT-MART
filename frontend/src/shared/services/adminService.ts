@@ -68,7 +68,7 @@ const mapBackendStoreToAdminStore = (store: any): AdminStore => ({
   address: store.storeAddress || '',
   email: store.storeEmail || '',
   phone: store.storePhone || '',
-  rating: store.averageRating || 0,
+  rating: typeof store.averageRating === 'string' ? parseFloat(store.averageRating) : (store.averageRating || 0),
   total_ratings: store.totalRatings || 0,
   product_count: store.productCount || 0,
   created_at: store.createdAt,
