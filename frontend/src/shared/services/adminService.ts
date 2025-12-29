@@ -104,7 +104,6 @@ const mapBackendDiscountToSystemDiscount = (discount: any): SystemDiscount => ({
  */
 const mapSystemDiscountToBackend = (data: Partial<SystemDiscount>): any => {
   const baseData: any = {
-    discountCode: data.discount_code,
     discountType: data.discount_type,
     name: data.name,
     description: data.description,
