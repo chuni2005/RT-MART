@@ -94,7 +94,7 @@ function AppContent() {
           <Route
             path="/cart"
             element={
-              <ProtectedRoute>
+              <ProtectedRoute excludeRoles={["admin"]}>
                 <Cart />
               </ProtectedRoute>
             }
@@ -102,7 +102,7 @@ function AppContent() {
           <Route
             path="/checkout"
             element={
-              <ProtectedRoute>
+              <ProtectedRoute excludeRoles={["admin"]}>
                 <Checkout />
               </ProtectedRoute>
             }
@@ -110,7 +110,8 @@ function AppContent() {
           <Route path="/faq" element={<FAQ />} />
 
           {/* User Center */}
-          <Route path="/user/*"
+          <Route
+            path="/user/*"
             element={
               <ProtectedRoute>
                 <UserCenter />
