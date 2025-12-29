@@ -84,14 +84,12 @@ const apiRequest = async <T = any>(endpoint: string, options: RequestOptions = {
         const refreshSuccess = await refreshAccessToken();
         isRefreshing = false;
         onRefreshed(refreshSuccess);
-
+        
         if (refreshSuccess) {
           // Token 刷新成功，重試原始請求
           options._retry = true;
           return apiRequest<T>(endpoint, options);
         } else {
-          // Token 刷新失敗，跳轉到登入頁
-          window.location.href = '/login';
           throw new Error('Session expired. Please login again.');
         }
       } else {
@@ -102,7 +100,6 @@ const apiRequest = async <T = any>(endpoint: string, options: RequestOptions = {
               options._retry = true;
               apiRequest<T>(endpoint, options).then(resolve).catch(reject);
             } else {
-              window.location.href = '/login';
               reject(new Error('Session expired. Please login again.'));
             }
           });

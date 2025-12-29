@@ -133,19 +133,29 @@ const delay = (ms: number) => new Promise((resolve) => setTimeout(resolve, ms));
 // ============================================
 
 /**
- * 建立訂單（串接真實 API）
+ * 建立訂單
  * POST /orders
  */
 export const createOrderApi = async (
   orderData: CreateOrderRequest
 ): Promise<CreateMultipleOrdersResponse> => {
   try {
-    // 後端接收：{ shippingAddressId, paymentMethod, notes }
-    const response = await post<BackendOrder>('/orders', {
+    // 構建請求 payload
+    const payload: any = {
       shippingAddressId: orderData.addressId,
       paymentMethod: orderData.paymentMethod,
       notes: orderData.note,
-    });
+    };
+
+    // 添加折扣碼（如果存在）
+    if (orderData.discountCodes?.shipping) {
+      payload.shippingDiscountCode = orderData.discountCodes.shipping;
+    }
+    if (orderData.discountCodes?.product) {
+      payload.productDiscountCode = orderData.discountCodes.product;
+    }
+
+    const response = await post<BackendOrder>('/orders', payload);
 
     // 目前後端僅返回單個訂單物件
     return {

@@ -198,33 +198,15 @@ export interface CheckoutSummaryProps {
 }
 
 /**
- * CheckoutSummary 購物車模式 Props
- * 用於購物車頁面的結帳摘要
- */
-export interface CheckoutSummaryCartModeProps {
-  mode?: 'cart';
-  subtotal: number;
-  shipping: number;
-  shippingDiscount?: number; // 運費折抵
-  discount: number;
-  total: number;
-  itemCount: number;
-  selectedCount: number;
-  freeShippingThreshold?: number;
-  onCheckout: () => void;
-  disabled?: boolean;
-  buttonText?: string;
-}
-
-/**
- * CheckoutSummary 結帳模式 Props
- * 用於結帳頁面的訂單摘要
+ * CheckoutSummary 統一 Props
+ * 用於購物車和結帳頁面的結帳摘要
  */
 export interface CheckoutSummaryCheckoutModeProps {
-  mode: 'checkout';
   storeGroups: StoreOrderGroup[];
-  appliedDiscounts?: import('./order').DiscountRecommendation | null;
+  selectedCount?: number; // 購物車模式使用：已選取數量
+  appliedDiscounts?: import('./order').ManualDiscountSelection | null;
   onCheckout: () => void;
+  onDiscountChange?: () => void;
   disabled?: boolean;
   buttonText?: string;
 }
