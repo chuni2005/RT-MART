@@ -43,6 +43,10 @@ export interface CreateOrderRequest {
   addressId: string;
   paymentMethod: PaymentMethod;
   note?: string;  // 合併後的備註
+  discountCodes?: {
+    shipping?: string;
+    product?: string;
+  };
 }
 
 /**
@@ -123,4 +127,23 @@ export interface GetOrdersResponse {
   page: number;
   limit: number;
   totalPages: number;
+}
+
+// ============================================
+// Discount Recommendation 相關類型
+// ============================================
+
+export interface DiscountRecommendation {
+  shipping: {
+    code: string;
+    name: string;
+    amount: number;
+  } | null;
+  product: {
+    code: string;
+    name: string;
+    amount: number;
+    type: string;
+  } | null;
+  totalSavings: number;
 }
