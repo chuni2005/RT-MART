@@ -12,14 +12,20 @@ function CheckoutSummary(props: Props) {
 
   // 結帳模式
   if (props.mode === "checkout") {
-    const { storeGroups } = props;
+    const { storeGroups, appliedDiscounts } = props;
     const totalItems = storeGroups.reduce((sum, g) => sum + g.items.length, 0);
     const subtotalAll = storeGroups.reduce((sum, g) => sum + g.subtotal, 0);
-    const totalShippingDiscount = storeGroups.reduce((sum, g) => sum + g.shippingDiscount, 0);
-    const grandTotal = storeGroups.reduce((sum, g) => sum + g.total, 0);
 
     // 計算基礎運費總額（每店 60）
     const baseShippingFee = storeGroups.length * 60;
+
+    // 計算優惠金額
+    const shippingDiscountAmount = appliedDiscounts?.shipping?.amount || 0;
+    const productDiscountAmount = appliedDiscounts?.product?.amount || 0;
+    const totalDiscount = shippingDiscountAmount + productDiscountAmount;
+
+    // 計算最終總額（含優惠）
+    const grandTotal = subtotalAll + baseShippingFee - totalDiscount;
 
     return (
       <div className={styles.checkoutSummary}>
@@ -35,10 +41,16 @@ function CheckoutSummary(props: Props) {
             <span>運費總額</span>
             <span>$ {baseShippingFee}</span>
           </div>
-          {totalShippingDiscount > 0 && (
+          {productDiscountAmount > 0 && (
             <div className={styles.row}>
-              <span>運費折抵</span>
-              <span className={styles.discount}>-$ {totalShippingDiscount}</span>
+              <span>商品折扣</span>
+              <span className={styles.discount}>-$ {productDiscountAmount}</span>
+            </div>
+          )}
+          {shippingDiscountAmount > 0 && (
+            <div className={styles.row}>
+              <span>運費折扣</span>
+              <span className={styles.discount}>-$ {shippingDiscountAmount}</span>
             </div>
           )}
           <div className={styles.divider} />

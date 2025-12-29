@@ -11,11 +11,13 @@ import AddressFormDialog, {
 } from "./components/AddressFormDialog";
 import PaymentMethodSelector from "./components/PaymentMethodSelector";
 import StoreOrderSection from "./components/StoreOrderSection";
+import DiscountBadge from "./components/DiscountBadge";
 import type { CartItem, Address } from "@/types";
 import type {
   PaymentMethod,
   CreateOrderRequest,
   CreateMultipleOrdersResponse,
+  DiscountRecommendation,
 } from "@/types/order";
 import {
   getAddresses,
@@ -23,6 +25,7 @@ import {
   addAddress,
 } from "@/shared/services/addressService";
 import { createOrder } from "@/shared/services/orderService";
+import { getRecommendedDiscounts } from "@/shared/services/discountService";
 import { groupOrdersByStore } from "@/shared/utils/groupOrdersByStore";
 import { useCart } from "@/shared/contexts/CartContext";
 
@@ -56,6 +59,9 @@ function Checkout() {
   const [showSuccessDialog, setShowSuccessDialog] = useState(false);
   const [orderResponse, setOrderResponse] =
     useState<CreateMultipleOrdersResponse | null>(null);
+
+  // 優惠碼狀態
+  const [appliedDiscounts, setAppliedDiscounts] = useState<DiscountRecommendation | null>(null);
 
   // 按商店分組
   const storeGroups = useMemo(
@@ -105,6 +111,29 @@ function Checkout() {
     setStoreNotes(initialNotes);
   }, [storeGroups]);
 
+  // 自動載入推薦優惠
+  useEffect(() => {
+    if (storeGroups.length === 0) return;
+
+    const loadDiscounts = async () => {
+      try {
+        const subtotal = storeGroups.reduce((sum, g) => sum + g.subtotal, 0);
+        const storeIds = storeGroups.map(g => g.storeId);
+
+        const recommendation = await getRecommendedDiscounts(subtotal, storeIds);
+
+        if (recommendation.totalSavings > 0) {
+          setAppliedDiscounts(recommendation);
+        }
+      } catch (error) {
+        console.error('Failed to load discount recommendations:', error);
+        // Silent fail - user can still checkout
+      }
+    };
+
+    loadDiscounts();
+  }, [storeGroups]);
+
   // 變更地址
   const handleChangeAddress = () => {
     setShowAddressDialog(true);
@@ -145,6 +174,11 @@ function Checkout() {
     });
   };
 
+  // 移除優惠
+  const handleRemoveDiscounts = () => {
+    setAppliedDiscounts(null);
+  };
+
   // 確認訂單
   const handleConfirmOrder = async () => {
     if (!selectedAddress) {
@@ -175,6 +209,10 @@ function Checkout() {
         addressId: selectedAddress.id,
         paymentMethod: paymentMethod,
         note: combinedNotes || undefined,
+        discountCodes: appliedDiscounts ? {
+          shipping: appliedDiscounts.shipping?.code,
+          product: appliedDiscounts.product?.code,
+        } : undefined,
       };
 
       const response = await createOrder(orderData);
@@ -293,12 +331,23 @@ function Checkout() {
               onChange={setPaymentMethod}
             />
           </section>
+
+          {/* 4. 優惠徽章 */}
+          {appliedDiscounts && (
+            <section className={styles.section}>
+              <DiscountBadge
+                discounts={appliedDiscounts}
+                onRemove={handleRemoveDiscounts}
+              />
+            </section>
+          )}
         </div>
 
         {/* 右側：訂單摘要 */}
         <CheckoutSummary
           mode="checkout"
           storeGroups={storeGroups}
+          appliedDiscounts={appliedDiscounts}
           onCheckout={handleConfirmOrder}
           disabled={isSubmitting || !selectedAddress || !paymentMethod}
           buttonText={isSubmitting ? "處理中..." : "確認訂單"}
