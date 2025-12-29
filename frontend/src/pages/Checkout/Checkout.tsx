@@ -24,10 +24,12 @@ import {
 } from "@/shared/services/addressService";
 import { createOrder } from "@/shared/services/orderService";
 import { groupOrdersByStore } from "@/shared/utils/groupOrdersByStore";
+import { useCart } from "@/shared/contexts/CartContext";
 
 function Checkout() {
   const navigate = useNavigate();
   const location = useLocation();
+  const { refreshCart } = useCart();
 
   // 從購物車傳來的選取商品
   const [checkoutItems, setCheckoutItems] = useState<CartItem[]>([]);
@@ -176,6 +178,9 @@ function Checkout() {
       };
 
       const response = await createOrder(orderData);
+
+      // 刷新購物車狀態（後端已自動移除已選商品）
+      await refreshCart();
 
       // 顯示成功 Dialog
       setOrderResponse(response);
