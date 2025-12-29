@@ -158,6 +158,12 @@ export class OrdersService {
         // Generate order number
         const orderNumber = this.generateOrderNumber();
 
+        // Determine initial order status based on payment method
+        const isCashOnDelivery = createDto.paymentMethod === 'cash_on_delivery';
+        const initialStatus = isCashOnDelivery
+          ? OrderStatus.PAID
+          : OrderStatus.PENDING_PAYMENT;
+
         // Create order
         const order = manager.create(Order, {
           orderNumber,
@@ -170,7 +176,8 @@ export class OrdersService {
           paymentMethod: createDto.paymentMethod,
           shippingAddressSnapshot: shippingAddress,
           notes: createDto.notes,
-          orderStatus: OrderStatus.PENDING_PAYMENT,
+          orderStatus: initialStatus,
+          paidAt: isCashOnDelivery ? new Date() : null,
         });
 
         const savedOrder = await manager.save(Order, order);
