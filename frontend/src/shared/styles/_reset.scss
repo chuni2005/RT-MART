@@ -63,23 +63,3 @@ textarea:focus,
 select:focus {
   outline: none;
 }
-
-// Disable text selection and cursor globally
-* {
-  user-select: none;
-  -webkit-user-select: none;
-  -moz-user-select: none;
-  -ms-user-select: none;
-  cursor: default;
-}
-
-// Re-enable for input elements where text selection is needed
-input,
-textarea,
-[contenteditable="true"] {
-  user-select: text;
-  -webkit-user-select: text;
-  -moz-user-select: text;
-  -ms-user-select: text;
-  cursor: text;
-}
