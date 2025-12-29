@@ -223,6 +223,7 @@ export interface CheckoutSummaryCartModeProps {
 export interface CheckoutSummaryCheckoutModeProps {
   mode: 'checkout';
   storeGroups: StoreOrderGroup[];
+  appliedDiscounts?: import('./order').DiscountRecommendation | null;
   onCheckout: () => void;
   disabled?: boolean;
   buttonText?: string;
