@@ -78,19 +78,26 @@ function DiscountCard({
         </span>
       </div>
 
-      {/* 折扣碼 - 內建複製功能 */}
-      <div className={styles.discountCode}>
+      {/* 折扣碼 - 可點擊複製 */}
+      <div
+        className={`${styles.discountCode} ${copied ? styles.copied : ''}`}
+        onClick={handleCopyCode}
+        role="button"
+        tabIndex={0}
+        onKeyDown={(e) => {
+          if (e.key === 'Enter' || e.key === ' ') {
+            e.preventDefault();
+            handleCopyCode();
+          }
+        }}
+        title="點擊複製折扣碼"
+      >
         <Icon icon="ticket" />
         <span className={styles.code}>{discount.discountCode}</span>
-        <button
-          type="button"
-          className={styles.copyButton}
-          onClick={handleCopyCode}
-          title="複製折扣碼"
-        >
+        <div className={styles.copyButton}>
           <Icon icon={copied ? "check" : "copy"} />
           {copied && <span className={styles.copiedText}>已複製</span>}
-        </button>
+        </div>
       </div>
 
       {/* 折扣資訊 */}
