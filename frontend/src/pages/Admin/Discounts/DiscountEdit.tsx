@@ -228,7 +228,37 @@ function DiscountEdit() {
       setTimeout(() => navigate('/admin/discounts'), 1500);
     } catch (error) {
       console.error('儲存折扣失敗:', error);
-      showAlert({ type: 'error', message: '儲存失敗，請稍後再試' });
+
+      // 解析後端錯誤訊息
+      let errorMessage = '儲存失敗，請稍後再試';
+
+      if (error instanceof Error) {
+        const backendMessage = error.message;
+
+        // 根據後端錯誤訊息顯示對應的中文錯誤
+        if (backendMessage.includes('should not exist')) {
+          errorMessage = '資料格式錯誤，請檢查輸入欄位';
+        } else if (backendMessage.includes('already exists')) {
+          errorMessage = '折扣碼已存在，請使用其他折扣碼';
+        } else if (backendMessage.includes('End date must be after start date')) {
+          errorMessage = '結束時間必須晚於開始時間';
+        } else if (backendMessage.includes('Seasonal discount details are required')) {
+          errorMessage = '缺少季節性折扣設定';
+        } else if (backendMessage.includes('Shipping discount details are required')) {
+          errorMessage = '缺少運費折扣設定';
+        } else if (backendMessage.includes('Special discount details are required')) {
+          errorMessage = '缺少特殊折扣設定';
+        } else if (backendMessage.includes('details are required')) {
+          errorMessage = '缺少必要的折扣設定';
+        } else if (backendMessage.includes('not found')) {
+          errorMessage = '找不到該折扣';
+        } else if (backendMessage) {
+          // 如果有其他後端訊息，直接顯示
+          errorMessage = backendMessage;
+        }
+      }
+
+      showAlert({ type: 'error', message: errorMessage });
     } finally {
       setSaving(false);
     }
