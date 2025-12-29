@@ -20,9 +20,11 @@ import { DiscountsModule } from './discounts/discounts.module';
 import { AuditLogsModule } from './audit-logs/audit-logs.module';
 import { CartHistoryModule } from './cart-history/cart-history.module';
 import { AdminModule } from './admin/admin.module';
+import { HealthModule } from './health/health.module';
 
 @Module({
   imports: [
+    HealthModule,
     // allow the app to read `.env` properly
     ConfigModule.forRoot({
       isGlobal: true,

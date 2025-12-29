@@ -3,6 +3,7 @@ import { NestFactory } from '@nestjs/core';
 import { ValidationPipe } from '@nestjs/common';
 import { AppModule } from './app.module';
 import helmet from 'helmet';
+import { AllExceptionsFilter } from './common/filters/http-exception.filter';
 
 async function bootstrap() {
   const app = await NestFactory.create(AppModule);
@@ -13,6 +14,9 @@ async function bootstrap() {
 
   // set global API prefix (so all routes will be /api/v1/...)
   app.setGlobalPrefix(process.env.API_PREFIX || 'api');
+
+  // enable global exception filter for detailed error logging
+  app.useGlobalFilters(new AllExceptionsFilter());
 
   // enable global validation pipe to automatically validate all incoming requests
   // whitelist: strip properties that don't have decorators
