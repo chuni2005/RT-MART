@@ -4,6 +4,7 @@ import Button from '@/shared/components/Button';
 import Alert from '@/shared/components/Alert';
 import sellerService from '@/shared/services/sellerService';
 import { useForm } from '@/shared/hooks/useForm';
+import { validatePhone, validateEmail, validateBankAccount } from '@/shared/utils/validation';
 import styles from './StoreSettings.module.scss';
 
 function StoreSettings() {
@@ -33,13 +34,11 @@ function StoreSettings() {
       },
       storePhone: (value) => {
         if (!value) return '請輸入聯絡電話';
-        if (!/^09\d{8}$/.test(value)) return '請輸入正確的手機號碼格式 (09xxxxxxxx)';
-        return null;
+        return validatePhone(value);
       },
       storeEmail: (value) => {
         if (!value) return '請輸入 Email';
-        if (!/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(value)) return '請輸入正確的 Email 格式';
-        return null;
+        return validateEmail(value);
       },
       storeAddress: (value) => {
         if (!value) return '請輸入實體地址';
@@ -47,8 +46,7 @@ function StoreSettings() {
       },
       bankAccountReference: (value) => {
         if (!value) return '請輸入銀行帳戶';
-        if (!/^\d{10,16}$/.test(value)) return '銀行帳戶必須是 10-16 位數字';
-        return null;
+        return validateBankAccount(value);
       },
     }
   );
@@ -179,7 +177,7 @@ function StoreSettings() {
             onBlur={handleBlur}
             error={errors.storePhone}
             required
-            placeholder="09xxxxxxxx"
+            placeholder="0912-345-678"
           />
 
           <FormInput
@@ -213,7 +211,7 @@ function StoreSettings() {
             onBlur={handleBlur}
             error={errors.bankAccountReference}
             required
-            placeholder="10-16位數字"
+            placeholder="123-4567890"
           />
         </section>
 
