@@ -569,6 +569,11 @@ export const updateSystemDiscount = async (
   >
 ): Promise<SystemDiscount> => {
   const backendData = mapSystemDiscountToBackend(discountData);
+
+  // 移除不可更新的欄位（後端 UpdateDiscountDto 不允許更新這些欄位）
+  delete backendData.discountCode;
+  delete backendData.discountType;
+
   const result = await patch<any>(`/discounts/admin/${discountId}`, backendData);
   return mapBackendDiscountToSystemDiscount(result);
 };
