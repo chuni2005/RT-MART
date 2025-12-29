@@ -42,7 +42,7 @@ export class AuthController {
       httpOnly: true,
       secure: false,
       sameSite: 'lax',
-      maxAge: 15 * 60 * 1000,
+      maxAge: 60 * 60 * 1000, // 1 hour
     });
 
     res.cookie('refreshToken', result.refreshToken, {
@@ -72,7 +72,7 @@ export class AuthController {
       secure: false,
       sameSite: 'lax',
       path: '/',
-      maxAge: 15 * 60 * 1000,
+      maxAge: 60 * 60 * 1000, // 1 hour
     });
     return this.authService.refreshTokens(refreshToken);
   }
