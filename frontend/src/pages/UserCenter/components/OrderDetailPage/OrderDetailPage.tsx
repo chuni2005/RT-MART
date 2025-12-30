@@ -1,4 +1,4 @@
-import { useState, useEffect } from 'react';
+import { useState, useEffect, useCallback } from 'react';
 import { useParams, useNavigate } from 'react-router-dom';
 import { getOrderDetail } from '@/shared/services/orderService';
 import type { Order, OrderStatus, PaymentMethod } from '@/types/order';
@@ -6,6 +6,7 @@ import Button from '@/shared/components/Button';
 import OrderTimeline from '@/pages/UserCenter/components/OrderTimeline';
 import ItemListCard from '@/shared/components/ItemListCard';
 import AddressCard from '@/pages/Checkout/components/AddressCard';
+import { useSSE } from '@/shared/hooks/useSSE';
 import styles from './OrderDetailPage.module.scss';
 
 /**
@@ -30,7 +31,7 @@ function OrderDetailPage() {
   }, [order_id]);
 
   // ========== 3. 數據獲取 ==========
-  const fetchOrderDetail = async () => {
+  const fetchOrderDetail = useCallback(async () => {
     try {
       setIsLoading(true);
       setError(null);
@@ -42,7 +43,18 @@ function OrderDetailPage() {
     } finally {
       setIsLoading(false);
     }
-  };
+  }, [order_id]);
+
+  // ========== SSE Real-time Updates ==========
+  useSSE({
+    'order:updated': useCallback((data: { orderId: string; status: OrderStatus }) => {
+      // Only update if this is the current order
+      if (data.orderId === order_id) {
+        console.log('Order updated via SSE, refreshing...');
+        fetchOrderDetail();
+      }
+    }, [order_id, fetchOrderDetail]),
+  });
 
   // ========== 4. 輔助函數 ==========
   const getStatusLabel = (status: OrderStatus): string => {

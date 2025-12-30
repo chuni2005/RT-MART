@@ -1,4 +1,4 @@
-import { useState, useEffect, useRef } from "react";
+import { useState, useEffect, useRef, useCallback } from "react";
 import { useNavigate, useParams } from "react-router-dom";
 import Button from "@/shared/components/Button";
 import Icon from "@/shared/components/Icon";
@@ -9,6 +9,7 @@ import sellerService from "@/shared/services/sellerService";
 import { AlertType } from "@/types";
 import { Order, OrderStatus } from "@/types/order";
 import { getOrderStatusText } from "@/shared/utils/orderUtils";
+import { useSSE } from "@/shared/hooks/useSSE";
 import styles from "./OrderDetail.module.scss";
 
 function OrderDetail() {
@@ -38,7 +39,7 @@ function OrderDetail() {
     }
   }, [orderId]);
 
-  const loadOrder = async (id: string) => {
+  const loadOrder = useCallback(async (id: string) => {
     setLoading(true);
     try {
       const data = await sellerService.getOrder(id);
@@ -48,7 +49,20 @@ function OrderDetail() {
     } finally {
       setLoading(false);
     }
-  };
+  }, []);
+
+  // SSE Real-time Updates
+  useSSE({
+    'order:updated': useCallback((data: { orderId: string; status: OrderStatus }) => {
+      // Only update if this is the current order
+      if (data.orderId === orderId) {
+        console.log('Order updated via SSE, refreshing...');
+        if (orderId) {
+          loadOrder(orderId);
+        }
+      }
+    }, [orderId, loadOrder]),
+  });
 
   const handleStatusChange = async (newStatus: OrderStatus) => {
     if (!order) return;

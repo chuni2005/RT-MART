@@ -17,6 +17,7 @@ import { ShippingAddressesService } from '../shipping-addresses/shipping-address
 import { InventoryService } from '../inventory/inventory.service';
 import { DiscountsService } from '../discounts/discounts.service';
 import { DiscountType } from '../discounts/entities/discount.entity';
+import { SseService } from '../sse/sse.service';
 
 @Injectable()
 export class OrdersService {
@@ -30,6 +31,7 @@ export class OrdersService {
     private readonly inventoryService: InventoryService,
     private readonly discountsService: DiscountsService,
     private readonly dataSource: DataSource,
+    private readonly sseService: SseService,
   ) {}
 
   async create(userId: string, createDto: CreateOrderDto): Promise<Order> {
@@ -300,7 +302,7 @@ export class OrdersService {
     this.validateStatusTransition(order.orderStatus, updateDto.status);
 
     // Use transaction for status update with inventory changes
-    return await this.dataSource.transaction(async (manager) => {
+    const updatedOrder = await this.dataSource.transaction(async (manager) => {
       order.orderStatus = updateDto.status;
 
       // Update timestamps based on status
@@ -343,6 +345,30 @@ export class OrdersService {
 
       return await manager.save(Order, order);
     });
+
+    // Send SSE notification to buyer and sellers after transaction completes
+    try {
+      // Get seller user IDs from order items (store.sellerId)
+      const sellerIds = updatedOrder.items
+        ? [...new Set(updatedOrder.items.map(item => item.product?.store?.sellerId).filter(Boolean))]
+        : [];
+
+      this.sseService.notifyOrderUpdate(
+        updatedOrder.orderId,
+        updatedOrder.userId,
+        sellerIds as string[],
+        {
+          orderNumber: updatedOrder.orderNumber,
+          status: updatedOrder.orderStatus,
+          updatedAt: new Date().toISOString(),
+        },
+      );
+    } catch (error) {
+      // Log SSE error but don't fail the order update
+      console.error('Failed to send SSE notification for order update:', error);
+    }
+
+    return updatedOrder;
   }
 
   async cancelOrder(id: string, userId: string): Promise<Order> {

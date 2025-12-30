@@ -19,6 +19,7 @@ import { CreateDiscountDto } from './dto/create-discount.dto';
 import { UpdateDiscountDto } from './dto/update-discount.dto';
 import { QueryDiscountDto } from './dto/query-discount.dto';
 import { generateDiscountCode } from './utils/discount-code.generator';
+import { SseService } from '../sse/sse.service';
 
 @Injectable()
 export class DiscountsService {
@@ -31,6 +32,7 @@ export class DiscountsService {
     private readonly shippingRepository: Repository<ShippingDiscount>,
     @InjectRepository(SpecialDiscount)
     private readonly specialRepository: Repository<SpecialDiscount>,
+    private readonly sseService: SseService,
   ) {}
 
   async adminCreate(
@@ -294,6 +296,7 @@ export class DiscountsService {
       ...baseDiscountData
     } = updateDto;
 
+    const oldIsActive = discount.isActive;
     Object.assign(discount, baseDiscountData);
     await this.discountRepository.save(discount);
 
@@ -313,7 +316,26 @@ export class DiscountsService {
       await this.specialRepository.save(discount.specialDiscount);
     }
 
-    return await this.findOne(id);
+    const updatedDiscount = await this.findOne(id);
+
+    // Send SSE notification if isActive status changed
+    if (oldIsActive !== updatedDiscount.isActive) {
+      try {
+        this.sseService.notifyDiscountStatusChange(
+          updatedDiscount.discountId,
+          updatedDiscount.isActive ? 'activated' : 'deactivated',
+          {
+            discountCode: updatedDiscount.discountCode,
+            name: updatedDiscount.name,
+            discountType: updatedDiscount.discountType,
+          },
+        );
+      } catch (error) {
+        console.error('Failed to send SSE notification for discount update:', error);
+      }
+    }
+
+    return updatedDiscount;
   }
 
   async adminUpdate(
@@ -351,6 +373,7 @@ export class DiscountsService {
       ...baseDiscountData
     } = updateDto;
 
+    const oldIsActive = discount.isActive;
     Object.assign(discount, baseDiscountData);
     await this.discountRepository.save(discount);
 
@@ -370,7 +393,26 @@ export class DiscountsService {
       await this.specialRepository.save(discount.specialDiscount);
     }
 
-    return await this.findOne(id);
+    const updatedDiscount = await this.findOne(id);
+
+    // Send SSE notification if isActive status changed
+    if (oldIsActive !== updatedDiscount.isActive) {
+      try {
+        this.sseService.notifyDiscountStatusChange(
+          updatedDiscount.discountId,
+          updatedDiscount.isActive ? 'activated' : 'deactivated',
+          {
+            discountCode: updatedDiscount.discountCode,
+            name: updatedDiscount.name,
+            discountType: updatedDiscount.discountType,
+          },
+        );
+      } catch (error) {
+        console.error('Failed to send SSE notification for discount update:', error);
+      }
+    }
+
+    return updatedDiscount;
   }
 
   async remove(id: string): Promise<void> {
