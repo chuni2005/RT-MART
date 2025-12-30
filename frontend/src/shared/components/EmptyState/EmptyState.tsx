@@ -5,7 +5,7 @@ import Button from '@/shared/components/Button/Button';
 import styles from './EmptyState.module.scss';
 
 export interface EmptyStateProps {
-  type?: 'search' | 'cart' | 'order';
+  type?: 'search' | 'cart' | 'order' | 'admin-order';
   icon?: string;
   title?: string;
   message?: string | ReactNode;
@@ -49,6 +49,14 @@ function EmptyState({
           suggestions: ['瀏覽商品', '查看熱門商品', '搜尋想要的商品'],
           buttonText: '開始購物',
           buttonAction: () => navigate('/'),
+        };
+      case 'admin-order':
+        return {
+          icon: 'magnifying-glass',
+          title: '未找到訂單',
+          suggestions: undefined,
+          buttonText: undefined,
+          buttonAction: undefined,
         };
       case 'search':
       default:
@@ -97,13 +105,15 @@ function EmptyState({
           </ul>
         </div>
       )}
-      <Button
-        variant="primary"
-        onClick={finalButtonAction}
-        className={styles.backButton}
-      >
-        {finalButtonText}
-      </Button>
+      {finalButtonText && finalButtonAction && (
+        <Button
+          variant="primary"
+          onClick={finalButtonAction}
+          className={styles.backButton}
+        >
+          {finalButtonText}
+        </Button>
+      )}
     </div>
   );
 }

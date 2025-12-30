@@ -1,7 +1,6 @@
 import { useLocation, useNavigate } from "react-router-dom";
 import { useAuth } from "@/shared/contexts/AuthContext";
 import { useCart } from "@/shared/contexts/CartContext";
-import Icon from "../Icon/Icon";
 import TopBar from "./TopBar";
 import SearchBar from "./SearchBar";
 import UserMenu from "./UserMenu";

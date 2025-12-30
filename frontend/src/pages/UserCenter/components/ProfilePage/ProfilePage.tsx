@@ -6,9 +6,10 @@
  * 3. 帳號設定 (刪除帳號)
  */
 
-import { useState, useEffect, ChangeEvent, FocusEvent, FormEvent } from "react";
+import { useState, useEffect, ChangeEvent } from "react";
 import { useNavigate } from "react-router-dom";
 import { useAuth } from "@/shared/hooks/useAuth";
+import { useForm } from "@/shared/hooks/useForm";
 import FormInput from "@/shared/components/FormInput";
 import Button from "@/shared/components/Button";
 import Icon from "@/shared/components/Icon";
@@ -37,22 +38,10 @@ interface ProfileFormData {
   phone: string;
 }
 
-interface ProfileFormErrors {
-  name?: string | null;
-  email?: string | null;
-  phone?: string | null;
-}
-
 interface PasswordFormData {
   currentPassword: string;
   newPassword: string;
   confirmPassword: string;
-}
-
-interface PasswordFormErrors {
-  currentPassword?: string | null;
-  newPassword?: string | null;
-  confirmPassword?: string | null;
 }
 
 interface AlertState {
@@ -76,37 +65,100 @@ function ProfilePage() {
   const { user, updateUser, checkAuth, logout } = useAuth();
   const navigate = useNavigate();
 
-  // Profile Form State
-  const [profileData, setProfileData] = useState<ProfileFormData>({
-    name: "",
-    email: "",
-    phone: "",
-  });
-  const [profileErrors, setProfileErrors] = useState<ProfileFormErrors>({});
-  const [profileTouched, setProfileTouched] = useState<Record<string, boolean>>(
-    {}
-  );
-  const [isProfileLoading, setIsProfileLoading] = useState(false);
-  const [profileAlert, setProfileAlert] = useState<AlertState>({
-    type: "",
-    message: "",
-  });
+  const [profileAlert, setProfileAlert] = useState<AlertState>({ type: "", message: "" });
+  const [passwordAlert, setPasswordAlert] = useState<AlertState>({ type: "", message: "" });
 
-  // Password Form State
-  const [passwordData, setPasswordData] = useState<PasswordFormData>({
-    currentPassword: "",
-    newPassword: "",
-    confirmPassword: "",
-  });
-  const [passwordErrors, setPasswordErrors] = useState<PasswordFormErrors>({});
-  const [passwordTouched, setPasswordTouched] = useState<
-    Record<string, boolean>
-  >({});
-  const [isPasswordLoading, setIsPasswordLoading] = useState(false);
-  const [passwordAlert, setPasswordAlert] = useState<AlertState>({
-    type: "",
-    message: "",
-  });
+  // Profile Form
+  const profileForm = useForm<ProfileFormData>(
+    {
+      name: user?.name || "",
+      email: user?.email || "",
+      phone: user?.phone || "",
+    },
+    async (formValues) => {
+      setProfileAlert({ type: "", message: "" });
+
+      try {
+        const updatedUser = await updateProfile(formValues);
+        updateUser(updatedUser);
+        await checkAuth();
+
+        setProfileAlert({
+          type: "success",
+          message: "個人資料已更新成功",
+        });
+
+        setTimeout(() => {
+          setProfileAlert({ type: "", message: "" });
+        }, 3000);
+      } catch (error) {
+        console.error("Profile update failed:", error);
+        setProfileAlert({
+          type: "error",
+          message: error instanceof Error ? error.message : "更新失敗,請稍後再試",
+        });
+      }
+    },
+    {
+      name: (value) => validateName(value),
+      email: (value) => validateEmail(value),
+      phone: (value) => validatePhone(value),
+    }
+  );
+
+  // Password Form
+  const passwordForm = useForm<PasswordFormData>(
+    {
+      currentPassword: "",
+      newPassword: "",
+      confirmPassword: "",
+    },
+    async (formValues) => {
+      setPasswordAlert({ type: "", message: "" });
+
+      try {
+        const response = await updatePassword({
+          currentPassword: formValues.currentPassword,
+          newPassword: formValues.newPassword,
+        });
+
+        if (response.success) {
+          passwordForm.reset();
+
+          setPasswordAlert({
+            type: "success",
+            message: "密碼已更新成功",
+          });
+
+          setTimeout(() => {
+            setPasswordAlert({ type: "", message: "" });
+          }, 3000);
+        }
+      } catch (error) {
+        console.error("Password update failed:", error);
+        setPasswordAlert({
+          type: "error",
+          message: error instanceof Error ? error.message : "密碼更新失敗,請稍後再試",
+        });
+      }
+    },
+    {
+      currentPassword: (value) => validatePassword(value),
+      newPassword: (value) => validatePasswordStrength(value),
+      confirmPassword: (value, allValues) =>
+        validateConfirmPassword(allValues.newPassword, value),
+    }
+  );
+
+  // Sync user data to profile form
+  useEffect(() => {
+    if (user) {
+      profileForm.setValue("name", user.name || "");
+      profileForm.setValue("email", user.email || "");
+      profileForm.setValue("phone", user.phone || "");
+    }
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [user]);
 
   // Delete Dialog State
   const [deleteDialog, setDeleteDialog] = useState<DeleteDialogState>({
@@ -121,273 +173,6 @@ function ProfilePage() {
     isOpen: false,
     countdown: 5,
   });
-
-  // Initialize profile data from user context
-  useEffect(() => {
-    if (user) {
-      setProfileData({
-        name: user.name || "",
-        email: user.email || "",
-        phone: user.phone || "",
-      });
-    }
-  }, [user]);
-
-  // ===========================
-  // Profile Form Handlers
-  // ===========================
-
-  const handleProfileChange = (e: ChangeEvent<HTMLInputElement>) => {
-    const { name, value } = e.target;
-
-    setProfileData((prev) => ({
-      ...prev,
-      [name]: value,
-    }));
-
-    // Clear error when user types
-    if (profileErrors[name as keyof ProfileFormErrors]) {
-      setProfileErrors((prev) => ({
-        ...prev,
-        [name]: null,
-      }));
-    }
-  };
-
-  const handleProfileBlur = (e: FocusEvent<HTMLInputElement>) => {
-    const { name, value } = e.target;
-
-    setProfileTouched((prev) => ({
-      ...prev,
-      [name]: true,
-    }));
-
-    validateProfileField(name, value);
-  };
-
-  const validateProfileField = (name: string, value: string): string | null => {
-    let error: string | null = null;
-
-    switch (name) {
-      case "name":
-        error = validateName(value);
-        break;
-      case "email":
-        error = validateEmail(value);
-        break;
-      case "phone":
-        error = validatePhone(value);
-        break;
-    }
-
-    setProfileErrors((prev) => ({
-      ...prev,
-      [name]: error,
-    }));
-
-    return error;
-  };
-
-  const validateAllProfileFields = (): boolean => {
-    const newErrors: ProfileFormErrors = {
-      name: validateName(profileData.name),
-      email: validateEmail(profileData.email),
-      phone: validatePhone(profileData.phone),
-    };
-
-    setProfileErrors(newErrors);
-    setProfileTouched({
-      name: true,
-      email: true,
-      phone: true,
-    });
-
-    return !newErrors.name && !newErrors.email && !newErrors.phone;
-  };
-
-  const handleProfileSubmit = async (e: FormEvent<HTMLFormElement>) => {
-    e.preventDefault();
-
-    if (!validateAllProfileFields()) {
-      return;
-    }
-
-    try {
-      setIsProfileLoading(true);
-      setProfileAlert({ type: "", message: "" });
-
-      // Call API to update profile
-      const updatedUser = await updateProfile(profileData);
-
-      // Update AuthContext with new data
-      updateUser(updatedUser);
-
-      // Refresh user data from API
-      await checkAuth();
-
-      // Show success message
-      setProfileAlert({
-        type: "success",
-        message: "個人資料已更新成功",
-      });
-
-      // Auto-hide success message after 3 seconds
-      setTimeout(() => {
-        setProfileAlert({ type: "", message: "" });
-      }, 3000);
-    } catch (error) {
-      console.error("Profile update failed:", error);
-      setProfileAlert({
-        type: "error",
-        message: error instanceof Error ? error.message : "更新失敗,請稍後再試",
-      });
-    } finally {
-      setIsProfileLoading(false);
-    }
-  };
-
-  // ===========================
-  // Password Form Handlers
-  // ===========================
-
-  const handlePasswordChange = (e: ChangeEvent<HTMLInputElement>) => {
-    const { name, value } = e.target;
-
-    setPasswordData((prev) => ({
-      ...prev,
-      [name]: value,
-    }));
-
-    // Clear error when user types
-    if (passwordErrors[name as keyof PasswordFormErrors]) {
-      setPasswordErrors((prev) => ({
-        ...prev,
-        [name]: null,
-      }));
-    }
-
-    // Re-validate confirm password when new password changes
-    if (name === "newPassword" && passwordTouched.confirmPassword) {
-      const confirmError = validateConfirmPassword(
-        value,
-        passwordData.confirmPassword
-      );
-      setPasswordErrors((prev) => ({
-        ...prev,
-        confirmPassword: confirmError,
-      }));
-    }
-  };
-
-  const handlePasswordBlur = (e: FocusEvent<HTMLInputElement>) => {
-    const { name, value } = e.target;
-
-    setPasswordTouched((prev) => ({
-      ...prev,
-      [name]: true,
-    }));
-
-    validatePasswordField(name, value);
-  };
-
-  const validatePasswordField = (
-    name: string,
-    value: string
-  ): string | null => {
-    let error: string | null = null;
-
-    switch (name) {
-      case "currentPassword":
-        error = validatePassword(value); // Basic validation
-        break;
-      case "newPassword":
-        error = validatePasswordStrength(value); // Strong validation
-        break;
-      case "confirmPassword":
-        error = validateConfirmPassword(passwordData.newPassword, value);
-        break;
-    }
-
-    setPasswordErrors((prev) => ({
-      ...prev,
-      [name]: error,
-    }));
-
-    return error;
-  };
-
-  const validateAllPasswordFields = (): boolean => {
-    const newErrors: PasswordFormErrors = {
-      currentPassword: validatePassword(passwordData.currentPassword),
-      newPassword: validatePasswordStrength(passwordData.newPassword),
-      confirmPassword: validateConfirmPassword(
-        passwordData.newPassword,
-        passwordData.confirmPassword
-      ),
-    };
-
-    setPasswordErrors(newErrors);
-    setPasswordTouched({
-      currentPassword: true,
-      newPassword: true,
-      confirmPassword: true,
-    });
-
-    return (
-      !newErrors.currentPassword &&
-      !newErrors.newPassword &&
-      !newErrors.confirmPassword
-    );
-  };
-
-  const handlePasswordSubmit = async (e: FormEvent<HTMLFormElement>) => {
-    e.preventDefault();
-
-    if (!validateAllPasswordFields()) {
-      return;
-    }
-
-    try {
-      setIsPasswordLoading(true);
-      setPasswordAlert({ type: "", message: "" });
-
-      // Call API to update password
-      const response = await updatePassword({
-        currentPassword: passwordData.currentPassword,
-        newPassword: passwordData.newPassword,
-      });
-
-      if (response.success) {
-        // Clear password form
-        setPasswordData({
-          currentPassword: "",
-          newPassword: "",
-          confirmPassword: "",
-        });
-        setPasswordTouched({});
-
-        // Show success message
-        setPasswordAlert({
-          type: "success",
-          message: "密碼已更新成功",
-        });
-
-        // Auto-hide success message after 3 seconds
-        setTimeout(() => {
-          setPasswordAlert({ type: "", message: "" });
-        }, 3000);
-      }
-    } catch (error) {
-      console.error("Password update failed:", error);
-      setPasswordAlert({
-        type: "error",
-        message:
-          error instanceof Error ? error.message : "密碼更新失敗,請稍後再試",
-      });
-    } finally {
-      setIsPasswordLoading(false);
-    }
-  };
 
   // ===========================
   // Delete Account Handlers
@@ -411,7 +196,7 @@ function ProfilePage() {
     });
   };
 
-  const handleDeletePasswordChange = (e: ChangeEvent<HTMLInputElement>) => {
+  const handleDeletePasswordChange = (e: ChangeEvent<HTMLInputElement | HTMLTextAreaElement>) => {
     setDeleteDialog((prev) => ({
       ...prev,
       password: e.target.value,
@@ -512,77 +297,68 @@ function ProfilePage() {
           />
         )}
 
-        <form onSubmit={handleProfileSubmit} className={styles.form}>
+        <form onSubmit={profileForm.handleSubmit} className={styles.form}>
           <FormInput
             label="姓名"
             type="text"
             name="name"
-            value={profileData.name}
-            onChange={handleProfileChange}
-            onBlur={handleProfileBlur}
+            value={profileForm.values.name}
+            onChange={profileForm.handleChange}
+            onBlur={profileForm.handleBlur}
             error={
-              profileTouched.name ? profileErrors.name ?? undefined : undefined
+              profileForm.touched.name ? profileForm.errors.name ?? undefined : undefined
             }
             placeholder="請輸入姓名"
-            disabled={isProfileLoading}
+            disabled={profileForm.isSubmitting}
             required
             fieldName="姓名"
-            onValidate={(error) => {
-              setProfileErrors((prev) => ({ ...prev, name: error || undefined }));
-            }}
           />
 
           <FormInput
             label="Email"
             type="email"
             name="email"
-            value={profileData.email}
-            onChange={handleProfileChange}
-            onBlur={handleProfileBlur}
+            value={profileForm.values.email}
+            onChange={profileForm.handleChange}
+            onBlur={profileForm.handleBlur}
             error={
-              profileTouched.email
-                ? profileErrors.email ?? undefined
+              profileForm.touched.email
+                ? profileForm.errors.email ?? undefined
                 : undefined
             }
             placeholder="請輸入您的 Email"
-            disabled={isProfileLoading}
+            disabled={profileForm.isSubmitting}
             autoComplete="email"
             required
             fieldName="Email"
-            onValidate={(error) => {
-              setProfileErrors((prev) => ({ ...prev, email: error || undefined }));
-            }}
           />
 
           <FormInput
             label="電話號碼"
             type="tel"
             name="phone"
-            value={profileData.phone}
-            onChange={handleProfileChange}
-            onBlur={handleProfileBlur}
+            value={profileForm.values.phone}
+            onChange={profileForm.handleChange}
+            onBlur={profileForm.handleBlur}
             error={
-              profileTouched.phone
-                ? profileErrors.phone ?? undefined
+              profileForm.touched.phone
+                ? profileForm.errors.phone ?? undefined
                 : undefined
             }
             placeholder="0912-345-678"
-            disabled={isProfileLoading}
+            disabled={profileForm.isSubmitting}
             autoComplete="tel"
             required
             fieldName="電話號碼"
-            onValidate={(error) => {
-              setProfileErrors((prev) => ({ ...prev, phone: error || undefined }));
-            }}
           />
 
           <Button
             type="submit"
             variant="primary"
-            disabled={isProfileLoading}
+            disabled={profileForm.isSubmitting}
             fullWidth
           >
-            {isProfileLoading ? "更新中..." : "儲存變更"}
+            {profileForm.isSubmitting ? "更新中..." : "儲存變更"}
           </Button>
         </form>
       </div>
@@ -600,49 +376,43 @@ function ProfilePage() {
           />
         )}
 
-        <form onSubmit={handlePasswordSubmit} className={styles.form}>
+        <form onSubmit={passwordForm.handleSubmit} className={styles.form}>
           <FormInput
             label="目前密碼"
             type="password"
             name="currentPassword"
-            value={passwordData.currentPassword}
-            onChange={handlePasswordChange}
-            onBlur={handlePasswordBlur}
+            value={passwordForm.values.currentPassword}
+            onChange={passwordForm.handleChange}
+            onBlur={passwordForm.handleBlur}
             error={
-              passwordTouched.currentPassword
-                ? passwordErrors.currentPassword ?? undefined
+              passwordForm.touched.currentPassword
+                ? passwordForm.errors.currentPassword ?? undefined
                 : undefined
             }
             placeholder="請輸入目前的密碼"
-            disabled={isPasswordLoading}
+            disabled={passwordForm.isSubmitting}
             autoComplete="current-password"
             required
             fieldName="目前密碼"
-            onValidate={(error) => {
-              setPasswordErrors((prev) => ({ ...prev, currentPassword: error || undefined }));
-            }}
           />
 
           <FormInput
             label="新密碼"
             type="password"
             name="newPassword"
-            value={passwordData.newPassword}
-            onChange={handlePasswordChange}
-            onBlur={handlePasswordBlur}
+            value={passwordForm.values.newPassword}
+            onChange={passwordForm.handleChange}
+            onBlur={passwordForm.handleBlur}
             error={
-              passwordTouched.newPassword
-                ? passwordErrors.newPassword ?? undefined
+              passwordForm.touched.newPassword
+                ? passwordForm.errors.newPassword ?? undefined
                 : undefined
             }
             placeholder="請輸入新密碼"
-            disabled={isPasswordLoading}
+            disabled={passwordForm.isSubmitting}
             autoComplete="new-password"
             required
             fieldName="新密碼"
-            onValidate={(error) => {
-              setPasswordErrors((prev) => ({ ...prev, newPassword: error || undefined }));
-            }}
           />
 
           {/* Helper text under new password field */}
@@ -654,31 +424,28 @@ function ProfilePage() {
             label="確認新密碼"
             type="password"
             name="confirmPassword"
-            value={passwordData.confirmPassword}
-            onChange={handlePasswordChange}
-            onBlur={handlePasswordBlur}
+            value={passwordForm.values.confirmPassword}
+            onChange={passwordForm.handleChange}
+            onBlur={passwordForm.handleBlur}
             error={
-              passwordTouched.confirmPassword
-                ? passwordErrors.confirmPassword ?? undefined
+              passwordForm.touched.confirmPassword
+                ? passwordForm.errors.confirmPassword ?? undefined
                 : undefined
             }
             placeholder="請再次輸入新密碼"
-            disabled={isPasswordLoading}
+            disabled={passwordForm.isSubmitting}
             autoComplete="new-password"
             required
             fieldName="確認新密碼"
-            onValidate={(error) => {
-              setPasswordErrors((prev) => ({ ...prev, confirmPassword: error || undefined }));
-            }}
           />
 
           <Button
             type="submit"
             variant="primary"
-            disabled={isPasswordLoading}
+            disabled={passwordForm.isSubmitting}
             fullWidth
           >
-            {isPasswordLoading ? "更新中..." : "更新密碼"}
+            {passwordForm.isSubmitting ? "更新中..." : "更新密碼"}
           </Button>
         </form>
       </div>
@@ -731,9 +498,6 @@ function ProfilePage() {
             autoComplete="current-password"
             required
             fieldName="密碼"
-            onValidate={(error) => {
-              setDeleteDialog((prev) => ({ ...prev, error: error || '' }));
-            }}
           />
 
           <div className={styles.deleteDialogActions}>

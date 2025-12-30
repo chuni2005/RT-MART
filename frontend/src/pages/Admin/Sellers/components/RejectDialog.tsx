@@ -15,7 +15,6 @@ interface RejectDialogProps {
 const COMMON_REASONS = [
   '資料不完整',
   '銀行帳戶資訊有誤',
-  '商店資訊不符規範',
   '疑似重複申請',
 ];
 
@@ -59,8 +58,8 @@ function RejectDialog({
             <span className={styles.value}>{application.user_name}</span>
           </div>
           <div className={styles.infoRow}>
-            <span className={styles.label}>商店名稱：</span>
-            <span className={styles.value}>{application.store_name}</span>
+            <span className={styles.label}>Email：</span>
+            <span className={styles.value}>{application.email}</span>
           </div>
         </div>
 

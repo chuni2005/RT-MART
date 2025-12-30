@@ -268,7 +268,7 @@ export const getOrders = async (params?: GetOrdersParams): Promise<GetOrdersResp
           orderId: order.orderId,
           orderNumber: order.orderNumber,
           status: order.orderStatus as any,
-          items: order.items?.map(transformOrderItem) || [],
+          // items not included in list for performance - use getOrderDetail for full data
           totalAmount: Number(order.totalAmount),
           createdAt: order.createdAt,
         })),

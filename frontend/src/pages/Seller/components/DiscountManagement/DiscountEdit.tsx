@@ -84,7 +84,10 @@ function DiscountEdit() {
   const { values, errors, validateAll, setValue } = form;
 
   // 包裝 handleChange 以支持直接傳值的方式
-  const handleChange = (nameOrEvent: string | React.ChangeEvent<HTMLInputElement>, value?: string) => {
+  const handleChange = (
+    nameOrEvent: string | React.ChangeEvent<HTMLInputElement | HTMLTextAreaElement>,
+    value?: string
+  ) => {
     if (typeof nameOrEvent === 'string') {
       // 直接傳遞字段名和值
       const name = nameOrEvent;
@@ -99,7 +102,7 @@ function DiscountEdit() {
   };
 
   // 包裝 handleBlur 以支持直接傳字段名的方式
-  const handleBlur = (nameOrEvent: string | React.FocusEvent<HTMLInputElement>) => {
+  const handleBlur = (nameOrEvent: string | React.FocusEvent<HTMLInputElement | HTMLTextAreaElement>) => {
     if (typeof nameOrEvent === 'string') {
       // 直接傳遞字段名 - 創建模擬事件對象
       const name = nameOrEvent;

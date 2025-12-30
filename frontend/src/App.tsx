@@ -42,8 +42,9 @@ import SellerApply from "./pages/Seller/Apply";
 import AdminCenter from "./pages/Admin";
 import AdminDashboard from "./pages/Admin/Dashboard";
 import AdminUsers from "./pages/Admin/Users";
+import AdminStores from "./pages/Admin/Stores";
 import AdminSellers from "./pages/Admin/Sellers";
-import AdminDisputes from "./pages/Admin/Disputes";
+import AdminOrders from "./pages/Admin/Orders";
 import AdminDiscounts from "./pages/Admin/Discounts";
 import AdminDiscountEdit from "./pages/Admin/Discounts/DiscountEdit";
 
@@ -142,7 +143,7 @@ function AppContent() {
           <Route
             path="/seller/*"
             element={
-              <ProtectedRoute excludeRoles={['admin']}>
+              <ProtectedRoute requiredRole="seller">
                 <SellerCenter />
               </ProtectedRoute>
             }
@@ -188,8 +189,9 @@ function AppContent() {
 
             <Route path="dashboard" element={<AdminDashboard />} />
             <Route path="users" element={<AdminUsers />} />
+            <Route path="stores" element={<AdminStores />} />
             <Route path="sellers" element={<AdminSellers />} />
-            <Route path="disputes" element={<AdminDisputes />} />
+            <Route path="orders" element={<AdminOrders />} />
             <Route path="discounts" element={<AdminDiscounts />} />
             <Route path="discount/new" element={<AdminDiscountEdit />} />
             <Route

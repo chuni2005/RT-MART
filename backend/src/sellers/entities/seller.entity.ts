@@ -34,6 +34,23 @@ export class Seller {
   @Column({ name: 'verified_by', type: 'bigint', nullable: true })
   verifiedBy: string | null;
 
+  @Column({ name: 'rejected_at', type: 'timestamp', nullable: true })
+  rejectedAt: Date | null;
+
+  @Column({
+    name: 'created_at',
+    type: 'timestamp',
+    default: () => 'CURRENT_TIMESTAMP',
+  })
+  createdAt: Date;
+
+  @Column({
+    name: 'updated_at',
+    type: 'timestamp',
+    default: () => 'CURRENT_TIMESTAMP',
+  })
+  updatedAt: Date;
+
   // Relations
   @OneToOne(() => User, (user) => user.seller, { onDelete: 'CASCADE' })
   @JoinColumn({ name: 'user_id' })

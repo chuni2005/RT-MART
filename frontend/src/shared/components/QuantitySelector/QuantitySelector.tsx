@@ -1,7 +1,7 @@
-import Icon from '../Icon';
-import Button from '../Button';
-import styles from './QuantitySelector.module.scss';
-import type { QuantitySelectorProps } from '@/types';
+import Icon from "../Icon";
+import Button from "../Button";
+import styles from "./QuantitySelector.module.scss";
+import type { QuantitySelectorProps } from "@/types";
 
 function QuantitySelector({
   value,
@@ -12,13 +12,14 @@ function QuantitySelector({
   readOnly = false,
   onValidationError,
   onBlur,
-  className = '',
-  size = 'lg',
+  className = "",
+  size = "lg",
   ariaLabel,
 }: QuantitySelectorProps) {
   // 增加數量
   const handleIncrease = () => {
-    const numValue = typeof value === 'string' ? parseInt(value, 10) || min : value;
+    const numValue =
+      typeof value === "string" ? parseInt(value, 10) || min : value;
     if (numValue < max) {
       onChange(numValue + 1);
     }
@@ -26,21 +27,24 @@ function QuantitySelector({
 
   // 減少數量
   const handleDecrease = () => {
-    const numValue = typeof value === 'string' ? parseInt(value, 10) || min : value;
+    const numValue =
+      typeof value === "string" ? parseInt(value, 10) || min : value;
     if (numValue > min) {
       onChange(numValue - 1);
     }
   };
 
   // 手動輸入數量
-  const handleInputChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+  const handleInputChange = (
+    e: React.ChangeEvent<HTMLInputElement | HTMLTextAreaElement>
+  ) => {
     if (readOnly) return;
 
     const inputValue = e.target.value;
 
     // 允許空值（用戶可能正在輸入）
-    if (inputValue === '') {
-      onChange('');
+    if (inputValue === "") {
+      onChange("");
       return;
     }
 
@@ -68,8 +72,8 @@ function QuantitySelector({
     if (readOnly) return;
 
     // 如果是空值，設定為 min
-    const numValue = typeof value === 'string' ? parseInt(value, 10) : value;
-    if (value === '' || isNaN(numValue) || numValue < min) {
+    const numValue = typeof value === "string" ? parseInt(value, 10) : value;
+    if (value === "" || isNaN(numValue) || numValue < min) {
       onChange(min);
     }
 
@@ -78,7 +82,8 @@ function QuantitySelector({
     }
   };
 
-  const numValue = typeof value === 'string' ? parseInt(value, 10) || min : value;
+  const numValue =
+    typeof value === "string" ? parseInt(value, 10) || min : value;
 
   const containerClasses = [
     styles.quantitySelector,
@@ -88,21 +93,15 @@ function QuantitySelector({
     className,
   ]
     .filter(Boolean)
-    .join(' ');
+    .join(" ");
 
-  const buttonClasses = [
-    styles.quantityButton,
-    styles[`size-${size}`],
-  ]
+  const buttonClasses = [styles.quantityButton, styles[`size-${size}`]]
     .filter(Boolean)
-    .join(' ');
+    .join(" ");
 
-  const inputClasses = [
-    styles.quantityInput,
-    styles[`size-${size}`],
-  ]
+  const inputClasses = [styles.quantityInput, styles[`size-${size}`]]
     .filter(Boolean)
-    .join(' ');
+    .join(" ");
 
   return (
     <div className={containerClasses}>
@@ -110,7 +109,7 @@ function QuantitySelector({
         className={buttonClasses}
         onClick={handleDecrease}
         disabled={disabled || numValue <= min}
-        aria-label={ariaLabel || '減少數量'}
+        aria-label={ariaLabel || "減少數量"}
         type="button"
       >
         <Icon icon="minus" />
@@ -124,14 +123,14 @@ function QuantitySelector({
         onBlur={handleInputBlur}
         disabled={disabled}
         readOnly={readOnly}
-        aria-label={ariaLabel || '商品數量'}
+        aria-label={ariaLabel || "商品數量"}
       />
 
       <Button
         className={buttonClasses}
         onClick={handleIncrease}
         disabled={disabled || numValue >= max}
-        aria-label={ariaLabel || '增加數量'}
+        aria-label={ariaLabel || "增加數量"}
         type="button"
       >
         <Icon icon="plus" />

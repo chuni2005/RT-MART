@@ -403,4 +403,40 @@ export class DiscountsService {
 
     return { valid: true, discount };
   }
+
+  /**
+   * Get active shipping discount amount
+   * Returns the shipping discount amount if there's an active shipping discount
+   */
+  async getActiveShippingDiscount(subtotal: number): Promise<number> {
+    const now = new Date();
+
+    const activeShippingDiscounts = await this.discountRepository.find({
+      where: {
+        discountType: DiscountType.SHIPPING,
+        isActive: true,
+        startDatetime: LessThan(now),
+        endDatetime: MoreThan(now),
+      },
+      relations: ['shippingDiscount'],
+    });
+
+    if (activeShippingDiscounts.length === 0) {
+      return 0;
+    }
+
+    // Find the best shipping discount (highest amount) that applies
+    let maxDiscount = 0;
+    for (const discount of activeShippingDiscounts) {
+      // Check if order meets minimum purchase requirement
+      if (subtotal >= Number(discount.minPurchaseAmount)) {
+        const discountAmount = Number(discount.shippingDiscount?.discountAmount || 0);
+        if (discountAmount > maxDiscount) {
+          maxDiscount = discountAmount;
+        }
+      }
+    }
+
+    return maxDiscount;
+  }
 }

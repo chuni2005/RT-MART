@@ -3,8 +3,8 @@
  * 功能：Email/Password 登入 + 記住我
  */
 
-import { useState, ChangeEvent, FocusEvent, FormEvent } from 'react';
 import { useNavigate } from 'react-router-dom';
+import { useForm } from "@/shared/hooks/useForm";
 import FormInput from '@/shared/components/FormInput';
 import { validateLoginIdentifier, validatePassword } from '@/shared/utils/validation';
 import styles from './LoginForm.module.scss';
@@ -20,108 +20,28 @@ interface LoginFormData {
   remember: boolean;
 }
 
-interface FormErrors {
-  loginIdentifier?: string | null;
-  password?: string | null;
-}
-
-interface TouchedFields {
-  loginIdentifier?: boolean;
-  password?: boolean;
-}
-
 const LoginForm = ({ onSubmit, isLoading }: LoginFormProps) => {
   const navigate = useNavigate();
 
-  const [formData, setFormData] = useState<LoginFormData>({
-    loginIdentifier: '',
-    password: '',
-    remember: false,
-  });
-
-  const [errors, setErrors] = useState<FormErrors>({});
-  const [touched, setTouched] = useState<TouchedFields>({});
-
-  const handleChange = (e: ChangeEvent<HTMLInputElement | HTMLTextAreaElement>) => {
-    const { name, value, type } = e.target;
-    const checked = 'checked' in e.target ? e.target.checked : false;
-    const newValue = type === 'checkbox' ? checked : value;
-
-    setFormData(prev => ({
-      ...prev,
-      [name]: newValue,
-    }));
-
-    if (errors[name as keyof FormErrors]) {
-      setErrors(prev => ({
-        ...prev,
-        [name]: null,
-      }));
-    }
-  };
-
-  const handleBlur = (e: FocusEvent<HTMLInputElement | HTMLTextAreaElement>) => {
-    const { name, value } = e.target;
-
-    setTouched(prev => ({
-      ...prev,
-      [name]: true,
-    }));
-
-    validateField(name, value);
-  };
-
-  const validateField = (name: string, value: string): string | null => {
-    let error: string | null = null;
-
-    switch (name) {
-      case 'loginIdentifier':
-        error = validateLoginIdentifier(value);
-        break;
-      case 'password':
-        error = validatePassword(value);
-        break;
-      default:
-        break;
-    }
-
-    setErrors(prev => ({
-      ...prev,
-      [name]: error,
-    }));
-
-    return error;
-  };
-
-  const validateAll = (): boolean => {
-    const newErrors: FormErrors = {
-      loginIdentifier: validateLoginIdentifier(formData.loginIdentifier),
-      password: validatePassword(formData.password),
-    };
-
-    setErrors(newErrors);
-    setTouched({ loginIdentifier: true, password: true });
-
-    return !newErrors.loginIdentifier && !newErrors.password;
-  };
-
-  const handleSubmit = async (e: FormEvent<HTMLFormElement>) => {
-    e.preventDefault();
-
-    if (!validateAll()) {
-      return;
-    }
-
-    try {
-      await onSubmit(formData);
-    } catch (error) {
-      console.error('Login form error:', error);
-    }
-  };
+  const { values, errors, touched, handleChange, handleBlur, handleSubmit } =
+    useForm<LoginFormData>(
+      {
+        loginIdentifier: "",
+        password: "",
+        remember: false,
+      },
+      async (formValues) => {
+        await onSubmit(formValues);
+      },
+      {
+        loginIdentifier: (value) => validateLoginIdentifier(value),
+        password: (value) => validatePassword(value),
+      }
+    );
 
   const handleForgotPassword = (e: React.MouseEvent<HTMLButtonElement>) => {
     e.preventDefault();
-    navigate('/forgot-password');
+    navigate("/forgot-password");
   };
 
   return (
@@ -130,7 +50,7 @@ const LoginForm = ({ onSubmit, isLoading }: LoginFormProps) => {
         label="帳號或 Email"
         type="text"
         name="loginIdentifier"
-        value={formData.loginIdentifier}
+        value={values.loginIdentifier}
         onChange={handleChange}
         onBlur={handleBlur}
         error={
@@ -143,16 +63,13 @@ const LoginForm = ({ onSubmit, isLoading }: LoginFormProps) => {
         autoComplete="username"
         required
         fieldName="帳號或 Email"
-        onValidate={(error) => {
-          setErrors((prev) => ({ ...prev, loginIdentifier: error || undefined }));
-        }}
       />
 
       <FormInput
         label="密碼"
         type="password"
         name="password"
-        value={formData.password}
+        value={values.password}
         onChange={handleChange}
         onBlur={handleBlur}
         error={touched.password ? errors.password ?? undefined : undefined}
@@ -161,9 +78,6 @@ const LoginForm = ({ onSubmit, isLoading }: LoginFormProps) => {
         autoComplete="current-password"
         required
         fieldName="密碼"
-        onValidate={(error) => {
-          setErrors((prev) => ({ ...prev, password: error || undefined }));
-        }}
       />
 
       <div className={styles.formOptions}>
@@ -171,7 +85,7 @@ const LoginForm = ({ onSubmit, isLoading }: LoginFormProps) => {
           <input
             type="checkbox"
             name="remember"
-            checked={formData.remember}
+            checked={values.remember}
             onChange={handleChange}
             disabled={isLoading}
           />

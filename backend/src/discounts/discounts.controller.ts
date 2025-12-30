@@ -27,14 +27,14 @@ export class DiscountsController {
   @Roles(UserRole.SELLER)
   @UseGuards(JwtAccessGuard, RolesGuard)
   @Post()
-  async createSpecial(@Req() req, @Body() createDto: CreateDiscountDto) {
+  async createSpecial(@Req() req: AuthRequest, @Body() createDto: CreateDiscountDto) {
     return await this.discountsService.sellerCreate(createDto, req.user.userId);
   }
 
   @Roles(UserRole.ADMIN)
   @UseGuards(JwtAccessGuard, RolesGuard)
   @Post('admin')
-  async create(@Req() req, @Body() createDto: CreateDiscountDto) {
+  async create(@Req() req: AuthRequest, @Body() createDto: CreateDiscountDto) {
     return await this.discountsService.adminCreate(createDto, req.user.userId);
   }
 

@@ -1,6 +1,7 @@
 import {
   Controller,
   Get,
+  Post,
   Body,
   Patch,
   Param,
@@ -87,9 +88,19 @@ export class StoresController {
 
   @Roles(UserRole.ADMIN)
   @UseGuards(JwtAccessGuard, RolesGuard)
-  @Patch(':storeId')
-  async restore(@Param('storeId') storeId: string) {
+  @Post(':storeId/restore')
+  async restoreStore(@Param('storeId') storeId: string) {
     return await this.storesService.restore(storeId);
+  }
+
+  @Roles(UserRole.ADMIN)
+  @UseGuards(JwtAccessGuard, RolesGuard)
+  @Patch(':storeId')
+  async updateByAdmin(
+    @Param('storeId') storeId: string,
+    @Body() updateDto: UpdateStoreDto,
+  ) {
+    return await this.storesService.update(storeId, updateDto);
   }
 
   @Roles(UserRole.SELLER)

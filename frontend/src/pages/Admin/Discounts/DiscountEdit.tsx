@@ -1,12 +1,10 @@
-import { useState, useEffect } from 'react';
+import { useState, useEffect, useRef } from 'react';
 import { useNavigate, useParams } from 'react-router-dom';
 import FormInput from '@/shared/components/FormInput';
-import Select from '@/shared/components/Select';
 import Button from '@/shared/components/Button';
 import Icon from '@/shared/components/Icon';
 import Alert from '@/shared/components/Alert';
-import adminService from '@/shared/services/adminService';
-import { SystemDiscount } from '@/types/admin';
+import adminService from '@/shared/services/adminService.index';
 import { AlertType } from '@/types';
 import { useForm } from '@/shared/hooks/useForm';
 import styles from './DiscountEdit.module.scss';
@@ -30,10 +28,21 @@ function DiscountEdit() {
   const navigate = useNavigate();
   const { discountId } = useParams<{ discountId: string }>();
   const isEditMode = Boolean(discountId);
+  const alertRef = useRef<HTMLDivElement>(null);
 
   const [loading, setLoading] = useState(isEditMode);
   const [saving, setSaving] = useState(false);
   const [alert, setAlert] = useState<{ type: AlertType; message: string } | null>(null);
+
+  // Custom setAlert with scroll behavior
+  const showAlert = (alertData: { type: AlertType; message: string } | null) => {
+    setAlert(alertData);
+    if (alertData && alertRef.current) {
+      setTimeout(() => {
+        alertRef.current?.scrollIntoView({ behavior: 'smooth', block: 'center' });
+      }, 100);
+    }
+  };
 
   const form = useForm<DiscountFormValues>(
     {
@@ -97,8 +106,13 @@ function DiscountEdit() {
 
   const { values, errors, validateAll, setValue } = form;
 
-  const handleChange = (nameOrEvent: string | React.ChangeEvent<HTMLInputElement>, value?: string) => {
-    if (typeof nameOrEvent === 'string') {
+  const handleChange = (
+    nameOrEvent:
+      | string
+      | React.ChangeEvent<HTMLInputElement | HTMLTextAreaElement>,
+    value?: string
+  ) => {
+    if (typeof nameOrEvent === "string") {
       const name = nameOrEvent;
       setValue(name as any, value);
       if (form.touched[name]) {
@@ -109,7 +123,7 @@ function DiscountEdit() {
     }
   };
 
-  const handleBlur = (nameOrEvent: string | React.FocusEvent<HTMLInputElement>) => {
+  const handleBlur = (nameOrEvent: string | React.FocusEvent<HTMLInputElement | HTMLTextAreaElement>) => {
     if (typeof nameOrEvent === 'string') {
       const name = nameOrEvent;
       const mockEvent = {
@@ -137,7 +151,7 @@ function DiscountEdit() {
       const discount = discounts.find((d) => d.discount_id === id);
 
       if (!discount) {
-        setAlert({ type: 'error', message: '找不到折扣' });
+        showAlert({ type: 'error', message: '找不到折扣' });
         navigate('/admin/discounts');
         return;
       }
@@ -158,7 +172,7 @@ function DiscountEdit() {
       }
     } catch (error) {
       console.error('載入折扣失敗:', error);
-      setAlert({ type: 'error', message: '載入折扣失敗' });
+      showAlert({ type: 'error', message: '載入折扣失敗' });
     } finally {
       setLoading(false);
     }
@@ -166,12 +180,12 @@ function DiscountEdit() {
 
   const handleSave = async () => {
     if (!validateAll()) {
-      setAlert({ type: 'warning', message: '請檢查表單錯誤' });
+      showAlert({ type: 'warning', message: '請檢查表單錯誤' });
       return;
     }
 
     if (new Date(values.endDatetime) <= new Date(values.startDatetime)) {
-      setAlert({ type: 'error', message: '結束時間必須晚於開始時間' });
+      showAlert({ type: 'error', message: '結束時間必須晚於開始時間' });
       return;
     }
 
@@ -205,16 +219,16 @@ function DiscountEdit() {
 
       if (isEditMode && discountId) {
         await adminService.updateSystemDiscount(discountId, discountData as any);
-        setAlert({ type: 'success', message: '折扣已更新' });
+        showAlert({ type: 'success', message: '折扣已更新' });
       } else {
         await adminService.createSystemDiscount(discountData as any);
-        setAlert({ type: 'success', message: '折扣已創建' });
+        showAlert({ type: 'success', message: '折扣已創建' });
       }
 
       setTimeout(() => navigate('/admin/discounts'), 1500);
     } catch (error) {
       console.error('儲存折扣失敗:', error);
-      setAlert({ type: 'error', message: '儲存失敗，請稍後再試' });
+      showAlert({ type: 'error', message: '儲存失敗，請稍後再試' });
     } finally {
       setSaving(false);
     }
@@ -229,24 +243,26 @@ function DiscountEdit() {
       <div className={styles.header}>
         <Button
           variant="ghost"
-          onClick={() => navigate('/admin/discounts')}
+          onClick={() => navigate("/admin/discounts")}
           className={styles.backButton}
         >
           <Icon icon="arrow-left" />
           返回列表
         </Button>
         <h1 className={styles.pageTitle}>
-          {isEditMode ? '編輯系統折扣' : '新增系統折扣'}
+          {isEditMode ? "編輯系統折扣" : "新增系統折扣"}
         </h1>
       </div>
 
       {/* Alert */}
       {alert && (
-        <Alert
-          type={alert.type}
-          message={alert.message}
-          onClose={() => setAlert(null)}
-        />
+        <div ref={alertRef}>
+          <Alert
+            type={alert.type}
+            message={alert.message}
+            onClose={() => setAlert(null)}
+          />
+        </div>
       )}
 
       <div className={styles.formContainer}>
@@ -258,20 +274,20 @@ function DiscountEdit() {
               <button
                 type="button"
                 className={`${styles.typeButton} ${
-                  values.discountType === 'seasonal' ? styles.active : ''
+                  values.discountType === "seasonal" ? styles.active : ""
                 }`}
-                onClick={() => handleChange('discountType', 'seasonal')}
+                onClick={() => handleChange("discountType", "seasonal")}
               >
-                <Icon icon="percent" />
+                <Icon icon="ticket" />
                 <span>季節性折扣</span>
                 <p className={styles.typeDesc}>百分比折扣優惠</p>
               </button>
               <button
                 type="button"
                 className={`${styles.typeButton} ${
-                  values.discountType === 'shipping' ? styles.active : ''
+                  values.discountType === "shipping" ? styles.active : ""
                 }`}
-                onClick={() => handleChange('discountType', 'shipping')}
+                onClick={() => handleChange("discountType", "shipping")}
               >
                 <Icon icon="truck-fast" />
                 <span>免運費</span>
@@ -301,8 +317,8 @@ function DiscountEdit() {
             <textarea
               name="description"
               value={values.description}
-              onChange={(e) => handleChange('description', e.target.value)}
-              onBlur={() => handleBlur('description')}
+              onChange={(e) => handleChange("description", e.target.value)}
+              onBlur={() => handleBlur("description")}
               className={styles.textarea}
               rows={3}
               placeholder="請輸入折扣活動描述"
@@ -317,7 +333,9 @@ function DiscountEdit() {
               <input
                 type="checkbox"
                 checked={values.isActive}
-                onChange={(e) => handleChange('isActive', e.target.checked.toString())}
+                onChange={(e) =>
+                  handleChange("isActive", e.target.checked.toString())
+                }
               />
               <span>立即啟用此折扣</span>
             </label>
@@ -328,7 +346,7 @@ function DiscountEdit() {
         <section className={styles.section}>
           <h2 className={styles.sectionTitle}>折扣設定</h2>
 
-          {values.discountType === 'seasonal' ? (
+          {values.discountType === "seasonal" ? (
             <>
               <div className={styles.row}>
                 <FormInput
@@ -422,11 +440,14 @@ function DiscountEdit() {
 
         {/* 操作按鈕 */}
         <div className={styles.actions}>
-          <Button variant="outline" onClick={() => navigate('/admin/discounts')}>
+          <Button
+            variant="outline"
+            onClick={() => navigate("/admin/discounts")}
+          >
             取消
           </Button>
           <Button onClick={handleSave} disabled={saving}>
-            {saving ? '儲存中...' : '儲存折扣'}
+            {saving ? "儲存中..." : "儲存折扣"}
           </Button>
         </div>
       </div>

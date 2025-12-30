@@ -1,12 +1,11 @@
-import { useState, FormEvent, ChangeEvent, FocusEvent } from "react";
+import { useState } from "react";
 import { useNavigate } from "react-router-dom";
 import { useAuth } from "@/shared/hooks/useAuth";
+import { useForm } from "@/shared/hooks/useForm";
 import FormInput from "@/shared/components/FormInput";
 import Alert from "@/shared/components/Alert";
 import sellerService from "@/shared/services/sellerService";
-import {
-  validateBankAccount,
-} from "@/shared/utils/validation";
+import { validateBankAccount } from "@/shared/utils/validation";
 import { AlertType } from "@/types";
 import type { SellerApplicationForm } from "@/types/seller";
 import styles from "./SellerApply.module.scss";
@@ -31,131 +30,45 @@ function SellerApply() {
     return null;
   }
 
-  // Form State
-  const [formData, setFormData] = useState<SellerApplicationForm>({
-    bank_account_reference: "",
-  });
-
-  // UI State
-  const [loading, setLoading] = useState(false);
   const [alert, setAlert] = useState<AlertState>({ type: "", message: "" });
-  const [errors, setErrors] = useState<
-    Partial<Record<keyof SellerApplicationForm, string>>
-  >({});
-  const [touched, setTouched] = useState<
-    Partial<Record<keyof SellerApplicationForm, boolean>>
-  >({});
 
-  // 處理表單輸入
-  const handleChange = (
-    e: ChangeEvent<HTMLInputElement | HTMLTextAreaElement>
-  ) => {
-    const { name, value } = e.target;
-    setFormData((prev) => ({
-      ...prev,
-      [name]: value,
-    }));
-    // 清除該欄位的錯誤
-    if (errors[name as keyof SellerApplicationForm]) {
-      setErrors((prev) => ({
-        ...prev,
-        [name]: undefined,
-      }));
-    }
-  };
+  const { values, errors, touched, handleChange, handleBlur, handleSubmit, isSubmitting } =
+    useForm<SellerApplicationForm>(
+      {
+        bank_account_reference: "",
+      },
+      async (formValues) => {
+        setAlert({ type: "", message: "" });
 
-  // 處理欄位失焦
-  const handleBlur = (
-    e: FocusEvent<HTMLInputElement | HTMLTextAreaElement>
-  ) => {
-    const { name, value } = e.target;
-    setTouched((prev) => ({
-      ...prev,
-      [name]: true,
-    }));
-    validateField(name as keyof SellerApplicationForm, value);
-  };
+        try {
+          const response = await sellerService.applyToBeSeller(formValues);
 
-  // 單一欄位驗證（處理自定義驗證邏輯）
-  const validateField = (
-    name: keyof SellerApplicationForm,
-    value: string
-  ): string | null => {
-    let error: string | null = null;
+          if (response.success) {
+            setAlert({
+              type: "success",
+              message: response.message,
+            });
 
-    if (name === 'bank_account_reference' && value) {
-      error = validateBankAccount(value);
-    }
-
-    if (error) {
-      setErrors((prev) => ({
-        ...prev,
-        [name]: error,
-      }));
-    }
-
-    return error;
-  };
-
-  // 表單驗證
-  const validateForm = (): boolean => {
-    const newErrors: Partial<Record<keyof SellerApplicationForm, string>> = {};
-
-    // 銀行帳戶：必填，格式驗證
-    const bankAccountError = validateBankAccount(formData.bank_account_reference);
-    if (bankAccountError) {
-      newErrors.bank_account_reference = bankAccountError;
-    }
-
-    setErrors(newErrors);
-    setTouched({
-      bank_account_reference: true,
-    });
-
-    return Object.keys(newErrors).length === 0;
-  };
-
-  // 處理表單提交
-  const handleSubmit = async (e: FormEvent) => {
-    e.preventDefault();
-
-    if (!validateForm()) {
-      setAlert({ type: "error", message: "請修正表單中的錯誤" });
-      return;
-    }
-
-    setLoading(true);
-    setAlert({ type: "", message: "" });
-
-    try {
-      const response = await sellerService.applyToBeSeller(formData);
-
-      if (response.success) {
-        setAlert({
-          type: "success",
-          message: response.message,
-        });
-
-        // 2秒後重定向到首頁
-        setTimeout(() => {
-          navigate("/");
-        }, 2000);
-      } else {
-        setAlert({
-          type: "error",
-          message: "申請提交失敗，請稍後再試",
-        });
+            setTimeout(() => {
+              navigate("/");
+            }, 2000);
+          } else {
+            setAlert({
+              type: "error",
+              message: "申請提交失敗，請稍後再試",
+            });
+          }
+        } catch (error: any) {
+          setAlert({
+            type: "error",
+            message: error?.message || "申請提交失敗，請檢查網路連接後重試",
+          });
+        }
+      },
+      {
+        bank_account_reference: (value) => validateBankAccount(value),
       }
-    } catch (error) {
-      console.error("申請失敗:", error);
-      setAlert({
-        type: "error",
-        message: "申請提交失敗，請檢查網路連接後重試",
-      });
-    } finally {
-      setLoading(false);
-    }
-  };
+    );
 
   return (
     <div className={styles.sellerApply}>
@@ -200,24 +113,22 @@ function SellerApply() {
                 name="bank_account_reference"
                 label="銀行帳戶"
                 type="text"
-                value={formData.bank_account_reference}
+                value={values.bank_account_reference}
                 onChange={handleChange}
                 onBlur={handleBlur}
                 placeholder="請輸入銀行帳戶參考號"
                 required
                 fieldName="銀行帳戶"
-                onValidate={(error) => {
-                  setErrors((prev) => ({ ...prev, bank_account_reference: error || undefined }));
-                }}
                 error={
                   touched.bank_account_reference
                     ? errors.bank_account_reference
                     : undefined
                 }
-                disabled={loading}
+                disabled={isSubmitting}
               />
               <p className={styles.hint}>
-                銀行帳戶資訊用於收款。商店名稱將在審核通過後自動生成為「您的姓名's Store」。
+                銀行帳戶資訊用於收款。商店名稱將在審核通過後自動生成為「您的姓名's
+                Store」。
               </p>
             </div>
 
@@ -227,33 +138,19 @@ function SellerApply() {
                 type="button"
                 className={styles.cancelButton}
                 onClick={() => navigate("/")}
-                disabled={loading}
+                disabled={isSubmitting}
               >
                 取消
               </button>
               <button
                 type="submit"
                 className={styles.submitButton}
-                disabled={loading}
+                disabled={isSubmitting}
               >
-                {loading ? "提交中..." : "提交申請"}
+                {isSubmitting ? "提交中..." : "提交申請"}
               </button>
             </div>
           </form>
-
-          {/* 底部連結 */}
-          <div className={styles.footer}>
-            <p>
-              已經是賣家？
-              <button
-                className={styles.linkButton}
-                onClick={() => navigate("/seller/center")}
-                disabled={loading}
-              >
-                前往賣家中心
-              </button>
-            </p>
-          </div>
         </div>
       </div>
     </div>

@@ -1,6 +1,9 @@
-import { ChartDataPoint } from "./seller";
 import type { OrderStatus, PaymentMethod, OrderItemDetail } from "./order";
 import type { Address } from "./common";
+import type { ChartDataPoint } from "./seller";
+
+// Re-export ChartDataPoint from seller types
+export type { ChartDataPoint } from "./seller";
 
 // Dashboard Types
 export interface DashboardStats {
@@ -17,7 +20,7 @@ export interface DashboardStats {
 
 export interface RecentActivity {
   id: string;
-  type: "seller_application" | "product_review" | "dispute";
+  type: "seller_application" | "product_review" | "order";
   message: string;
   count: number;
   timestamp: string;
@@ -35,49 +38,45 @@ export interface AdminUser {
   deleted_at: string | null; // null = active, timestamp = suspended
 }
 
+// Admin Store Type (with admin-specific fields)
+export interface AdminStore {
+  store_id: string;
+  store_name: string;
+  seller_id: string;
+  seller_name: string;
+  seller_email: string;
+  description: string;
+  address: string;
+  email: string;
+  phone: string;
+  rating: number;
+  total_ratings: number;
+  product_count: number;
+  created_at: string;
+  deleted_at: string | null; // null = active, timestamp = suspended
+}
+
 // Seller Application Type
 export interface SellerApplication {
-  application_id: string;
-
+  seller_id: string;
   user_id: string;
+
+  // User 資訊 (from JOIN)
+  login_id: string;
   user_name: string;
   email: string;
   phone_number: string;
 
-  store_name: string;
-  store_description: string;
-  store_address: string;
-  store_email: string;
-  store_phone: string;
-
+  // Seller 資訊
   bank_account_reference: string;
+  verified: boolean;
+  verified_at: string | null;
+  verified_by: string | null;
+  rejected_at: string | null;
 
-  status: "pending" | "approved" | "rejected";
-  reviewed_by?: string;
-  reviewed_at?: string;
-  rejection_reason?: string;
-
-  application_created_at: string;
-}
-
-// Dispute Type
-export interface Dispute {
-  dispute_id: string;
-  order_number: string;
-  buyer_name: string;
-  seller_name: string;
-  dispute_type: "not_received" | "not_as_described" | "damaged" | "other";
-  description: string;
-  buyer_evidence: string;
-  seller_response: string | null;
-  status: "pending" | "resolved";
-  created_at: string;
-  resolved_at: string | null;
-  resolution: {
-    type: "full_refund" | "partial_refund" | "reject";
-    amount?: number;
-    reason: string;
-  } | null;
+  // Timestamps
+  created_at: string; // Seller.created_at (申請時間)
+  updated_at: string;
 }
 
 // System Discount Type
@@ -129,9 +128,6 @@ export interface AdminOrder {
   delivered_at?: string;
   completed_at?: string;
   cancelled_at?: string;
-  // Admin-specific fields
-  is_flagged?: boolean; // 標記異常
-  admin_notes?: string; // 管理員備註
 }
 
 // Order Filter Parameters

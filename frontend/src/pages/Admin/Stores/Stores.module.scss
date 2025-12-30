@@ -1,0 +1,154 @@
+@use "sass:color";
+
+.stores {
+  padding: $spacing-lg;
+}
+
+.pageTitle {
+  font-size: $font-3xl;
+  font-weight: 600;
+  color: $text-primary;
+  margin-bottom: $spacing-xl;
+}
+
+// Search Section
+.searchForm {
+  max-width: none;
+  width: 100%;
+  display: flex;
+}
+
+// Loading & Empty States
+.loading,
+.emptyState {
+  @include flex-center;
+  flex-direction: column;
+  min-height: 18.75rem;
+  font-size: $font-lg;
+  color: $text-secondary;
+  gap: $spacing-md;
+
+  svg {
+    font-size: $font-4xl;
+  }
+}
+
+// Table
+.tableContainer {
+  background: $bg-secondary;
+  border-radius: $border-radius-md;
+  overflow-x: auto;
+  box-shadow: $shadow-sm;
+}
+
+.table {
+  width: 100%;
+  border-collapse: collapse;
+  text-align: center;
+  align-items: center;
+
+  thead {
+    background: $bg-tertiary;
+
+    th {
+      padding: $spacing-md;
+      font-size: $font-sm;
+      font-weight: 600;
+      color: $text-secondary;
+      border-bottom: 2px solid $border-color;
+      white-space: nowrap;
+    }
+  }
+
+  tbody {
+    tr {
+      border-bottom: 1px solid $border-color;
+      transition: $transition-fast;
+
+      &:hover {
+        background: $bg-tertiary;
+      }
+
+      &:last-child {
+        border-bottom: none;
+      }
+    }
+
+    td {
+      padding: $spacing-md;
+      font-size: $font-sm;
+      color: $text-primary;
+      white-space: nowrap;
+    }
+  }
+}
+
+// Rating
+.rating {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 0.25rem;
+
+  .starIcon {
+    color: #fbbf24;
+    font-size: $font-sm;
+  }
+}
+
+// Status
+.statusActive {
+  color: $success-color;
+  font-weight: 600;
+}
+
+.statusSuspended {
+  color: $error-color;
+  font-weight: 600;
+}
+
+// Action Buttons
+.actionButtons {
+  white-space: nowrap;
+}
+
+// Dialog
+.dialogContent {
+  padding: $spacing-md;
+
+  p {
+    margin-bottom: $spacing-lg;
+    color: $text-primary;
+  }
+
+  input {
+    margin-bottom: $spacing-lg;
+  }
+}
+
+.dialogActions {
+  display: flex;
+  justify-content: flex-end;
+  gap: $spacing-md;
+}
+
+// Custom Button Styles
+.btnSuccess {
+  background: $success-color;
+  color: white;
+  border: none;
+
+  &:hover:not(:disabled) {
+    background: color.adjust($success-color, $lightness: -10%);
+  }
+}
+
+.btnDanger {
+  background: $error-color;
+  color: white;
+  border: none;
+
+  &:hover:not(:disabled) {
+    background: color.adjust($error-color, $lightness: -10%);
+  }
+}

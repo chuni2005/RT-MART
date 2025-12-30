@@ -65,7 +65,7 @@ function ProductEdit() {
 
   // 包裝 handleChange 以支持直接傳值的方式
   const handleChange = (
-    nameOrEvent: string | React.ChangeEvent<HTMLInputElement>,
+    nameOrEvent: string | React.ChangeEvent<HTMLInputElement | HTMLTextAreaElement>,
     value?: string
   ) => {
     if (typeof nameOrEvent === "string") {
@@ -83,7 +83,9 @@ function ProductEdit() {
 
   // 包裝 handleBlur 以支持直接傳字段名的方式
   const handleBlur = (
-    nameOrEvent: string | React.FocusEvent<HTMLInputElement>
+    nameOrEvent:
+      | string
+      | React.FocusEvent<HTMLInputElement | HTMLTextAreaElement>
   ) => {
     if (typeof nameOrEvent === "string") {
       // 直接傳遞字段名 - 創建模擬事件對象
@@ -218,9 +220,6 @@ function ProductEdit() {
             error={errors.productName}
             required
             fieldName="商品名稱"
-            onValidate={(error) => {
-              form.setErrors((prev) => ({ ...prev, productName: error || undefined }));
-            }}
             placeholder="請輸入商品名稱"
           />
 

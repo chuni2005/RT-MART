@@ -1,4 +1,3 @@
-import { OrderStatus } from '@/types/order';
 import Icon from '@/shared/components/Icon';
 import styles from './OrderTimeline.module.scss';
 

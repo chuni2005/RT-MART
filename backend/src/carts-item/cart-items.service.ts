@@ -26,6 +26,7 @@ export class CartItemsService {
    */
   async getCart(userId: string): Promise<CartItem[]> {
     return await this.cartItemRepository.find({
+
       where: { userId },
       relations: ['product', 'product.images', 'product.store', 'product.inventory'],
       order: { createdAt: 'ASC' },
@@ -39,7 +40,9 @@ export class CartItemsService {
     });
 
     // Check stock availability
-    const stock = await this.inventoryService.getAvailableStock(addToCartDto.productId);
+    const stock = await this.inventoryService.getAvailableStock(
+      addToCartDto.productId,
+    );
     if (stock < addToCartDto.quantity) {
       throw new BadRequestException('Product quantity is not enough');
     }

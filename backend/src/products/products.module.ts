@@ -17,6 +17,7 @@ import { Inventory } from '../inventory/entities/inventory.entity';
     TypeOrmModule.forFeature([Product, ProductImage, Inventory]),
     ProductTypesModule,
     StoresModule,
+    StoresModule,
     SellersModule,
     CloudinaryModule,
     forwardRef(() => InventoryModule),

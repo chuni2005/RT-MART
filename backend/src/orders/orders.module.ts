@@ -8,6 +8,8 @@ import { OrderDiscount } from './entities/order-discount.entity';
 import { CartItemsModule } from '../carts-item/cart-items.module';
 import { ShippingAddressesModule } from '../shipping-addresses/shipping-addresses.module';
 import { InventoryModule } from '../inventory/inventory.module';
+import { DiscountsModule } from '../discounts/discounts.module';
+import { SellersModule } from '../sellers/sellers.module';
 
 @Module({
   imports: [
@@ -15,6 +17,8 @@ import { InventoryModule } from '../inventory/inventory.module';
     forwardRef(() =>CartItemsModule),
     ShippingAddressesModule,
     InventoryModule,
+    DiscountsModule,
+    SellersModule,
   ],
   controllers: [OrdersController],
   providers: [OrdersService],
