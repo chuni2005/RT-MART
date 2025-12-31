@@ -20,13 +20,13 @@ export class CartItem {
   @Column({ name: 'user_id', type: 'bigint', unique: true })
   userId: string;
 
-  @Column({ name: 'product_id', type: 'bigint' }) 
+  @Column({ name: 'product_id', type: 'bigint' })
   productId: string;
 
-  @Column({ name: 'quantity', type: 'int', nullable: false }) 
-  quantity: number; 
-  
-  @Column({ name: 'selected', type: 'boolean', default: false }) 
+  @Column({ name: 'quantity', type: 'int', nullable: false })
+  quantity: number;
+
+  @Column({ name: 'selected', type: 'boolean', default: false })
   selected: boolean;
 
   @CreateDateColumn({
@@ -43,11 +43,13 @@ export class CartItem {
   })
   updatedAt: Date;
 
-  @ManyToOne(() => User, (user) => user.cartItems, { onDelete: 'CASCADE' }) 
-  @JoinColumn({ name: 'user_id' }) 
+  @ManyToOne(() => User, (user) => user.cartItems, { onDelete: 'CASCADE' })
+  @JoinColumn({ name: 'user_id' })
   user: User;
 
-  @ManyToOne(() => Product, (product) => product.cartItems, { onDelete: 'CASCADE' }) 
+  @ManyToOne(() => Product, (product) => product.cartItems, {
+    onDelete: 'CASCADE',
+  })
   @JoinColumn({ name: 'product_id' })
   product: Product;
 }

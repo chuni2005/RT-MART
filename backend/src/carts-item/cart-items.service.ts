@@ -17,7 +17,7 @@ export class CartItemsService {
     @InjectRepository(CartItem)
     private readonly cartItemRepository: Repository<CartItem>,
     private readonly inventoryService: InventoryService,
-  ) { }
+  ) {}
 
   // async getOrCreateCart(userId: string): Promise<CartItem> {
   //   let cart = await this.cartItemRepository.findOne({
