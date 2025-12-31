@@ -63,12 +63,12 @@ const SignUpForm = ({ onSubmit, isLoading }: SignUpFormProps) => {
       },
       {
         // 驗證規則
-        loginId: (value) => validateUsername(value),
-        email: (value) => validateEmail(value),
-        phone: (value) => validatePhone(value),
-        password: (value) => validatePasswordStrength(value),
+        loginId: (value) => validateUsername(value, t),
+        email: (value) => validateEmail(value, t),
+        phone: (value) => validatePhone(value, t),
+        password: (value) => validatePasswordStrength(value, t),
         confirmPassword: (value, allValues) =>
-          validateConfirmPassword(allValues.password, value),
+          validateConfirmPassword(allValues.password, value, t),
         agreeTerms: (value) => (value ? null : t('signUpForm.errors.agreeTerms')),
       }
     );

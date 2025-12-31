@@ -36,8 +36,8 @@ const LoginForm = ({ onSubmit, isLoading }: LoginFormProps) => {
         await onSubmit(formValues);
       },
       {
-        loginIdentifier: (value) => validateLoginIdentifier(value),
-        password: (value) => validatePassword(value),
+        loginIdentifier: (value) => validateLoginIdentifier(value, t),
+        password: (value) => validatePassword(value, t),
       }
     );
 
