@@ -3,10 +3,9 @@
  * 功能：用戶名 + Email + 電話 + Password + 確認密碼 + 密碼強度檢查
  * 注意：註冊時 name = loginId，後續可透過個人設定更改 name
  */
-
-import { useState, ChangeEvent, FocusEvent, FormEvent } from "react";
 import FormInput from "@/shared/components/FormInput";
 import PasswordStrength from "./PasswordStrength";
+import { useForm } from "@/shared/hooks/useForm";
 import {
   validateUsername,
   validateEmail,
@@ -38,154 +37,39 @@ interface FormData {
   agreeTerms: boolean;
 }
 
-interface FormErrors {
-  loginId?: string | null;
-  email?: string | null;
-  phone?: string | null;
-  password?: string | null;
-  confirmPassword?: string | null;
-  agreeTerms?: string | null;
-}
-
 const SignUpForm = ({ onSubmit, isLoading }: SignUpFormProps) => {
-  const [formData, setFormData] = useState<FormData>({
-    loginId: "",
-    email: "",
-    phone: "",
-    password: "",
-    confirmPassword: "",
-    agreeTerms: false,
-  });
-
-  const [errors, setErrors] = useState<FormErrors>({});
-  const [touched, setTouched] = useState<Record<string, boolean>>({});
-
-  const handleChange = (e: ChangeEvent<HTMLInputElement | HTMLTextAreaElement>) => {
-    const { name, value, type } = e.target;
-    const checked = "checked" in e.target ? e.target.checked : false;
-    const newValue = type === "checkbox" ? checked : value;
-
-    setFormData((prev) => ({
-      ...prev,
-      [name]: newValue,
-    }));
-
-    if (errors[name as keyof FormErrors]) {
-      setErrors((prev) => ({
-        ...prev,
-        [name]: null,
-      }));
-    }
-
-    if (name === "password" && touched.confirmPassword) {
-      const confirmError = validateConfirmPassword(
-        value as string,
-        formData.confirmPassword
-      );
-      setErrors((prev) => ({
-        ...prev,
-        confirmPassword: confirmError,
-      }));
-    }
-  };
-
-  const handleBlur = (e: FocusEvent<HTMLInputElement | HTMLTextAreaElement>) => {
-    const { name, value } = e.target;
-
-    setTouched((prev) => ({
-      ...prev,
-      [name]: true,
-    }));
-
-    validateField(name, value);
-  };
-
-  const validateField = (name: string, value: string): string | null => {
-    let error: string | null = null;
-
-    switch (name) {
-      case "loginId":
-        error = validateUsername(value);
-        break;
-      case "email":
-        error = validateEmail(value);
-        break;
-      case "phone":
-        error = validatePhone(value);
-        break;
-      case "password":
-        error = validatePasswordStrength(value);
-        break;
-      case "confirmPassword":
-        error = validateConfirmPassword(formData.password, value);
-        break;
-      default:
-        break;
-    }
-
-    setErrors((prev) => ({
-      ...prev,
-      [name]: error,
-    }));
-
-    return error;
-  };
-
-  const validateAll = (): boolean => {
-    const newErrors: FormErrors = {
-      loginId: validateUsername(formData.loginId),
-      email: validateEmail(formData.email),
-      phone: validatePhone(formData.phone),
-      password: validatePasswordStrength(formData.password),
-      confirmPassword: validateConfirmPassword(
-        formData.password,
-        formData.confirmPassword
-      ),
-    };
-
-    if (!formData.agreeTerms) {
-      newErrors.agreeTerms = "請同意服務條款與隱私政策";
-    }
-
-    setErrors(newErrors);
-    setTouched({
-      loginId: true,
-      email: true,
-      phone: true,
-      password: true,
-      confirmPassword: true,
-      agreeTerms: true,
-    });
-
-    return (
-      !newErrors.loginId &&
-      !newErrors.email &&
-      !newErrors.phone &&
-      !newErrors.password &&
-      !newErrors.confirmPassword &&
-      !newErrors.agreeTerms
+  // 使用 useForm hook 替換所有手動狀態管理
+  const { values, errors, touched, handleChange, handleBlur, handleSubmit } =
+    useForm<FormData>(
+      {
+        loginId: "",
+        email: "",
+        phone: "",
+        password: "",
+        confirmPassword: "",
+        agreeTerms: false,
+      },
+      async (formValues) => {
+        // 提交邏輯
+        await onSubmit({
+          loginId: formValues.loginId,
+          name: formValues.loginId,
+          email: formValues.email,
+          phone: formValues.phone,
+          password: formValues.password,
+        });
+      },
+      {
+        // 驗證規則
+        loginId: (value) => validateUsername(value),
+        email: (value) => validateEmail(value),
+        phone: (value) => validatePhone(value),
+        password: (value) => validatePasswordStrength(value),
+        confirmPassword: (value, allValues) =>
+          validateConfirmPassword(allValues.password, value),
+        agreeTerms: (value) => (value ? null : "請同意服務條款與隱私政策"),
+      }
     );
-  };
-
-  const handleSubmit = async (e: FormEvent<HTMLFormElement>) => {
-    e.preventDefault();
-
-    if (!validateAll()) {
-      return;
-    }
-
-    try {
-      await onSubmit({
-        loginId: formData.loginId,
-        name: formData.loginId,
-        email: formData.email,
-        phone: formData.phone,
-        password: formData.password,
-      });
-    } catch (error) {
-      console.error("SignUp form error:", error);
-    }
-  };
 
   return (
     <form className={styles.signUpForm} onSubmit={handleSubmit}>
@@ -193,25 +77,22 @@ const SignUpForm = ({ onSubmit, isLoading }: SignUpFormProps) => {
         label="用戶名"
         type="text"
         name="loginId"
-        value={formData.loginId}
+        value={values.loginId}
         onChange={handleChange}
         onBlur={handleBlur}
         error={touched.loginId ? errors.loginId ?? undefined : undefined}
-        placeholder="4-20 個英數字"
+        placeholder="4-20 個英數字或符號(_ - .)"
         disabled={isLoading}
         autoComplete="username"
         required
         fieldName="用戶名"
-        onValidate={(error) => {
-          setErrors((prev) => ({ ...prev, loginId: error || undefined }));
-        }}
       />
 
       <FormInput
         label="Email"
         type="email"
         name="email"
-        value={formData.email}
+        value={values.email}
         onChange={handleChange}
         onBlur={handleBlur}
         error={touched.email ? errors.email ?? undefined : undefined}
@@ -220,16 +101,13 @@ const SignUpForm = ({ onSubmit, isLoading }: SignUpFormProps) => {
         autoComplete="email"
         required
         fieldName="Email"
-        onValidate={(error) => {
-          setErrors((prev) => ({ ...prev, email: error || undefined }));
-        }}
       />
 
       <FormInput
         label="電話號碼"
         type="tel"
         name="phone"
-        value={formData.phone}
+        value={values.phone}
         onChange={handleChange}
         onBlur={handleBlur}
         error={touched.phone ? errors.phone ?? undefined : undefined}
@@ -238,16 +116,13 @@ const SignUpForm = ({ onSubmit, isLoading }: SignUpFormProps) => {
         autoComplete="tel"
         required
         fieldName="電話號碼"
-        onValidate={(error) => {
-          setErrors((prev) => ({ ...prev, phone: error || undefined }));
-        }}
       />
 
       <FormInput
         label="密碼"
         type="password"
         name="password"
-        value={formData.password}
+        value={values.password}
         onChange={handleChange}
         onBlur={handleBlur}
         error={touched.password ? errors.password ?? undefined : undefined}
@@ -256,18 +131,15 @@ const SignUpForm = ({ onSubmit, isLoading }: SignUpFormProps) => {
         autoComplete="new-password"
         required
         fieldName="密碼"
-        onValidate={(error) => {
-          setErrors((prev) => ({ ...prev, password: error || undefined }));
-        }}
       />
 
-      {formData.password && <PasswordStrength password={formData.password} />}
+      {values.password && <PasswordStrength password={values.password} />}
 
       <FormInput
         label="確認密碼"
         type="password"
         name="confirmPassword"
-        value={formData.confirmPassword}
+        value={values.confirmPassword}
         onChange={handleChange}
         onBlur={handleBlur}
         error={
@@ -280,12 +152,6 @@ const SignUpForm = ({ onSubmit, isLoading }: SignUpFormProps) => {
         autoComplete="new-password"
         required
         fieldName="確認密碼"
-        onValidate={(error) => {
-          setErrors((prev) => ({
-            ...prev,
-            confirmPassword: error || undefined,
-          }));
-        }}
       />
 
       <div className={styles.termsContainer}>
@@ -293,7 +159,7 @@ const SignUpForm = ({ onSubmit, isLoading }: SignUpFormProps) => {
           <input
             type="checkbox"
             name="agreeTerms"
-            checked={formData.agreeTerms}
+            checked={values.agreeTerms}
             onChange={handleChange}
             disabled={isLoading}
           />

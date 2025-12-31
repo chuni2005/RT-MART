@@ -62,13 +62,6 @@ function DiscountList() {
     return <div className={styles.loading}>載入中...</div>;
   }
 
-  const isActive = (discount: Discount) => {
-    const now = new Date();
-    const start = new Date(discount.startDatetime);
-    const end = new Date(discount.endDatetime);
-    return discount.isActive && now >= start && now <= end;
-  };
-
   const getDiscountStatus = (discount: Discount) => {
     const now = new Date();
     const start = new Date(discount.startDatetime);

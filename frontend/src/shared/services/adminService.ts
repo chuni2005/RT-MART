@@ -1,9 +1,9 @@
-// import api from './api'; // TODO: 當實作真實 API 時取消註解
+import { get, post, patch, del } from './api';
 import type {
   DashboardStats,
   AdminUser,
+  AdminStore,
   SellerApplication,
-  Dispute,
   SystemDiscount,
   AdminOrder,
   AdminOrderFilters,
@@ -14,69 +14,172 @@ import type {
  * 提供所有管理員相關的 API 調用
  */
 
-const delay = (ms: number) => new Promise((resolve) => setTimeout(resolve, ms));
+// ========== Mapper Functions ==========
+
+/**
+ * 將後端 Seller 資料轉換為前端 SellerApplication 格式
+ */
+const mapBackendSellerToApplication = (seller: any): SellerApplication => ({
+  seller_id: seller.sellerId,
+  user_id: seller.userId,
+
+  // User info from joined relation
+  login_id: seller.user?.loginId || '',
+  user_name: seller.user?.name || '',
+  email: seller.user?.email || '',
+  phone_number: seller.user?.phoneNumber || '',
+
+  // Seller info
+  bank_account_reference: seller.bankAccountReference || '',
+  verified: seller.verified,
+  verified_at: seller.verifiedAt,
+  verified_by: seller.verifiedBy,
+  rejected_at: seller.rejectedAt,
+
+  // Timestamps
+  created_at: seller.createdAt,
+  updated_at: seller.updatedAt,
+});
+
+/**
+ * 將後端 User 資料轉換為前端 AdminUser 格式
+ */
+const mapBackendUserToAdminUser = (user: any): AdminUser => ({
+  user_id: user.userId,
+  login_id: user.loginId,
+  name: user.name,
+  email: user.email,
+  phone_number: user.phoneNumber || '',
+  role: user.role,
+  created_at: user.createdAt,
+  deleted_at: user.deletedAt,
+});
+
+/**
+ * 將後端 Store 資料轉換為前端 AdminStore 格式
+ */
+const mapBackendStoreToAdminStore = (store: any): AdminStore => ({
+  store_id: store.storeId,
+  store_name: store.storeName,
+  seller_id: store.sellerId,
+  seller_name: store.seller?.name || '',
+  seller_email: store.seller?.email || '',
+  description: store.storeDescription || '',
+  address: store.storeAddress || '',
+  email: store.storeEmail || '',
+  phone: store.storePhone || '',
+  rating: store.averageRating || 0,
+  total_ratings: store.totalRatings || 0,
+  product_count: store.productCount || 0,
+  created_at: store.createdAt,
+  deleted_at: store.deletedAt,
+});
+
+/**
+ * 將後端 Discount 資料轉換為前端 SystemDiscount 格式
+ */
+const mapBackendDiscountToSystemDiscount = (discount: any): SystemDiscount => ({
+  discount_id: discount.discountId,
+  discount_code: discount.discountCode,
+  discount_type: discount.discountType,
+  name: discount.name,
+  description: discount.description || '',
+  min_purchase_amount: discount.minPurchaseAmount,
+  start_datetime: discount.startDatetime,
+  end_datetime: discount.endDatetime,
+  is_active: discount.isActive,
+  usage_limit: discount.usageLimit,
+  usage_count: discount.usageCount,
+  created_by_type: discount.createdByType,
+  created_by_id: discount.createdById,
+  created_at: discount.createdAt,
+  // Type-specific fields
+  discount_rate: discount.seasonalDiscount?.discountRate,
+  max_discount_amount: discount.seasonalDiscount?.maxDiscountAmount,
+  discount_amount: discount.shippingDiscount?.discountAmount,
+});
+
+/**
+ * 將前端 SystemDiscount 資料轉換為後端格式
+ */
+const mapSystemDiscountToBackend = (data: Partial<SystemDiscount>): any => {
+  const baseData: any = {
+    discountCode: data.discount_code,
+    discountType: data.discount_type,
+    name: data.name,
+    description: data.description,
+    minPurchaseAmount: data.min_purchase_amount,
+    startDatetime: data.start_datetime,
+    endDatetime: data.end_datetime,
+    isActive: data.is_active,
+    usageLimit: data.usage_limit,
+  };
+
+  // Add type-specific details
+  if (data.discount_type === 'seasonal' && data.discount_rate !== undefined) {
+    baseData.seasonalDetails = {
+      discountRate: data.discount_rate,
+      maxDiscountAmount: data.max_discount_amount,
+    };
+  }
+
+  if (data.discount_type === 'shipping' && data.discount_amount !== undefined) {
+    baseData.shippingDetails = {
+      discountAmount: data.discount_amount,
+    };
+  }
+
+  return baseData;
+};
 
 // ========== Dashboard ==========
 
 /**
  * 獲取 Dashboard 統計數據
- * TODO: 替換為 GET /api/v1/admin/dashboard/stats
+ * GET /admin/dashboard/stats
  */
 export const getDashboardStats = async (): Promise<DashboardStats> => {
-  await delay(500);
-  return { ...mockDashboardStats };
+  const result = await get<DashboardStats>('/admin/dashboard/stats');
+  return result;
 };
 
 // ========== Users Management ==========
 
 /**
  * 獲取使用者列表
- * TODO: 替換為 GET /api/v1/admin/users
+ * GET /users?search=&role=
  */
 export const getUsers = async (params?: {
   search?: string;
   role?: "buyer" | "seller" | "all";
 }): Promise<{ users: AdminUser[]; total: number }> => {
-  await delay(400);
+  const queryParams = new URLSearchParams();
 
-  let filteredUsers = [...mockUsers];
-
-  // 搜尋篩選
   if (params?.search) {
-    const search = params.search.toLowerCase();
-    filteredUsers = filteredUsers.filter(
-      (user) =>
-        user.login_id.toLowerCase().includes(search) ||
-        user.name.toLowerCase().includes(search) ||
-        user.email.toLowerCase().includes(search)
-    );
+    queryParams.append('search', params.search);
   }
 
-  // 角色篩選
   if (params?.role && params.role !== "all") {
-    filteredUsers = filteredUsers.filter((user) => user.role === params.role);
+    queryParams.append('role', params.role);
   }
+
+  const result = await get<{ data: any[]; total: number }>(`/users?${queryParams.toString()}`);
 
   return {
-    users: filteredUsers,
-    total: filteredUsers.length,
+    users: result.data.map(mapBackendUserToAdminUser),
+    total: result.total,
   };
 };
 
 /**
- * 停權使用者
- * TODO: 替換為 PUT /api/v1/admin/users/:userId/suspend
+ * 停權使用者（軟刪除）
+ * DELETE /users/:userId
  */
 export const suspendUser = async (
   userId: string,
-  reason: string
+  _reason: string
 ): Promise<{ success: boolean; message: string }> => {
-  await delay(300);
-
-  const user = mockUsers.find((u) => u.user_id === userId);
-  if (!user) throw new Error("使用者不存在");
-
-  user.deleted_at = new Date().toISOString();
+  await del(`/users/${userId}`);
 
   return {
     success: true,
@@ -86,17 +189,12 @@ export const suspendUser = async (
 
 /**
  * 解除停權
- * TODO: 替換為 PUT /api/v1/admin/users/:userId/unsuspend
+ * POST /users/:userId/restore
  */
 export const unsuspendUser = async (
   userId: string
 ): Promise<{ success: boolean; message: string }> => {
-  await delay(300);
-
-  const user = mockUsers.find((u) => u.user_id === userId);
-  if (!user) throw new Error("使用者不存在");
-
-  user.deleted_at = null;
+  await post(`/users/${userId}/restore`);
 
   return {
     success: true,
@@ -105,18 +203,13 @@ export const unsuspendUser = async (
 };
 
 /**
- * 刪除使用者
- * TODO: 替換為 DELETE /api/v1/admin/users/:userId
+ * 刪除使用者（永久刪除）
+ * DELETE /users/:userId/permanent
  */
 export const deleteUser = async (
   userId: string
 ): Promise<{ success: boolean; message: string }> => {
-  await delay(300);
-
-  const index = mockUsers.findIndex((u) => u.user_id === userId);
-  if (index === -1) throw new Error("使用者不存在");
-
-  mockUsers.splice(index, 1);
+  await del(`/users/${userId}/permanent`);
 
   return {
     success: true,
@@ -124,42 +217,87 @@ export const deleteUser = async (
   };
 };
 
+// ========== Stores Management ==========
+
+/**
+ * 獲取商家列表
+ * GET /stores?search=
+ */
+export const getStores = async (params?: {
+  search?: string;
+}): Promise<{ stores: AdminStore[]; total: number }> => {
+  const queryParams = new URLSearchParams();
+
+  if (params?.search) {
+    queryParams.append('search', params.search);
+  }
+
+  const result = await get<{ data: any[]; total: number }>(`/stores?${queryParams.toString()}`);
+
+  return {
+    stores: result.data.map(mapBackendStoreToAdminStore),
+    total: result.total,
+  };
+};
+
+/**
+ * 停權商家（軟刪除）
+ * DELETE /stores/:storeId
+ */
+export const suspendStore = async (
+  storeId: string,
+  _reason: string
+): Promise<{ success: boolean; message: string }> => {
+  await del(`/stores/${storeId}`);
+
+  return {
+    success: true,
+    message: "商家已停權",
+  };
+};
+
+/**
+ * 解除商家停權
+ * POST /stores/:storeId/restore
+ */
+export const unsuspendStore = async (
+  storeId: string
+): Promise<{ success: boolean; message: string }> => {
+  await post(`/stores/${storeId}/restore`);
+
+  return {
+    success: true,
+    message: "已解除停權",
+  };
+};
+
 // ========== Seller Applications ==========
 
 /**
  * 獲取賣家申請列表
- * TODO: 替換為 GET /api/v1/admin/seller-applications
+ * GET /sellers?status=pending|approved|rejected
  */
 export const getSellerApplications = async (params?: {
   status?: "pending" | "approved" | "rejected" | "all";
 }): Promise<SellerApplication[]> => {
-  await delay(400);
-
-  let filtered = [...mockSellerApplications];
+  const queryParams = new URLSearchParams();
 
   if (params?.status && params.status !== "all") {
-    filtered = filtered.filter((app) => app.status === params.status);
+    queryParams.append('status', params.status);
   }
-  return filtered;
+
+  const result = await get<{ data: any[] }>(`/sellers?${queryParams.toString()}`);
+  return result.data.map(mapBackendSellerToApplication);
 };
 
 /**
  * 批准賣家申請
- * TODO: 替換為 POST /api/v1/admin/seller-applications/:sellerId/approve
+ * POST /sellers/:sellerId/verify
  */
 export const approveSellerApplication = async (
-  applicationId: string
+  sellerId: string
 ): Promise<{ success: boolean; message: string }> => {
-  await delay(500);
-
-  const application = mockSellerApplications.find(
-    (a) => a.application_id === applicationId
-  );
-  if (!application) throw new Error("申請不存在");
-
-  application.status = "approved";
-  application.reviewed_by = "admin001";
-  application.reviewed_at = new Date().toISOString();
+  await post(`/sellers/${sellerId}/verify`);
 
   return {
     success: true,
@@ -169,23 +307,13 @@ export const approveSellerApplication = async (
 
 /**
  * 拒絕賣家申請
- * TODO: 替換為 POST /api/v1/admin/seller-applications/:sellerId/reject
+ * POST /sellers/:sellerId/reject
  */
 export const rejectSellerApplication = async (
-  applicationId: string,
-  reason: string
+  sellerId: string,
+  reason?: string
 ): Promise<{ success: boolean; message: string }> => {
-  await delay(500);
-
-  const application = mockSellerApplications.find(
-    (a) => a.application_id === applicationId
-  );
-  if (!application) throw new Error("申請不存在");
-
-  application.status = "rejected";
-  application.reviewed_by = "admin001";
-  application.reviewed_at = new Date().toISOString();
-  application.rejection_reason = reason;
+  await post(`/sellers/${sellerId}/reject`, reason ? { reason } : undefined);
 
   return {
     success: true,
@@ -193,189 +321,220 @@ export const rejectSellerApplication = async (
   };
 };
 
-// ========== Disputes ==========
-
-/**
- * 獲取訂單爭議列表
- * TODO: 替換為 GET /api/v1/admin/disputes
- */
-export const getDisputes = async (params?: {
-  status?: "pending" | "resolved" | "all";
-}): Promise<Dispute[]> => {
-  await delay(400);
-
-  let filtered = [...mockDisputes];
-
-  if (params?.status && params.status !== "all") {
-    filtered = filtered.filter((d) => d.status === params.status);
-  }
-
-  return filtered;
-};
-
-/**
- * 判決訂單爭議
- * TODO: 替換為 POST /api/v1/admin/disputes/:disputeId/resolve
- */
-export const resolveDispute = async (
-  disputeId: string,
-  resolution: {
-    type: "full_refund" | "partial_refund" | "reject";
-    amount?: number;
-    reason: string;
-  }
-): Promise<{ success: boolean; message: string }> => {
-  await delay(500);
-
-  const dispute = mockDisputes.find((d) => d.dispute_id === disputeId);
-  if (!dispute) throw new Error("爭議不存在");
-
-  dispute.status = "resolved";
-  dispute.resolved_at = new Date().toISOString();
-  dispute.resolution = resolution;
-
-  return {
-    success: true,
-    message: "爭議已判決",
-  };
-};
-
 // ========== Order Management ==========
 
 /**
+ * Map backend order data to frontend AdminOrder type
+ */
+const mapBackendOrderToAdminOrder = (order: any): AdminOrder => ({
+  order_id: order.orderId,
+  order_number: order.orderNumber,
+  buyer_id: order.buyerId,
+  buyer_name: order.buyerName,
+  buyer_email: order.buyerEmail,
+  seller_id: order.sellerId,
+  seller_name: order.sellerName,
+  store_name: order.storeName,
+  status: order.status,
+  payment_method: order.paymentMethod,
+  items: order.items,
+  shipping_address: order.shippingAddress,
+  note: order.note,
+  subtotal: order.subtotal,
+  shipping: order.shipping,
+  discount: order.discount,
+  total_amount: order.totalAmount,
+  created_at: order.createdAt,
+  updated_at: order.updatedAt,
+  paid_at: order.paidAt,
+  shipped_at: order.shippedAt,
+  delivered_at: order.deliveredAt,
+  completed_at: order.completedAt,
+  cancelled_at: order.cancelledAt,
+});
+
+/**
  * 獲取訂單列表（管理員）
- * TODO: 替換為 GET /api/v1/admin/orders
+ * GET /orders/admin/all
  */
 export const getAdminOrders = async (
   filters?: AdminOrderFilters
 ): Promise<{ orders: AdminOrder[]; total: number }> => {
-  await delay(400);
+  const queryParams = new URLSearchParams();
 
-  let filtered = [...mockAdminOrders];
-
-  // 搜尋篩選（訂單編號、買家、賣家）
   if (filters?.search) {
-    const search = filters.search.toLowerCase();
-    filtered = filtered.filter(
-      (order) =>
-        order.order_number.toLowerCase().includes(search) ||
-        order.buyer_name.toLowerCase().includes(search) ||
-        order.seller_name.toLowerCase().includes(search) ||
-        order.store_name.toLowerCase().includes(search)
-    );
+    queryParams.append('search', filters.search);
   }
-
-  // 狀態篩選
-  if (filters?.status && filters.status !== "all") {
-    filtered = filtered.filter((order) => order.status === filters.status);
+  if (filters?.status && filters.status !== 'all') {
+    queryParams.append('status', filters.status);
   }
-
-  // 日期範圍篩選
   if (filters?.startDate) {
-    filtered = filtered.filter(
-      (order) => new Date(order.created_at) >= new Date(filters.startDate!)
-    );
+    queryParams.append('startDate', filters.startDate);
   }
   if (filters?.endDate) {
-    filtered = filtered.filter(
-      (order) => new Date(order.created_at) <= new Date(filters.endDate!)
-    );
+    queryParams.append('endDate', filters.endDate);
+  }
+  if (filters?.page) {
+    queryParams.append('page', filters.page.toString());
+  }
+  if (filters?.limit) {
+    queryParams.append('limit', filters.limit.toString());
   }
 
-  // 分頁
-  const page = filters?.page || 1;
-  const limit = filters?.limit || 20;
-  const start = (page - 1) * limit;
-  const end = start + limit;
-  const paginatedOrders = filtered.slice(start, end);
+  const result = await get<{ data: any[]; total: number }>(
+    `/orders/admin/all?${queryParams.toString()}`
+  );
 
   return {
-    orders: paginatedOrders,
-    total: filtered.length,
+    orders: result.data.map(mapBackendOrderToAdminOrder),
+    total: result.total,
   };
 };
 
 /**
  * 獲取單個訂單詳情（管理員）
- * TODO: 替換為 GET /api/v1/admin/orders/:orderId
+ * GET /orders/admin/:id
  */
 export const getAdminOrderById = async (
   orderId: string
 ): Promise<AdminOrder> => {
-  await delay(300);
-
-  const order = mockAdminOrders.find((o) => o.order_id === orderId);
-  if (!order) throw new Error("訂單不存在");
-
-  return { ...order };
+  const order = await get<any>(`/orders/admin/${orderId}`);
+  return mapBackendOrderToAdminOrder(order);
 };
 
 /**
- * 標記訂單異常
- * TODO: 替換為 PATCH /api/v1/admin/orders/:orderId/flag
+ * 標記訂單異常（已改為直接取消訂單）
+ * POST /orders/admin/:id/cancel
+ * @deprecated 原本的標記功能已改為直接取消訂單，adminNotes 參數現在作為取消原因
  */
 export const flagOrder = async (
   orderId: string,
   adminNotes: string
 ): Promise<{ success: boolean; message: string }> => {
-  await delay(300);
-
-  const order = mockAdminOrders.find((o) => o.order_id === orderId);
-  if (!order) throw new Error("訂單不存在");
-
-  order.is_flagged = true;
-  order.admin_notes = adminNotes;
+  await post(`/orders/admin/${orderId}/cancel`, {
+    reason: adminNotes,
+  });
 
   return {
     success: true,
-    message: "訂單已標記為異常",
+    message: "訂單已取消",
   };
 };
 
 /**
  * 取消標記訂單異常
- * TODO: 替換為 PATCH /api/v1/admin/orders/:orderId/unflag
+ * @deprecated 此功能已棄用。因為訂單取消操作不可逆，所以不再提供取消標記功能。
+ * 如果管理員發現異常，應直接使用 flagOrder (現在會取消訂單)。
  */
 export const unflagOrder = async (
-  orderId: string
+  _orderId: string
 ): Promise<{ success: boolean; message: string }> => {
-  await delay(300);
+  console.warn('unflagOrder is deprecated: 訂單取消操作不可逆，此功能已停用');
+  throw new Error("此功能已棄用：訂單取消操作不可逆，無法恢復");
+};
 
-  const order = mockAdminOrders.find((o) => o.order_id === orderId);
-  if (!order) throw new Error("訂單不存在");
-
-  order.is_flagged = false;
-  order.admin_notes = undefined;
+/**
+ * Admin 更新訂單狀態（無狀態轉換限制）
+ * PATCH /orders/admin/:orderId/status
+ */
+export const updateAdminOrderStatus = async (
+  orderId: string,
+  status: string
+): Promise<{ success: boolean; message: string }> => {
+  await patch(`/orders/admin/${orderId}/status`, { status });
 
   return {
     success: true,
-    message: "已取消標記異常",
+    message: "訂單狀態已更新",
   };
+};
+
+/**
+ * Admin 取消訂單（附原因）
+ * POST /orders/admin/:orderId/cancel
+ */
+export const cancelAdminOrder = async (
+  orderId: string,
+  reason: string
+): Promise<{ success: boolean; message: string }> => {
+  await post(`/orders/admin/${orderId}/cancel`, { reason });
+
+  return {
+    success: true,
+    message: "訂單已取消",
+  };
+};
+
+/**
+ * 獲取異常訂單列表（pending_payment 超過 24 小時）
+ * GET /orders/admin/anomalies
+ */
+export const getAnomalyOrders = async (): Promise<AdminOrder[]> => {
+  const result = await get<any[]>('/orders/admin/anomalies');
+
+  // Map backend format to AdminOrder format
+  return result.map((order) => ({
+    order_id: order.orderId,
+    order_number: order.orderNumber,
+    buyer_id: order.userId?.toString() || '',
+    buyer_name: order.buyerName || '',
+    buyer_email: order.buyerEmail || '',
+    seller_id: order.storeId?.toString() || '',
+    seller_name: order.sellerName || '',
+    store_name: order.storeName || '',
+    status: order.orderStatus,
+    payment_method: order.paymentMethod || '',
+    items: [],
+    shipping_address: {
+      id: '',
+      recipientName: '',
+      phone: '',
+      city: '',
+      district: '',
+      postalCode: '',
+      addressLine1: '',
+      isDefault: false,
+    },
+    subtotal: order.subtotal || 0,
+    shipping: order.shippingFee || 0,
+    discount: order.totalDiscount || 0,
+    total_amount: order.totalAmount,
+    created_at: order.createdAt,
+    updated_at: order.updatedAt,
+    paid_at: order.paidAt,
+    shipped_at: order.shippedAt,
+    delivered_at: order.deliveredAt,
+    completed_at: order.completedAt,
+    cancelled_at: order.cancelledAt
+  }));
 };
 
 // ========== System Discounts ==========
 
 /**
  * 獲取系統折扣列表
- * TODO: 替換為 GET /api/v1/admin/discounts
+ * GET /discounts?discountType=seasonal|shipping
  */
 export const getSystemDiscounts = async (params?: {
   type?: "seasonal" | "shipping";
 }): Promise<SystemDiscount[]> => {
-  await delay(400);
-
-  let filtered = [...mockSystemDiscounts];
+  const queryParams = new URLSearchParams();
 
   if (params?.type) {
-    filtered = filtered.filter((d) => d.discount_type === params.type);
+    queryParams.append('discountType', params.type);
   }
 
-  return filtered;
+  const result = await get<{ data: any[] }>(`/discounts?${queryParams.toString()}`);
+
+  // Filter system discounts only
+  return result.data
+    .filter(d => d.createdByType === 'system')
+    .map(mapBackendDiscountToSystemDiscount);
 };
 
 /**
  * 創建系統折扣
- * TODO: 替換為 POST /api/v1/admin/discounts
+ * POST /discounts/admin
  */
 export const createSystemDiscount = async (
   discountData: Omit<
@@ -387,24 +546,14 @@ export const createSystemDiscount = async (
     | "created_by_id"
   >
 ): Promise<SystemDiscount> => {
-  await delay(500);
-
-  const newDiscount: SystemDiscount = {
-    discount_id: `disc_${Date.now()}`,
-    ...discountData,
-    usage_count: 0,
-    created_by_type: "system",
-    created_by_id: null,
-    created_at: new Date().toISOString(),
-  };
-
-  mockSystemDiscounts.push(newDiscount);
-  return newDiscount;
+  const backendData = mapSystemDiscountToBackend(discountData);
+  const result = await post<any>('/discounts/admin', backendData);
+  return mapBackendDiscountToSystemDiscount(result);
 };
 
 /**
  * 更新系統折扣
- * TODO: 替換為 PUT /api/v1/admin/discounts/:discountId
+ * PATCH /discounts/admin/:discountId
  */
 export const updateSystemDiscount = async (
   discountId: string,
@@ -419,37 +568,20 @@ export const updateSystemDiscount = async (
     >
   >
 ): Promise<SystemDiscount> => {
-  await delay(500);
-
-  const index = mockSystemDiscounts.findIndex(
-    (d) => d.discount_id === discountId
-  );
-  if (index === -1) throw new Error("折扣不存在");
-
-  mockSystemDiscounts[index] = {
-    ...mockSystemDiscounts[index],
-    ...discountData,
-  };
-
-  return mockSystemDiscounts[index];
+  const backendData = mapSystemDiscountToBackend(discountData);
+  const result = await patch<any>(`/discounts/admin/${discountId}`, backendData);
+  return mapBackendDiscountToSystemDiscount(result);
 };
 
 /**
  * 更新系統折扣狀態
- * TODO: 替換為 PATCH /api/v1/admin/discounts/:discountId/status
+ * PATCH /discounts/admin/:discountId
  */
 export const updateSystemDiscountStatus = async (
   discountId: string,
   isActive: boolean
 ): Promise<{ success: boolean; message: string }> => {
-  await delay(300);
-
-  const discount = mockSystemDiscounts.find(
-    (d) => d.discount_id === discountId
-  );
-  if (!discount) throw new Error("折扣不存在");
-
-  discount.is_active = isActive;
+  await patch(`/discounts/admin/${discountId}`, { isActive });
 
   return {
     success: true,
@@ -459,19 +591,12 @@ export const updateSystemDiscountStatus = async (
 
 /**
  * 刪除系統折扣
- * TODO: 替換為 DELETE /api/v1/admin/discounts/:discountId
+ * DELETE /discounts/:discountId
  */
 export const deleteSystemDiscount = async (
   discountId: string
 ): Promise<{ success: boolean; message: string }> => {
-  await delay(300);
-
-  const index = mockSystemDiscounts.findIndex(
-    (d) => d.discount_id === discountId
-  );
-  if (index === -1) throw new Error("折扣不存在");
-
-  mockSystemDiscounts.splice(index, 1);
+  await del(`/discounts/${discountId}`);
 
   return {
     success: true,
@@ -481,421 +606,24 @@ export const deleteSystemDiscount = async (
 
 /**
  * 切換系統折扣狀態
- * TODO: 替換為 PATCH /api/v1/admin/discounts/:discountId/toggle
+ * GET + PATCH /discounts/code/:discountId + /discounts/admin/:discountId
  */
 export const toggleDiscountStatus = async (
   discountId: string
 ): Promise<{ success: boolean; message: string; isActive: boolean }> => {
-  await delay(300);
+  // First get current status
+  const currentDiscount = await get<any>(`/discounts/code/${discountId}`);
+  const newStatus = !currentDiscount.isActive;
 
-  const discount = mockSystemDiscounts.find(
-    (d) => d.discount_id === discountId
-  );
-  if (!discount) throw new Error("折扣不存在");
-
-  discount.is_active = !discount.is_active;
+  // Update status
+  await patch(`/discounts/admin/${discountId}`, { isActive: newStatus });
 
   return {
     success: true,
-    message: `折扣已${discount.is_active ? "啟用" : "停用"}`,
-    isActive: discount.is_active,
+    message: `折扣已${newStatus ? "啟用" : "停用"}`,
+    isActive: newStatus,
   };
 };
-
-// ========== Mock Data ==========
-
-// Dashboard 統計數據
-const mockDashboardStats: DashboardStats = {
-  totalRevenue: 5000000,
-  totalUsers: 10000,
-  activeSellers: 500,
-  pendingReviews: 25,
-  recentActivities: [
-    {
-      id: "1",
-      type: "seller_application",
-      message: "新賣家申請",
-      count: 3,
-      timestamp: "2025-01-16 10:30",
-    },
-    {
-      id: "2",
-      type: "product_review",
-      message: "商品待審核",
-      count: 15,
-      timestamp: "2025-01-16 09:15",
-    },
-    {
-      id: "3",
-      type: "dispute",
-      message: "訂單爭議",
-      count: 7,
-      timestamp: "2025-01-15 18:45",
-    },
-  ],
-  // 交易額趨勢數據（最近12個月）
-  revenueChartData: [
-    { label: "2024-02", value: 320000 },
-    { label: "2024-03", value: 380000 },
-    { label: "2024-04", value: 420000 },
-    { label: "2024-05", value: 450000 },
-    { label: "2024-06", value: 480000 },
-    { label: "2024-07", value: 510000 },
-    { label: "2024-08", value: 490000 },
-    { label: "2024-09", value: 530000 },
-    { label: "2024-10", value: 560000 },
-    { label: "2024-11", value: 590000 },
-    { label: "2024-12", value: 620000 },
-    { label: "2025-01", value: 650000 },
-  ],
-  // 用戶增長數據（最近12個月）
-  userGrowthChartData: [
-    { label: "2024-02", value: 850 },
-    { label: "2024-03", value: 920 },
-    { label: "2024-04", value: 1050 },
-    { label: "2024-05", value: 980 },
-    { label: "2024-06", value: 1120 },
-    { label: "2024-07", value: 1280 },
-    { label: "2024-08", value: 1150 },
-    { label: "2024-09", value: 1300 },
-    { label: "2024-10", value: 1400 },
-    { label: "2024-11", value: 1520 },
-    { label: "2024-12", value: 1680 },
-    { label: "2025-01", value: 1800 },
-  ],
-  // 訂單狀態分布數據
-  orderStatusChartData: [
-    { label: "已完成", value: 7200 },
-    { label: "配送中", value: 1500 },
-    { label: "處理中", value: 800 },
-    { label: "已取消", value: 350 },
-    { label: "退款中", value: 150 },
-  ],
-};
-
-// 使用者數據
-let mockUsers: AdminUser[] = [
-  {
-    user_id: "1",
-    login_id: "user001",
-    name: "王小明",
-    email: "user001@example.com",
-    phone_number: "0912345678",
-    role: "buyer",
-    created_at: "2024-01-01T00:00:00Z",
-    deleted_at: null,
-  },
-  {
-    user_id: "2",
-    login_id: "seller001",
-    name: "張大賣",
-    email: "seller001@example.com",
-    phone_number: "0923456789",
-    role: "seller",
-    created_at: "2024-02-01T00:00:00Z",
-    deleted_at: null,
-  },
-];
-
-// 賣家申請數據
-let mockSellerApplications: SellerApplication[] = [
-  {
-    application_id: "app_001",
-
-    user_id: "3",
-    user_name: "張大賣",
-    email: "seller001@example.com",
-    phone_number: "0912345678",
-
-    store_name: "大賣商店",
-    store_description: "專營電子產品",
-    store_address: "台北市信義區忠孝東路100號",
-    store_email: "store@example.com",
-    store_phone: "02-1234-5678",
-
-    bank_account_reference: "123-456-789",
-
-    status: "pending",
-
-    application_created_at: "2025-01-15T10:30:00Z",
-  },
-];
-
-// 訂單爭議數據
-let mockDisputes: Dispute[] = [
-  {
-    dispute_id: "1",
-    order_number: "ORD20250101001",
-    buyer_name: "王小明",
-    seller_name: "張大賣",
-    dispute_type: "not_received",
-    description: "商品未送達",
-    buyer_evidence: "物流顯示已簽收但我沒收到",
-    seller_response: null,
-    status: "pending",
-    created_at: "2025-01-15T10:30:00Z",
-    resolved_at: null,
-    resolution: null,
-  },
-];
-
-// 管理員訂單數據
-let mockAdminOrders: AdminOrder[] = [
-  {
-    order_id: "1",
-    order_number: "ORD20250122001",
-    buyer_id: "1",
-    buyer_name: "王小明",
-    buyer_email: "user001@example.com",
-    seller_id: "2",
-    seller_name: "張大賣",
-    store_name: "大賣商店",
-    status: "delivered",
-    payment_method: "credit_card",
-    items: [
-      {
-        id: "1",
-        productId: "prod001",
-        productName: "iPhone 15 Pro",
-        productImage: "https://picsum.photos/200/200?random=1",
-        quantity: 1,
-        price: 36900,
-      },
-    ],
-    shipping_address: {
-      id: "addr001",
-      recipientName: "王小明",
-      phone: "0912345678",
-      city: "台北市",
-      district: "信義區",
-      postalCode: "110",
-      detail: "忠孝東路100號",
-      isDefault: true,
-    },
-    note: "請小心包裝",
-    subtotal: 36900,
-    shipping: 60,
-    discount: 0,
-    total_amount: 36960,
-    created_at: "2025-01-22T10:30:00Z",
-    updated_at: "2025-01-22T15:45:00Z",
-    paid_at: "2025-01-22T10:35:00Z",
-    shipped_at: "2025-01-22T14:00:00Z",
-    delivered_at: "2025-01-22T15:45:00Z",
-    is_flagged: false,
-  },
-  {
-    order_id: "2",
-    order_number: "ORD20250122002",
-    buyer_id: "3",
-    buyer_name: "李小華",
-    buyer_email: "user002@example.com",
-    seller_id: "4",
-    seller_name: "林賣家",
-    store_name: "3C專賣店",
-    status: "processing",
-    payment_method: "cash_on_delivery",
-    items: [
-      {
-        id: "2",
-        productId: "prod002",
-        productName: 'MacBook Pro 14"',
-        productImage: "https://picsum.photos/200/200?random=2",
-        quantity: 1,
-        price: 59900,
-      },
-    ],
-    shipping_address: {
-      id: "addr002",
-      recipientName: "李小華",
-      phone: "0923456789",
-      city: "新北市",
-      district: "板橋區",
-      postalCode: "220",
-      detail: "中山路200號",
-      isDefault: true,
-    },
-    subtotal: 59900,
-    shipping: 80,
-    discount: 500,
-    total_amount: 59480,
-    created_at: "2025-01-22T09:15:00Z",
-    updated_at: "2025-01-22T09:20:00Z",
-    paid_at: "2025-01-22T09:20:00Z",
-    is_flagged: false,
-  },
-  {
-    order_id: "3",
-    order_number: "ORD20250121003",
-    buyer_id: "5",
-    buyer_name: "陳大明",
-    buyer_email: "user003@example.com",
-    seller_id: "2",
-    seller_name: "張大賣",
-    store_name: "大賣商店",
-    status: "pending_payment",
-    payment_method: "bank_transfer",
-    items: [
-      {
-        id: "3",
-        productId: "prod003",
-        productName: "AirPods Pro 2",
-        productImage: "https://picsum.photos/200/200?random=3",
-        quantity: 2,
-        price: 7990,
-      },
-    ],
-    shipping_address: {
-      id: "addr003",
-      recipientName: "陳大明",
-      phone: "0934567890",
-      city: "台中市",
-      district: "西屯區",
-      postalCode: "407",
-      detail: "台灣大道300號",
-      isDefault: true,
-    },
-    subtotal: 15980,
-    shipping: 60,
-    discount: 0,
-    total_amount: 16040,
-    created_at: "2025-01-21T16:20:00Z",
-    updated_at: "2025-01-21T16:20:00Z",
-    is_flagged: true,
-    admin_notes: "付款逾期超過24小時，需關注",
-  },
-  {
-    order_id: "4",
-    order_number: "ORD20250121004",
-    buyer_id: "6",
-    buyer_name: "黃小美",
-    buyer_email: "user004@example.com",
-    seller_id: "7",
-    seller_name: "趙賣家",
-    store_name: "時尚服飾店",
-    status: "shipped",
-    payment_method: "credit_card",
-    items: [
-      {
-        id: "4",
-        productId: "prod004",
-        productName: "冬季羽絨外套",
-        productImage: "https://picsum.photos/200/200?random=4",
-        quantity: 1,
-        price: 2990,
-      },
-      {
-        id: "5",
-        productId: "prod005",
-        productName: "保暖圍巾",
-        productImage: "https://picsum.photos/200/200?random=5",
-        quantity: 2,
-        price: 490,
-      },
-    ],
-    shipping_address: {
-      id: "addr004",
-      recipientName: "黃小美",
-      phone: "0945678901",
-      city: "高雄市",
-      district: "左營區",
-      postalCode: "813",
-      detail: "博愛路400號",
-      isDefault: true,
-    },
-    subtotal: 3970,
-    shipping: 60,
-    discount: 100,
-    total_amount: 3930,
-    created_at: "2025-01-21T11:00:00Z",
-    updated_at: "2025-01-22T08:30:00Z",
-    paid_at: "2025-01-21T11:05:00Z",
-    shipped_at: "2025-01-22T08:30:00Z",
-    is_flagged: false,
-  },
-  {
-    order_id: "5",
-    order_number: "ORD20250120005",
-    buyer_id: "8",
-    buyer_name: "吳小強",
-    buyer_email: "user005@example.com",
-    seller_id: "9",
-    seller_name: "周賣家",
-    store_name: "運動用品店",
-    status: "completed",
-    payment_method: "debit_card",
-    items: [
-      {
-        id: "6",
-        productId: "prod006",
-        productName: "Nike Air Max 90",
-        productImage: "https://picsum.photos/200/200?random=6",
-        quantity: 1,
-        price: 4500,
-      },
-    ],
-    shipping_address: {
-      id: "addr005",
-      recipientName: "吳小強",
-      phone: "0956789012",
-      city: "台南市",
-      district: "東區",
-      postalCode: "701",
-      detail: "大學路500號",
-      isDefault: true,
-    },
-    subtotal: 4500,
-    shipping: 80,
-    discount: 0,
-    total_amount: 4580,
-    created_at: "2025-01-20T14:30:00Z",
-    updated_at: "2025-01-21T16:00:00Z",
-    paid_at: "2025-01-20T14:35:00Z",
-    shipped_at: "2025-01-20T18:00:00Z",
-    delivered_at: "2025-01-21T10:30:00Z",
-    completed_at: "2025-01-21T16:00:00Z",
-    is_flagged: false,
-  },
-];
-
-// 系統折扣數據
-let mockSystemDiscounts: SystemDiscount[] = [
-  {
-    discount_id: "1",
-    discount_code: "NEWYEAR2025",
-    discount_type: "seasonal",
-    name: "新年慶季節折扣",
-    description: "新年期間全站商品享 10% 折扣",
-    min_purchase_amount: 0,
-    start_datetime: "2025-01-01T00:00:00Z",
-    end_datetime: "2025-01-31T23:59:59Z",
-    is_active: true,
-    usage_limit: null,
-    usage_count: 45,
-    created_by_type: "system",
-    created_by_id: null,
-    created_at: "2024-12-20T00:00:00Z",
-    discount_rate: 10,
-    max_discount_amount: 500,
-  },
-  {
-    discount_id: "2",
-    discount_code: "FREESHIP30",
-    discount_type: "shipping",
-    name: "春節運費優惠",
-    description: "滿額免運費優惠",
-    min_purchase_amount: 500,
-    start_datetime: "2025-01-20T00:00:00Z",
-    end_datetime: "2025-02-10T23:59:59Z",
-    is_active: true,
-    usage_limit: 1000,
-    usage_count: 234,
-    created_by_type: "system",
-    created_by_id: null,
-    created_at: "2025-01-10T00:00:00Z",
-    discount_amount: 30,
-  },
-];
 
 // 默認導出
 export default {
@@ -904,15 +632,19 @@ export default {
   suspendUser,
   unsuspendUser,
   deleteUser,
+  getStores,
+  suspendStore,
+  unsuspendStore,
   getSellerApplications,
   approveSellerApplication,
   rejectSellerApplication,
-  getDisputes,
-  resolveDispute,
   getAdminOrders,
   getAdminOrderById,
   flagOrder,
   unflagOrder,
+  updateAdminOrderStatus,
+  cancelAdminOrder,
+  getAnomalyOrders,
   toggleDiscountStatus,
   getSystemDiscounts,
   createSystemDiscount,

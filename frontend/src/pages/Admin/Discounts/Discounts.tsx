@@ -1,17 +1,18 @@
-import { useState, useEffect } from 'react';
+import { useState, useEffect, useRef } from 'react';
 import { useNavigate } from 'react-router-dom';
 import Button from '@/shared/components/Button';
 import Icon from '@/shared/components/Icon';
 import Dialog from '@/shared/components/Dialog';
 import Alert from '@/shared/components/Alert';
 import Tab from '@/shared/components/Tab';
-import adminService from '@/shared/services/adminService';
+import adminService from '@/shared/services/adminService.index';
 import { SystemDiscount } from '@/types/admin';
 import { AlertType } from '@/types';
 import styles from './Discounts.module.scss';
 
 function Discounts() {
   const navigate = useNavigate();
+  const alertRef = useRef<HTMLDivElement>(null);
   const [discounts, setDiscounts] = useState<SystemDiscount[]>([]);
   const [loading, setLoading] = useState(true);
   const [activeTab, setActiveTab] = useState('all');
@@ -29,6 +30,16 @@ function Discounts() {
     { key: 'shipping', label: '免運費' },
   ];
 
+  // Custom setAlert with scroll behavior
+  const showAlert = (alertData: { type: AlertType; message: string } | null) => {
+    setAlert(alertData);
+    if (alertData && alertRef.current) {
+      setTimeout(() => {
+        alertRef.current?.scrollIntoView({ behavior: 'smooth', block: 'center' });
+      }, 100);
+    }
+  };
+
   useEffect(() => {
     loadDiscounts();
   }, [activeTab]);
@@ -42,7 +53,7 @@ function Discounts() {
       setDiscounts(data);
     } catch (error) {
       console.error('載入系統折扣失敗:', error);
-      setAlert({ type: 'error', message: '載入系統折扣失敗' });
+      showAlert({ type: 'error', message: '載入系統折扣失敗' });
     } finally {
       setLoading(false);
     }
@@ -56,10 +67,10 @@ function Discounts() {
           d.discount_id === discountId ? { ...d, is_active: !isActive } : d
         )
       );
-      setAlert({ type: 'success', message: `已${!isActive ? '啟用' : '停用'}折扣` });
+      showAlert({ type: 'success', message: `已${!isActive ? '啟用' : '停用'}折扣` });
     } catch (error) {
       console.error('更新折扣狀態失敗:', error);
-      setAlert({ type: 'error', message: '更新折扣狀態失敗' });
+      showAlert({ type: 'error', message: '更新折扣狀態失敗' });
     }
   };
 
@@ -68,10 +79,10 @@ function Discounts() {
       await adminService.deleteSystemDiscount(deleteDialog.discountId);
       setDiscounts(discounts.filter((d) => d.discount_id !== deleteDialog.discountId));
       setDeleteDialog({ isOpen: false, discountId: '', discountName: '' });
-      setAlert({ type: 'success', message: '折扣已刪除' });
+      showAlert({ type: 'success', message: '折扣已刪除' });
     } catch (error) {
       console.error('刪除折扣失敗:', error);
-      setAlert({ type: 'error', message: '刪除折扣失敗' });
+      showAlert({ type: 'error', message: '刪除折扣失敗' });
     }
   };
 
@@ -112,11 +123,13 @@ function Discounts() {
 
       {/* Alert */}
       {alert && (
-        <Alert
-          type={alert.type}
-          message={alert.message}
-          onClose={() => setAlert(null)}
-        />
+        <div ref={alertRef}>
+          <Alert
+            type={alert.type}
+            message={alert.message}
+            onClose={() => setAlert(null)}
+          />
+        </div>
       )}
 
       {/* Tabs */}

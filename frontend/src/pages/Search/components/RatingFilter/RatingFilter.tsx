@@ -1,4 +1,3 @@
-import React from 'react';
 import Icon from '@/shared/components/Icon';
 import styles from './RatingFilter.module.scss';
 

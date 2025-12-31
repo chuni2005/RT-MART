@@ -12,4 +12,6 @@ export class CreateOrderDto {
   @IsString()
   @IsOptional()
   paymentMethod?: string;
+  cartSnapshot: {};
+  shippingAddressSnapshot: any;
 }

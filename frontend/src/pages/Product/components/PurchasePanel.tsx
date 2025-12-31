@@ -6,7 +6,6 @@ import Alert from "@/shared/components/Alert/Alert";
 import QuantitySelector from "@/shared/components/QuantitySelector";
 import { useAuth } from "@/shared/hooks/useAuth";
 import { useCart } from "@/shared/contexts/CartContext";
-import { Product } from "@/types";
 
 interface PurchasePanelProps {
   stock: number;

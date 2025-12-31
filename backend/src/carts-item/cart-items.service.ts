@@ -10,6 +10,8 @@ import { AddToCartDto } from './dto/add-to-cart.dto';
 import { UpdateCartItemDto } from './dto/update-cart-item.dto';
 import { BatchUpdateCartItemsDto } from './dto/batch-update-cart-items.dto';
 import { InventoryService } from '../inventory/inventory.service';
+import { CartHistoryService } from '../cart-history/cart-history.service';
+import { CartHistory } from '../cart-history/entities/cart-history.entity';
 
 @Injectable()
 export class CartItemsService {
@@ -17,169 +19,193 @@ export class CartItemsService {
     @InjectRepository(CartItem)
     private readonly cartItemRepository: Repository<CartItem>,
     private readonly inventoryService: InventoryService,
+    private readonly cartHistoryService: CartHistoryService,
   ) {}
+  /**
+   * Return all cart items for a user with product relations
+   */
+  async getCart(userId: string): Promise<CartItem[]> {
+    return await this.cartItemRepository.find({
+      where: { userId },
+      relations: [
+        'product',
+        'product.images',
+        'product.store',
+        'product.inventory',
+      ],
+      order: { createdAt: 'ASC' },
+    });
+  }
 
-  // async getOrCreateCart(userId: string): Promise<CartItem> {
-  //   let cart = await this.cartItemRepository.findOne({
-  //     where: { userId },
-  //     relations: [
-  //       'items',
-  //       'items.product',
-  //       'items.product.images',
-  //       'items.product.store',
-  //       'items.product.inventory',
-  //     ],
-  //   });
+  async addToCart(
+    userId: string,
+    addToCartDto: AddToCartDto,
+  ): Promise<CartItem> {
+    // Check if product is already in cart for this user
+    const existingItem = await this.cartItemRepository.findOne({
+      where: { userId, productId: addToCartDto.productId },
+    });
 
-  //   if (!cart) {
-  //     cart = this.cartItemRepository.create({ userId });
-  //     cart = await this.cartItemRepository.save(cart);
-  //   }
+    // Check stock availability
+    const stock = await this.inventoryService.getAvailableStock(
+      addToCartDto.productId,
+    );
+    if (stock < addToCartDto.quantity) {
+      throw new BadRequestException('Product quantity is not enough');
+    }
 
-  //   return cart;
-  // }
+    if (existingItem) {
+      // Update quantity and selected status
+      existingItem.quantity += addToCartDto.quantity;
+      if (addToCartDto.selected !== undefined) {
+        existingItem.selected = addToCartDto.selected;
+      }
+      await this.cartItemRepository.save(existingItem);
+    } else {
+      // Create new cart item
+      const cartItem = this.cartItemRepository.create({
+        userId,
+        productId: addToCartDto.productId,
+        quantity: addToCartDto.quantity,
+        selected: addToCartDto.selected ?? true,
+      });
+      await this.cartItemRepository.save(cartItem);
+    }
 
-  // async addToCart(userId: string, addToCartDto: AddToCartDto): Promise<CartItem> {
-  //   const cart = await this.getOrCreateCart(userId);
+    return (await this.getCart(userId)) as any;
+  }
 
-  //   // Check if product is already in cart
-  //   const existingItem = await this.cartItemRepository.findOne({
-  //     where: { cartId: cart.cartId, productId: addToCartDto.productId },
-  //   });
+  async updateCartItem(
+    userId: string,
+    cartItemId: string,
+    updateDto: UpdateCartItemDto,
+  ): Promise<CartItem> {
+    const cartItem = await this.cartItemRepository.findOne({
+      where: { cartItemId, userId },
+    });
 
-  //   // Check stock availability
-  //   const stock = await this.inventoryService.getAvailableStock(addToCartDto.productId);
-  //   if (stock < addToCartDto.quantity) {
-  //     throw new BadRequestException('Product quantity is not enough');
-  //   }
+    if (!cartItem) {
+      throw new NotFoundException('CartItem item not found');
+    }
 
-  //   if (existingItem) {
-  //     // Update quantity and selected status
-  //     existingItem.quantity += addToCartDto.quantity;
-  //     if (addToCartDto.selected !== undefined) {
-  //       existingItem.selected = addToCartDto.selected;
-  //     }
-  //     await this.cartItemRepository.save(existingItem);
-  //   } else {
-  //     // Create new cart item
-  //     const cartItem = this.cartItemRepository.create({
-  //       cartId: cart.cartId,
-  //       productId: addToCartDto.productId,
-  //       quantity: addToCartDto.quantity,
-  //       selected: addToCartDto.selected ?? true, // Default to true if not provided
-  //     });
-  //     await this.cartItemRepository.save(cartItem);
-  //   }
+    // Check stock availability
+    const stock = await this.inventoryService.getAvailableStock(
+      cartItem.productId,
+    );
 
-  //   return await this.getOrCreateCart(userId);
-  // }
+    if (stock < updateDto.quantity) {
+      throw new BadRequestException('Insufficient stock for this product');
+    }
 
-  // async updateCartItem(
-  //   userId: string,
-  //   cartItemId: string,
-  //   updateDto: UpdateCartItemDto,
-  // ): Promise<CartItem> {
-  //   const cart = await this.getOrCreateCart(userId);
+    cartItem.quantity = updateDto.quantity;
+    await this.cartItemRepository.save(cartItem);
 
-  //   const cartItem = await this.cartItemRepository.findOne({
-  //     where: { cartItemId, cartId: cart.cartId },
-  //   });
+    return (await this.getCart(userId)) as any;
+  }
 
-  //   if (!cartItem) {
-  //     throw new NotFoundException('CartItem item not found');
-  //   }
+  async batchUpdateCartItems(
+    userId: string,
+    batchDto: BatchUpdateCartItemsDto,
+  ): Promise<CartItem> {
+    for (const itemUpdate of batchDto.items) {
+      const cartItem = await this.cartItemRepository.findOne({
+        where: { cartItemId: itemUpdate.cartItemId, userId },
+      });
 
-  //   // Check stock availability
-  //   const stock = await this.inventoryService.getAvailableStock(cartItem.productId);
+      if (cartItem) {
+        cartItem.selected = itemUpdate.selected;
+        await this.cartItemRepository.save(cartItem);
+      }
+    }
 
-  //   if (stock < updateDto.quantity) {
-  //     throw new BadRequestException('Insufficient stock for this product');
-  //   }
+    return (await this.getCart(userId)) as any;
+  }
 
-  //   cartItem.quantity = updateDto.quantity;
-  //   await this.cartItemRepository.save(cartItem);
+  async removeFromCart(userId: string, cartItemId: string): Promise<CartItem> {
+    const cartItem = await this.cartItemRepository.findOne({
+      where: { cartItemId, userId },
+    });
 
-  //   return await this.getOrCreateCart(userId);
-  // }
+    if (!cartItem) {
+      throw new NotFoundException('CartItem item not found');
+    }
 
-  // async batchUpdateCartItems(
-  //   userId: string,
-  //   batchDto: BatchUpdateCartItemsDto,
-  // ): Promise<CartItem> {
-  //   const cart = await this.getOrCreateCart(userId);
+    await this.cartItemRepository.remove(cartItem);
 
-  //   for (const itemUpdate of batchDto.items) {
-  //     const cartItem = await this.cartItemRepository.findOne({
-  //       where: { cartItemId: itemUpdate.cartItemId, cartId: cart.cartId },
-  //     });
+    return (await this.getCart(userId)) as any;
+  }
 
-  //     if (cartItem) {
-  //       cartItem.selected = itemUpdate.selected;
-  //       await this.cartItemRepository.save(cartItem);
-  //     }
-  //   }
+  async clearCart(userId: string): Promise<void> {
+    await this.cartItemRepository.delete({ userId });
+  }
 
-  //   return await this.getOrCreateCart(userId);
-  // }
+  async removeSelectedItems(userId: string): Promise<void> {
+    await this.cartItemRepository.delete({
+      userId,
+      selected: true,
+    });
+  }
 
-  // async removeFromCart(userId: string, cartItemId: string): Promise<CartItem> {
-  //   const cart = await this.getOrCreateCart(userId);
+  async getCartSummary(userId: string): Promise<{
+    cart: CartItem[];
+    totalItems: number;
+    totalAmount: number;
+    selectedTotalAmount: number;
+  }> {
+    const items = await this.getCart(userId);
 
-  //   const cartItem = await this.cartItemRepository.findOne({
-  //     where: { cartItemId, cartId: cart.cartId },
-  //   });
+    let totalItems = 0;
+    let totalAmount = 0;
+    let selectedTotalAmount = 0;
 
-  //   if (!cartItem) {
-  //     throw new NotFoundException('CartItem item not found');
-  //   }
+    for (const item of items) {
+      const price = Number(item.product?.price || 0);
+      const itemSubtotal = price * item.quantity;
+      totalItems += item.quantity;
+      totalAmount += itemSubtotal;
 
-  //   await this.cartItemRepository.remove(cartItem);
+      if (item.selected) selectedTotalAmount += itemSubtotal;
+    }
 
-  //   return await this.getOrCreateCart(userId);
-  // }
+    return {
+      cart: items,
+      totalItems,
+      totalAmount,
+      selectedTotalAmount,
+    };
+  }
 
-  // async clearCart(userId: string): Promise<void> {
-  //   const cart = await this.getOrCreateCart(userId);
-  //   await this.cartItemRepository.delete({ cartId: cart.cartId });
-  // }
+  /**
+   * Move selected cart items to cart history snapshot and remove them from cart
+   */
+  async moveSelectedToHistory(userId: string): Promise<CartHistory> {
+    const { cart: items, selectedTotalAmount } =
+      await this.getCartSummary(userId);
 
-  // async removeSelectedItems(userId: string): Promise<void> {
-  //   const cart = await this.getOrCreateCart(userId);
-  //   await this.cartItemRepository.delete({
-  //     cartId: cart.cartId,
-  //     selected: true,
-  //   });
-  // }
+    const selectedItems = (items || []).filter((i) => i.selected);
 
-  // async getCartSummary(userId: string): Promise<{
-  //   cart: CartItem;
-  //   totalItems: number;
-  //   totalAmount: number;
-  //   selectedTotalAmount: number;
-  // }> {
-  //   const cart = await this.getOrCreateCart(userId);
+    if (selectedItems.length === 0) {
+      throw new BadRequestException('No selected items to move to history');
+    }
 
-  //   let totalItems = 0;
-  //   let totalAmount = 0;
-  //   let selectedTotalAmount = 0;
+    const cartSnapshot = {
+      items: selectedItems.map((i) => ({
+        productId: i.productId,
+        quantity: i.quantity,
+        product: i.product,
+      })),
+      totalAmount: selectedTotalAmount,
+    };
 
-  //   if (cart.items) {
-  //     for (const item of cart.items) {
-  //       const itemSubtotal = Number(item.product.price) * item.quantity;
-  //       totalItems += item.quantity;
-  //       totalAmount += itemSubtotal;
+    const history = await this.cartHistoryService.saveCartSnapshot(
+      userId,
+      cartSnapshot,
+      selectedItems.length,
+    );
 
-  //       if (item.selected) {
-  //         selectedTotalAmount += itemSubtotal;
-  //       }
-  //     }
-  //   }
+    // remove selected items from cart
+    await this.removeSelectedItems(userId);
 
-  //   return {
-  //     cart,
-  //     totalItems,
-  //     totalAmount,
-  //     selectedTotalAmount,
-  //   };
-  // }
+    return history;
+  }
 }

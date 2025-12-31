@@ -40,7 +40,23 @@ const apiRequest = async <T = any>(endpoint: string, options: RequestOptions = {
 
   if (!response.ok) {
     // 處理 HTTP 錯誤狀態
-    throw new Error(data.message || `HTTP Error: ${response.status}`);
+    // NestJS 錯誤格式可能是 { message: string } 或 { message: string[] }
+    let errorMessage = `HTTP Error: ${response.status}`;
+
+    if (data) {
+      if (typeof data === 'string') {
+        errorMessage = data;
+      } else if (data.message) {
+        // NestJS validation errors 可能回傳 message 陣列
+        errorMessage = Array.isArray(data.message)
+          ? data.message.join(', ')
+          : data.message;
+      } else if (data.error) {
+        errorMessage = data.error;
+      }
+    }
+
+    throw new Error(errorMessage);
   }
 
   return data;
@@ -84,7 +100,7 @@ export const put = <T = any>(endpoint: string, data?: any, options: RequestOptio
 export const patch = <T = any>(endpoint: string, data?: any, options: RequestOptions = {}): Promise<T> => {
   return apiRequest<T>(endpoint, {
     method: 'PATCH',
-    body: data instanceof FormData ? data : JSON.stringify(data),
+    body: JSON.stringify(data),
     ...options,
   });
 };

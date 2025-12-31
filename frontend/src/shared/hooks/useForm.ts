@@ -3,7 +3,7 @@
  * 簡化表單狀態管理和驗證邏輯
  */
 
-import { useState, ChangeEvent, FocusEvent, FormEvent } from 'react';
+import { useState, ChangeEvent, FocusEvent, FormEvent } from "react";
 
 type ValidationRule<T = any> = (value: any, allValues: T) => string | null;
 
@@ -16,9 +16,13 @@ interface UseFormReturn<T> {
   errors: Record<string, string>;
   touched: Record<string, boolean>;
   isSubmitting: boolean;
-  handleChange: (e: ChangeEvent<HTMLInputElement>) => void;
-  handleBlur: (e: FocusEvent<HTMLInputElement>) => void;
-  handleSubmit: (e?: FormEvent<HTMLFormElement>) => Promise<void>;
+  handleChange: (
+    e: ChangeEvent<HTMLInputElement | HTMLTextAreaElement>
+  ) => void;
+  handleBlur: (e: FocusEvent<HTMLInputElement | HTMLTextAreaElement>) => void;
+  handleSubmit: (
+    e?: FormEvent<HTMLFormElement | HTMLTextAreaElement>
+  ) => Promise<void>;
   reset: () => void;
   setValue: (fieldName: keyof T, value: any) => void;
   setFieldError: (fieldName: string, error: string | null) => void;
@@ -47,11 +51,14 @@ export const useForm = <T extends Record<string, any>>(
   /**
    * 處理輸入變更
    */
-  const handleChange = (e: ChangeEvent<HTMLInputElement>) => {
-    const { name, value, type, checked } = e.target;
-    const newValue = type === 'checkbox' ? checked : value;
+  const handleChange = (
+    e: ChangeEvent<HTMLInputElement | HTMLTextAreaElement>
+  ) => {
+    const { name, value, type } = e.target;
+    const checked = "checked" in e.target ? e.target.checked : false;
+    const newValue = type === "checkbox" ? checked : value;
 
-    setValues(prev => ({
+    setValues((prev) => ({
       ...prev,
       [name]: newValue,
     }));
@@ -65,10 +72,12 @@ export const useForm = <T extends Record<string, any>>(
   /**
    * 處理 Blur 事件（欄位失焦）
    */
-  const handleBlur = (e: FocusEvent<HTMLInputElement>) => {
+  const handleBlur = (
+    e: FocusEvent<HTMLInputElement | HTMLTextAreaElement>
+  ) => {
     const { name, value } = e.target;
 
-    setTouched(prev => ({
+    setTouched((prev) => ({
       ...prev,
       [name]: true,
     }));
@@ -84,9 +93,9 @@ export const useForm = <T extends Record<string, any>>(
     if (validationRules[fieldName as string]) {
       const error = validationRules[fieldName as string](value, values);
 
-      setErrors(prev => ({
+      setErrors((prev) => ({
         ...prev,
-        [fieldName]: error || '',
+        [fieldName]: error || "",
       }));
 
       return error;
@@ -102,7 +111,7 @@ export const useForm = <T extends Record<string, any>>(
     const newErrors: Record<string, string> = {};
     let isValid = true;
 
-    Object.keys(validationRules).forEach(fieldName => {
+    Object.keys(validationRules).forEach((fieldName) => {
       const error = validationRules[fieldName](values[fieldName], values);
       if (error) {
         newErrors[fieldName] = error;
@@ -125,7 +134,9 @@ export const useForm = <T extends Record<string, any>>(
   /**
    * 處理表單提交
    */
-  const handleSubmit = async (e?: FormEvent<HTMLFormElement>) => {
+  const handleSubmit = async (
+    e?: FormEvent<HTMLFormElement | HTMLTextAreaElement>
+  ) => {
     if (e) {
       e.preventDefault();
     }
@@ -142,11 +153,11 @@ export const useForm = <T extends Record<string, any>>(
       setIsSubmitting(true);
       await onSubmit(values);
     } catch (error) {
-      console.error('Form submission error:', error);
+      console.error("Form submission error:", error);
       // 可以在這裡設置全域錯誤訊息
-      setErrors(prev => ({
+      setErrors((prev) => ({
         ...prev,
-        _form: error instanceof Error ? error.message : '提交失敗，請稍後再試', // TODO: i18n
+        _form: error instanceof Error ? error.message : "提交失敗，請稍後再試", // TODO: i18n
       }));
     } finally {
       setIsSubmitting(false);
@@ -167,7 +178,7 @@ export const useForm = <T extends Record<string, any>>(
    * 設定特定欄位的值
    */
   const setValue = (fieldName: keyof T, value: any) => {
-    setValues(prev => ({
+    setValues((prev) => ({
       ...prev,
       [fieldName]: value,
     }));
@@ -177,9 +188,9 @@ export const useForm = <T extends Record<string, any>>(
    * 設定特定欄位的錯誤
    */
   const setFieldError = (fieldName: string, error: string | null) => {
-    setErrors(prev => ({
+    setErrors((prev) => ({
       ...prev,
-      [fieldName]: error || '',
+      [fieldName]: error || "",
     }));
   };
 
@@ -187,7 +198,7 @@ export const useForm = <T extends Record<string, any>>(
    * 清除特定欄位的錯誤
    */
   const clearFieldError = (fieldName: string) => {
-    setErrors(prev => {
+    setErrors((prev) => {
       const newErrors = { ...prev };
       delete newErrors[fieldName];
       return newErrors;

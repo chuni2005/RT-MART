@@ -1,16 +1,17 @@
-import { useState } from 'react';
+import { useState, useRef } from 'react';
 import Icon from '@/shared/components/Icon';
 import Button from '@/shared/components/Button';
 import FormInput from '@/shared/components/FormInput';
 import Dialog from '@/shared/components/Dialog';
 import Alert from '@/shared/components/Alert';
 import SearchBar from '@/shared/components/Header/SearchBar';
-import adminService from '@/shared/services/adminService';
+import adminService from '@/shared/services/adminService.index';
 import { AdminUser } from '@/types/admin';
 import { AlertType } from '@/types';
 import styles from './Users.module.scss';
 
 function Users() {
+  const alertRef = useRef<HTMLDivElement>(null);
   const [users, setUsers] = useState<AdminUser[]>([]);
   const [loading, setLoading] = useState(false);
   const [searched, setSearched] = useState(false);
@@ -20,10 +21,20 @@ function Users() {
   const [suspendReason, setSuspendReason] = useState('');
   const [alert, setAlert] = useState<{ type: AlertType; message: string } | null>(null);
 
+  // Custom setAlert with scroll behavior
+  const showAlert = (alertData: { type: AlertType; message: string } | null) => {
+    setAlert(alertData);
+    if (alertData && alertRef.current) {
+      setTimeout(() => {
+        alertRef.current?.scrollIntoView({ behavior: 'smooth', block: 'center' });
+      }, 100);
+    }
+  };
+
   const handleSearch = async (keyword: string) => {
     setLastSearchKeyword(keyword);
     if (!keyword.trim()) {
-      setAlert({ type: 'warning', message: '請輸入 Email 或 User ID' });
+      showAlert({ type: 'warning', message: '請輸入 Email 或 User ID' });
       return;
     }
 
@@ -41,7 +52,7 @@ function Users() {
       setUsers(filtered);
     } catch (error) {
       console.error('搜尋使用者失敗:', error);
-      setAlert({ type: 'error', message: '搜尋使用者失敗' });
+      showAlert({ type: 'error', message: '搜尋使用者失敗' });
     } finally {
       setLoading(false);
     }
@@ -50,13 +61,13 @@ function Users() {
   const handleSuspend = async () => {
     if (!selectedUser) return;
     if (!suspendReason.trim()) {
-      setAlert({ type: 'warning', message: '請輸入停權原因' });
+      showAlert({ type: 'warning', message: '請輸入停權原因' });
       return;
     }
 
     try {
       await adminService.suspendUser(selectedUser.user_id, suspendReason);
-      setAlert({ type: 'success', message: '使用者已停權' });
+      showAlert({ type: 'success', message: '使用者已停權' });
       setShowSuspendDialog(false);
       setSuspendReason('');
       setSelectedUser(null);
@@ -65,20 +76,20 @@ function Users() {
       }
     } catch (error) {
       console.error('停權失敗:', error);
-      setAlert({ type: 'error', message: '停權失敗' });
+      showAlert({ type: 'error', message: '停權失敗' });
     }
   };
 
   const handleUnsuspend = async (user: AdminUser) => {
     try {
       await adminService.unsuspendUser(user.user_id);
-      setAlert({ type: 'success', message: '已解除停權' });
+      showAlert({ type: 'success', message: '已解除停權' });
       if (lastSearchKeyword) {
         handleSearch(lastSearchKeyword);
       }
     } catch (error) {
       console.error('解除停權失敗:', error);
-      setAlert({ type: 'error', message: '解除停權失敗' });
+      showAlert({ type: 'error', message: '解除停權失敗' });
     }
   };
 
@@ -218,11 +229,13 @@ function Users() {
         <div className={styles.dialogContent}>
           {/* Alert */}
           {alert && (
-            <Alert
-              type={alert.type}
-              message={alert.message}
-              onClose={() => setAlert(null)}
-            />
+            <div ref={alertRef}>
+              <Alert
+                type={alert.type}
+                message={alert.message}
+                onClose={() => setAlert(null)}
+              />
+            </div>
           )}
           <p>確定要停權使用者「{selectedUser?.name}」嗎？</p>
           <FormInput

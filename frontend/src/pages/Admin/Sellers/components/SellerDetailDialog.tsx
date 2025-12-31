@@ -30,7 +30,6 @@ function SellerDetailDialog({
       onClose={onClose}
       title="賣家申請詳情"
       type="custom"
-      size="large"
     >
       <div className={styles.dialogContent}>
         {/* Section 1: 賣家資訊 */}
@@ -55,39 +54,12 @@ function SellerDetailDialog({
             </div>
             <div className={styles.infoItem}>
               <label>申請時間</label>
-              <p>{new Date(application.user_created_at).toLocaleString()}</p>
+              <p>{new Date(application.created_at).toLocaleString()}</p>
             </div>
           </div>
         </section>
 
-        {/* Section 2: 商店資訊 */}
-        <section className={styles.section}>
-          <h3 className={styles.sectionTitle}>商店資訊</h3>
-          <div className={styles.infoGrid}>
-            <div className={styles.infoItem}>
-              <label>商店名稱</label>
-              <p>{application.store_name}</p>
-            </div>
-            <div className={styles.infoItem}>
-              <label>商店描述</label>
-              <p>{application.store_description}</p>
-            </div>
-            <div className={styles.infoItem}>
-              <label>商店地址</label>
-              <p>{application.store_address}</p>
-            </div>
-            <div className={styles.infoItem}>
-              <label>商店電話</label>
-              <p>{application.store_phone}</p>
-            </div>
-            <div className={styles.infoItem}>
-              <label>商店 Email</label>
-              <p>{application.store_email}</p>
-            </div>
-          </div>
-        </section>
-
-        {/* Section 3: 金流資訊 */}
+        {/* Section 2: 金流資訊 */}
         <section className={styles.section}>
           <h3 className={styles.sectionTitle}>金流資訊</h3>
           <div className={styles.infoGrid}>
@@ -98,7 +70,7 @@ function SellerDetailDialog({
           </div>
         </section>
 
-        {/* Section 4: 審核狀態 */}
+        {/* Section 3: 審核狀態 */}
         <section className={styles.section}>
           <h3 className={styles.sectionTitle}>審核狀態</h3>
           <div className={styles.statusInfo}>
@@ -112,12 +84,6 @@ function SellerDetailDialog({
                       <strong>審核時間：</strong>
                       {new Date(application.verified_at).toLocaleString()}
                     </p>
-                    {application.verified_by && (
-                      <p>
-                        <strong>審核者：</strong>
-                        {application.verified_by}
-                      </p>
-                    )}
                   </div>
                 )}
               </>
@@ -131,12 +97,6 @@ function SellerDetailDialog({
                       <strong>拒絕時間：</strong>
                       {new Date(application.rejected_at).toLocaleString()}
                     </p>
-                    {application.rejection_reason && (
-                      <p>
-                        <strong>拒絕原因：</strong>
-                        {application.rejection_reason}
-                      </p>
-                    )}
                   </div>
                 )}
               </>
@@ -146,17 +106,14 @@ function SellerDetailDialog({
 
         {/* Action Buttons */}
         <div className={styles.actions}>
-          <Button variant="outline" onClick={onClose}>
-            關閉
-          </Button>
-          {isPending && onReject && (
-            <Button className={styles.btnDanger} onClick={onReject}>
-              拒絕
-            </Button>
-          )}
           {isPending && onApprove && (
             <Button className={styles.btnSuccess} onClick={onApprove}>
               批准
+            </Button>
+          )}
+          {isPending && onReject && (
+            <Button className={styles.btnDanger} onClick={onReject}>
+              拒絕
             </Button>
           )}
         </div>

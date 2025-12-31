@@ -2,7 +2,7 @@
 export type ValidationError = string | null;
 
 export interface PasswordStrength {
-  level: 'weak' | 'medium' | 'strong';
+  level: "weak" | "medium" | "strong";
   score: number;
 }
 
@@ -13,7 +13,9 @@ export interface FormInputProps {
   id: string;
   name: string;
   value: string;
-  onChange: (e: React.ChangeEvent<HTMLInputElement>) => void;
+  onChange: (
+    e: React.ChangeEvent<HTMLInputElement | HTMLTextAreaElement>
+  ) => void;
   onBlur?: (e: React.FocusEvent<HTMLInputElement>) => void;
   placeholder?: string;
   error?: string;

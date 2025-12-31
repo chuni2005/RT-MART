@@ -70,11 +70,9 @@ function CheckoutSummary(props: Props) {
     subtotal,
     shipping,
     shippingDiscount = 0,
-    discount,
     total,
     itemCount,
     selectedCount,
-    freeShippingThreshold = 500,
   } = props;
 
   // 計算基礎運費總額（實際運費 + 折抵）

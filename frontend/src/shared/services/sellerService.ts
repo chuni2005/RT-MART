@@ -293,26 +293,71 @@ export const deactivateProduct = async (id: string): Promise<void> => {
 // ========== Orders ==========
 
 /**
- * 獲取訂單列表
- * 目前暫時保留 Mock，待 Order API 完成賣家過濾
+ * 轉換後端訂單項目數據為前端格式
  */
-export const getOrders = async (_status?: string): Promise<any[]> => {
-  return new Promise((resolve) => {
-    setTimeout(() => {
-      // 這裡目前回傳空陣列，等待後端 API
-      resolve([]);
-    }, 500);
-  });
+const transformOrderItem = (item: any) => ({
+  id: item.orderItemId,
+  productId: item.productId || item.productSnapshot?.productId,
+  productName: item.productSnapshot?.product_name || item.productSnapshot?.productName || 'Unknown Product',
+  productImage: item.productSnapshot?.images?.[0]?.imageUrl || '',
+  quantity: item.quantity || 0,
+  price: Number(item.unitPrice || item.price || 0),
+});
+
+/**
+ * 轉換後端訂單數據為前端格式
+ */
+const transformOrder = (order: any) => {
+  const transformed: any = {
+    orderId: order.orderId,
+    orderNumber: order.orderNumber,
+    userId: order.userId,
+    storeId: order.storeId,
+    storeName: order.store?.storeName || 'Unknown Store',
+    status: order.orderStatus,
+    shippingAddress: order.shippingAddressSnapshot,
+    paymentMethod: order.paymentMethod,
+    note: order.notes || '',
+    subtotal: Number(order.subtotal || 0),
+    shipping: Number(order.shippingFee || 0),
+    discount: Number(order.totalDiscount || 0),
+    totalAmount: Number(order.totalAmount || 0),
+    createdAt: order.createdAt,
+    updatedAt: order.updatedAt,
+    paidAt: order.paidAt,
+    shippedAt: order.shippedAt,
+    deliveredAt: order.deliveredAt,
+    completedAt: order.completedAt,
+    cancelledAt: order.cancelledAt,
+  };
+
+  // Only include items if they exist (detail endpoint returns items, list endpoint doesn't)
+  if (order.items && order.items.length > 0) {
+    transformed.items = order.items.map(transformOrderItem);
+  }
+
+  return transformed;
+};
+
+/**
+ * 獲取訂單列表
+ */
+export const getOrders = async (status?: string): Promise<any[]> => {
+  const params = new URLSearchParams();
+  if (status && status !== 'all') {
+    params.append('status', status);
+  }
+
+  const response = await api.get<{ data: any[] }>(`/orders/seller/orders?${params.toString()}`);
+  return response.data.map(transformOrder);
 };
 
 /**
  * 獲取訂單詳情
  */
-export const getOrderDetail = async (_id: string): Promise<any> => {
-  // TODO: return api.get(`/seller/orders/${_id}`);
-  return new Promise((resolve) => {
-    setTimeout(() => resolve({ /* mock */ }), 300);
-  });
+export const getOrderDetail = async (id: string): Promise<any> => {
+  const order = await api.get(`/orders/seller/orders/${id}`);
+  return transformOrder(order);
 };
 
 export const getOrder = getOrderDetail;
@@ -320,8 +365,53 @@ export const getOrder = getOrderDetail;
 /**
  * 更新訂單狀態
  */
-export const updateOrderStatus = async (_id: string, _status: string, _note?: string): Promise<void> => {
-  // TODO: api.patch(`/orders/${_id}/status`, { status, note });
+export const updateOrderStatus = async (id: string, status: string, note?: string): Promise<void> => {
+  try {
+    await api.patch(`/orders/seller/orders/${id}/status`, { status, note });
+  } catch (error: any) {
+    console.error('更新訂單狀態失敗:', error);
+
+    const errorMessage = error.message || '';
+
+    // 根據後端錯誤訊息映射到前端友善訊息
+    // 1. 訂單不存在
+    if (errorMessage.includes('not found')) {
+      throw new Error('訂單不存在，請重新整理頁面後再試。');
+    }
+
+    // 2. 權限不足
+    if (errorMessage.includes('permission')) {
+      throw new Error('您沒有權限修改此訂單。');
+    }
+
+    // 3. 賣家無法標記為已完成
+    if (errorMessage.includes('cannot mark orders as completed')) {
+      throw new Error('賣家無法將訂單標記為已完成，只有買家可以確認收貨。');
+    }
+
+    // 4. 無效的狀態轉換
+    if (errorMessage.includes('cannot transition')) {
+      throw new Error('此狀態無法轉換到選擇的狀態，請確認訂單當前狀態。');
+    }
+
+    // 5. 庫存保留數量不足
+    if (errorMessage.includes('Reserved quantity is not enougth') || errorMessage.includes('Reserved quantity')) {
+      throw new Error('庫存保留數量不足，無法完成此操作。請聯繫技術支援。');
+    }
+
+    // 6. 賣家帳號問題
+    if (errorMessage.includes('Seller not found')) {
+      throw new Error('賣家帳號異常，請重新登入。');
+    }
+
+    // 7. 網路問題
+    if (errorMessage.includes('fetch') || errorMessage.includes('network')) {
+      throw new Error('網路連線異常，請檢查網路後重試。');
+    }
+
+    // 如果沒有匹配到特定錯誤，使用通用訊息
+    throw new Error('更新訂單狀態失敗，請稍後再試。');
+  }
 };
 
 // ========== Discounts ==========

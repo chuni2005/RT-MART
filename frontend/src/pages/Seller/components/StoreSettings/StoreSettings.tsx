@@ -3,12 +3,10 @@ import FormInput from '@/shared/components/FormInput';
 import Button from '@/shared/components/Button';
 import Alert from '@/shared/components/Alert';
 import sellerService from '@/shared/services/sellerService';
-import { StoreInfo } from '@/types/seller';
 import { useForm } from '@/shared/hooks/useForm';
 import styles from './StoreSettings.module.scss';
 
 function StoreSettings() {
-  const [storeInfo, setStoreInfo] = useState<StoreInfo | null>(null);
   const [loading, setLoading] = useState(true);
   const [saveStatus, setSaveStatus] = useState<'idle' | 'saving' | 'success' | 'error'>('idle');
 
@@ -58,8 +56,13 @@ function StoreSettings() {
   const { values, errors, validateAll, setValue } = form;
 
   // 包裝 handleChange 以支持直接傳值的方式
-  const handleChange = (nameOrEvent: string | React.ChangeEvent<HTMLInputElement>, value?: string) => {
-    if (typeof nameOrEvent === 'string') {
+  const handleChange = (
+    nameOrEvent:
+      | string
+      | React.ChangeEvent<HTMLInputElement | HTMLTextAreaElement>,
+    value?: string
+  ) => {
+    if (typeof nameOrEvent === "string") {
       // 直接傳遞字段名和值
       const name = nameOrEvent;
       setValue(name as any, value);
@@ -73,7 +76,7 @@ function StoreSettings() {
   };
 
   // 包裝 handleBlur 以支持直接傳字段名的方式
-  const handleBlur = (nameOrEvent: string | React.FocusEvent<HTMLInputElement>) => {
+  const handleBlur = (nameOrEvent: string | React.FocusEvent<HTMLInputElement | HTMLTextAreaElement>) => {
     if (typeof nameOrEvent === 'string') {
       // 直接傳遞字段名 - 創建模擬事件對象
       const name = nameOrEvent;
@@ -82,11 +85,11 @@ function StoreSettings() {
           name,
           value: values[name as keyof typeof values],
         },
-      } as React.FocusEvent<HTMLInputElement>;
+      } as React.FocusEvent<HTMLInputElement | HTMLTextAreaElement>;
       form.handleBlur(mockEvent);
     } else {
       // 傳遞事件對象
-      form.handleBlur(nameOrEvent);
+      form.handleBlur(nameOrEvent as any);
     }
   };
 
@@ -98,7 +101,6 @@ function StoreSettings() {
     setLoading(true);
     try {
       const data = await sellerService.getStoreInfo();
-      setStoreInfo(data);
       // 填充表單數據
       if (data.storeName !== undefined) setValue('storeName', data.storeName);
       if (data.storeDescription !== undefined) setValue('storeDescription', data.storeDescription || '');
