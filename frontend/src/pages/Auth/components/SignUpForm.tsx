@@ -14,6 +14,7 @@ import {
   validateConfirmPassword,
 } from "@/shared/utils/validation";
 import styles from "./SignUpForm.module.scss";
+import { useTranslation } from 'react-i18next';
 
 interface SignUpFormProps {
   onSubmit: (formData: SignUpFormData) => Promise<void>;
@@ -39,6 +40,7 @@ interface FormData {
 
 const SignUpForm = ({ onSubmit, isLoading }: SignUpFormProps) => {
   // 使用 useForm hook 替換所有手動狀態管理
+  const { t } = useTranslation()
   const { values, errors, touched, handleChange, handleBlur, handleSubmit } =
     useForm<FormData>(
       {
@@ -67,76 +69,76 @@ const SignUpForm = ({ onSubmit, isLoading }: SignUpFormProps) => {
         password: (value) => validatePasswordStrength(value),
         confirmPassword: (value, allValues) =>
           validateConfirmPassword(allValues.password, value),
-        agreeTerms: (value) => (value ? null : "請同意服務條款與隱私政策"),
+        agreeTerms: (value) => (value ? null : t('signUpForm.errors.agreeTerms')),
       }
     );
 
   return (
     <form className={styles.signUpForm} onSubmit={handleSubmit}>
       <FormInput
-        label="用戶名"
+        label={t('signUpForm.labels.loginId')}
         type="text"
         name="loginId"
         value={values.loginId}
         onChange={handleChange}
         onBlur={handleBlur}
         error={touched.loginId ? errors.loginId ?? undefined : undefined}
-        placeholder="4-20 個英數字或符號(_ - .)"
+        placeholder={t('signUpForm.placeholders.loginId')}
         disabled={isLoading}
         autoComplete="username"
         required
-        fieldName="用戶名"
+        fieldName={t('signUpForm.labels.loginId')}
       />
 
       <FormInput
-        label="Email"
+        label={t('signUpForm.labels.email')}
         type="email"
         name="email"
         value={values.email}
         onChange={handleChange}
         onBlur={handleBlur}
         error={touched.email ? errors.email ?? undefined : undefined}
-        placeholder="請輸入您的 Email"
+        placeholder={t('signUpForm.placeholders.email')}
         disabled={isLoading}
         autoComplete="email"
         required
-        fieldName="Email"
+        fieldName={t('signUpForm.labels.email')}
       />
 
       <FormInput
-        label="電話號碼"
+        label={t('signUpForm.labels.phone')}
         type="tel"
         name="phone"
         value={values.phone}
         onChange={handleChange}
         onBlur={handleBlur}
         error={touched.phone ? errors.phone ?? undefined : undefined}
-        placeholder="0912-345-678"
+        placeholder={t('signUpForm.placeholders.phone')}
         disabled={isLoading}
         autoComplete="tel"
         required
-        fieldName="電話號碼"
+        fieldName={t('signUpForm.labels.phone')}
       />
 
       <FormInput
-        label="密碼"
+        label={t('signUpForm.labels.password')}
         type="password"
         name="password"
         value={values.password}
         onChange={handleChange}
         onBlur={handleBlur}
         error={touched.password ? errors.password ?? undefined : undefined}
-        placeholder="請輸入密碼（至少 8 碼，含大小寫及數字）"
+        placeholder={t('signUpForm.placeholders.password')}
         disabled={isLoading}
         autoComplete="new-password"
         required
-        fieldName="密碼"
+        fieldName={t('signUpForm.labels.password')}
       />
 
       {values.password && <PasswordStrength password={values.password} />}
 
       <FormInput
-        label="確認密碼"
+        label={t('signUpForm.labels.confirmPassword')}
         type="password"
         name="confirmPassword"
         value={values.confirmPassword}
@@ -147,11 +149,11 @@ const SignUpForm = ({ onSubmit, isLoading }: SignUpFormProps) => {
             ? errors.confirmPassword ?? undefined
             : undefined
         }
-        placeholder="請再次輸入密碼"
+        placeholder={t('signUpForm.placeholders.confirmPassword')}
         disabled={isLoading}
         autoComplete="new-password"
         required
-        fieldName="確認密碼"
+        fieldName={t('signUpForm.labels.confirmPassword')}
       />
 
       <div className={styles.termsContainer}>
@@ -164,7 +166,7 @@ const SignUpForm = ({ onSubmit, isLoading }: SignUpFormProps) => {
             disabled={isLoading}
           />
           <span>
-            我同意 <a href="#">服務條款</a> 與 <a href="#">隱私政策</a>
+            {t('signUpForm.terms.agree')} <a href="#">{t('signUpForm.terms.arg1')}</a> {t('signUpForm.terms.and')} <a href="#">{t('signUpForm.terms.arg2')}</a>
           </span>
         </label>
         {touched.agreeTerms && errors.agreeTerms && (
@@ -177,7 +179,7 @@ const SignUpForm = ({ onSubmit, isLoading }: SignUpFormProps) => {
         className={styles.submitButton}
         disabled={isLoading}
       >
-        {isLoading ? "註冊中..." : "註冊"}
+        {isLoading ? t('signUpForm.buttons.submitting') : t('signUpForm.buttons.submit')}
       </button>
     </form>
   );

@@ -47,6 +47,7 @@ import AdminSellers from "./pages/Admin/Sellers";
 import AdminOrders from "./pages/Admin/Orders";
 import AdminDiscounts from "./pages/Admin/Discounts";
 import AdminDiscountEdit from "./pages/Admin/Discounts/DiscountEdit";
+import "./shared/components/Header/i18n";
 
 // Role-based Home Redirect Component
 function RoleBasedHome() {
