@@ -38,6 +38,10 @@ export class UserLoader extends BaseLoader<User> {
       user.passwordHash = passwordHash;
       user.name = data.name;
       user.email = data.email;
+      user.avatarUrl =
+        typeof data.avatar_url === 'string'
+          ? data.avatar_url
+          : `https://i.pravatar.cc/150?img=${scriptId}`;
       user.phoneNumber =
         typeof data.phone_number === 'string' ? data.phone_number : null;
       user.role =
