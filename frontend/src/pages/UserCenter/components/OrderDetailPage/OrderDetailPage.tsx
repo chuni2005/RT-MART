@@ -31,7 +31,7 @@ function OrderDetailPage() {
   // ========== 2. 副作用 ==========
   useEffect(() => {
     if (!order_id) {
-      navigate('/user-center/orders');
+      navigate('/user/orders');
       return;
     }
     fetchOrderDetail();
@@ -123,7 +123,7 @@ function OrderDetailPage() {
       <div className={styles.orderDetailPage}>
         <div className={styles.error}>
           <p>{error || '訂單不存在'}</p>
-          <Button variant="primary" onClick={() => navigate('/user-center/orders')}>
+          <Button variant="primary" onClick={() => navigate('/user/orders')}>
             返回訂單列表
           </Button>
         </div>
@@ -138,7 +138,7 @@ function OrderDetailPage() {
       <Button
         variant="ghost"
         icon="arrow-left"
-        onClick={() => navigate('/user-center/orders')}
+        onClick={() => navigate('/user/orders')}
         className={styles.backButton}
       >
         返回訂單列表
