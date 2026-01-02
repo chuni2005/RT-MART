@@ -29,6 +29,89 @@ export class AuthService {
     return { success: true, userId: user.userId };
   }
 
+  /**
+   * Register user with already verified email and hashed password
+   * This is called after email verification is completed
+   */
+  async registerWithVerifiedEmail(metadata: {
+    loginId: string;
+    passwordHash: string;
+    name: string;
+    email: string;
+    phoneNumber?: string;
+  }) {
+    // Create user directly with the hashed password from verification metadata
+    const user = await this.usersService.createWithHash({
+      loginId: metadata.loginId,
+      passwordHash: metadata.passwordHash,
+      name: metadata.name,
+      email: metadata.email,
+      phoneNumber: metadata.phoneNumber,
+      role: UserRole.BUYER,
+    });
+    return user;
+  }
+
+  /**
+   * Generate access and refresh tokens for a user (without password verification)
+   * Used after email verification registration
+   */
+  async generateTokensForUser(user: {
+    userId: string;
+    loginId: string;
+    role: UserRole;
+  }) {
+    const accessToken = this.jwtService.sign(
+      {
+        sub: user.userId,
+        loginId: user.loginId,
+        role: user.role,
+      },
+      {
+        expiresIn: '15m',
+        secret: process.env.ACCESS_SECRET,
+      },
+    );
+
+    const refreshToken = this.jwtService.sign(
+      {
+        sub: user.userId,
+        loginId: user.loginId,
+        role: user.role,
+      },
+      {
+        expiresIn: '1d',
+        secret: process.env.REFRESH_SECRET,
+      },
+    );
+
+    const decoded: JwtPayload | null | string =
+      this.jwtService.decode(refreshToken);
+    if (!decoded || typeof decoded === 'string') {
+      throw new UnauthorizedException('Invalid token format');
+    }
+    const jwtPayload: JwtPayload = decoded;
+    const createdAt = jwtPayload.iat
+      ? new Date(jwtPayload.iat * 1000)
+      : new Date();
+
+    // Store token hash
+    await this.tokenRepository.save({
+      userId: user.userId,
+      tokenHash: await bcrypt.hash(refreshToken, 10),
+      createdAt,
+      expiresAt: jwtPayload.exp
+        ? new Date(jwtPayload.exp * 1000)
+        : new Date(Date.now() + 24 * 60 * 60 * 1000),
+      isRevoked: false,
+    });
+
+    return {
+      accessToken,
+      refreshToken,
+    };
+  }
+
   async login(loginDto: LoginDto) {
     // Include suspended users to check suspension status
     const user = await this.usersService.findByLoginId(loginDto.loginId, true);

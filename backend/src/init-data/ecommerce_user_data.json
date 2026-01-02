@@ -493,5 +493,14 @@
     "email": "chillKai1006@gmail.com",
     "phone_number": null,
     "role": "admin"
+  },
+  {
+    "script_id": 56,
+    "login_id": "test",
+    "password": "Test@123456",
+    "name": "hahahai",
+    "email": "t.j.x20040816@gmail.com",
+    "phone_number": "0968-147-782",
+    "role": "buyer"
   }
 ]

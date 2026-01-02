@@ -17,6 +17,7 @@ import { ShippingAddressesService } from '../shipping-addresses/shipping-address
 import { InventoryService } from '../inventory/inventory.service';
 import { DiscountsService } from '../discounts/discounts.service';
 import { SseService } from '../sse/sse.service';
+import { MailService } from '../mail/mail.service';
 
 @Injectable()
 export class OrdersService {
@@ -31,6 +32,7 @@ export class OrdersService {
     private readonly discountsService: DiscountsService,
     private readonly dataSource: DataSource,
     private readonly sseService: SseService,
+    private readonly mailService: MailService,
   ) {}
 
   // TODO: 付款等待 清空購物車邏輯
@@ -346,9 +348,53 @@ export class OrdersService {
   }
 
   async cancelOrder(id: string, userId: string): Promise<Order> {
-    return await this.updateStatus(id, userId, {
+    const cancelledOrder = await this.updateStatus(id, userId, {
       status: OrderStatus.CANCELLED,
     });
+
+    // Fetch full order details with relations for email
+    const order = await this.orderRepository.findOne({
+      where: { orderId: id },
+      relations: ['items', 'items.product', 'user', 'store', 'store.seller', 'store.seller.user'],
+    });
+
+    // Send email notifications
+    if (order) {
+      try {
+        const orderDetails = {
+          orderNumber: order.orderNumber,
+          totalAmount: order.totalAmount,
+          items: order.items,
+          user: order.user,
+          store: order.store,
+          cancelledAt: order.cancelledAt,
+        };
+
+        // Send to buyer
+        if (order.user?.email) {
+          await this.mailService.sendOrderCancelledToBuyer(
+            order.user.email,
+            order.orderNumber,
+            orderDetails,
+            'Order cancelled by buyer',
+          );
+        }
+
+        // Send to seller
+        if (order.store?.seller?.user?.email) {
+          await this.mailService.sendOrderCancelledToSeller(
+            order.store.seller.user.email,
+            order.orderNumber,
+            orderDetails,
+            'Order cancelled by buyer',
+          );
+        }
+      } catch (error) {
+        console.error('Failed to send order cancellation emails:', error);
+      }
+    }
+
+    return cancelledOrder;
   }
 
   private generateOrderNumber(): string {
@@ -530,10 +576,10 @@ export class OrdersService {
     };
   }
 
-  async adminCancelOrder(id: string, _reason?: string): Promise<any> {
+  async adminCancelOrder(id: string, reason?: string): Promise<any> {
     const order = await this.orderRepository.findOne({
       where: { orderId: id },
-      relations: ['items'],
+      relations: ['items', 'items.product', 'user', 'store', 'store.seller', 'store.seller.user'],
     });
 
     if (!order) {
@@ -542,14 +588,43 @@ export class OrdersService {
 
     const updatedOrder = await this.dataSource.transaction(async (manager) => {
       await this.applyStatusChange(manager, order, OrderStatus.CANCELLED);
-
-      // TODO: Send email notification with reason using nodeMailer
-      // if (reason) {
-      //   await this.mailService.sendOrderCancelledEmail(order, reason);
-      // }
-
       return await manager.save(Order, order);
     });
+
+    // Send email notifications to both buyer and seller
+    try {
+      const orderDetails = {
+        orderNumber: updatedOrder.orderNumber,
+        totalAmount: updatedOrder.totalAmount,
+        items: updatedOrder.items,
+        user: updatedOrder.user,
+        store: updatedOrder.store,
+        cancelledAt: updatedOrder.cancelledAt,
+      };
+
+      // Send to buyer
+      if (updatedOrder.user?.email) {
+        await this.mailService.sendOrderCancelledToBuyer(
+          updatedOrder.user.email,
+          updatedOrder.orderNumber,
+          orderDetails,
+          reason || 'Order cancelled by administrator',
+        );
+      }
+
+      // Send to seller
+      if (updatedOrder.store?.seller?.user?.email) {
+        await this.mailService.sendOrderCancelledToSeller(
+          updatedOrder.store.seller.user.email,
+          updatedOrder.orderNumber,
+          orderDetails,
+          reason || 'Order cancelled by administrator',
+        );
+      }
+    } catch (error) {
+      // Log error but don't fail the cancellation
+      console.error('Failed to send order cancellation emails:', error);
+    }
 
     this.notifyOrderUpdate(updatedOrder);
     return updatedOrder;

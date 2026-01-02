@@ -55,6 +55,40 @@ export class UsersService {
     return await this.userRepository.save(user);
   }
 
+  /**
+   * Create user with already hashed password (for email verification flow)
+   */
+  async createWithHash(createUserDto: {
+    loginId: string;
+    passwordHash: string;
+    name: string;
+    email: string;
+    phoneNumber?: string;
+    role: UserRole;
+  }): Promise<User> {
+    // Check if loginId or email already exists (excluding soft-deleted users)
+    const existingUser = await this.userRepository.findOne({
+      where: [
+        { loginId: createUserDto.loginId, deletedAt: IsNull() },
+        { email: createUserDto.email, deletedAt: IsNull() },
+      ],
+    });
+
+    if (existingUser) {
+      if (existingUser.loginId === createUserDto.loginId) {
+        throw new ConflictException('Login ID already exists');
+      }
+      throw new ConflictException('Email already exists');
+    }
+
+    const user = this.userRepository.create({
+      ...createUserDto,
+      phoneNumber: formatPhoneNumber(createUserDto.phoneNumber),
+    });
+
+    return await this.userRepository.save(user);
+  }
+
   async findAll(
     queryDto: QueryUserDto,
   ): Promise<{ data: User[]; total: number }> {
