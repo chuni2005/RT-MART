@@ -12,6 +12,15 @@ const USE_MOCK_API = import.meta.env.VITE_USE_MOCK_API === 'true';
 // 根據環境變數導出對應的服務
 const authService = USE_MOCK_API ? mockAuthService : realAuthService;
 
-export const { login, register, logout, getCurrentUser, validateToken } = authService;
+export const {
+  login,
+  register,
+  sendVerificationCode,
+  verifyRegistrationCode,
+  resendVerificationCode,
+  logout,
+  getCurrentUser,
+  validateToken
+} = authService;
 
 export default authService;

@@ -2,6 +2,50 @@
   width: 100%;
 }
 
+.verificationStep {
+  width: 100%;
+  display: flex;
+  flex-direction: column;
+  gap: $spacing-lg;
+}
+
+.verificationHeader {
+  text-align: center;
+
+  h3 {
+    font-size: 24px;
+    font-weight: 600;
+    color: $text-primary;
+    margin-bottom: $spacing-sm;
+  }
+
+  p {
+    font-size: $font-md;
+    color: $text-secondary;
+    line-height: 1.5;
+
+    strong {
+      color: $primary-color;
+      font-weight: 600;
+    }
+  }
+}
+
+.timer {
+  margin: $spacing-md 0;
+}
+
+.codeInputContainer {
+  margin: $spacing-lg 0;
+}
+
+.verificationActions {
+  display: flex;
+  flex-direction: column;
+  gap: $spacing-md;
+  margin-top: $spacing-lg;
+}
+
 .termsContainer {
   margin-bottom: $spacing-lg;
   font-size: $font-sm;

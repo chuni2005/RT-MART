@@ -93,12 +93,8 @@ export const AuthProvider = ({ children }: AuthProviderProps) => {
   };
 
   /**
-   * 註冊
-   * @param loginId - 登入帳號（永久，不可更改）
-   * @param name - 使用者名稱（註冊時 = loginId，後續可透過個人設定更改）
-   * @param email
-   * @param phone
-   * @param password
+   * 註冊（舊版直接註冊）
+   * @deprecated 已棄用，請使用 registerWithVerification
    */
   const register = async (
     loginId: string,
@@ -133,6 +129,63 @@ export const AuthProvider = ({ children }: AuthProviderProps) => {
     } finally {
       setIsLoading(false);
     }
+  };
+
+  /**
+   * 兩步驟驗證註冊
+   */
+  const registerWithVerification = {
+    /**
+     * Step 1: 發送驗證碼到 email
+     */
+    sendCode: async (
+      loginId: string,
+      name: string,
+      email: string,
+      phone: string,
+      password: string
+    ): Promise<void> => {
+      await authService.sendVerificationCode(
+        loginId,
+        name,
+        email,
+        phone,
+        password
+      );
+    },
+
+    /**
+     * Step 2: 驗證碼驗證並完成註冊（自動登入）
+     */
+    verifyCode: async (email: string, code: string): Promise<AuthResponse> => {
+      try {
+        setIsLoading(true);
+
+        const response = await authService.verifyRegistrationCode(email, code);
+
+        if (response.success) {
+          // 更新狀態（後端已自動登入，cookies 中已有 token）
+          setUser(response.user);
+          setIsAuthenticated(true);
+
+          return response;
+        } else {
+          throw new Error(response.message || "驗證失敗");
+        }
+      } catch (error) {
+        console.error("Verify code error:", error);
+        throw error;
+      } finally {
+        setIsLoading(false);
+      }
+    },
+
+    /**
+     * 重新發送驗證碼
+     */
+    resendCode: async (email: string): Promise<void> => {
+      await authService.resendVerificationCode(email);
+    },
   };
 
   /**
@@ -175,6 +228,7 @@ export const AuthProvider = ({ children }: AuthProviderProps) => {
     isLoading,
     login,
     register,
+    registerWithVerification,
     logout,
     updateUser,
     checkAuth,

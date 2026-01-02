@@ -198,9 +198,33 @@ export const mockValidateToken = async (): Promise<ValidateTokenResponse> => {
   });
 };
 
+/**
+ * Mock 發送驗證碼（未實現，使用真實 API）
+ */
+export const mockSendVerificationCode = async (): Promise<{ success: boolean; message: string }> => {
+  throw new Error('Mock mode does not support email verification. Please use real API.');
+};
+
+/**
+ * Mock 驗證註冊碼（未實現，使用真實 API）
+ */
+export const mockVerifyRegistrationCode = async (): Promise<AuthResponse> => {
+  throw new Error('Mock mode does not support email verification. Please use real API.');
+};
+
+/**
+ * Mock 重新發送驗證碼（未實現，使用真實 API）
+ */
+export const mockResendVerificationCode = async (): Promise<{ success: boolean; message: string }> => {
+  throw new Error('Mock mode does not support email verification. Please use real API.');
+};
+
 export default {
   login: mockLogin,
   register: mockRegister,
+  sendVerificationCode: mockSendVerificationCode,
+  verifyRegistrationCode: mockVerifyRegistrationCode,
+  resendVerificationCode: mockResendVerificationCode,
   logout: mockLogout,
   getCurrentUser: mockGetCurrentUser,
   validateToken: mockValidateToken,

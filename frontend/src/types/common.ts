@@ -288,3 +288,21 @@ export interface ProtectedRouteProps {
   requiredRole?: 'buyer' | 'seller' | 'admin';
   excludeRoles?: Array<'buyer' | 'seller' | 'admin'>;
 }
+
+// VerificationCodeInput types
+export interface VerificationCodeInputProps {
+  length?: number;
+  value: string;
+  onChange: (code: string) => void;
+  onComplete?: (code: string) => void;
+  disabled?: boolean;
+  error?: string;
+  className?: string;
+}
+
+// CountdownTimer types
+export interface CountdownTimerProps {
+  initialSeconds: number;
+  onExpire?: () => void;
+  className?: string;
+}
