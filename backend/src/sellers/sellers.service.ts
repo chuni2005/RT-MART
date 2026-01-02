@@ -692,16 +692,34 @@ export class SellersService {
         const productSnapshot = item.productSnapshot as any;
         const productName = productSnapshot?.product_name || 'Unknown';
 
+        const subtotalValue = parseFloat(item.subtotal.toString());
+        const paymentFee = parseFloat((subtotalValue * 0.01).toFixed(2));
+        const netAmount = parseFloat((subtotalValue - paymentFee).toFixed(2));
+
         csvRows.push({
+          // 訂單資訊
           orderDate: this.formatDateTime(order.createdAt),
           orderNumber: order.orderNumber,
           orderStatus: order.orderStatus,
+
+          // 商品資訊
           productName,
           quantity: item.quantity,
+
+          // 價格明細
           originalPrice: parseFloat(item.originalPrice.toString()),
+          itemDiscount: parseFloat(item.itemDiscount.toString()),
           unitPrice: parseFloat(item.unitPrice.toString()),
-          subtotal: parseFloat(item.subtotal.toString()),
+          itemSubtotal: parseFloat(item.originalPrice.toString()) * item.quantity,
+          subtotal: subtotalValue,
+
+          // 財務計算
+          paymentFee,
+          netAmount,
+
+          // 訂單層級資訊
           shippingFee: parseFloat(order.shippingFee.toString()),
+          totalDiscount: parseFloat(order.totalDiscount.toString()),
           discountCode,
           paymentMethod: order.paymentMethod || 'Unknown',
         });
@@ -725,29 +743,49 @@ export class SellersService {
 
   private convertToCSV(data: SalesReportItemDto[]): string {
     const headers = [
+      // 訂單識別
       '訂單日期',
       '訂單編號',
       '訂單狀態',
+      // 商品詳情
       '商品名稱',
       '銷售數量',
+      // 價格明細
       '商品原價',
+      '商品折扣',
       '實際單價',
-      '小計',
+      '原始小計',
+      '折後小計',
+      // 財務分解
+      '金流手續費',
+      '淨額',
+      // 訂單層級
       '運費',
+      '訂單總折扣',
       '使用折扣代碼',
       '付款方式',
     ];
 
     const rows = data.map((item) => [
+      // 訂單識別
       item.orderDate,
       item.orderNumber,
       item.orderStatus,
+      // 商品詳情
       item.productName,
       item.quantity.toString(),
+      // 價格明細
       item.originalPrice.toFixed(2),
+      item.itemDiscount.toFixed(2),
       item.unitPrice.toFixed(2),
+      item.itemSubtotal.toFixed(2),
       item.subtotal.toFixed(2),
+      // 財務分解
+      item.paymentFee.toFixed(2),
+      item.netAmount.toFixed(2),
+      // 訂單層級
       item.shippingFee.toFixed(2),
+      item.totalDiscount.toFixed(2),
       item.discountCode || '',
       item.paymentMethod,
     ]);
