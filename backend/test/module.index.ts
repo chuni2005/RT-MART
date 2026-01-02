@@ -1,7 +1,7 @@
 import { AuditLogsModule } from '../src/audit-logs/audit-logs.module';
 import { AuthModule } from '../src/auth/auth.module';
 import { CartHistoryModule } from '../src/cart-history/cart-history.module';
-import { CartsModule } from '../src/carts/carts.module';
+import { CartItemsModule } from '../src/carts-item/cart-items.module';
 import { DiscountsModule } from '../src/discounts/discounts.module';
 import { InventoryModule } from '../src/inventory/inventory.module';
 import { OrdersModule } from '../src/orders/orders.module';
@@ -16,7 +16,7 @@ export const AppModules = [
   AuditLogsModule,
   AuthModule,
   CartHistoryModule,
-  CartsModule,
+  CartItemsModule,
   DiscountsModule,
   InventoryModule,
   OrdersModule,

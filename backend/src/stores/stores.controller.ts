@@ -10,10 +10,14 @@ import {
   UseGuards,
   Req,
   NotFoundException,
+  UseInterceptors,
+  ClassSerializerInterceptor,
 } from '@nestjs/common';
+import { plainToInstance } from 'class-transformer';
 import { StoresService } from './stores.service';
 import { UpdateStoreDto } from './dto/update-store.dto';
 import { QueryStoreDto } from './dto/query-store.dto';
+import { StoreResponseDto } from './dto/store-response.dto';
 import { JwtAccessGuard } from '../auth/guards/jwt-auth.guard';
 import { RolesGuard } from '../auth/guards/roles.guard';
 import { Roles } from '../auth/decorators/roles.decorator';
@@ -22,6 +26,7 @@ import type { AuthRequest } from '../common/types';
 import { SellersService } from '../sellers/sellers.service';
 
 @Controller('stores')
+@UseInterceptors(ClassSerializerInterceptor)
 export class StoresController {
   constructor(
     private readonly storesService: StoresService,
@@ -46,8 +51,18 @@ export class StoresController {
   @Get()
   async findAll(@Query() queryDto: QueryStoreDto) {
     const { data, total } = await this.storesService.findAll(queryDto);
+    console.log(
+      '[StoresController] findAll - first store:',
+      data[0]
+        ? {
+            storeId: data[0].storeId,
+            storeName: data[0].storeName,
+            deletedAt: data[0].deletedAt,
+          }
+        : 'No stores found',
+    );
     return {
-      data,
+      data: plainToInstance(StoreResponseDto, data),
       total,
       page: parseInt(queryDto.page || '1', 10),
       limit: parseInt(queryDto.limit || '10', 10),

@@ -1,0 +1,132 @@
+.discountDialog {
+  max-width: 900px;
+  width: 90vw;
+}
+
+.dialogContent {
+  max-height: 70vh;
+  overflow-y: auto;
+  padding: 1rem 0;
+}
+
+.loading {
+  text-align: center;
+  padding: 2rem;
+  color: #757575;
+}
+
+.discountSection {
+  margin-bottom: 2rem;
+
+  &:last-child {
+    margin-bottom: 0;
+  }
+
+  h4 {
+    font-size: 1.1rem;
+    font-weight: 600;
+    margin-bottom: 1rem;
+    color: #333;
+    padding-bottom: 0.5rem;
+    border-bottom: 2px solid #1976d2;
+  }
+}
+
+.tableWrapper {
+  overflow-x: auto;
+}
+
+.discountTable {
+  width: 100%;
+  border-collapse: collapse;
+  font-size: 0.9rem;
+
+  thead {
+    background: #f5f5f5;
+
+    th {
+      padding: 0.75rem 0.5rem;
+      text-align: left;
+      font-weight: 600;
+      color: #555;
+      border-bottom: 2px solid #ddd;
+      white-space: nowrap;
+    }
+  }
+
+  tbody {
+    tr {
+      border-bottom: 1px solid #eee;
+      transition: background 0.2s;
+
+      &:hover {
+        background: #fafafa;
+      }
+
+      &:last-child {
+        border-bottom: none;
+      }
+    }
+
+    td {
+      padding: 0.75rem 0.5rem;
+      vertical-align: middle;
+
+      code {
+        background: #f0f0f0;
+        padding: 0.2rem 0.4rem;
+        border-radius: 3px;
+        font-size: 0.85rem;
+        color: #d32f2f;
+      }
+    }
+  }
+
+  input[type="radio"] {
+    cursor: pointer;
+    width: 18px;
+    height: 18px;
+  }
+}
+
+.noDiscountOption {
+  font-weight: 500;
+  color: #757575;
+}
+
+.discountAmount {
+  color: #d32f2f;
+  font-weight: 600;
+}
+
+.discountType {
+  display: inline-block;
+  padding: 0.25rem 0.5rem;
+  background: #e3f2fd;
+  color: #1976d2;
+  border-radius: 3px;
+  font-size: 0.85rem;
+  font-weight: 500;
+}
+
+.dateRange {
+  font-size: 0.85rem;
+  color: #666;
+  white-space: nowrap;
+}
+
+.emptyMessage {
+  text-align: center;
+  color: #999;
+  padding: 1.5rem !important;
+  font-style: italic;
+}
+
+.dialogFooter {
+  display: flex;
+  justify-content: flex-end;
+  gap: 0.75rem;
+  padding-top: 1rem;
+  margin-top: 1rem;
+  border-top: 1px solid #eee;
+}

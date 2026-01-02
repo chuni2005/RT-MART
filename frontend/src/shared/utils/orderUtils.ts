@@ -19,24 +19,6 @@ export function getOrderStatusText(status: OrderStatus): string {
 }
 
 /**
- * 獲取訂單狀態的顏色
- */
-export function getOrderStatusColor(status: OrderStatus): string {
-  const statusColorMap: Record<OrderStatus, string> = {
-    pending_payment: '#ffc107', // 黃色
-    payment_failed: '#dc3545',  // 紅色
-    paid: '#17a2b8',            // 藍色
-    processing: '#007bff',      // 深藍色
-    shipped: '#6f42c1',         // 紫色
-    delivered: '#28a745',       // 綠色
-    completed: '#28a745',       // 綠色
-    cancelled: '#6c757d',       // 灰色
-  };
-
-  return statusColorMap[status] || '#6c757d';
-}
-
-/**
  * 獲取付款方式的中文文字
  */
 export function getPaymentMethodText(method: string): string {

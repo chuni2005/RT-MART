@@ -1,17 +1,16 @@
-import { useState, useEffect, useRef } from "react";
+import { useState, useEffect, useRef, useCallback } from "react";
 import { useNavigate, useParams } from "react-router-dom";
 import Button from "@/shared/components/Button";
 import Icon from "@/shared/components/Icon";
 import Alert from "@/shared/components/Alert";
 import Select from "@/shared/components/Select";
 import Dialog from "@/shared/components/Dialog";
+import ItemListCard from "@/shared/components/ItemListCard";
 import sellerService from "@/shared/services/sellerService";
 import { AlertType } from "@/types";
 import { Order, OrderStatus } from "@/types/order";
-import {
-  getOrderStatusText,
-  getOrderStatusColor,
-} from "@/shared/utils/orderUtils";
+import { getOrderStatusText } from "@/shared/utils/orderUtils";
+import { useSSE } from "@/shared/hooks/useSSE";
 import styles from "./OrderDetail.module.scss";
 
 function OrderDetail() {
@@ -41,7 +40,7 @@ function OrderDetail() {
     }
   }, [orderId]);
 
-  const loadOrder = async (id: string) => {
+  const loadOrder = useCallback(async (id: string) => {
     setLoading(true);
     try {
       const data = await sellerService.getOrder(id);
@@ -51,7 +50,20 @@ function OrderDetail() {
     } finally {
       setLoading(false);
     }
-  };
+  }, []);
+
+  // SSE Real-time Updates
+  useSSE({
+    'order:updated': useCallback((data: { orderId: string; status: OrderStatus }) => {
+      // Only update if this is the current order
+      if (data.orderId === orderId) {
+        console.log('Order updated via SSE, refreshing...');
+        if (orderId) {
+          loadOrder(orderId);
+        }
+      }
+    }, [orderId, loadOrder]),
+  });
 
   const handleStatusChange = async (newStatus: OrderStatus) => {
     if (!order) return;
@@ -173,10 +185,7 @@ function OrderDetail() {
         <section className={styles.section}>
           <div className={styles.sectionHeader}>
             <h2 className={styles.sectionTitle}>訂單資訊</h2>
-            <span
-              className={styles.status}
-              style={{ color: getOrderStatusColor(order.status) }}
-            >
+            <span className={`${styles.status} ${styles[order.status]}`}>
               {getOrderStatusText(order.status)}
             </span>
           </div>
@@ -247,23 +256,19 @@ function OrderDetail() {
           <h2 className={styles.sectionTitle}>訂單商品</h2>
           <div className={styles.productList}>
             {order.items.map((item) => (
-              <div key={item.id} className={styles.productItem}>
-                <img
-                  src={item.productImage || "/placeholder-product.png"}
-                  alt={item.productName}
-                  className={styles.productImage}
-                />
-                <div className={styles.productInfo}>
-                  <h4 className={styles.productName}>{item.productName}</h4>
-                  <div className={styles.productMeta}>
-                    <span>NT$ {item.price.toLocaleString()}</span>
-                    <span>x {item.quantity}</span>
-                  </div>
-                </div>
-                <div className={styles.productTotal}>
-                  NT$ {(item.price * item.quantity).toLocaleString()}
-                </div>
-              </div>
+              <ItemListCard
+                key={item.id}
+                variant="order-detail"
+                item={{
+                  id: item.id,
+                  productId: item.productId,
+                  productName: item.productName,
+                  productImage: item.productImage,
+                  price: item.price,
+                  quantity: item.quantity,
+                }}
+                onClick={() => navigate(`/product/${item.productId}`)}
+              />
             ))}
           </div>
         </section>

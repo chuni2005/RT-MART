@@ -22,6 +22,11 @@ export default defineConfig({
   server: {
     host: true,
     port: 5173,
+    hmr: {
+      protocol: 'ws',
+      host: 'localhost',
+      clientPort: 5173,
+    },
     proxy: {
       '/api': {
         target: process.env.DOCKER_ENV ? 'http://backend:3000' : 'http://localhost:3000',

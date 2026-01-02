@@ -6,10 +6,14 @@ import CheckoutSummary from "@/shared/components/CheckoutSummary";
 import EmptyState from "@/shared/components/EmptyState";
 import StoreGroupHeader from "@/shared/components/StoreGroupHeader";
 import Dialog from "@/shared/components/Dialog";
+import DiscountSelectionDialog from "@/pages/Checkout/components/DiscountSelectionDialog";
 import type { CartItem } from "@/types";
 import type { StoreGroup } from "@/types/cart";
+import type { ManualDiscountSelection } from "@/types/order";
 import { useCart } from "@/shared/contexts/CartContext";
 import { groupOrdersByStore } from "@/shared/utils/groupOrdersByStore";
+import { getAllAvailableDiscounts } from "@/shared/services/discountService";
+import { calculateDiscountAmounts } from "@/shared/utils/discountCalculator";
 
 /**
  * Group cart items by store
@@ -55,6 +59,15 @@ function Cart() {
 
   const [showDeleteDialog, setShowDeleteDialog] = useState(false);
   const [deleteItemId, setDeleteItemId] = useState<string | null>(null);
+  const [showDiscountDialog, setShowDiscountDialog] = useState(false);
+  const [discountSelections, setDiscountSelections] = useState<{
+    shipping: string | null;
+    product: string | null;
+  }>({
+    shipping: null,
+    product: null,
+  });
+  const [appliedDiscounts, setAppliedDiscounts] = useState<ManualDiscountSelection | null>(null);
 
   // Group items by store
   const storeGroups = useMemo(() => groupItemsByStore(cartItems), [cartItems]);
@@ -67,18 +80,8 @@ function Cart() {
 
   // 按商店分組計算運費（每個商店獨立計算滿 500 免運）
   // TODO: 改為管理員設定
-  const { subtotal, shipping, shippingDiscount, total } = useMemo(() => {
-    const storeGroups = groupOrdersByStore(selectedItems);
-
-    return {
-      subtotal: storeGroups.reduce((sum, group) => sum + group.subtotal, 0),
-      shipping: storeGroups.reduce((sum, group) => sum + group.shipping, 0),
-      shippingDiscount: storeGroups.reduce(
-        (sum, group) => sum + group.shippingDiscount,
-        0
-      ),
-      total: storeGroups.reduce((sum, group) => sum + group.total, 0),
-    };
+  const selectedStoreGroups = useMemo(() => {
+    return groupOrdersByStore(selectedItems);
   }, [selectedItems]);
 
   // 全選狀態
@@ -122,9 +125,8 @@ function Cart() {
     }
   };
 
-  // 更新數量
+  // 更新數量（只在 blur 時調用，此時數量已經是有效的數字）
   const handleQuantityChange = async (id: string, quantity: number) => {
-    
     if (quantity < 1) return;
 
     try {
@@ -154,15 +156,48 @@ function Cart() {
     }
   };
 
+  // 打開折扣選擇對話框
+  const handleDiscountChange = () => {
+    setShowDiscountDialog(true);
+  };
+
+  // 確認折扣選擇（從對話框返回的 ID 選擇）
+  const handleDiscountConfirm = async (selections: {
+    shipping: string | null;
+    product: string | null;
+  }) => {
+    try {
+      const subtotal = selectedStoreGroups.reduce((sum, g) => sum + g.subtotal, 0);
+      const storeIds = selectedStoreGroups.map((g) => g.storeId);
+
+      // 獲取所有可用折扣以計算實際金額
+      const allDiscounts = await getAllAvailableDiscounts(subtotal, storeIds);
+
+      // 使用共用的折扣計算函數
+      const newSelection = calculateDiscountAmounts(selections, allDiscounts, subtotal);
+
+      setDiscountSelections(selections);
+      setAppliedDiscounts(newSelection);
+    } catch (error) {
+      console.error("Failed to apply discounts:", error);
+      alert("套用折扣失敗，請稍後再試");
+    } finally {
+      setShowDiscountDialog(false);
+    }
+  };
+
   // 前往結帳
   const handleCheckout = () => {
     if (selectedItems.length === 0) {
       alert("請至少選擇一個商品");
       return;
     }
-    // TODO: 實作結帳頁面
+    // 將折扣信息帶到結帳頁面
     navigate("/checkout", {
-      state: { items: selectedItems },
+      state: {
+        items: selectedItems,
+        appliedDiscounts: appliedDiscounts
+      },
     });
   };
 
@@ -268,15 +303,11 @@ function Cart() {
 
         {/* 右側：結帳摘要 */}
         <CheckoutSummary
-          subtotal={subtotal}
-          shipping={shipping}
-          shippingDiscount={shippingDiscount}
-          discount={0}
-          total={total}
-          itemCount={cartItems.length}
-          selectedCount={selectedItems.length}
-          freeShippingThreshold={500}
+          storeGroups={selectedStoreGroups}
+          selectedCount={cartItems.length}
+          appliedDiscounts={appliedDiscounts}
           onCheckout={handleCheckout}
+          onDiscountChange={handleDiscountChange}
           disabled={selectedItems.length === 0}
         />
       </div>
@@ -293,6 +324,16 @@ function Cart() {
         cancelText="取消"
         onConfirm={confirmDelete}
         mediaUrl="/CryingEmoji.gif"
+      />
+
+      {/* 折扣選擇對話框 */}
+      <DiscountSelectionDialog
+        isOpen={showDiscountDialog}
+        onClose={() => setShowDiscountDialog(false)}
+        currentSelections={discountSelections}
+        onConfirm={handleDiscountConfirm}
+        subtotal={selectedStoreGroups.reduce((sum, g) => sum + g.subtotal, 0)}
+        storeIds={selectedStoreGroups.map(g => g.storeId)}
       />
     </div>
   );

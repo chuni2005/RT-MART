@@ -40,6 +40,10 @@ export class UpdateUserDto {
 
   @IsString()
   @IsOptional()
+  avatarUrl?: string;
+
+  @IsString()
+  @IsOptional()
   @Matches(/^[0-9+\-() ]+$/, {
     message: 'phoneNumber must be a valid phone number format',
   })

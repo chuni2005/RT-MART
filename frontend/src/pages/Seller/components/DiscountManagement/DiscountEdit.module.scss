@@ -122,3 +122,45 @@
   font-size: $font-lg;
   color: $text-secondary;
 }
+
+.discountCodeDisplay {
+  display: flex;
+  align-items: center;
+  gap: $spacing-sm;
+  padding: $spacing-md;
+  background: $bg-primary;
+  border: 1px solid $border-color;
+  border-radius: $border-radius-md;
+
+  .codeText {
+    flex: 1;
+    font-size: $font-md;
+    font-weight: 600;
+    color: $text-primary;
+    font-family: monospace;
+  }
+
+  .copyButton {
+    display: flex;
+    align-items: center;
+    gap: $spacing-xs;
+    padding: $spacing-xs $spacing-sm;
+    background: transparent;
+    border: 1px solid $border-color;
+    border-radius: $border-radius-sm;
+    cursor: pointer;
+    transition: $transition-fast;
+    color: $text-secondary;
+
+    &:hover {
+      background: $bg-tertiary;
+      border-color: $primary-color;
+      color: $primary-color;
+    }
+
+    .copiedText {
+      font-size: $font-xs;
+      color: $success-color;
+    }
+  }
+}

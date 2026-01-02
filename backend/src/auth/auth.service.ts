@@ -30,9 +30,15 @@ export class AuthService {
   }
 
   async login(loginDto: LoginDto) {
-    const user = await this.usersService.findByLoginId(loginDto.loginId);
+    // Include suspended users to check suspension status
+    const user = await this.usersService.findByLoginId(loginDto.loginId, true);
     if (!user) {
       throw new UnauthorizedException('Invalid credentials');
+    }
+
+    // Check if user account is suspended
+    if (user.deletedAt) {
+      throw new UnauthorizedException('Account has been suspended');
     }
 
     const isPasswordValid = await bcrypt.compare(

@@ -3,9 +3,11 @@ import {
   NotFoundException,
   ConflictException,
   UnauthorizedException,
+  Inject,
+  forwardRef,
 } from '@nestjs/common';
 import { InjectRepository } from '@nestjs/typeorm';
-import { Repository, Like, IsNull } from 'typeorm';
+import { Repository, IsNull } from 'typeorm';
 import * as bcrypt from 'bcrypt';
 import { User, UserRole } from './entities/user.entity';
 import { CreateUserDto } from './dto/create-user.dto';
@@ -56,31 +58,75 @@ export class UsersService {
   async findAll(
     queryDto: QueryUserDto,
   ): Promise<{ data: User[]; total: number }> {
+    console.log('[UsersService] findAll called with:', queryDto);
+
     const page = parseInt(queryDto.page || '1', 10);
     const limit = parseInt(queryDto.limit || '10', 10);
     const skip = (page - 1) * limit;
 
-    const where: Record<
-      string,
-      string | ReturnType<typeof Like> | ReturnType<typeof IsNull>
-    > = {
-      deletedAt: IsNull(), // Only return non-deleted users
-    };
+    const queryBuilder = this.userRepository
+      .createQueryBuilder('user')
+      .skip(skip)
+      .take(limit)
+      .orderBy('user.createdAt', 'DESC');
+
+    // Include suspended users if requested (admin only)
+    console.log('[UsersService] includeSuspended:', queryDto.includeSuspended);
+    if (queryDto.includeSuspended) {
+      console.log('[UsersService] Using withDeleted()');
+      queryBuilder.withDeleted();
+    }
+
+    // Apply filters - use WHERE for first condition, andWhere for subsequent
+    let hasWhereCondition = false;
+
+    if (!queryDto.includeSuspended) {
+      queryBuilder.where('user.deletedAt IS NULL');
+      hasWhereCondition = true;
+    }
 
     if (queryDto.role) {
-      where.role = queryDto.role;
+      if (hasWhereCondition) {
+        queryBuilder.andWhere('user.role = :role', { role: queryDto.role });
+      } else {
+        queryBuilder.where('user.role = :role', { role: queryDto.role });
+        hasWhereCondition = true;
+      }
     }
 
     if (queryDto.search) {
-      where.name = Like(`%${queryDto.search}%`);
+      const searchCondition =
+        'user.name LIKE :search OR user.loginId LIKE :search OR user.email LIKE :search OR user.userId LIKE :search';
+      if (hasWhereCondition) {
+        queryBuilder.andWhere(searchCondition, {
+          search: `%${queryDto.search}%`,
+        });
+      } else {
+        queryBuilder.where(searchCondition, {
+          search: `%${queryDto.search}%`,
+        });
+      }
     }
 
-    const [data, total] = await this.userRepository.findAndCount({
-      where,
-      skip,
-      take: limit,
-      order: { createdAt: 'DESC' },
-    });
+    const [data, total] = await queryBuilder.getManyAndCount();
+
+    console.log(
+      '[UsersService] Query result - total:',
+      total,
+      'returned:',
+      data.length,
+    );
+    console.log(
+      '[UsersService] First user (if any):',
+      data[0]
+        ? {
+            userId: data[0].userId,
+            name: data[0].name,
+            loginId: data[0].loginId,
+            deletedAt: data[0].deletedAt,
+          }
+        : 'No users found',
+    );
 
     return { data, total };
   }
@@ -97,7 +143,16 @@ export class UsersService {
     return user;
   }
 
-  async findByLoginId(loginId: string): Promise<User | null> {
+  async findByLoginId(
+    loginId: string,
+    includeSuspended: boolean = false,
+  ): Promise<User | null> {
+    if (includeSuspended) {
+      return await this.userRepository.findOne({
+        where: { loginId },
+        withDeleted: true,
+      });
+    }
     return await this.userRepository.findOne({
       where: { loginId, deletedAt: IsNull() },
     });
@@ -261,5 +316,59 @@ export class UsersService {
     }
 
     await this.userRepository.remove(user);
+  }
+
+  /**
+   * Suspend a user account
+   * When user is suspended:
+   * 1. Set deletedAt to current timestamp
+   * 2. Suspend their store (if seller)
+   * 3. Cancel all pending orders
+   * 4. Restore inventory for cancelled orders
+   */
+  async suspendUser(id: string): Promise<User> {
+    const user = await this.userRepository.findOne({
+      where: { userId: id, deletedAt: IsNull() },
+    });
+
+    if (!user) {
+      throw new NotFoundException(
+        `User with ID ${id} not found or already suspended`,
+      );
+    }
+
+    // Note: Actual suspension logic (store suspension, order cancellation)
+    // will be implemented in controller with proper service injections
+    // Here we just handle the user entity suspension
+    await this.userRepository.softRemove(user);
+
+    // TODO: Send suspension email notification
+
+    return (await this.userRepository.findOne({
+      where: { userId: id },
+      withDeleted: true,
+    })) as User;
+  }
+
+  /**
+   * Restore a suspended user account
+   * Note: The controller will automatically restore their store if it was deleted within 1 minute of user suspension
+   */
+  async restoreSuspendedUser(id: string): Promise<User> {
+    const user = await this.userRepository.findOne({
+      where: { userId: id },
+      withDeleted: true,
+    });
+
+    if (!user) {
+      throw new NotFoundException(`User with ID ${id} not found`);
+    }
+
+    if (!user.deletedAt) {
+      throw new ConflictException('User is not suspended');
+    }
+
+    await this.userRepository.restore(id);
+    return await this.findOne(id);
   }
 }

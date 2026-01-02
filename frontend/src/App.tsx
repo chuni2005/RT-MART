@@ -64,18 +64,25 @@ function RoleBasedHome() {
 // Header Wrapper Component to handle conditional rendering
 function AppHeader() {
   const location = useLocation();
+  const { user } = useAuth();
 
+  // Auth page always gets simple header
   if (location.pathname === "/auth") {
     return <Header variant="simple" />;
   }
 
-  if (
-    location.pathname.startsWith("/seller") ||
-    location.pathname.startsWith("/admin")
-  ) {
+  // SECURITY: Admin always gets HeaderC (admin variant) - regardless of path
+  // This prevents "jailbreak" via SearchBar when admin navigates to non-admin routes
+  if (user?.role === "admin") {
     return <Header variant="admin" />;
   }
 
+  // Seller gets HeaderC
+  if (location.pathname.startsWith("/seller")) {
+    return <Header variant="admin" />;
+  }
+
+  // Default: HeaderA for buyers and guests
   return <Header />;
 }
 
@@ -88,13 +95,36 @@ function AppContent() {
           {/* Buyer Pages */}
           <Route path="/" element={<RoleBasedHome />} />
           <Route path="/auth" element={<Auth />} />
-          <Route path="/search" element={<Search />} />
-          <Route path="/product/:product_id" element={<ProductDetail />} />
-          <Route path="/store/:store_id" element={<Store />} />
+
+          {/* SECURITY: Public buyer/seller routes - exclude admin access */}
+          <Route
+            path="/search"
+            element={
+              <ProtectedRoute excludeRoles={["admin"]}>
+                <Search />
+              </ProtectedRoute>
+            }
+          />
+          <Route
+            path="/product/:product_id"
+            element={
+              <ProtectedRoute excludeRoles={["admin"]}>
+                <ProductDetail />
+              </ProtectedRoute>
+            }
+          />
+          <Route
+            path="/store/:store_id"
+            element={
+              <ProtectedRoute excludeRoles={["admin"]}>
+                <Store />
+              </ProtectedRoute>
+            }
+          />
           <Route
             path="/cart"
             element={
-              <ProtectedRoute>
+              <ProtectedRoute excludeRoles={["admin"]}>
                 <Cart />
               </ProtectedRoute>
             }
@@ -102,32 +132,43 @@ function AppContent() {
           <Route
             path="/checkout"
             element={
-              <ProtectedRoute>
+              <ProtectedRoute excludeRoles={["admin"]}>
                 <Checkout />
               </ProtectedRoute>
             }
           />
           <Route path="/faq" element={<FAQ />} />
 
-          {/* User Center */}
-          <Route path="/user/*"
+          {/* User Center - Split into Account (admin allowed) and Orders (admin excluded) */}
+
+          {/* User Account Settings - ALLOW ADMIN ACCESS */}
+          <Route
+            path="/user/account/*"
             element={
               <ProtectedRoute>
                 <UserCenter />
               </ProtectedRoute>
             }
           >
-            {/* Index redirect */}
-            <Route index element={<Navigate to="account/profile" replace />} />
-
-            {/* User Account Routes */}
-            <Route path="account/profile" element={<ProfilePage />} />
-            <Route path="account/address" element={<AddressPage />} />
-
-            {/* Order Routes */}
-            <Route path="orders" element={<OrderListPage />} />
-            <Route path="orders/:order_id" element={<OrderDetailPage />} />
+            <Route path="profile" element={<ProfilePage />} />
+            <Route path="address" element={<AddressPage />} />
           </Route>
+
+          {/* User Orders - EXCLUDE ADMIN */}
+          <Route
+            path="/user/orders"
+            element={
+              <ProtectedRoute excludeRoles={["admin"]}>
+                <UserCenter />
+              </ProtectedRoute>
+            }
+          >
+            <Route index element={<OrderListPage />} />
+            <Route path=":order_id" element={<OrderDetailPage />} />
+          </Route>
+
+          {/* Fallback redirect from /user to /user/account/profile */}
+          <Route path="/user" element={<Navigate to="/user/account/profile" replace />} />
 
           {/* Seller Application (独立路由，不包含在 SellerCenter 布局中) */}
           <Route

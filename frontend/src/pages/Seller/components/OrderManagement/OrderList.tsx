@@ -8,7 +8,7 @@ import EmptyState from '@/shared/components/EmptyState';
 import sellerService from '@/shared/services/sellerService';
 import { AlertType } from '@/types';
 import { Order, OrderStatus } from '@/types';
-import { getOrderStatusText, getOrderStatusColor } from '@/shared/utils/orderUtils';
+import { getOrderStatusText } from '@/shared/utils/orderUtils';
 import styles from './OrderList.module.scss';
 
 function OrderList() {
@@ -162,10 +162,7 @@ function OrderList() {
                     {new Date(order.createdAt).toLocaleDateString("zh-TW")}
                   </span>
                 </div>
-                <span
-                  className={styles.status}
-                  style={{ color: getOrderStatusColor(order.status) }}
-                >
+                <span className={`${styles.status} ${styles[order.status]}`}>
                   {getOrderStatusText(order.status)}
                 </span>
               </div>

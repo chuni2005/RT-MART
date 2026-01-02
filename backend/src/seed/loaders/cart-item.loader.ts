@@ -1,5 +1,5 @@
 import { BaseLoader } from './base.loader';
-import { CartItem } from '../../carts/entities/cart-item.entity';
+import { CartItem } from '../../carts-item/entities/cart-item.entity';
 
 export class CartItemLoader extends BaseLoader<CartItem> {
   protected entityName = 'CartItem';
@@ -11,7 +11,7 @@ export class CartItemLoader extends BaseLoader<CartItem> {
   ): Promise<CartItem | null> {
     try {
       if (
-        !data.cart_id ||
+        !data.user_id ||
         !data.product_id ||
         data.quantity === undefined ||
         data.quantity === null
@@ -19,10 +19,10 @@ export class CartItemLoader extends BaseLoader<CartItem> {
         return Promise.resolve(null);
       }
 
-      // 從 IdMapping 取得實際的 cart_id 和 product_id
-      const cartId = this.idMapping.getMapping(
-        'Cart',
-        typeof data.cart_id === 'number' ? data.cart_id : Number(data.cart_id),
+      // 從 IdMapping 取得實際的 user_id 和 product_id
+      const userId = this.idMapping.getMapping(
+        'User',
+        typeof data.user_id === 'number' ? data.user_id : Number(data.user_id),
       );
       const productId = this.idMapping.getMapping(
         'Product',
@@ -31,12 +31,12 @@ export class CartItemLoader extends BaseLoader<CartItem> {
           : Number(data.product_id),
       );
 
-      if (!cartId || !productId) {
+      if (!userId || !productId) {
         return Promise.resolve(null);
       }
 
       const cartItem = new CartItem();
-      cartItem.cartId = cartId;
+      cartItem.userId = userId;
       cartItem.productId = productId;
       cartItem.quantity =
         typeof data.quantity === 'number'
@@ -54,7 +54,7 @@ export class CartItemLoader extends BaseLoader<CartItem> {
   protected async checkExists(entity: CartItem): Promise<boolean> {
     const existing = await this.entityManager.findOne(CartItem, {
       where: {
-        cartId: entity.cartId,
+        userId: entity.userId,
         productId: entity.productId,
       },
     });

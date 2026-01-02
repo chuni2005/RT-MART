@@ -4,6 +4,7 @@ import { Repository, IsNull } from 'typeorm';
 import { Order, OrderStatus } from '../orders/entities/order.entity';
 import { User } from '../users/entities/user.entity';
 import { Seller } from '../sellers/entities/seller.entity';
+import { QueryDashboardDto } from './dto/query-dashboard.dto';
 
 interface ChartDataPoint {
   label: string;
@@ -40,7 +41,15 @@ export class AdminService {
     private readonly sellerRepository: Repository<Seller>,
   ) {}
 
-  async getDashboardStats(): Promise<DashboardStats> {
+  async getDashboardStats(
+    filters?: QueryDashboardDto,
+  ): Promise<DashboardStats> {
+    // Set default date range if not provided (last 12 months)
+    const endDate = filters?.endDate ? new Date(filters.endDate) : new Date();
+    const startDate = filters?.startDate
+      ? new Date(filters.startDate)
+      : new Date(endDate.getTime() - 365 * 24 * 60 * 60 * 1000);
+
     // Get basic statistics
     const [
       totalRevenue,
@@ -52,14 +61,14 @@ export class AdminService {
       userGrowthChartData,
       orderStatusChartData,
     ] = await Promise.all([
-      this.getTotalRevenue(),
+      this.getTotalRevenue(startDate, endDate),
       this.getTotalUsers(),
       this.getActiveSellers(),
       this.getPendingReviews(),
       this.getRecentActivities(),
-      this.getRevenueChartData(),
-      this.getUserGrowthChartData(),
-      this.getOrderStatusChartData(),
+      this.getRevenueChartData(startDate, endDate),
+      this.getUserGrowthChartData(startDate, endDate),
+      this.getOrderStatusChartData(startDate, endDate),
     ]);
 
     return {
@@ -74,11 +83,16 @@ export class AdminService {
     };
   }
 
-  private async getTotalRevenue(): Promise<number> {
+  private async getTotalRevenue(
+    startDate: Date,
+    endDate: Date,
+  ): Promise<number> {
     const result = await this.orderRepository
       .createQueryBuilder('order')
       .select('SUM(order.totalAmount)', 'total')
       .where('order.orderStatus = :status', { status: OrderStatus.COMPLETED })
+      .andWhere('order.createdAt >= :startDate', { startDate })
+      .andWhere('order.createdAt <= :endDate', { endDate })
       .getRawOne();
 
     return parseFloat(result?.total || '0');
@@ -149,14 +163,18 @@ export class AdminService {
     return activities;
   }
 
-  private async getRevenueChartData(): Promise<ChartDataPoint[]> {
-    // Get revenue for the last 12 months
+  private async getRevenueChartData(
+    startDate: Date,
+    endDate: Date,
+  ): Promise<ChartDataPoint[]> {
+    // Get revenue for the specified date range
     const result = await this.orderRepository
       .createQueryBuilder('order')
       .select("DATE_FORMAT(order.createdAt, '%Y-%m')", 'month')
       .addSelect('SUM(order.totalAmount)', 'revenue')
       .where('order.orderStatus = :status', { status: OrderStatus.COMPLETED })
-      .andWhere('order.createdAt >= DATE_SUB(NOW(), INTERVAL 12 MONTH)')
+      .andWhere('order.createdAt >= :startDate', { startDate })
+      .andWhere('order.createdAt <= :endDate', { endDate })
       .groupBy('month')
       .orderBy('month', 'ASC')
       .getRawMany();
@@ -167,13 +185,17 @@ export class AdminService {
     }));
   }
 
-  private async getUserGrowthChartData(): Promise<ChartDataPoint[]> {
-    // Get new users for the last 12 months
+  private async getUserGrowthChartData(
+    startDate: Date,
+    endDate: Date,
+  ): Promise<ChartDataPoint[]> {
+    // Get new users for the specified date range
     const result = await this.userRepository
       .createQueryBuilder('user')
       .select("DATE_FORMAT(user.createdAt, '%Y-%m')", 'month')
       .addSelect('COUNT(*)', 'count')
-      .where('user.createdAt >= DATE_SUB(NOW(), INTERVAL 12 MONTH)')
+      .andWhere('user.createdAt >= :startDate', { startDate })
+      .andWhere('user.createdAt <= :endDate', { endDate })
       .groupBy('month')
       .orderBy('month', 'ASC')
       .getRawMany();
@@ -184,11 +206,16 @@ export class AdminService {
     }));
   }
 
-  private async getOrderStatusChartData(): Promise<ChartDataPoint[]> {
+  private async getOrderStatusChartData(
+    startDate: Date,
+    endDate: Date,
+  ): Promise<ChartDataPoint[]> {
     const result = await this.orderRepository
       .createQueryBuilder('order')
       .select('order.orderStatus', 'status')
       .addSelect('COUNT(*)', 'count')
+      .where('order.createdAt >= :startDate', { startDate })
+      .andWhere('order.createdAt <= :endDate', { endDate })
       .groupBy('order.orderStatus')
       .getRawMany();
 

@@ -13,6 +13,32 @@
   margin-bottom: $spacing-lg;
 }
 
+.filtersSection {
+  background: $bg-secondary;
+  border-radius: $border-radius-lg;
+  padding: $spacing-lg;
+  margin-bottom: $spacing-lg;
+  display: flex;
+  flex-direction: column;
+  gap: $spacing-md;
+
+  @include mobile {
+    padding: $spacing-md;
+  }
+}
+
+.topRow {
+  display: flex;
+  gap: $spacing-md;
+  align-items: center;
+  flex-wrap: wrap;
+
+  @include mobile {
+    flex-direction: column;
+    align-items: stretch;
+  }
+}
+
 .section {
   background: $bg-secondary;
   border-radius: $border-radius-lg;

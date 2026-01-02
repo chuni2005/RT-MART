@@ -11,6 +11,14 @@
   margin-bottom: $spacing-xl;
 }
 
+.filtersSection {
+  background: $bg-secondary;
+  border-radius: $border-radius-md;
+  padding: $spacing-lg;
+  margin-bottom: $spacing-xl;
+  box-shadow: $shadow-sm;
+}
+
 .loading,
 .error {
   @include flex-center;

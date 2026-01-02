@@ -1,4 +1,5 @@
-import { IsOptional, IsString } from 'class-validator';
+import { IsOptional, IsString, IsBoolean } from 'class-validator';
+import { Transform } from 'class-transformer';
 
 export class QueryStoreDto {
   @IsString()
@@ -12,4 +13,9 @@ export class QueryStoreDto {
   @IsString()
   @IsOptional()
   limit?: string;
+
+  @IsBoolean()
+  @IsOptional()
+  @Transform(({ value }) => value === 'true' || value === true)
+  includeSuspended?: boolean;
 }

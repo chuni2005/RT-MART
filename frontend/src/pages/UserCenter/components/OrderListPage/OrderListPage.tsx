@@ -1,28 +1,38 @@
-import { useState, useEffect } from "react";
-import { useNavigate } from "react-router-dom";
+import { useState, useEffect, useRef } from "react";
+import { useNavigate, Navigate } from "react-router-dom";
 import Tab from "@/shared/components/Tab";
 import OrderCard from "../OrderCard";
 import EmptyState from "@/shared/components/EmptyState";
 import Dialog from "@/shared/components/Dialog";
 import Alert from "@/shared/components/Alert";
-import { OrderListItem, OrderStatus } from "@/types/order";
+import { AlertType, OrderListItem, OrderStatus } from "@/types";
 import { OrderAction } from "@/types/userCenter";
-import { getOrders, cancelOrder, confirmDelivery } from "@/shared/services/orderService";
+import {
+  getOrders,
+  cancelOrder,
+  confirmDelivery,
+  getOrderDetail,
+} from "@/shared/services/orderService";
+import cartService from "@/shared/services/cartService";
+import { useAuth } from "@/shared/contexts/AuthContext";
 import styles from "./OrderListPage.module.scss";
 
 /**
  * 訂單列表頁面
  */
 function OrderListPage() {
+  const { user } = useAuth();
   const navigate = useNavigate();
+
+  // SECURITY: Defense in depth - block admin access even if routing fails
+  if (user?.role === "admin") {
+    return <Navigate to="/admin/dashboard" replace />;
+  }
+  const alertRef = useRef<HTMLDivElement>(null);
   const [activeTab, setActiveTab] = useState<string>("all");
   const [orders, setOrders] = useState<OrderListItem[]>([]);
   const [isLoading, setIsLoading] = useState(true);
   const [isProcessing, setIsProcessing] = useState<string | null>(null);
-  const [alertMessage, setAlertMessage] = useState<{
-    type: 'success' | 'error';
-    message: string;
-  } | null>(null);
   const [confirmDialog, setConfirmDialog] = useState<{
     isOpen: boolean;
     orderId: string;
@@ -30,6 +40,24 @@ function OrderListPage() {
     title: string;
     message: string;
   } | null>(null);
+  const [alert, setAlert] = useState<{
+    type: AlertType;
+    message: string;
+  } | null>(null);
+
+  const showAlert = (
+    alertData: { type: AlertType; message: string } | null
+  ) => {
+    setAlert(alertData);
+    if (alertData && alertRef.current) {
+      setTimeout(() => {
+        alertRef.current?.scrollIntoView({
+          behavior: "smooth",
+          block: "center",
+        });
+      }, 100);
+    }
+  };
 
   // Tab 項目定義
   const tabItems = [
@@ -67,6 +95,55 @@ function OrderListPage() {
     navigate(`/user/orders/${orderId}`);
   };
 
+  // 處理再買一次
+  const handleReorder = async (orderId: string) => {
+    try {
+      setIsProcessing(orderId);
+
+      // 取得該訂單詳細資訊（包含商品列表）
+      const order = await getOrderDetail(orderId);
+
+      if (!order.items || order.items.length === 0) {
+        throw new Error("此訂單沒有可重新購買的商品。");
+      }
+
+      // 將所有商品重新加入購物車
+      const addTasks = order.items.map((item) =>
+        cartService.addToCart(item.productId, item.quantity)
+      );
+
+      // 等待所有 API 請求完成
+      const results = await Promise.all(addTasks);
+
+      // 檢查是否所有商品都成功加入
+      const failedTask = results.find((r) => !r.success);
+      if (failedTask) {
+        throw new Error(
+          failedTask.message || "部分商品庫存不足，無法加入購物車。"
+        );
+      }
+
+      showAlert({
+        type: "success",
+        message: "已將訂單商品加入購物車！正在前往購物車...",
+      });
+
+      // 導向購物車頁面
+      setTimeout(() => {
+        navigate("/cart");
+      }, 800);
+    } catch (error) {
+      console.error("Reorder failed:", error);
+      showAlert({
+        type: "error",
+        message:
+          error instanceof Error ? error.message : "再買一次失敗，請稍後再試。",
+      });
+    } finally {
+      setIsProcessing(null);
+    }
+  };
+
   // 處理訂單操作
   const handleAction = (orderId: string, action: OrderAction) => {
     switch (action) {
@@ -94,18 +171,20 @@ function OrderListPage() {
 
       case "pay":
         // TODO: 後續跳出 dialog 讓用戶信用卡支付
-        setAlertMessage({
+        showAlert({
           type: "error",
           message: "付款功能開發中，敬請期待。",
         });
         break;
 
       case "review":
-      case "reorder":
-        setAlertMessage({
+        showAlert({
           type: "error",
           message: "此功能尚未開放，敬請期待。",
         });
+        break;
+      case "reorder":
+        handleReorder(orderId);
         break;
 
       default:
@@ -126,7 +205,7 @@ function OrderListPage() {
       switch (action) {
         case "confirm":
           await confirmDelivery(orderId);
-          setAlertMessage({
+          showAlert({
             type: "success",
             message: "已確認收貨，訂單完成！",
           });
@@ -134,7 +213,7 @@ function OrderListPage() {
 
         case "cancel":
           await cancelOrder(orderId);
-          setAlertMessage({
+          showAlert({
             type: "success",
             message: "訂單已成功取消。",
           });
@@ -143,12 +222,12 @@ function OrderListPage() {
 
       // 刷新訂單列表
       await fetchOrders();
-
     } catch (error) {
       console.error("Order action failed:", error);
-      setAlertMessage({
+      showAlert({
         type: "error",
-        message: error instanceof Error ? error.message : "操作失敗，請稍後再試。",
+        message:
+          error instanceof Error ? error.message : "操作失敗，請稍後再試。",
       });
     } finally {
       setIsProcessing(null);
@@ -168,6 +247,17 @@ function OrderListPage() {
         className={styles.orderTabs}
       />
 
+      {/* 提示訊息 */}
+      {alert && (
+        <div ref={alertRef}>
+          <Alert
+            type={alert.type}
+            message={alert.message}
+            onClose={() => setAlert(null)}
+          />
+        </div>
+      )}
+
       {/* 訂單列表 */}
       <div className={styles.orderList}>
         {isLoading ? (
@@ -186,15 +276,6 @@ function OrderListPage() {
           <EmptyState type="order" icon="receipt" title="暫無訂單" />
         )}
       </div>
-
-      {/* 提示訊息 */}
-      {alertMessage && (
-        <Alert
-          type={alertMessage.type}
-          message={alertMessage.message}
-          onClose={() => setAlertMessage(null)}
-        />
-      )}
 
       {/* 確認對話框 */}
       {confirmDialog && (

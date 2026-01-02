@@ -16,6 +16,7 @@ interface BackendUser {
   name: string;
   email: string;
   phoneNumber: string | null;
+  avatarUrl: string | null;
   role: string;
   createdAt: string;
   updatedAt: string;
@@ -32,6 +33,7 @@ export const updateProfile = async (data: UpdateProfileRequest): Promise<User> =
       name: data.name,
       email: data.email,
       phoneNumber: data.phone, // 映射前端 phone 到底層 phoneNumber
+      avatarUrl: data.avatar,
     });
     
     const updatedUser = mapUserResponseToUser(backendUser);

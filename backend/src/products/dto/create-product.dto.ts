@@ -1,14 +1,10 @@
 import {
-  IsArray,
   IsNotEmpty,
-  IsNumber,
   IsOptional,
   IsPositive,
   IsString,
-  IsUrl,
   Length,
   Min,
-  ValidateNested,
 } from 'class-validator';
 import { Type } from 'class-transformer';
 

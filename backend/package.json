@@ -27,7 +27,8 @@
     "migration:generate": "typeorm-ts-node-commonjs migration:generate -n NewMigration -d src/config/data-source.ts",
     "migration:show": "typeorm-ts-node-commonjs migration:show -d src/config/data-source.ts",
     "seed": "ts-node -r tsconfig-paths/register src/seed/seed.runner.ts",
-    "seed:force": "ts-node -r tsconfig-paths/register src/seed/seed.runner.ts --force"
+    "seed:force": "ts-node -r tsconfig-paths/register src/seed/seed.runner.ts --force",
+    "type-check": "tsc --noEmit"
   },
   "dependencies": {
     "@nestjs/common": "^11.0.1",

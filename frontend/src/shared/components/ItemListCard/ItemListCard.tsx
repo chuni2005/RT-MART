@@ -1,3 +1,4 @@
+import { useState, useEffect } from "react";
 import type { ItemListCardProps } from "@/types";
 import styles from "./ItemListCard.module.scss";
 import Button from "../Button";
@@ -24,12 +25,34 @@ function ItemListCard(props: ItemListCardProps) {
       onDelete?: () => void;
     };
 
+    // 本地狀態管理輸入值
+    const [localQuantity, setLocalQuantity] = useState<number | string>(item.quantity);
+
+    // 當 item.quantity 從外部更新時（例如從 API 更新後），同步本地狀態
+    useEffect(() => {
+      setLocalQuantity(item.quantity);
+    }, [item.quantity]);
+
+    // 處理本地輸入變更
     const handleQuantityChange = (newQuantity: number | string) => {
+      setLocalQuantity(newQuantity);
+    };
+
+    // 只在失去焦點時觸發 API 更新
+    const handleQuantityBlur = () => {
       const numQuantity =
-        typeof newQuantity === "string"
-          ? parseInt(newQuantity, 10)
-          : newQuantity;
-      if (editable && onQuantityChange) {
+        typeof localQuantity === "string"
+          ? parseInt(localQuantity, 10)
+          : localQuantity;
+
+      // 確保數量有效且大於 0，並且與當前 item.quantity 不同時才更新
+      if (
+        editable &&
+        onQuantityChange &&
+        !isNaN(numQuantity) &&
+        numQuantity >= 1 &&
+        numQuantity !== item.quantity
+      ) {
         onQuantityChange(numQuantity);
       }
     };
@@ -78,8 +101,9 @@ function ItemListCard(props: ItemListCardProps) {
           <div className={styles.quantityWrapper}>
             {editable ? (
               <QuantitySelector
-                value={item.quantity}
+                value={localQuantity}
                 onChange={handleQuantityChange}
+                onBlur={handleQuantityBlur}
                 max={item.stock}
                 min={1}
                 size="sm"

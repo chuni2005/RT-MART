@@ -31,7 +31,13 @@ export class CreateUserDto {
 
   @IsEmail()
   @IsNotEmpty()
+  @IsString()
   email: string;
+
+  @IsString()
+  @IsOptional()
+  @IsString()
+  avatarUrl?: string;
 
   @IsString()
   @IsOptional()

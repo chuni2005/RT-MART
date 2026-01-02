@@ -14,17 +14,22 @@ import { StoresModule } from './stores/stores.module';
 import { ProductTypesModule } from './product-types/product-types.module';
 import { ProductsModule } from './products/products.module';
 import { InventoryModule } from './inventory/inventory.module';
-import { CartsModule } from './carts/carts.module';
+import { CartItemsModule } from './carts-item/cart-items.module';
 import { OrdersModule } from './orders/orders.module';
 import { DiscountsModule } from './discounts/discounts.module';
 import { AuditLogsModule } from './audit-logs/audit-logs.module';
 import { CartHistoryModule } from './cart-history/cart-history.module';
 import { AdminModule } from './admin/admin.module';
+import { ReviewModule } from './review/review.module';
+import { HealthModule } from './health/health.module';
+import { SseModule } from './sse/sse.module';
 import { MailModule } from './mail/mail.module';
 import { EmailVerificationModule } from './email-verification/email-verification.module';
 
 @Module({
   imports: [
+    HealthModule,
+    SseModule,
     // allow the app to read `.env` properly
     ConfigModule.forRoot({
       isGlobal: true,
@@ -58,7 +63,7 @@ import { EmailVerificationModule } from './email-verification/email-verification
     InventoryModule,
 
     // Phase 3: Cart & Order modules
-    CartsModule,
+    CartItemsModule,
     OrdersModule,
 
     // Phase 4: Discount modules
@@ -69,10 +74,6 @@ import { EmailVerificationModule } from './email-verification/email-verification
     CartHistoryModule,
 
     AdminModule,
-
-    // Phase 6: Email & Notification modules
-    MailModule,
-    EmailVerificationModule,
   ],
   controllers: [AppController],
   providers: [AppService],

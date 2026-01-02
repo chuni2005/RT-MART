@@ -3,6 +3,8 @@ import {
   NotFoundException,
   BadRequestException,
   ForbiddenException,
+  Inject,
+  forwardRef,
 } from '@nestjs/common';
 import { InjectRepository } from '@nestjs/typeorm';
 import { Repository } from 'typeorm';
@@ -18,6 +20,7 @@ export class InventoryService {
     @InjectRepository(Inventory)
     private readonly inventoryRepository: Repository<Inventory>,
     private readonly storesService: StoresService,
+    @Inject(forwardRef(() => ProductsService))
     private readonly productsService: ProductsService,
     private readonly sellerService: SellersService,
   ) {}

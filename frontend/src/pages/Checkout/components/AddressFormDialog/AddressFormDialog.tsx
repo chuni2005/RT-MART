@@ -8,6 +8,7 @@ import {
   cityOptions,
   getDistrictsByCity,
 } from "@/shared/utils/taiwanAddressData";
+import { validatePhone, validatePostalCode } from "@/shared/utils/validation";
 import styles from "./AddressFormDialog.module.scss";
 
 export interface AddressFormData {
@@ -74,16 +75,13 @@ function AddressFormDialog({
       recipientName: (value) => (!value.trim() ? "請輸入收件人姓名" : null),
       phone: (value) => {
         if (!value.trim()) return "請輸入聯絡電話";
-        if (!/^09\d{8}$/.test(value))
-          return "請輸入有效的手機號碼（例：0912345678）";
-        return null;
+        return validatePhone(value);
       },
       city: (value) => (!value ? "請選擇城市" : null),
       district: (value) => (!value ? "請選擇區域" : null),
       postalCode: (value) => {
         if (!value.trim()) return "請輸入郵遞區號";
-        if (!/^\d{3,5}$/.test(value)) return "請輸入有效的郵遞區號";
-        return null;
+        return validatePostalCode(value);
       },
       addressLine1: (value) => (!value.trim() ? "請輸入詳細地址" : null),
     }
@@ -143,7 +141,7 @@ function AddressFormDialog({
           type="tel"
           value={values.phone}
           onChange={handleChange}
-          placeholder="0912345678"
+          placeholder="0912-345-678"
           error={errors.phone}
           required
           fieldName="聯絡電話"

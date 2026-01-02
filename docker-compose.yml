@@ -2,6 +2,7 @@ services:
   mariadb:
     image: mariadb:11.2
     container_name: rt_mart_mariadb
+    command: --lower-case-table-names=1
     ports:
       - "3306:3306"
     environment:
@@ -64,7 +65,7 @@ services:
         condition: service_healthy
     healthcheck:
       # Check if backend API is responding
-      test: ["CMD", "curl", "-f", "http://localhost:3000/health"]
+      test: ["CMD", "curl", "-f", "http://localhost:3000/api/health"]
       interval: 30s
       timeout: 10s
       retries: 3

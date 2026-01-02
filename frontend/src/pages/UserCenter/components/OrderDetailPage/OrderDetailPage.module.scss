@@ -64,35 +64,43 @@
 
   // 根據狀態顯示不同顏色
   &.pending_payment {
-    background: #fff3cd;
-    color: #856404;
+    background: $order-pending-payment-bg;
+    color: $order-pending-payment-text;
   }
 
   &.payment_failed {
-    background: #f8d7da;
-    color: #721c24;
+    background: $order-payment-failed-bg;
+    color: $order-payment-failed-text;
   }
 
-  &.paid,
+  &.paid {
+    background: $order-paid-bg;
+    color: $order-paid-text;
+  }
+
   &.processing {
-    background: #cce5ff;
-    color: #004085;
+    background: $order-processing-bg;
+    color: $order-processing-text;
   }
 
-  &.shipped,
+  &.shipped {
+    background: $order-shipped-bg;
+    color: $order-shipped-text;
+  }
+
   &.delivered {
-    background: #d4edda;
-    color: #155724;
+    background: $order-delivered-bg;
+    color: $order-delivered-text;
   }
 
   &.completed {
-    background: #d1ecf1;
-    color: #0c5460;
+    background: $order-completed-bg;
+    color: $order-completed-text;
   }
 
   &.cancelled {
-    background: #f8d7da;
-    color: #721c24;
+    background: $order-cancelled-bg;
+    color: $order-cancelled-text;
   }
 }
 

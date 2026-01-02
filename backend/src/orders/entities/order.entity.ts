@@ -149,10 +149,10 @@ export class Order {
   store: Store;
 
   @OneToMany(() => OrderItem, (item) => item.order, { cascade: true })
-  items?: OrderItem[];
+  items: OrderItem[];
 
   @OneToMany(() => OrderDiscount, (orderDiscount) => orderDiscount.order, {
     cascade: true,
   })
-  orderDiscounts?: OrderDiscount[];
+  orderDiscounts: OrderDiscount[];
 }

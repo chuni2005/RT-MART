@@ -9,6 +9,7 @@ export class CreateUserTable20251116030000 implements MigrationInterface {
         password_hash VARCHAR(255) NOT NULL,
         name VARCHAR(100) NOT NULL,
         email VARCHAR(100) NOT NULL UNIQUE,
+        avatar_url VARCHAR(255),
         phone_number VARCHAR(20),
         role ENUM('buyer', 'seller', 'admin') NOT NULL,
         deleted_at TIMESTAMP NULL,

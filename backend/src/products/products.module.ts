@@ -1,4 +1,4 @@
-import { Module } from '@nestjs/common';
+import { forwardRef, Module } from '@nestjs/common';
 import { TypeOrmModule } from '@nestjs/typeorm';
 import { ProductsService } from './products.service';
 import { ProductsController } from './products.controller';
@@ -9,6 +9,7 @@ import { StoresModule } from '../stores/stores.module';
 import { CloudinaryService } from '../cloudinary/cloudinary.service';
 import { SellersModule } from '../sellers/sellers.module';
 import { CloudinaryModule } from '../cloudinary/cloudinary.module';
+import { InventoryModule } from '../inventory/inventory.module';
 import { Inventory } from '../inventory/entities/inventory.entity';
 
 @Module({
@@ -16,8 +17,10 @@ import { Inventory } from '../inventory/entities/inventory.entity';
     TypeOrmModule.forFeature([Product, ProductImage, Inventory]),
     ProductTypesModule,
     StoresModule,
+    StoresModule,
     SellersModule,
     CloudinaryModule,
+    forwardRef(() => InventoryModule),
   ],
   controllers: [ProductsController],
   providers: [ProductsService, CloudinaryService],

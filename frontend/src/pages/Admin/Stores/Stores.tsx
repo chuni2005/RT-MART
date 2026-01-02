@@ -42,14 +42,12 @@ function Stores() {
     setSearched(true);
     setAlert(null);
     try {
-      const { stores: allStores } = await adminService.getStores();
-      const filtered = allStores.filter(
-        (store) =>
-          store.store_name.toLowerCase().includes(keyword.toLowerCase()) ||
-          store.store_id.toLowerCase().includes(keyword.toLowerCase()) ||
-          store.seller_name.toLowerCase().includes(keyword.toLowerCase())
-      );
-      setStores(filtered);
+      // Let backend do the filtering instead of fetching all stores
+      const { stores } = await adminService.getStores({
+        search: keyword,
+        includeSuspended: true, // Include suspended stores in search
+      });
+      setStores(stores);
     } catch (error) {
       console.error('搜尋商家失敗:', error);
       showAlert({ type: 'error', message: '搜尋商家失敗' });
@@ -155,7 +153,7 @@ function Stores() {
                     <div className={styles.rating}>
                       <Icon icon="star" className={styles.starIcon} />
                       <span>
-                        {store.rating.toFixed(1)} ({store.total_ratings})
+                        {typeof store.rating === 'number' ? store.rating.toFixed(1) : '0.0'} ({store.total_ratings})
                       </span>
                     </div>
                   </td>

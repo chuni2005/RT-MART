@@ -42,8 +42,11 @@ export const AuthProvider = ({ children }: AuthProviderProps) => {
       setUser(userData);
       setIsAuthenticated(true);
     } catch (error) {
-      console.error('Auth check failed:', error);
-      clearAuth();
+      // 401 / token 過期時，改由這裡控制導航
+      setUser(null);
+      setIsAuthenticated(false);
+      console.warn("User not logged in, will show login page");
+      console.error("Auth check failed:", error);
     } finally {
       setIsLoading(false);
     }

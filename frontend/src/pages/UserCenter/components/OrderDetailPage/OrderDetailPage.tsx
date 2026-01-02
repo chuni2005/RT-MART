@@ -1,11 +1,13 @@
-import { useState, useEffect } from 'react';
-import { useParams, useNavigate } from 'react-router-dom';
+import { useState, useEffect, useCallback } from 'react';
+import { useParams, useNavigate, Navigate } from 'react-router-dom';
 import { getOrderDetail } from '@/shared/services/orderService';
 import type { Order, OrderStatus, PaymentMethod } from '@/types/order';
 import Button from '@/shared/components/Button';
 import OrderTimeline from '@/pages/UserCenter/components/OrderTimeline';
 import ItemListCard from '@/shared/components/ItemListCard';
 import AddressCard from '@/pages/Checkout/components/AddressCard';
+import { useSSE } from '@/shared/hooks/useSSE';
+import { useAuth } from '@/shared/contexts/AuthContext';
 import styles from './OrderDetailPage.module.scss';
 
 /**
@@ -13,8 +15,14 @@ import styles from './OrderDetailPage.module.scss';
  */
 function OrderDetailPage() {
   // ========== 1. Hooks 與 State ==========
+  const { user } = useAuth();
   const { order_id } = useParams<{ order_id: string }>();
   const navigate = useNavigate();
+
+  // SECURITY: Defense in depth - block admin access even if routing fails
+  if (user?.role === "admin") {
+    return <Navigate to="/admin/dashboard" replace />;
+  }
 
   const [order, setOrder] = useState<Order | null>(null);
   const [isLoading, setIsLoading] = useState(true);
@@ -23,14 +31,14 @@ function OrderDetailPage() {
   // ========== 2. 副作用 ==========
   useEffect(() => {
     if (!order_id) {
-      navigate('/user-center/orders');
+      navigate('/user/orders');
       return;
     }
     fetchOrderDetail();
   }, [order_id]);
 
   // ========== 3. 數據獲取 ==========
-  const fetchOrderDetail = async () => {
+  const fetchOrderDetail = useCallback(async () => {
     try {
       setIsLoading(true);
       setError(null);
@@ -42,7 +50,18 @@ function OrderDetailPage() {
     } finally {
       setIsLoading(false);
     }
-  };
+  }, [order_id]);
+
+  // ========== SSE Real-time Updates ==========
+  useSSE({
+    'order:updated': useCallback((data: { orderId: string; status: OrderStatus }) => {
+      // Only update if this is the current order
+      if (data.orderId === order_id) {
+        console.log('Order updated via SSE, refreshing...');
+        fetchOrderDetail();
+      }
+    }, [order_id, fetchOrderDetail]),
+  });
 
   // ========== 4. 輔助函數 ==========
   const getStatusLabel = (status: OrderStatus): string => {
@@ -104,7 +123,7 @@ function OrderDetailPage() {
       <div className={styles.orderDetailPage}>
         <div className={styles.error}>
           <p>{error || '訂單不存在'}</p>
-          <Button variant="primary" onClick={() => navigate('/user-center/orders')}>
+          <Button variant="primary" onClick={() => navigate('/user/orders')}>
             返回訂單列表
           </Button>
         </div>
@@ -119,7 +138,7 @@ function OrderDetailPage() {
       <Button
         variant="ghost"
         icon="arrow-left"
-        onClick={() => navigate('/user-center/orders')}
+        onClick={() => navigate('/user/orders')}
         className={styles.backButton}
       >
         返回訂單列表

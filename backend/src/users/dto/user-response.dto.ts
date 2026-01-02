@@ -16,6 +16,9 @@ export class UserResponseDto {
   email: string;
 
   @Expose()
+  avatarUrl: string | null;
+
+  @Expose()
   phoneNumber: string | null;
 
   @Expose()
@@ -26,4 +29,7 @@ export class UserResponseDto {
 
   @Expose()
   updatedAt: Date;
+
+  @Expose()
+  deletedAt: Date | null;
 }

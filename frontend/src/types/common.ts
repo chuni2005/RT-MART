@@ -4,6 +4,18 @@ import type { StoreOrderGroup } from './order';
 
 // Common component prop types
 
+// DateRangeFilter types
+export interface DateRangeFilterProps {
+  startDate: string;
+  endDate: string;
+  onStartDateChange: (date: string) => void;
+  onEndDateChange: (date: string) => void;
+  showQuickSelectors?: boolean;
+  onQuickSelect?: (period: 'day' | 'week' | 'month' | 'year') => void;
+  activeQuickSelector?: 'day' | 'week' | 'month' | 'year' | null;
+  className?: string;
+}
+
 // Alert types
 export type AlertType = 'success' | 'error' | 'warning' | 'info';
 
@@ -198,32 +210,15 @@ export interface CheckoutSummaryProps {
 }
 
 /**
- * CheckoutSummary 購物車模式 Props
- * 用於購物車頁面的結帳摘要
- */
-export interface CheckoutSummaryCartModeProps {
-  mode?: 'cart';
-  subtotal: number;
-  shipping: number;
-  shippingDiscount?: number; // 運費折抵
-  discount: number;
-  total: number;
-  itemCount: number;
-  selectedCount: number;
-  freeShippingThreshold?: number;
-  onCheckout: () => void;
-  disabled?: boolean;
-  buttonText?: string;
-}
-
-/**
- * CheckoutSummary 結帳模式 Props
- * 用於結帳頁面的訂單摘要
+ * CheckoutSummary 統一 Props
+ * 用於購物車和結帳頁面的結帳摘要
  */
 export interface CheckoutSummaryCheckoutModeProps {
-  mode: 'checkout';
   storeGroups: StoreOrderGroup[];
+  selectedCount?: number; // 購物車模式使用：已選取數量
+  appliedDiscounts?: import('./order').ManualDiscountSelection | null;
   onCheckout: () => void;
+  onDiscountChange?: () => void;
   disabled?: boolean;
   buttonText?: string;
 }

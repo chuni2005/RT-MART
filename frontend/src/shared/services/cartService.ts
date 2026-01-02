@@ -58,7 +58,7 @@ interface BackendCart {
  * 後端 Summary API 回應結構
  */
 interface BackendCartSummaryResponse {
-  cart: BackendCart;
+  cart: BackendCartItem[]; // 修改這裡，對應後端回傳的 CartItem[]
   totalItems: number;
   totalAmount: number;
   selectedTotalAmount: number;

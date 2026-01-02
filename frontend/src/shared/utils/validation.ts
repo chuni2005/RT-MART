@@ -165,6 +165,18 @@ export const validateLoginIdentifier = (identifier: string): ValidationError => 
 };
 
 /**
+ * 郵遞區號格式驗證
+ */
+export const validatePostalCode = (postalCode: string): ValidationError => {
+  const postalCodeRegex = /^\d{3,5}$/;
+  if (!postalCodeRegex.test(postalCode)) {
+    return '請輸入有效的郵遞區號'; // TODO: i18n
+  }
+
+  return null;
+};
+
+/**
  * 銀行賬號 格式驗證
  */
 export const validateBankAccount = (bank_account_reference: string): ValidationError => {

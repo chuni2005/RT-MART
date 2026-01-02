@@ -1,13 +1,14 @@
 // Review related types
 export interface Review {
   id: string;
-  userId: string;
-  userName: string;
-  userAvatar: string | null;
-  rating: number;
+  productId: string; // 關聯商品
+  userId: string;            // 關聯用戶
+  userName: string;          // 顯示用
+  userAvatar: string | null; // 顯示用
+  rating: number;            // 1-5
   content: string;
-  images: string[];
-  createdAt: string;
+  images: string[];          // 圖片陣列
+  createdAt: string;         // 建立時間
 }
 
 export interface ReviewStatistics {

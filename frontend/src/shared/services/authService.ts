@@ -20,6 +20,7 @@ export const mapUserResponseToUser = (data: {
   name: string;
   email: string;
   phoneNumber: string | null;
+  avatarUrl?: string | null;
   role: string;
 }): User => {
   return {
@@ -28,7 +29,7 @@ export const mapUserResponseToUser = (data: {
     name: data.name,
     email: data.email,
     phone: data.phoneNumber ?? '',
-    avatar: "https://media.tenor.com/fGLpFBW-QBoAAAAe/memecat.png",
+    avatar: data.avatarUrl || "https://media.tenor.com/fGLpFBW-QBoAAAAe/memecat.png",
     role: data.role as 'buyer' | 'seller' | 'admin',
   }
 }
@@ -47,6 +48,7 @@ const fetchFullUser = async (): Promise<User> => {
     name: string;
     email: string;
     phoneNumber: string | null;
+    avatarUrl: string | null;
     role: string;
   }>(`/users/${profile.userId}`);
 

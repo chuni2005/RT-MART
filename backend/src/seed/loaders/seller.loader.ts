@@ -46,12 +46,14 @@ export class SellerLoader extends BaseLoader<Seller> {
       seller.rejectedAt = DataMapper.parseDate(
         typeof data.rejected_at === 'string' ? data.rejected_at : null,
       );
-      seller.createdAt = DataMapper.parseDate(
-        typeof data.created_at === 'string' ? data.created_at : null,
-      ) || new Date();
-      seller.updatedAt = DataMapper.parseDate(
-        typeof data.updated_at === 'string' ? data.updated_at : null,
-      ) || new Date();
+      seller.createdAt =
+        DataMapper.parseDate(
+          typeof data.created_at === 'string' ? data.created_at : null,
+        ) || new Date();
+      seller.updatedAt =
+        DataMapper.parseDate(
+          typeof data.updated_at === 'string' ? data.updated_at : null,
+        ) || new Date();
 
       return Promise.resolve(seller);
     } catch {

@@ -1,0 +1,93 @@
+.discountSection {
+  background: #fff;
+  border: 1px solid #e0e0e0;
+  border-radius: 4px;
+  padding: 1rem;
+  margin-bottom: 1.5rem;
+}
+
+.header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: 0.75rem;
+
+  h3 {
+    font-size: 1rem;
+    font-weight: 600;
+    margin: 0;
+  }
+}
+
+.discountsList {
+  display: flex;
+  flex-direction: column;
+  gap: 0.5rem;
+}
+
+.discountItem {
+  position: relative;
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  padding: 0.5rem 0.75rem;
+  background: #f5f5f5;
+  border-radius: 4px;
+  cursor: help;
+  transition: background 0.2s;
+
+  &:hover {
+    background: #ececec;
+  }
+}
+
+.type {
+  font-size: 0.9rem;
+  color: #333;
+}
+
+.amount {
+  font-size: 0.9rem;
+  font-weight: 600;
+  color: #d32f2f;
+}
+
+.tooltip {
+  position: absolute;
+  top: 100%;
+  left: 0;
+  right: 0;
+  margin-top: 0.5rem;
+  padding: 0.75rem;
+  background: #fff;
+  border: 1px solid #ddd;
+  border-radius: 4px;
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.15);
+  z-index: 10;
+  font-size: 0.875rem;
+
+  strong {
+    color: #1976d2;
+  }
+
+  div {
+    margin-bottom: 0.25rem;
+
+    &:last-child {
+      margin-bottom: 0;
+    }
+  }
+}
+
+.tooltipAmount {
+  color: #d32f2f;
+  font-weight: 600;
+}
+
+.noDiscount {
+  color: #757575;
+  font-size: 0.9rem;
+  margin: 0;
+  padding: 0.5rem;
+  text-align: center;
+}

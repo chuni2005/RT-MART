@@ -55,22 +55,97 @@ export const applyToBeSeller = async (
 
 /**
  * 獲取 Dashboard 數據
- * 目前後端尚未提供整合的 Dashboard API，暫時保留 Mock
+ * GET /sellers/dashboard?period=&startDate=&endDate=&productName=
  */
-export const getDashboardData = async (period: SalesPeriod): Promise<DashboardData> => {
-  // Mock 數據
-  return new Promise((resolve) => {
-    setTimeout(() => {
-      resolve({
-        revenue: period === 'day' ? 15000 : period === 'week' ? 50000 : 180000,
-        orderCount: period === 'day' ? 20 : period === 'week' ? 120 : 450,
-        chartData: generateMockChartData(period),
-        categoryData: generateMockCategoryData(),
-        popularProducts: MOCK_POPULAR_PRODUCTS,
-        recentOrders: MOCK_RECENT_ORDERS
-      });
-    }, 500);
-  });
+export const getDashboardData = async (filters: {
+  period?: SalesPeriod;
+  startDate?: string;
+  endDate?: string;
+  productName?: string;
+}): Promise<DashboardData> => {
+  const queryParams = new URLSearchParams();
+
+  if (filters.period) {
+    queryParams.append('period', filters.period);
+  }
+  if (filters.startDate) {
+    queryParams.append('startDate', filters.startDate);
+  }
+  if (filters.endDate) {
+    queryParams.append('endDate', filters.endDate);
+  }
+  if (filters.productName) {
+    queryParams.append('productName', filters.productName);
+  }
+
+  const response = await api.get<any>(`/sellers/dashboard?${queryParams.toString()}`);
+
+  return {
+    revenue: Number(response.revenue || 0),
+    orderCount: Number(response.orderCount || 0),
+    chartData: response.chartData || [],
+    categoryData: response.categoryData || [],
+    popularProducts: (response.popularProducts || []).map((p: any) => ({
+      id: p.id,
+      name: p.name,
+      image: p.image,
+      salesCount: Number(p.salesCount || 0),
+      revenue: Number(p.revenue || 0),
+    })),
+    recentOrders: (response.recentOrders || []).map((o: any) => ({
+      id: o.id,
+      orderNumber: o.orderNumber,
+      buyerName: o.buyerName,
+      itemCount: Number(o.itemCount || 0),
+      totalAmount: Number(o.totalAmount || 0),
+      status: o.status,
+      createdAt: o.createdAt,
+    })),
+  };
+};
+
+/**
+ * 下載銷售報表
+ * GET /sellers/sales-report?startDate=&endDate=&productName=
+ */
+export const downloadSalesReport = async (filters: {
+  startDate?: string;
+  endDate?: string;
+  productName?: string;
+}): Promise<void> => {
+  const queryParams = new URLSearchParams();
+  if (filters.startDate) queryParams.append('startDate', filters.startDate);
+  if (filters.endDate) queryParams.append('endDate', filters.endDate);
+  if (filters.productName) queryParams.append('productName', filters.productName);
+
+  const response = await fetch(
+    `/api/sellers/sales-report?${queryParams.toString()}`,
+    {
+      method: 'GET',
+      credentials: 'include', // 使用 cookie 认证
+    }
+  );
+
+  if (!response.ok) {
+    throw new Error('Failed to download report');
+  }
+
+  // Extract filename from Content-Disposition header
+  const contentDisposition = response.headers.get('Content-Disposition');
+  const filename = contentDisposition
+    ? contentDisposition.split('filename=')[1].replace(/"/g, '')
+    : `sales_report_${new Date().toISOString().split('T')[0]}.csv`;
+
+  // Create blob and trigger download
+  const blob = await response.blob();
+  const url = window.URL.createObjectURL(blob);
+  const a = document.createElement('a');
+  a.href = url;
+  a.download = filename;
+  document.body.appendChild(a);
+  a.click();
+  document.body.removeChild(a);
+  window.URL.revokeObjectURL(url);
 };
 
 // ========== Store Settings ==========
@@ -295,14 +370,27 @@ export const deactivateProduct = async (id: string): Promise<void> => {
 /**
  * 轉換後端訂單項目數據為前端格式
  */
-const transformOrderItem = (item: any) => ({
-  id: item.orderItemId,
-  productId: item.productId || item.productSnapshot?.productId,
-  productName: item.productSnapshot?.product_name || item.productSnapshot?.productName || 'Unknown Product',
-  productImage: item.productSnapshot?.images?.[0]?.imageUrl || '',
-  quantity: item.quantity || 0,
-  price: Number(item.unitPrice || item.price || 0),
-});
+const transformOrderItem = (item: any) => {
+  const snapshot = item.productSnapshot || {};
+
+  // 嘗試從不同的可能欄位獲取圖片 URL
+  let productImage = '';
+
+  if (snapshot.images && Array.isArray(snapshot.images) && snapshot.images.length > 0) {
+    // Product entity has images relation loaded
+    const firstImage = snapshot.images[0];
+    productImage = firstImage.imageUrl || firstImage.image_url || '';
+  }
+
+  return {
+    id: item.orderItemId,
+    productId: item.productId || snapshot.productId || snapshot.product_id,
+    productName: snapshot.product_name || snapshot.productName || 'Unknown Product',
+    productImage,
+    quantity: item.quantity || 0,
+    price: Number(item.unitPrice || item.price || 0),
+  };
+};
 
 /**
  * 轉換後端訂單數據為前端格式
@@ -435,12 +523,12 @@ export const getDiscount = async (id: string): Promise<Discount> => {
 /**
  * 創建折扣
  */
-export const createDiscount = async (data: DiscountFormData): Promise<void> => {
+export const createDiscount = async (data: DiscountFormData): Promise<Discount> => {
   const store = await getStoreInfo();
   if (!store.storeId) throw new Error('Store ID not found');
 
   const body = {
-    discountCode: data.discountCode,
+    // discountCode removed - backend generates it
     name: data.name,
     description: data.description,
     minPurchaseAmount: data.minPurchaseAmount,
@@ -456,7 +544,8 @@ export const createDiscount = async (data: DiscountFormData): Promise<void> => {
     }
   }
 
-  await api.post('/discounts', body);
+  const response = await api.post<any>('/discounts', body);
+  return transformDiscount(response);
 };
 
 /**
@@ -592,6 +681,7 @@ const MOCK_RECENT_ORDERS: RecentOrder[] = [
 export default {
   applyToBeSeller,
   getDashboardData,
+  downloadSalesReport,
   getStoreInfo,
   updateStoreInfo,
   getProducts,

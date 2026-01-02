@@ -186,9 +186,9 @@ function Dialog({
                 )
               )}
               {message && (
-                <p id="dialog-message" className={styles.message}>
+                <div id="dialog-message" className={styles.message}>
                   {message}
-                </p>
+                </div>
               )}
             </>
           )}
