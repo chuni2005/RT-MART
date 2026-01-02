@@ -206,7 +206,6 @@ function Orders() {
       setCancelReason("");
       loadOrders();
     } catch (error) {
-      console.error("更新訂單狀態失敗:", error);
       showAlert({ type: "error", message: "更新訂單狀態失敗" });
     }
   };

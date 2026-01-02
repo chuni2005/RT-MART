@@ -457,7 +457,6 @@ export const updateOrderStatus = async (id: string, status: string, note?: strin
   try {
     await api.patch(`/orders/seller/orders/${id}/status`, { status, note });
   } catch (error: any) {
-    console.error('更新訂單狀態失敗:', error);
 
     const errorMessage = error.message || '';
 

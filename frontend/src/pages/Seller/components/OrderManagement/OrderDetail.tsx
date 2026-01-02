@@ -91,7 +91,6 @@ function OrderDetail() {
         message: '訂單狀態更新成功',
       });
     } catch (error) {
-      console.error("更新訂單狀態失敗:", error);
       showAlert({
         type: 'error',
         message: error instanceof Error ? error.message : '更新訂單狀態失敗，請稍後再試。',
