@@ -74,6 +74,7 @@ import { EmailVerificationModule } from './email-verification/email-verification
     CartHistoryModule,
 
     AdminModule,
+    ReviewModule,
   ],
   controllers: [AppController],
   providers: [AppService],
