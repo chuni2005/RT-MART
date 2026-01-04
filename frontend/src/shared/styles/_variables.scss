@@ -27,6 +27,47 @@ $warning-color: #ffb400;
 $error-color: #ff424f;
 $info-color: #1890ff;
 
+// ========== 订单状态颜色 (Order Status Colors) ==========
+// Pending Payment
+$order-pending-payment-bg: #fff3cd;
+$order-pending-payment-text: #856404;
+$order-pending-payment-solid: #ffc107;
+
+// Payment Failed
+$order-payment-failed-bg: #f8d7da;
+$order-payment-failed-text: #721c24;
+$order-payment-failed-solid: #dc3545;
+
+// Paid
+$order-paid-bg: #cce5ff;
+$order-paid-text: #004085;
+$order-paid-solid: #17a2b8;
+
+// Processing
+$order-processing-bg: #cce5ff;
+$order-processing-text: #004085;
+$order-processing-solid: #007bff;
+
+// Shipped
+$order-shipped-bg: #e2d9f3;
+$order-shipped-text: #4a2a7c;
+$order-shipped-solid: #6f42c1;
+
+// Delivered
+$order-delivered-bg: #d4edda;
+$order-delivered-text: #155724;
+$order-delivered-solid: #28a745;
+
+// Completed
+$order-completed-bg: #d1ecf1;
+$order-completed-text: #0c5460;
+$order-completed-solid: #28a745;
+
+// Cancelled
+$order-cancelled-bg: #f8d7da;
+$order-cancelled-text: #721c24;
+$order-cancelled-solid: #6c757d;
+
 // Gradient
 $gradient-primary: linear-gradient(135deg, #ee4d2d 0%, #ff6b4a 100%);
 $gradient-secondary: linear-gradient(135deg, #ff9800 0%, #ffc107 100%);

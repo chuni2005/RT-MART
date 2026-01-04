@@ -1,0 +1,128 @@
+.dateRangeFilter {
+  display: flex;
+  flex-direction: column;
+  gap: $spacing-md;
+}
+
+.tabContainer {
+  margin-bottom: $spacing-sm;
+}
+
+.tabContent {
+  padding: $spacing-lg;
+  background: $bg-secondary;
+  border: 1px solid $border-color;
+  border-radius: $border-radius-md;
+  min-height: 120px;
+}
+
+.description {
+  display: flex;
+  align-items: center;
+  gap: $spacing-sm;
+  color: $text-secondary;
+  font-size: $font-sm;
+  margin-bottom: $spacing-md;
+
+  svg {
+    width: 16px;
+    height: 16px;
+  }
+}
+
+.quickSelectorsContent,
+.customDateContent {
+  display: flex;
+  flex-direction: column;
+}
+
+.quickSelectors {
+  display: flex;
+  gap: $spacing-sm;
+  flex-wrap: wrap;
+}
+
+.quickButton {
+  padding: $spacing-sm $spacing-md;
+  border: 1px solid $border-color;
+  background: $bg-secondary;
+  border-radius: $border-radius-md;
+  cursor: pointer;
+  font-size: $font-sm;
+  transition: $transition-fast;
+  white-space: nowrap;
+
+  &:hover {
+    background: $bg-tertiary;
+    border-color: $primary-color;
+  }
+
+  &:active {
+    transform: scale(0.98);
+  }
+
+  &.active {
+    background: $primary-color;
+    color: $text-white;
+    border-color: $primary-color;
+    font-weight: 600;
+
+    &:hover {
+      background: $primary-hover;
+      border-color: $primary-hover;
+    }
+  }
+}
+
+.dateInputs {
+  display: flex;
+  gap: $spacing-md;
+  flex-wrap: wrap;
+  align-items: flex-end;
+}
+
+.dateField {
+  display: flex;
+  flex-direction: column;
+  gap: $spacing-sm;
+  flex: 1;
+  min-width: 150px;
+
+  label {
+    font-size: $font-sm;
+    font-weight: 500;
+    color: $text-primary;
+  }
+}
+
+.dateInput {
+  padding: $spacing-sm;
+  border: 1px solid $border-color;
+  border-radius: $border-radius-md;
+  font-size: $font-sm;
+  transition: border-color $duration-fast;
+
+  &:focus {
+    outline: none;
+    border-color: $primary-color;
+  }
+}
+
+// Responsive design
+@media (max-width: 768px) {
+  .dateInputs {
+    flex-direction: column;
+  }
+
+  .dateField {
+    width: 100%;
+  }
+
+  .quickSelectors {
+    justify-content: center;
+  }
+
+  .tabContent {
+    padding: $spacing-md;
+  }
+}

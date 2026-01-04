@@ -40,7 +40,7 @@ export class CartItemsService {
   async addToCart(
     userId: string,
     addToCartDto: AddToCartDto,
-  ): Promise<CartItem> {
+  ): Promise<CartItem[]> {
     // Check if product is already in cart for this user
     const existingItem = await this.cartItemRepository.findOne({
       where: { userId, productId: addToCartDto.productId },
@@ -50,8 +50,14 @@ export class CartItemsService {
     const stock = await this.inventoryService.getAvailableStock(
       addToCartDto.productId,
     );
-    if (stock < addToCartDto.quantity) {
-      throw new BadRequestException('Product quantity is not enough');
+
+    const currentQuantityInCart = existingItem ? existingItem.quantity : 0;
+    const requestedTotal = currentQuantityInCart + addToCartDto.quantity;
+
+    if (stock < requestedTotal) {
+      throw new BadRequestException(
+        `庫存不足。您的購物車已有 ${currentQuantityInCart} 件商品，目前可用庫存為 ${stock}件。`,
+      );
     }
 
     if (existingItem) {
@@ -72,14 +78,14 @@ export class CartItemsService {
       await this.cartItemRepository.save(cartItem);
     }
 
-    return (await this.getCart(userId)) as any;
+    return await this.getCart(userId);
   }
 
   async updateCartItem(
     userId: string,
     cartItemId: string,
     updateDto: UpdateCartItemDto,
-  ): Promise<CartItem> {
+  ): Promise<CartItem[]> {
     const cartItem = await this.cartItemRepository.findOne({
       where: { cartItemId, userId },
     });
@@ -93,20 +99,27 @@ export class CartItemsService {
       cartItem.productId,
     );
 
-    if (stock < updateDto.quantity) {
-      throw new BadRequestException('Insufficient stock for this product');
+    if (updateDto.quantity !== undefined && stock < updateDto.quantity) {
+      throw new BadRequestException(
+        `Insufficient stock. Available stock is ${stock}.`,
+      );
     }
 
-    cartItem.quantity = updateDto.quantity;
+    if (updateDto.quantity !== undefined) {
+      cartItem.quantity = updateDto.quantity;
+    }
+    if (updateDto.selected !== undefined) {
+      cartItem.selected = updateDto.selected;
+    }
     await this.cartItemRepository.save(cartItem);
 
-    return (await this.getCart(userId)) as any;
+    return await this.getCart(userId);
   }
 
   async batchUpdateCartItems(
     userId: string,
     batchDto: BatchUpdateCartItemsDto,
-  ): Promise<CartItem> {
+  ): Promise<CartItem[]> {
     for (const itemUpdate of batchDto.items) {
       const cartItem = await this.cartItemRepository.findOne({
         where: { cartItemId: itemUpdate.cartItemId, userId },
@@ -118,10 +131,13 @@ export class CartItemsService {
       }
     }
 
-    return (await this.getCart(userId)) as any;
+    return await this.getCart(userId);
   }
 
-  async removeFromCart(userId: string, cartItemId: string): Promise<CartItem> {
+  async removeFromCart(
+    userId: string,
+    cartItemId: string,
+  ): Promise<CartItem[]> {
     const cartItem = await this.cartItemRepository.findOne({
       where: { cartItemId, userId },
     });
@@ -132,7 +148,7 @@ export class CartItemsService {
 
     await this.cartItemRepository.remove(cartItem);
 
-    return (await this.getCart(userId)) as any;
+    return await this.getCart(userId);
   }
 
   async clearCart(userId: string): Promise<void> {

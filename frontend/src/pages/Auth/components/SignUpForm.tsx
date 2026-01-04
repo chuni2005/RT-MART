@@ -1,10 +1,15 @@
 /**
- * SignUpForm Component - 註冊表單
- * 功能：用戶名 + Email + 電話 + Password + 確認密碼 + 密碼強度檢查
- * 注意：註冊時 name = loginId，後續可透過個人設定更改 name
+ * SignUpForm Component - 兩步驟註冊表單
+ * Step 1: 基本資料填寫
+ * Step 2: Email 驗證碼驗證
  */
+import { useState } from 'react';
 import FormInput from "@/shared/components/FormInput";
 import PasswordStrength from "./PasswordStrength";
+import VerificationCodeInput from "@/shared/components/VerificationCodeInput/VerificationCodeInput";
+import CountdownTimer from "@/shared/components/CountdownTimer/CountdownTimer";
+import Button from "@/shared/components/Button";
+import Alert from "@/shared/components/Alert";
 import { useForm } from "@/shared/hooks/useForm";
 import {
   validateUsername,
@@ -17,7 +22,9 @@ import styles from "./SignUpForm.module.scss";
 import { useTranslation } from 'react-i18next';
 
 interface SignUpFormProps {
-  onSubmit: (formData: SignUpFormData) => Promise<void>;
+  onSendCode: (formData: SignUpFormData) => Promise<void>;
+  onVerifyCode: (email: string, code: string) => Promise<void>;
+  onResendCode: (email: string) => Promise<void>;
   isLoading: boolean;
 }
 
@@ -38,10 +45,19 @@ interface FormData {
   agreeTerms: boolean;
 }
 
-const SignUpForm = ({ onSubmit, isLoading }: SignUpFormProps) => {
-  // 使用 useForm hook 替換所有手動狀態管理
+const VERIFICATION_TIMEOUT = 300; // 5 minutes in seconds
+
+const SignUpForm = ({ onSendCode, onVerifyCode, onResendCode, isLoading }: SignUpFormProps) => {
+  const [step, setStep] = useState<1 | 2>(1);
+  const [verificationCode, setVerificationCode] = useState('');
+  const [codeError, setCodeError] = useState('');
+  const [isCodeExpired, setIsCodeExpired] = useState(false);
+  const [canResend, setCanResend] = useState(false);
+  const [timerKey, setTimerKey] = useState(0);
+  const [alertMessage, setAlertMessage] = useState<{ type: 'success' | 'error'; message: string } | null>(null);
+
   const { t } = useTranslation()
-  const { values, errors, touched, handleChange, handleBlur, handleSubmit } =
+  const { values, errors, touched, handleChange, handleBlur, handleSubmit, isValid } =
     useForm<FormData>(
       {
         loginId: "",
@@ -52,14 +68,23 @@ const SignUpForm = ({ onSubmit, isLoading }: SignUpFormProps) => {
         agreeTerms: false,
       },
       async (formValues) => {
-        // 提交邏輯
-        await onSubmit({
-          loginId: formValues.loginId,
-          name: formValues.loginId,
-          email: formValues.email,
-          phone: formValues.phone,
-          password: formValues.password,
-        });
+        // Step 1: 發送驗證碼
+        try {
+          await onSendCode({
+            loginId: formValues.loginId,
+            name: formValues.loginId,
+            email: formValues.email,
+            phone: formValues.phone,
+            password: formValues.password,
+          });
+          setStep(2);
+          setIsCodeExpired(false);
+          setCanResend(false);
+          setTimerKey(prev => prev + 1);
+          setAlertMessage({ type: 'success', message: '驗證碼已發送至您的 Email' });
+        } catch (error: any) {
+          setAlertMessage({ type: 'error', message: error.message || '發送驗證碼失敗' });
+        }
       },
       {
         // 驗證規則
@@ -73,8 +98,136 @@ const SignUpForm = ({ onSubmit, isLoading }: SignUpFormProps) => {
       }
     );
 
+  const handleVerifyCode = async (code: string) => {
+    if (code.length !== 6) {
+      setCodeError("請輸入完整的 6 位數驗證碼");
+      return;
+    }
+
+    setCodeError("");
+    try {
+      await onVerifyCode(values.email, code);
+      // 驗證成功，AuthContext 會處理登入和跳轉
+    } catch (error: any) {
+      setCodeError(error.message || "驗證碼錯誤或已過期");
+      setVerificationCode("");
+    }
+  };
+
+  const handleResendCode = async () => {
+    if (!canResend) return;
+
+    try {
+      await onResendCode(values.email);
+      setVerificationCode('');
+      setCodeError('');
+      setIsCodeExpired(false);
+      setCanResend(false);
+      setTimerKey(prev => prev + 1);
+      setAlertMessage({ type: 'success', message: '驗證碼已重新發送' });
+    } catch (error: any) {
+      setAlertMessage({ type: 'error', message: error.message || '重新發送失敗' });
+    }
+  };
+
+  const handleTimerExpire = () => {
+    setIsCodeExpired(true);
+    setCanResend(true);
+    setAlertMessage({ type: 'error', message: '驗證碼已過期，請重新發送' });
+  };
+
+  const handleBackToStep1 = () => {
+    setStep(1);
+    setVerificationCode('');
+    setCodeError('');
+    setIsCodeExpired(false);
+    setCanResend(false);
+    setAlertMessage(null);
+  };
+
+  if (step === 2) {
+    return (
+      <div className={styles.verificationStep}>
+        {alertMessage && (
+          <Alert
+            type={alertMessage.type}
+            message={alertMessage.message}
+            onClose={() => setAlertMessage(null)}
+          />
+        )}
+
+        <div className={styles.verificationHeader}>
+          <h3>驗證您的 Email</h3>
+          <p>
+            我們已將驗證碼發送至 <strong>{values.email}</strong>
+          </p>
+        </div>
+
+        <CountdownTimer
+          key={timerKey}
+          initialSeconds={VERIFICATION_TIMEOUT}
+          onExpire={handleTimerExpire}
+          className={styles.timer}
+        />
+
+        <div className={styles.codeInputContainer}>
+          <VerificationCodeInput
+            value={verificationCode}
+            onChange={(code) => {
+              setVerificationCode(code);
+              setCodeError("");
+            }}
+            onComplete={handleVerifyCode}
+            disabled={isLoading || isCodeExpired}
+            error={codeError}
+          />
+        </div>
+
+        <div className={styles.verificationActions}>
+          <Button
+            variant="primary"
+            fullWidth
+            onClick={() => handleVerifyCode(verificationCode)}
+            disabled={
+              isLoading || verificationCode.length !== 6 || isCodeExpired
+            }
+          >
+            {isLoading ? "驗證中..." : "確認驗證"}
+          </Button>
+
+          <Button
+            variant="outline"
+            fullWidth
+            onClick={handleResendCode}
+            disabled={isLoading || !canResend}
+          >
+            重新發送驗證碼
+          </Button>
+
+          <Button
+            variant="ghost"
+            fullWidth
+            onClick={handleBackToStep1}
+            disabled={isLoading}
+          >
+            返回修改資料
+          </Button>
+        </div>
+      </div>
+    );
+  }
+
+  // Step 1: 基本資料表單
   return (
     <form className={styles.signUpForm} onSubmit={handleSubmit}>
+      {alertMessage && (
+        <Alert
+          type={alertMessage.type}
+          message={alertMessage.message}
+          onClose={() => setAlertMessage(null)}
+        />
+      )}
+
       <FormInput
         label={t('signUpForm.labels.loginId')}
         type="text"
@@ -174,13 +327,14 @@ const SignUpForm = ({ onSubmit, isLoading }: SignUpFormProps) => {
         )}
       </div>
 
-      <button
+      <Button
         type="submit"
+        fullWidth
         className={styles.submitButton}
-        disabled={isLoading}
+        disabled={isLoading || !isValid}
       >
         {isLoading ? t('signUpForm.buttons.submitting') : t('signUpForm.buttons.submit')}
-      </button>
+      </Button>
     </form>
   );
 };

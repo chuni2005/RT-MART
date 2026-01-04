@@ -10,11 +10,13 @@ import { UserToken } from './entities/user-token.entity';
 import { UsersModule } from '../users/users.module';
 import { JwtAccessStrategy } from './strategies/jwt-access.strategy';
 import { JwtRefreshStrategy } from './strategies/jwt-refresh.strategy';
+import { EmailVerificationModule } from '../email-verification/email-verification.module';
 
 @Module({
   imports: [
     TypeOrmModule.forFeature([UserToken]),
     UsersModule,
+    EmailVerificationModule,
     PassportModule,
     ConfigModule.forRoot({ isGlobal: true }),
     JwtModule.register({}),

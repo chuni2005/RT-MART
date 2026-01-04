@@ -1,0 +1,75 @@
+.badge {
+  position: relative;
+  margin-bottom: 1rem;
+}
+
+.content {
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+  padding: 0.75rem 1rem;
+  background: #d4edda;
+  border: 1px solid #c3e6cb;
+  border-radius: 4px;
+  color: #155724;
+}
+
+.icon {
+  font-size: 1.2rem;
+  font-weight: bold;
+}
+
+.text {
+  flex: 1;
+  font-weight: 500;
+}
+
+.removeBtn {
+  background: none;
+  border: none;
+  font-size: 1.5rem;
+  color: #155724;
+  cursor: pointer;
+  padding: 0;
+  width: 24px;
+  height: 24px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+
+  &:hover {
+    opacity: 0.7;
+  }
+}
+
+.tooltip {
+  position: absolute;
+  top: 100%;
+  left: 0;
+  right: 0;
+  margin-top: 0.5rem;
+  padding: 1rem;
+  background: white;
+  border: 1px solid #ddd;
+  border-radius: 4px;
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
+  z-index: 10;
+}
+
+.tooltipTitle {
+  font-weight: 600;
+  margin-bottom: 0.5rem;
+}
+
+.tooltipItem {
+  margin-bottom: 0.5rem;
+
+  &:last-child {
+    margin-bottom: 0;
+  }
+}
+
+.amount {
+  color: #28a745;
+  font-weight: 500;
+}

@@ -17,7 +17,7 @@ export class CartItem {
   @PrimaryGeneratedColumn({ name: 'cart_item_id', type: 'bigint' })
   cartItemId: string;
 
-  @Column({ name: 'user_id', type: 'bigint', unique: true })
+  @Column({ name: 'user_id', type: 'bigint' })
   userId: string;
 
   @Column({ name: 'product_id', type: 'bigint' })

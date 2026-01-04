@@ -1,6 +1,6 @@
 import Icon from '@/shared/components/Icon';
 import { RecentOrder } from '@/types/seller';
-import { getOrderStatusText, getOrderStatusColor } from '@/shared/utils/orderUtils';
+import { getOrderStatusText } from '@/shared/utils/orderUtils';
 import styles from './RecentOrdersList.module.scss';
 
 interface RecentOrdersListProps {
@@ -39,10 +39,7 @@ function RecentOrdersList({ orders, onOrderClick }: RecentOrdersListProps) {
               <td>{order.itemCount} 項商品</td>
               <td className={styles.amount}>NT$ {order.totalAmount.toLocaleString()}</td>
               <td>
-                <span
-                  className={styles.status}
-                  style={{ color: getOrderStatusColor(order.status) }}
-                >
+                <span className={`${styles.status} ${styles[order.status]}`}>
                   {getOrderStatusText(order.status)}
                 </span>
               </td>

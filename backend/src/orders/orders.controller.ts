@@ -11,6 +11,7 @@ import {
 } from '@nestjs/common';
 import { OrdersService } from './orders.service';
 import { CreateOrderDto } from './dto/create-order.dto';
+import { CreateOrderFromSnapshotDto } from './dto/create-order-from-snapshot.dto';
 import { UpdateOrderStatusDto } from './dto/update-order-status.dto';
 import { QueryOrderDto } from './dto/query-order.dto';
 import { QueryAdminOrderDto } from './dto/query-admin-order.dto';
@@ -35,11 +36,16 @@ export class OrdersController {
   @Post()
   async create(@Req() req: AuthRequest, @Body() createDto: CreateOrderDto) {
     const userId = req.user.userId;
-    return await this.ordersService.createFromSnapshot(
-      userId,
-      createDto.cartSnapshot || {},
-      createDto as any,
-    );
+    return await this.ordersService.create(userId, createDto);
+  }
+
+  @Post('from-snapshot')
+  async createFromSnapshot(
+    @Req() req: AuthRequest,
+    @Body() snapshotDto: CreateOrderFromSnapshotDto,
+  ) {
+    const userId = req.user.userId;
+    return await this.ordersService.createFromSnapshot(userId, snapshotDto);
   }
 
   @Get()

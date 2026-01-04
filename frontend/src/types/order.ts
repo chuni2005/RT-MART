@@ -43,6 +43,10 @@ export interface CreateOrderRequest {
   addressId: string;
   paymentMethod: PaymentMethod;
   note?: string;  // 合併後的備註
+  discountCodes?: {
+    shipping?: string;
+    product?: string;
+  };
 }
 
 /**
@@ -123,4 +127,78 @@ export interface GetOrdersResponse {
   page: number;
   limit: number;
   totalPages: number;
+}
+
+// ============================================
+// Discount Recommendation 相關類型
+// ============================================
+
+export interface DiscountRecommendation {
+  shipping: {
+    code: string;
+    name: string;
+    amount: number;
+  } | null;
+  product: {
+    code: string;
+    name: string;
+    amount: number;
+    type: string;
+  } | null;
+  totalSavings: number;
+}
+
+// 用戶手動選擇的折扣（分開三種類型）
+export interface ManualDiscountSelection {
+  shipping: {
+    code: string;
+    name: string;
+    amount: number;
+  } | null;
+  seasonal: {
+    code: string;
+    name: string;
+    amount: number;
+  } | null;
+  special: {
+    code: string;
+    name: string;
+    amount: number;
+  } | null;
+}
+
+// 可用折扣的完整信息（從 API 返回）
+export interface AvailableDiscount {
+  discountId: string;
+  discountCode: string;
+  name: string;
+  description: string | null;
+  discountType: 'shipping' | 'seasonal' | 'special';
+  minPurchaseAmount: number;
+  startDatetime: string;
+  endDatetime: string;
+  isActive: boolean;
+  usageLimit: number | null;
+  usageCount: number;
+  // Nested relations
+  seasonalDiscount?: {
+    discountRate: number;
+    maxDiscountAmount: number | null;
+  };
+  shippingDiscount?: {
+    discountAmount: number;
+  };
+  specialDiscount?: {
+    discountRate: number;
+    maxDiscountAmount: number | null;
+    storeId: string;
+  };
+}
+
+/**
+ * 折扣選擇（折扣碼）
+ */
+export interface DiscountSelections {
+  shipping: string | null;
+  product: string | null;
 }

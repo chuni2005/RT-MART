@@ -4,10 +4,11 @@ import {
   BadRequestException,
 } from '@nestjs/common';
 import { InjectRepository } from '@nestjs/typeorm';
-import { Repository, DataSource, LessThan } from 'typeorm';
+import { Repository, DataSource, LessThan, In } from 'typeorm';
 import { Order, OrderStatus } from './entities/order.entity';
 import { OrderItem } from './entities/order-item.entity';
 import { CreateOrderDto } from './dto/create-order.dto';
+import { CreateOrderFromSnapshotDto } from './dto/create-order-from-snapshot.dto';
 import { UpdateOrderStatusDto } from './dto/update-order-status.dto';
 import { QueryOrderDto } from './dto/query-order.dto';
 import { QueryAdminOrderDto } from './dto/query-admin-order.dto';
@@ -15,6 +16,8 @@ import { CartItemsService } from '../carts-item/cart-items.service';
 import { ShippingAddressesService } from '../shipping-addresses/shipping-addresses.service';
 import { InventoryService } from '../inventory/inventory.service';
 import { DiscountsService } from '../discounts/discounts.service';
+import { SseService } from '../sse/sse.service';
+import { MailService } from '../mail/mail.service';
 
 @Injectable()
 export class OrdersService {
@@ -28,25 +31,94 @@ export class OrdersService {
     private readonly inventoryService: InventoryService,
     private readonly discountsService: DiscountsService,
     private readonly dataSource: DataSource,
+    private readonly sseService: SseService,
+    private readonly mailService: MailService,
   ) {}
+
+  // TODO: 付款等待 清空購物車邏輯
+  // 標準下單：從目前購物車建立
+  async create(userId: string, createDto: CreateOrderDto): Promise<Order[]> {
+    // 1. 從資料庫抓取目前購物車資料
+    const summary = await this.cartsService.getCartSummary(userId);
+    const cartItems = (summary.cart || []).filter((item: any) => item.selected);
+
+    if (cartItems.length === 0) {
+      throw new BadRequestException('No items selected for checkout');
+    }
+
+    // 2. 處理地址
+    const shippingAddress = await this.shippingAddressesService.findOne(
+      createDto.shippingAddressId,
+      userId,
+    );
+
+    if (!shippingAddress) {
+      throw new BadRequestException('Shipping address is required');
+    }
+
+    // 3. 呼叫核心邏輯
+    const orders = await this.executeOrderCreation(
+      userId,
+      cartItems,
+      shippingAddress,
+      createDto,
+    );
+
+    // 4. 一般下單完畢後，清理購物車
+    try {
+      await this.cartsService.removeSelectedItems(userId);
+    } catch (err: any) {
+      console.warn(
+        'Failed to clear cart items after order creation:',
+        err?.message || 'Unknown error',
+      );
+    }
+
+    return orders;
+  }
+
+  // 歷史下單：從快照建立 (再次購買等功能)
   async createFromSnapshot(
     userId: string,
-    cartSnapshot: any,
-    createDto: CreateOrderDto,
+    createDto: CreateOrderFromSnapshotDto,
   ): Promise<Order[]> {
-    // Expect cartSnapshot.items with product (snapshot) and quantity
-    const items = cartSnapshot.items || [];
+    const items = createDto.cartSnapshot?.items || [];
     if (items.length === 0) {
       throw new BadRequestException('No items in snapshot');
     }
 
-    // Group by storeId (try to read from product.storeId or product.store?.storeId)
+    const shippingAddress = createDto.shippingAddressSnapshot;
+    if (!shippingAddress) {
+      throw new BadRequestException('Shipping address snapshot is required');
+    }
+
+    // 直接呼叫核心邏輯，不清理目前的購物車
+    return await this.executeOrderCreation(
+      userId,
+      items,
+      shippingAddress,
+      createDto,
+    );
+  }
+
+  /**
+   * 核心私有方法：負責事務處理、分組、庫存與資料庫操作
+   */
+  private async executeOrderCreation(
+    userId: string,
+    items: any[],
+    shippingAddress: any,
+    options: CreateOrderDto | CreateOrderFromSnapshotDto,
+  ): Promise<Order[]> {
+    // 依 storeId 分組
     const itemsByStore = new Map<string, any[]>();
     for (const it of items) {
       const storeId = String(
         it.product?.storeId || it.product?.store?.storeId || '0',
       );
-      if (!itemsByStore.has(storeId)) itemsByStore.set(storeId, []);
+      if (!itemsByStore.has(storeId)) {
+        itemsByStore.set(storeId, []);
+      }
       itemsByStore.get(storeId)!.push(it);
     }
 
@@ -55,15 +127,40 @@ export class OrdersService {
     return await this.dataSource.transaction(async (manager) => {
       for (const [storeId, storeItems] of itemsByStore.entries()) {
         let subtotal = 0;
+
+        // 庫存檢查與金額計算
         for (const item of storeItems) {
+          const productId = item.productId || item.product?.productId;
+
+          // 庫存預扣
+          if (productId) {
+            const isAvailable =
+              await this.inventoryService.checkStockAvailability(
+                productId,
+                item.quantity,
+              );
+
+            if (!isAvailable) {
+              throw new BadRequestException(
+                `Insufficient stock for product: ${item.product?.productName || item.product?.product_name || 'Unknown'}`,
+              );
+            }
+
+            await this.inventoryService.orderCreated(productId, item.quantity);
+          }
+
           subtotal +=
             Number(item.product?.price || 0) * Number(item.quantity || 1);
         }
 
         const shippingFee = 60;
         const totalAmount = subtotal + shippingFee;
-
         const orderNumber = this.generateOrderNumber();
+
+        const isCashOnDelivery = options.paymentMethod === 'cash_on_delivery';
+        const initialStatus = isCashOnDelivery
+          ? OrderStatus.PAID
+          : OrderStatus.PENDING_PAYMENT;
 
         const order = manager.create(Order, {
           orderNumber,
@@ -73,10 +170,10 @@ export class OrdersService {
           shippingFee,
           totalDiscount: 0,
           totalAmount,
-          paymentMethod: createDto?.paymentMethod,
-          shippingAddressSnapshot: createDto?.shippingAddressSnapshot,
-          notes: createDto?.notes,
-          orderStatus: OrderStatus.PENDING_PAYMENT,
+          paymentMethod: options.paymentMethod || 'credit_card',
+          shippingAddressSnapshot: shippingAddress,
+          notes: options.notes,
+          orderStatus: initialStatus,
         });
 
         const savedOrder = await manager.save(Order, order);
@@ -84,7 +181,7 @@ export class OrdersService {
         for (const item of storeItems) {
           const orderItem = manager.create(OrderItem, {
             orderId: savedOrder.orderId,
-            productId: item.productId,
+            productId: item.productId || item.product?.productId,
             productSnapshot: item.product,
             quantity: item.quantity,
             originalPrice: item.product?.price || 0,
@@ -93,21 +190,18 @@ export class OrdersService {
             subtotal:
               Number(item.product?.price || 0) * Number(item.quantity || 1),
           });
-
           await manager.save(OrderItem, orderItem);
         }
 
         createdOrders.push(savedOrder);
       }
 
-      // Optionally clear selected items in cart
-      try {
-        await this.cartsService.removeSelectedItems(userId);
-      } catch (err) {
-        // ignore
-      }
-
-      return createdOrders;
+      // 回傳包含關聯的訂單資料
+      const orderIds = createdOrders.map((o) => o.orderId);
+      return (await manager.find(Order, {
+        where: { orderId: In(orderIds), userId },
+        relations: ['store', 'items', 'items.product'],
+      })) as Order[];
     });
   }
 
@@ -164,56 +258,143 @@ export class OrdersService {
     // Validate status transition
     this.validateStatusTransition(order.orderStatus, updateDto.status);
 
-    // Use transaction for status update with inventory changes
-    return await this.dataSource.transaction(async (manager) => {
-      order.orderStatus = updateDto.status;
-
-      // Update timestamps based on status
-      switch (updateDto.status) {
-        case OrderStatus.PAID:
-          order.paidAt = new Date();
-          // Payment confirmed, inventory already reserved
-          break;
-        case OrderStatus.SHIPPED:
-          order.shippedAt = new Date();
-          // Release reserved inventory when shipped
-          for (const item of order.items || []) {
-            if (item.productId) {
-              await this.inventoryService.orderShipped(
-                item.productId,
-                item.quantity,
-              );
-            }
-          }
-          break;
-        case OrderStatus.DELIVERED:
-          order.deliveredAt = new Date();
-          break;
-        case OrderStatus.COMPLETED:
-          order.completedAt = new Date();
-          break;
-        case OrderStatus.CANCELLED:
-          order.cancelledAt = new Date();
-          // Release reserved inventory (restore quantity, decrease reserved)
-          for (const item of order.items || []) {
-            if (item.productId) {
-              await this.inventoryService.orderCancel(
-                item.productId,
-                item.quantity,
-              );
-            }
-          }
-          break;
-      }
-
+    // Use transaction for status update
+    const updatedOrder = await this.dataSource.transaction(async (manager) => {
+      await this.applyStatusChange(manager, order, updateDto.status);
       return await manager.save(Order, order);
     });
+
+    // Send SSE notification
+    this.notifyOrderUpdate(updatedOrder);
+
+    return updatedOrder;
+  }
+
+  /**
+   * 統一處理狀態變更的副作用（時間戳、庫存）
+   */
+  private async applyStatusChange(
+    manager: any,
+    order: Order,
+    newStatus: OrderStatus,
+  ): Promise<void> {
+    order.orderStatus = newStatus;
+
+    switch (newStatus) {
+      case OrderStatus.PAID:
+        order.paidAt = new Date();
+        break;
+      case OrderStatus.SHIPPED:
+        order.shippedAt = new Date();
+        // 釋放預留庫存（實際出貨）
+        for (const item of order.items || []) {
+          if (item.productId) {
+            await this.inventoryService.orderShipped(
+              item.productId,
+              item.quantity,
+            );
+          }
+        }
+        break;
+      case OrderStatus.DELIVERED:
+        order.deliveredAt = new Date();
+        break;
+      case OrderStatus.COMPLETED:
+        order.completedAt = new Date();
+        break;
+      case OrderStatus.CANCELLED:
+        order.cancelledAt = new Date();
+        // 退回預留庫存
+        for (const item of order.items || []) {
+          if (item.productId) {
+            await this.inventoryService.orderCancel(
+              item.productId,
+              item.quantity,
+            );
+          }
+        }
+        break;
+    }
+  }
+
+  /**
+   * 統一發送 SSE 通知
+   */
+  private notifyOrderUpdate(order: Order): void {
+    try {
+      const sellerIds = order.items
+        ? [
+            ...new Set(
+              order.items
+                .map((item) => item.product?.store?.sellerId)
+                .filter(Boolean),
+            ),
+          ]
+        : [];
+
+      this.sseService.notifyOrderUpdate(
+        order.orderId,
+        order.userId,
+        sellerIds as string[],
+        {
+          orderNumber: order.orderNumber,
+          status: order.orderStatus,
+          updatedAt: new Date().toISOString(),
+        },
+      );
+    } catch (error) {
+      console.error('Failed to send SSE notification:', error);
+    }
   }
 
   async cancelOrder(id: string, userId: string): Promise<Order> {
-    return await this.updateStatus(id, userId, {
+    const cancelledOrder = await this.updateStatus(id, userId, {
       status: OrderStatus.CANCELLED,
     });
+
+    // Fetch full order details with relations for email
+    const order = await this.orderRepository.findOne({
+      where: { orderId: id },
+      relations: ['items', 'items.product', 'user', 'store', 'store.seller', 'store.seller.user'],
+    });
+
+    // Send email notifications
+    if (order) {
+      try {
+        const orderDetails = {
+          orderNumber: order.orderNumber,
+          totalAmount: order.totalAmount,
+          items: order.items,
+          user: order.user,
+          store: order.store,
+          cancelledAt: order.cancelledAt,
+        };
+
+        // Send to buyer
+        if (order.user?.email) {
+          await this.mailService.sendOrderCancelledToBuyer(
+            order.user.email,
+            order.orderNumber,
+            orderDetails,
+            'Order cancelled by buyer',
+          );
+        }
+
+        // Send to seller
+        if (order.store?.seller?.user?.email) {
+          await this.mailService.sendOrderCancelledToSeller(
+            order.store.seller.user.email,
+            order.orderNumber,
+            orderDetails,
+            'Order cancelled by buyer',
+          );
+        }
+      } catch (error) {
+        console.error('Failed to send order cancellation emails:', error);
+      }
+    }
+
+    return cancelledOrder;
   }
 
   private generateOrderNumber(): string {
@@ -398,35 +579,55 @@ export class OrdersService {
   async adminCancelOrder(id: string, reason?: string): Promise<any> {
     const order = await this.orderRepository.findOne({
       where: { orderId: id },
-      relations: ['items'],
+      relations: ['items', 'items.product', 'user', 'store', 'store.seller', 'store.seller.user'],
     });
 
     if (!order) {
       throw new NotFoundException(`Order with ID ${id} not found`);
     }
 
-    // Admin can cancel any order (skip user check)
-    return await this.dataSource.transaction(async (manager) => {
-      order.orderStatus = OrderStatus.CANCELLED;
-      order.cancelledAt = new Date();
-
-      // Release reserved inventory (restore quantity, decrease reserved)
-      for (const item of order.items || []) {
-        if (item.productId) {
-          await this.inventoryService.orderCancel(
-            item.productId,
-            item.quantity,
-          );
-        }
-      }
-
-      // TODO: Send email notification with reason using nodeMailer
-      // if (reason) {
-      //   await this.mailService.sendOrderCancelledEmail(order, reason);
-      // }
-
+    const updatedOrder = await this.dataSource.transaction(async (manager) => {
+      await this.applyStatusChange(manager, order, OrderStatus.CANCELLED);
       return await manager.save(Order, order);
     });
+
+    // Send email notifications to both buyer and seller
+    try {
+      const orderDetails = {
+        orderNumber: updatedOrder.orderNumber,
+        totalAmount: updatedOrder.totalAmount,
+        items: updatedOrder.items,
+        user: updatedOrder.user,
+        store: updatedOrder.store,
+        cancelledAt: updatedOrder.cancelledAt,
+      };
+
+      // Send to buyer
+      if (updatedOrder.user?.email) {
+        await this.mailService.sendOrderCancelledToBuyer(
+          updatedOrder.user.email,
+          updatedOrder.orderNumber,
+          orderDetails,
+          reason || 'Order cancelled by administrator',
+        );
+      }
+
+      // Send to seller
+      if (updatedOrder.store?.seller?.user?.email) {
+        await this.mailService.sendOrderCancelledToSeller(
+          updatedOrder.store.seller.user.email,
+          updatedOrder.orderNumber,
+          orderDetails,
+          reason || 'Order cancelled by administrator',
+        );
+      }
+    } catch (error) {
+      // Log error but don't fail the cancellation
+      console.error('Failed to send order cancellation emails:', error);
+    }
+
+    this.notifyOrderUpdate(updatedOrder);
+    return updatedOrder;
   }
 
   async updateAdminOrderStatus(
@@ -435,46 +636,20 @@ export class OrdersService {
   ): Promise<any> {
     const order = await this.orderRepository.findOne({
       where: { orderId: id },
+      relations: ['items'], // 需要 items 來處理庫存
     });
 
     if (!order) {
       throw new NotFoundException(`Order with ID ${id} not found`);
     }
 
-    // Admin can update to any status (skip status transition validation)
-    return await this.dataSource.transaction(async (manager) => {
-      order.orderStatus = updateDto.status;
-
-      // Update corresponding timestamp based on new status
-      switch (updateDto.status) {
-        case OrderStatus.PAID:
-          order.paidAt = new Date();
-          break;
-        case OrderStatus.SHIPPED:
-          order.shippedAt = new Date();
-          break;
-        case OrderStatus.DELIVERED:
-          order.deliveredAt = new Date();
-          break;
-        case OrderStatus.COMPLETED:
-          order.completedAt = new Date();
-          break;
-        case OrderStatus.CANCELLED:
-          order.cancelledAt = new Date();
-          // Release reserved inventory (restore quantity, decrease reserved)
-          for (const item of order.items || []) {
-            if (item.productId) {
-              await this.inventoryService.orderCancel(
-                item.productId,
-                item.quantity,
-              );
-            }
-          }
-          break;
-      }
-
+    const updatedOrder = await this.dataSource.transaction(async (manager) => {
+      await this.applyStatusChange(manager, order, updateDto.status);
       return await manager.save(Order, order);
     });
+
+    this.notifyOrderUpdate(updatedOrder);
+    return updatedOrder;
   }
 
   async findAnomalies(): Promise<any[]> {
@@ -557,7 +732,7 @@ export class OrdersService {
   /**
    * Get single order detail for seller
    */
-  async findSellerOrder(sellerId: string, orderId: string): Promise<Order> {
+  async findSellerOrder(sellerId: string, orderId: string): Promise<any> {
     const order = await this.orderRepository.findOne({
       where: { orderId },
       relations: ['store', 'store.seller', 'user', 'items', 'items.product'],
@@ -574,7 +749,41 @@ export class OrdersService {
       );
     }
 
-    return order;
+    // Format the order response with proper item structure
+    return {
+      orderId: order.orderId,
+      orderNumber: order.orderNumber,
+      userId: order.userId,
+      storeId: order.storeId,
+      storeName: order.store?.storeName || 'Unknown Store',
+      orderStatus: order.orderStatus,
+      paymentMethod: order.paymentMethod,
+      shippingAddressSnapshot: order.shippingAddressSnapshot,
+      notes: order.notes,
+      subtotal: parseFloat(order.subtotal.toString()),
+      shippingFee: parseFloat(order.shippingFee.toString()),
+      totalDiscount: parseFloat(order.totalDiscount.toString()),
+      totalAmount: parseFloat(order.totalAmount.toString()),
+      items: (order.items || []).map((item) => {
+        const snapshot = item.productSnapshot as any;
+        return {
+          orderItemId: item.orderItemId,
+          productId: item.productId,
+          productSnapshot: snapshot,
+          quantity: item.quantity,
+          originalPrice: parseFloat(item.originalPrice.toString()),
+          unitPrice: parseFloat(item.unitPrice.toString()),
+          subtotal: parseFloat(item.subtotal.toString()),
+        };
+      }),
+      createdAt: order.createdAt,
+      updatedAt: order.updatedAt,
+      paidAt: order.paidAt,
+      shippedAt: order.shippedAt,
+      deliveredAt: order.deliveredAt,
+      completedAt: order.completedAt,
+      cancelledAt: order.cancelledAt,
+    };
   }
 
   /**
@@ -594,46 +803,19 @@ export class OrdersService {
     // Validate seller can make this status transition
     this.validateSellerStatusTransition(order.orderStatus, status);
 
-    // Use transaction for status update with inventory changes
-    return await this.dataSource.transaction(async (manager) => {
-      order.orderStatus = status;
+    // Use transaction for status update
+    const updatedOrder = await this.dataSource.transaction(async (manager) => {
       if (note) {
         order.notes = note;
       }
-
-      // Update timestamps based on status
-      switch (status) {
-        case OrderStatus.SHIPPED:
-          order.shippedAt = new Date();
-          // Release reserved inventory when shipped
-          for (const item of order.items || []) {
-            if (item.productId) {
-              await this.inventoryService.orderShipped(
-                item.productId,
-                item.quantity,
-              );
-            }
-          }
-          break;
-        case OrderStatus.DELIVERED:
-          order.deliveredAt = new Date();
-          break;
-        case OrderStatus.CANCELLED:
-          order.cancelledAt = new Date();
-          // Release reserved inventory (restore quantity, decrease reserved)
-          for (const item of order.items || []) {
-            if (item.productId) {
-              await this.inventoryService.orderCancel(
-                item.productId,
-                item.quantity,
-              );
-            }
-          }
-          break;
-      }
-
+      await this.applyStatusChange(manager, order, status);
       return await manager.save(Order, order);
     });
+
+    // Send SSE notification
+    this.notifyOrderUpdate(updatedOrder);
+
+    return updatedOrder;
   }
 
   /**

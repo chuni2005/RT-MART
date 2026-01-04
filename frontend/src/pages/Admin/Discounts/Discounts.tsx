@@ -5,6 +5,7 @@ import Icon from '@/shared/components/Icon';
 import Dialog from '@/shared/components/Dialog';
 import Alert from '@/shared/components/Alert';
 import Tab from '@/shared/components/Tab';
+import DiscountCard from '@/shared/components/DiscountCard';
 import adminService from '@/shared/services/adminService.index';
 import { SystemDiscount } from '@/types/admin';
 import { AlertType } from '@/types';
@@ -86,30 +87,6 @@ function Discounts() {
     }
   };
 
-  const getDiscountStatus = (discount: SystemDiscount) => {
-    const now = new Date();
-    const start = new Date(discount.start_datetime);
-    const end = new Date(discount.end_datetime);
-
-    if (!discount.is_active) return '已停用';
-    if (now < start) return '未開始';
-    if (now > end) return '已結束';
-    return '進行中';
-  };
-
-  const getStatusColor = (status: string) => {
-    const colorMap: Record<string, string> = {
-      進行中: '#28a745',
-      未開始: '#ffc107',
-      已結束: '#6c757d',
-      已停用: '#dc3545',
-    };
-    return colorMap[status] || '#6c757d';
-  };
-
-  const getDiscountTypeLabel = (type: 'seasonal' | 'shipping') => {
-    return type === 'seasonal' ? '季節性折扣' : '免運費';
-  };
 
   return (
     <div className={styles.discounts}>
@@ -156,116 +133,31 @@ function Discounts() {
       {/* Discounts Grid */}
       {!loading && discounts.length > 0 && (
         <div className={styles.discountsGrid}>
-          {discounts.map((discount) => {
-            const status = getDiscountStatus(discount);
-            return (
-              <div key={discount.discount_id} className={styles.discountCard}>
-                {/* 卡片標題 */}
-                <div className={styles.cardHeader}>
-                  <div className={styles.titleSection}>
-                    <h3 className={styles.discountName}>{discount.name}</h3>
-                    <span className={styles.discountType}>
-                      {getDiscountTypeLabel(discount.discount_type)}
-                    </span>
-                  </div>
-                  <span
-                    className={styles.status}
-                    style={{ color: getStatusColor(status) }}
-                  >
-                    {status}
-                  </span>
-                </div>
-
-                {/* 折扣資訊 */}
-                <div className={styles.discountInfo}>
-                  {discount.discount_type === 'seasonal' && (
-                    <>
-                      <div className={styles.infoItem}>
-                        <span className={styles.label}>折扣率</span>
-                        <span className={styles.value}>
-                          {((discount.discount_rate || 0) * 100).toFixed(0)}%
-                        </span>
-                      </div>
-                      {discount.max_discount_amount && (
-                        <div className={styles.infoItem}>
-                          <span className={styles.label}>最高折抵</span>
-                          <span className={styles.value}>
-                            NT$ {discount.max_discount_amount.toLocaleString()}
-                          </span>
-                        </div>
-                      )}
-                    </>
-                  )}
-                  {discount.discount_type === 'shipping' && discount.discount_amount && (
-                    <div className={styles.infoItem}>
-                      <span className={styles.label}>折抵金額</span>
-                      <span className={styles.value}>
-                        NT$ {discount.discount_amount.toLocaleString()}
-                      </span>
-                    </div>
-                  )}
-                  <div className={styles.infoItem}>
-                    <span className={styles.label}>最低消費</span>
-                    <span className={styles.value}>
-                      NT$ {discount.min_purchase_amount.toLocaleString()}
-                    </span>
-                  </div>
-                </div>
-
-                {/* 有效期間 */}
-                <div className={styles.period}>
-                  <Icon icon="calendar" />
-                  <div className={styles.periodText}>
-                    <div>
-                      {new Date(discount.start_datetime).toLocaleDateString('zh-TW')}
-                    </div>
-                    <div>~</div>
-                    <div>
-                      {new Date(discount.end_datetime).toLocaleDateString('zh-TW')}
-                    </div>
-                  </div>
-                </div>
-
-                {/* 操作按鈕 */}
-                <div className={styles.cardActions}>
-                  <Button
-                    variant="outline"
-                    size="sm"
-                    onClick={() =>
-                      navigate(`/admin/discount/edit/${discount.discount_id}`)
-                    }
-                  >
-                    <Icon icon="pen-to-square" />
-                    編輯
-                  </Button>
-                  <Button
-                    variant="outline"
-                    size="sm"
-                    onClick={() =>
-                      handleToggleStatus(discount.discount_id, discount.is_active)
-                    }
-                  >
-                    <Icon icon={discount.is_active ? 'toggle-on' : 'toggle-off'} />
-                    {discount.is_active ? '停用' : '啟用'}
-                  </Button>
-                  <Button
-                    variant="outline"
-                    size="sm"
-                    onClick={() =>
-                      setDeleteDialog({
-                        isOpen: true,
-                        discountId: discount.discount_id,
-                        discountName: discount.name,
-                      })
-                    }
-                  >
-                    <Icon icon="trash" />
-                    刪除
-                  </Button>
-                </div>
-              </div>
-            );
-          })}
+          {discounts.map((discount) => (
+            <DiscountCard
+              key={discount.discount_id}
+              discount={{
+                discountId: discount.discount_id,
+                discountCode: discount.discount_code,
+                name: discount.name,
+                discountType: discount.discount_type,
+                discountRate: discount.discount_rate,
+                discountAmount: discount.discount_amount,
+                minPurchaseAmount: discount.min_purchase_amount,
+                maxDiscountAmount: discount.max_discount_amount,
+                startDatetime: discount.start_datetime,
+                endDatetime: discount.end_datetime,
+                isActive: discount.is_active,
+                usageCount: discount.usage_count,
+                usageLimit: discount.usage_limit,
+              }}
+              onEdit={(id) => navigate(`/admin/discount/edit/${id}`)}
+              onToggleStatus={handleToggleStatus}
+              onDelete={(id, name) =>
+                setDeleteDialog({ isOpen: true, discountId: id, discountName: name })
+              }
+            />
+          ))}
         </div>
       )}
 

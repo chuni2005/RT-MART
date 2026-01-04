@@ -150,3 +150,11 @@ export interface DiscountFormData {
 export interface SellerApplicationForm {
   bank_account_reference: string;
 }
+
+// ========== Dashboard Filter Types ==========
+export interface SellerDashboardFilters {
+  period?: SalesPeriod;
+  startDate?: string;
+  endDate?: string;
+  productName?: string;
+}

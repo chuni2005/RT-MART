@@ -20,7 +20,8 @@ interface AlertState {
 function PurchasePanel({ stock, productId }: PurchasePanelProps) {
   const [quantity, setQuantity] = useState<number | string>(1);
   const [alert, setAlert] = useState<AlertState | null>(null);
-  const [isAdding, setIsAdding] = useState(false);
+  const [isAddingToCart, setIsAddingToCart] = useState(false);
+  const [isBuyingNow, setIsBuyingNow] = useState(false);
   const navigate = useNavigate();
   const { isAuthenticated } = useAuth();
   const { addToCart } = useCart();
@@ -65,7 +66,7 @@ function PurchasePanel({ stock, productId }: PurchasePanelProps) {
     }
 
     try {
-      setIsAdding(true);
+      setIsAddingToCart(true);
       // 使用 CartContext 的 addToCart，它會自動更新 Header 的購物車數量
       // 使用者要求 handleAddToCart 時，selected 為 false
       await addToCart(productId.toString(), qty, false);
@@ -78,7 +79,7 @@ function PurchasePanel({ stock, productId }: PurchasePanelProps) {
       console.error("Add to cart failed:", error);
       showAlert("error", error.message || "加入購物車失敗，請稍後再試");
     } finally {
-      setIsAdding(false);
+      setIsAddingToCart(false);
     }
   };
 
@@ -104,7 +105,7 @@ function PurchasePanel({ stock, productId }: PurchasePanelProps) {
     }
 
     try {
-      setIsAdding(true);
+      setIsBuyingNow(true);
       // 立即購買時，selected 為 true
       await addToCart(productId.toString(), qty, true);
 
@@ -114,7 +115,7 @@ function PurchasePanel({ stock, productId }: PurchasePanelProps) {
       console.error("Buy now failed:", error);
       showAlert("error", error.message || "立即購買失敗，請稍後再試");
     } finally {
-      setIsAdding(false);
+      setIsBuyingNow(false);
     }
   };
 
@@ -140,22 +141,22 @@ function PurchasePanel({ stock, productId }: PurchasePanelProps) {
         <Button
           variant="outline"
           onClick={handleAddToCart}
-          disabled={stock === 0 || isAdding}
-          icon={isAdding ? undefined : "shopping-cart"}
+          disabled={stock === 0 || isAddingToCart}
+          icon={isAddingToCart ? undefined : "shopping-cart"}
           fullWidth
           className={styles.addToCartButton}
         >
-          {isAdding ? "加入中..." : "加入購物車"}
+          {isAddingToCart ? "加入中..." : "加入購物車"}
         </Button>
 
         <Button
           variant="primary"
           onClick={handleBuyNow}
-          disabled={stock === 0 || isAdding}
+          disabled={stock === 0 || isBuyingNow}
           fullWidth
           className={styles.buyNowButton}
         >
-          {isAdding ? "處理中..." : "立即購買"}
+          {isBuyingNow ? "處理中..." : "立即購買"}
         </Button>
       </div>
 

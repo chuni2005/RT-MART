@@ -1,0 +1,62 @@
+@import "./variables";
+
+// 订单状态徽章样式
+// 统一的 order status badge 样式，适用于 Buyer、Seller、Admin
+
+.orderStatusBadge {
+  display: inline-block;
+  padding: $spacing-xs 0.75rem;
+  border-radius: $border-radius-xl;
+  font-size: $font-sm;
+  font-weight: 500;
+  white-space: nowrap;
+  transition: $transition-fast;
+
+  // Pending Payment
+  &.pending_payment {
+    background: $order-pending-payment-bg;
+    color: $order-pending-payment-text;
+  }
+
+  // Payment Failed
+  &.payment_failed {
+    background: $order-payment-failed-bg;
+    color: $order-payment-failed-text;
+  }
+
+  // Paid
+  &.paid {
+    background: $order-paid-bg;
+    color: $order-paid-text;
+  }
+
+  // Processing
+  &.processing {
+    background: $order-processing-bg;
+    color: $order-processing-text;
+  }
+
+  // Shipped
+  &.shipped {
+    background: $order-shipped-bg;
+    color: $order-shipped-text;
+  }
+
+  // Delivered
+  &.delivered {
+    background: $order-delivered-bg;
+    color: $order-delivered-text;
+  }
+
+  // Completed
+  &.completed {
+    background: $order-completed-bg;
+    color: $order-completed-text;
+  }
+
+  // Cancelled
+  &.cancelled {
+    background: $order-cancelled-bg;
+    color: $order-cancelled-text;
+  }
+}

@@ -88,7 +88,90 @@ export const login = async (
 };
 
 /**
+ * 發送註冊驗證碼：POST /auth/register/send-code
+ */
+export const sendVerificationCode = async (
+  loginId: string,
+  name: string,
+  email: string,
+  phone: string,
+  password: string
+): Promise<{ success: boolean; message: string }> => {
+  try {
+    const result = await post<{ success: boolean; message: string }>(
+      '/auth/register/send-code',
+      {
+        loginId,
+        name,
+        email,
+        phoneNumber: phone,
+        password,
+        purpose: 'registration',
+      }
+    );
+    return result;
+  } catch (error: any) {
+    throw new Error(error.message || '發送驗證碼失敗');
+  }
+};
+
+/**
+ * 驗證註冊碼並完成註冊：POST /auth/register/verify
+ * 成功後會自動登入（後端會設置 cookies）
+ */
+export const verifyRegistrationCode = async (
+  email: string,
+  code: string
+): Promise<AuthResponse> => {
+  try {
+    const result = await post<{
+      success: boolean;
+      userId: string;
+      accessToken: string;
+      refreshToken: string;
+    }>(
+      '/auth/register/verify',
+      { email, code }
+    );
+
+    if (!result.success) {
+      throw new Error('驗證失敗');
+    }
+
+    // 取得完整用戶資料
+    const user = await fetchFullUser();
+
+    return {
+      success: true,
+      message: '註冊成功！',
+      user,
+      token: result.accessToken,
+    };
+  } catch (error: any) {
+    throw new Error(error.message || '驗證碼錯誤或已過期');
+  }
+};
+
+/**
+ * 重新發送驗證碼：POST /email-verification/resend
+ */
+export const resendVerificationCode = async (
+  email: string
+): Promise<{ success: boolean; message: string }> => {
+  try {
+    const result = await post<{ success: boolean; message: string }>(
+      '/email-verification/resend',
+      { email, purpose: 'registration' }
+    );
+    return result;
+  } catch (error: any) {
+    throw new Error(error.message || '重新發送驗證碼失敗');
+  }
+};
+
+/**
  * 註冊：POST /auth/register，成功後再自動登入
+ * @deprecated 已棄用，請使用 sendVerificationCode + verifyRegistrationCode
  */
 export const register = async (
   loginId: string,
@@ -180,6 +263,9 @@ export const validateToken = async (): Promise<ValidateTokenResponse> => {
 export default {
   login,
   register,
+  sendVerificationCode,
+  verifyRegistrationCode,
+  resendVerificationCode,
   logout,
   getCurrentUser,
   validateToken,

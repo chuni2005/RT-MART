@@ -8,20 +8,23 @@ import {
   Delete,
   UseGuards,
   Req,
+  Res,
   NotFoundException,
   ConflictException,
   Query,
 } from '@nestjs/common';
-import { SellersService } from './sellers.service';
+import { SellersService, DashboardData } from './sellers.service';
 import { CreateSellerDto } from './dto/create-seller.dto';
 import { UpdateSellerDto } from './dto/update-seller.dto';
 import { VerifySellerDto } from './dto/verify-seller.dto';
+import { RejectSellerDto } from './dto/reject-seller.dto';
 import { JwtAccessGuard } from '../auth/guards/jwt-auth.guard';
 import { RolesGuard } from '../auth/guards/roles.guard';
 import { Roles } from '../auth/decorators/roles.decorator';
 import { UserRole } from '../users/entities/user.entity';
 import { UsersService } from '../users/users.service';
 import { QuerySellerDto } from './dto/query-seller.dto';
+import { QuerySellerDashboardDto } from './dto/query-seller-dashboard.dto';
 
 @Controller('sellers')
 export class SellersController {
@@ -57,6 +60,34 @@ export class SellersController {
   //   return await this.sellersService.findByUserId(userId);
   // }
 
+  @Roles(UserRole.SELLER)
+  @UseGuards(JwtAccessGuard, RolesGuard)
+  @Get('dashboard')
+  async getDashboardData(
+    @Req() req: any,
+    @Query() queryDto: QuerySellerDashboardDto,
+  ): Promise<DashboardData> {
+    const userId = req.user.userId;
+    return await this.sellersService.getDashboardData(userId, queryDto);
+  }
+
+  @Roles(UserRole.SELLER)
+  @UseGuards(JwtAccessGuard, RolesGuard)
+  @Get('sales-report')
+  async downloadSalesReport(
+    @Req() req: any,
+    @Query() queryDto: QuerySellerDashboardDto,
+    @Res() res: any,
+  ): Promise<void> {
+    const userId = req.user.userId;
+    const csv = await this.sellersService.generateSalesReport(userId, queryDto);
+
+    const filename = `sales_report_${new Date().toISOString().split('T')[0]}.csv`;
+    res.setHeader('Content-Type', 'text/csv; charset=utf-8');
+    res.setHeader('Content-Disposition', `attachment; filename="${filename}"`);
+    res.send(csv);
+  }
+
   @Roles(UserRole.ADMIN)
   @UseGuards(JwtAccessGuard, RolesGuard)
   @Get(':sellerId')
@@ -86,8 +117,11 @@ export class SellersController {
   @Roles(UserRole.ADMIN)
   @UseGuards(JwtAccessGuard, RolesGuard)
   @Post(':sellerId/reject')
-  async reject(@Param('sellerId') sellerId: string) {
-    return await this.sellersService.reject(sellerId);
+  async reject(
+    @Param('sellerId') sellerId: string,
+    @Body() rejectDto: RejectSellerDto,
+  ) {
+    return await this.sellersService.reject(sellerId, rejectDto);
   }
 
   @Roles(UserRole.ADMIN)

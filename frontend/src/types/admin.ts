@@ -139,3 +139,9 @@ export interface AdminOrderFilters {
   page?: number;
   limit?: number;
 }
+
+// Dashboard Filter Parameters
+export interface DashboardFilters {
+  startDate?: string;
+  endDate?: string;
+}

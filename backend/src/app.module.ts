@@ -21,9 +21,15 @@ import { AuditLogsModule } from './audit-logs/audit-logs.module';
 import { CartHistoryModule } from './cart-history/cart-history.module';
 import { AdminModule } from './admin/admin.module';
 import { ReviewModule } from './review/review.module';
+import { HealthModule } from './health/health.module';
+import { SseModule } from './sse/sse.module';
+import { MailModule } from './mail/mail.module';
+import { EmailVerificationModule } from './email-verification/email-verification.module';
 
 @Module({
   imports: [
+    HealthModule,
+    SseModule,
     // allow the app to read `.env` properly
     ConfigModule.forRoot({
       isGlobal: true,

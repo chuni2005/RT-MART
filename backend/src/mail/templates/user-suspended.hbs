@@ -1,0 +1,36 @@
+<h1>帳戶停權通知</h1>
+
+<p>親愛的 {{name}}，</p>
+
+<div class='danger-box'>
+  <p><strong>您的帳戶已被停權</strong></p>
+  <p><strong>停權原因：</strong>{{reason}}</p>
+  {{#if isPermanent}}
+    <p><strong>停權類型：</strong>永久停權</p>
+  {{else}}
+    <p><strong>停權期限：</strong>{{expiresAt}}</p>
+    <p>您的帳戶將在上述日期自動恢復。</p>
+  {{/if}}
+</div>
+
+<h2>這對您意味著什麼？</h2>
+<ul>
+  <li>您將無法登入 RT-MART 平台</li>
+  <li>您的個人資料和訂單記錄仍然保留</li>
+  {{#if isPermanent}}
+    <li>若需恢復帳戶，請聯繫客服團隊</li>
+  {{else}}
+    <li>停權期滿後，您可以正常使用所有功能</li>
+  {{/if}}
+</ul>
+
+<h2>如何申訴？</h2>
+<p>如果您認為此停權決定有誤，請聯繫我們的客服團隊：</p>
+<ul>
+  <li>Email: rtmartcsie@gmail.com</li>
+  <li>客服熱線: 0800-123-456</li>
+</ul>
+
+<p>我們會盡快處理您的申訴。</p>
+
+<p>RT-MART 管理團隊</p>

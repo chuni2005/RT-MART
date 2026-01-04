@@ -1,0 +1,48 @@
+<h1>商店停權通知</h1>
+
+<p>親愛的賣家，</p>
+
+<div class='danger-box'>
+  <p><strong>您的商店「{{storeName}}」已被停權</strong></p>
+  <p><strong>停權原因：</strong>{{reason}}</p>
+  {{#if isPermanent}}
+    <p><strong>停權類型：</strong>永久停權</p>
+  {{else}}
+    <p><strong>停權期限：</strong>{{expiresAt}}</p>
+    <p>您的商店將在上述日期自動恢復營運。</p>
+  {{/if}}
+</div>
+
+<h2>停權期間的影響</h2>
+<ul>
+  <li>買家將無法瀏覽或購買您的商品</li>
+  <li>您的商品列表將暫時下架</li>
+  <li>現有訂單處理不受影響，請繼續完成進行中的訂單</li>
+  <li>商店資料和商品資訊仍然保留</li>
+  {{#if isPermanent}}
+    <li>若需恢復商店營運，請聯繫客服團隊</li>
+  {{else}}
+    <li>停權期滿後，您的商店將自動恢復上架</li>
+  {{/if}}
+</ul>
+
+<h2>下一步該怎麼做？</h2>
+<div class='info-box'>
+  <p><strong>建議您採取以下行動：</strong></p>
+  <ul style='margin: 10px 0; padding-left: 20px;'>
+    <li>檢視並改善導致停權的問題</li>
+    <li>完成所有進行中的訂單</li>
+    <li>確保符合平台規範和政策</li>
+  </ul>
+</div>
+
+<h2>如何申訴？</h2>
+<p>如果您認為此停權決定有誤，請聯繫我們的賣家支援團隊：</p>
+<ul>
+  <li>Email: seller-rtmartcsie@gmail.com</li>
+  <li>賣家專線: 0800-789-012</li>
+</ul>
+
+<p>我們重視每一位賣家，期待能盡快解決問題。</p>
+
+<p>RT-MART 管理團隊</p>

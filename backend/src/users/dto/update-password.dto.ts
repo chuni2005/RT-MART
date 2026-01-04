@@ -8,4 +8,3 @@ export class UpdatePasswordDto {
   @MinLength(8)
   newPassword: string;
 }
-

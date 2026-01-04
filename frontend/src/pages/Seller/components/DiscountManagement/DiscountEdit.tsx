@@ -19,6 +19,7 @@ function DiscountEdit() {
   const [loading, setLoading] = useState(isEditMode);
   const [saving, setSaving] = useState(false);
   const [productTypes, setProductTypes] = useState<ProductType[]>([]);
+  const [copied, setCopied] = useState(false);
 
   const form = useForm(
     {
@@ -35,12 +36,6 @@ function DiscountEdit() {
     },
     async () => {},
     {
-      discountCode: (value) => {
-        if (!value) return '請輸入折扣碼';
-        if (value.length < 3) return '折扣碼至少需要 3 個字元';
-        if (value.length > 20) return '折扣碼不可超過 20 個字元';
-        return null;
-      },
       name: (value) => {
         if (!value) return '請輸入折扣名稱';
         if (value.length < 2) return '折扣名稱至少需要 2 個字元';
@@ -139,7 +134,7 @@ function DiscountEdit() {
     setLoading(true);
     try {
       const discount = await sellerService.getDiscount(id);
-      setValue('discountCode', discount.discountCode);
+      setValue('discountCode', discount.discountCode); // Keep for display only
       setValue('name', discount.name);
       setValue('description', discount.description || '');
       setValue('minPurchaseAmount', discount.minPurchaseAmount.toString());
@@ -159,6 +154,16 @@ function DiscountEdit() {
     }
   };
 
+  const handleCopyCode = async () => {
+    try {
+      await navigator.clipboard.writeText(values.discountCode);
+      setCopied(true);
+      setTimeout(() => setCopied(false), 2000);
+    } catch (err) {
+      console.error('複製失敗:', err);
+    }
+  };
+
   const handleSave = async () => {
     if (!validateAll()) {
       return;
@@ -173,7 +178,7 @@ function DiscountEdit() {
     setSaving(true);
     try {
       const formData: DiscountFormData = {
-        discountCode: values.discountCode,
+        // discountCode removed - backend generates it
         name: values.name,
         description: values.description || undefined,
         minPurchaseAmount: Number(values.minPurchaseAmount),
@@ -189,8 +194,10 @@ function DiscountEdit() {
 
       if (isEditMode && discountId) {
         await sellerService.updateDiscount(discountId, formData);
+        alert('折扣已更新');
       } else {
-        await sellerService.createDiscount(formData);
+        const createdDiscount = await sellerService.createDiscount(formData);
+        alert(`折扣已創建！折扣碼：${createdDiscount.discountCode}`);
       }
 
       navigate('/seller/discounts');
@@ -233,16 +240,24 @@ function DiscountEdit() {
             placeholder="例如：新年優惠"
           />
 
-          <FormInput
-            label="折扣碼"
-            name="discountCode"
-            value={values.discountCode}
-            onChange={handleChange}
-            onBlur={handleBlur}
-            error={errors.discountCode}
-            required
-            placeholder="例如：NEWYEAR2024"
-          />
+          {isEditMode && values.discountCode && (
+            <div className={styles.formGroup}>
+              <label className={styles.label}>折扣碼</label>
+              <div className={styles.discountCodeDisplay}>
+                <Icon icon="ticket" />
+                <span className={styles.codeText}>{values.discountCode}</span>
+                <button
+                  type="button"
+                  className={styles.copyButton}
+                  onClick={handleCopyCode}
+                  title="複製折扣碼"
+                >
+                  <Icon icon={copied ? "check" : "copy"} />
+                  {copied && <span className={styles.copiedText}>已複製</span>}
+                </button>
+              </div>
+            </div>
+          )}
 
           <div className={styles.formGroup}>
             <label className={styles.label}>描述</label>

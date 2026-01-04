@@ -212,44 +212,44 @@
   text-transform: uppercase;
   letter-spacing: 0.03125rem;
 
-  &.pending {
-    background: color.change($warning-color, $alpha: 0.1);
-    color: color.adjust($warning-color, $alpha: 0.1);
+  &.pending_payment {
+    background: $order-pending-payment-bg;
+    color: $order-pending-payment-text;
   }
 
-  &.failed {
-    background: color.change($error-color, $alpha: 0.1);
-    color: $error-color;
+  &.payment_failed {
+    background: $order-payment-failed-bg;
+    color: $order-payment-failed-text;
   }
 
   &.paid {
-    background: color.change($info-color, $alpha: 0.1);
-    color: color.adjust($info-color, $lightness: -10%);
+    background: $order-paid-bg;
+    color: $order-paid-text;
   }
 
   &.processing {
-    background: color.change($primary-color, $alpha:0.1);
-    color: $primary-color;
+    background: $order-processing-bg;
+    color: $order-processing-text;
   }
 
   &.shipped {
-    background: color.change($info-color, $alpha: 0.15);
-    color: color.adjust($info-color, $lightness: -15%);
+    background: $order-shipped-bg;
+    color: $order-shipped-text;
   }
 
   &.delivered {
-    background: color.change($success-color, $alpha: 0.1);
-    color: color.adjust($success-color, $lightness: -10%);
+    background: $order-delivered-bg;
+    color: $order-delivered-text;
   }
 
   &.completed {
-    background: color.change($success-color, $alpha: 0.15);
-    color: color.adjust($success-color, $lightness: 15%);
+    background: $order-completed-bg;
+    color: $order-completed-text;
   }
 
   &.cancelled {
-    background: color.change($text-tertiary, $alpha: 0.1);
-    color: $text-tertiary;
+    background: $order-cancelled-bg;
+    color: $order-cancelled-text;
   }
 }
 

@@ -12,6 +12,12 @@ export class CreateOrderDto {
   @IsString()
   @IsOptional()
   paymentMethod?: string;
-  cartSnapshot: {};
-  shippingAddressSnapshot: any;
+
+  @IsString()
+  @IsOptional()
+  shippingDiscountCode?: string;
+
+  @IsString()
+  @IsOptional()
+  productDiscountCode?: string;
 }

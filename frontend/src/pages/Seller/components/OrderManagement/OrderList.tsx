@@ -8,7 +8,7 @@ import EmptyState from '@/shared/components/EmptyState';
 import sellerService from '@/shared/services/sellerService';
 import { AlertType } from '@/types';
 import { Order, OrderStatus } from '@/types';
-import { getOrderStatusText, getOrderStatusColor } from '@/shared/utils/orderUtils';
+import { getOrderStatusText } from '@/shared/utils/orderUtils';
 import styles from './OrderList.module.scss';
 
 function OrderList() {
@@ -80,7 +80,6 @@ function OrderList() {
         message: '訂單狀態更新成功',
       });
     } catch (error) {
-      console.error('更新訂單狀態失敗:', error);
       showAlert({
         type: 'error',
         message: error instanceof Error ? error.message : '更新訂單狀態失敗，請稍後再試。',
@@ -162,10 +161,7 @@ function OrderList() {
                     {new Date(order.createdAt).toLocaleDateString("zh-TW")}
                   </span>
                 </div>
-                <span
-                  className={styles.status}
-                  style={{ color: getOrderStatusColor(order.status) }}
-                >
+                <span className={`${styles.status} ${styles[order.status]}`}>
                   {getOrderStatusText(order.status)}
                 </span>
               </div>

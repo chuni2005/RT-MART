@@ -1,0 +1,42 @@
+<h1>賣家申請審核結果通知</h1>
+
+<p>親愛的 {{name}}，</p>
+
+<p>感謝您申請成為 RT-MART 的賣家。我們已經仔細審核了您的申請。</p>
+
+<div class='danger-box'>
+  <p><strong>很抱歉,您的賣家申請未獲通過</strong></p>
+  {{#if reason}}
+    <p><strong>拒絕原因：</strong>{{reason}}</p>
+  {{else}}
+    <p><strong>拒絕原因：</strong>您的申請資料不符合我們的賣家資格要求</p>
+  {{/if}}
+</div>
+
+<h2>接下來該怎麼做？</h2>
+<ul>
+  <li>您可以在 <strong>30 天後</strong>重新提交賣家申請</li>
+  <li>重新申請前,請確保您的資料完整且符合要求</li>
+  <li>請詳細閱讀我們的<a href="#">賣家申請指南</a></li>
+</ul>
+
+<div class='info-box'>
+  <strong>賣家資格要求：</strong>
+  <ul style="margin: 10px 0; padding-left: 20px;">
+    <li>提供有效的銀行帳戶資訊</li>
+    <li>帳戶狀態良好,無違規記錄</li>
+    <li>同意遵守平台賣家規範</li>
+  </ul>
+</div>
+
+<h2>需要協助？</h2>
+<p>如果您對此決定有任何疑問,或需要更多關於申請要求的資訊,請隨時聯繫我們：</p>
+<ul>
+  <li>Email: rtmartcsie@gmail.com</li>
+  <li>客服熱線: 0800-123-456</li>
+</ul>
+
+<p>我們期待未來有機會與您合作！</p>
+
+<p>祝您一切順利！<br>
+RT-MART 管理團隊</p>

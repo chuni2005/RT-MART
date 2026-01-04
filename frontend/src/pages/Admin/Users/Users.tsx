@@ -42,14 +42,13 @@ function Users() {
     setSearched(true);
     setAlert(null);
     try {
-      const { users: allUsers } = await adminService.getUsers();
-      const filtered = allUsers.filter(
-        (user) =>
-          user.email.toLowerCase().includes(keyword.toLowerCase()) ||
-          user.user_id.toLowerCase().includes(keyword.toLowerCase()) ||
-          user.login_id.toLowerCase().includes(keyword.toLowerCase())
-      );
-      setUsers(filtered);
+      // Let backend do the filtering instead of fetching all users
+      const { users } = await adminService.getUsers({
+        search: keyword,
+        includeSuspended: true, // Include suspended users in search
+      });
+      console.log('[Users.tsx] Search results:', users);
+      setUsers(users);
     } catch (error) {
       console.error('搜尋使用者失敗:', error);
       showAlert({ type: 'error', message: '搜尋使用者失敗' });

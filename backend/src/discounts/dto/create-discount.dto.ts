@@ -56,11 +56,6 @@ export class SpecialDiscountDetailsDto {
 }
 
 export class CreateDiscountDto {
-  @IsString()
-  @IsNotEmpty()
-  @Length(1, 50)
-  discountCode: string;
-
   @IsEnum(DiscountType)
   discountType: DiscountType;
 

@@ -90,14 +90,13 @@ export class CartHistoryController {
   ) {
     const userId = req.user.userId;
     const history = await this.cartHistoryService.findOne(id, userId);
-    const snapshot: any = history.cartSnapshot as any;
+    const cartSnapshot: any = history.cartSnapshot;
 
-    // ordersService.createFromSnapshot will create one order per store
-    const orders = await this.ordersService.createFromSnapshot(
-      userId,
-      snapshot,
-      body,
-    );
+    // 將資料庫中的 cartSnapshot 與請求中的其他資訊合併成 DTO
+    const orders = await this.ordersService.createFromSnapshot(userId, {
+      ...body,
+      cartSnapshot,
+    });
 
     const orderIds = orders.map((o) => o.orderId);
     await this.cartHistoryService.linkOrdersToSnapshot(

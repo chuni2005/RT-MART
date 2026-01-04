@@ -39,6 +39,11 @@ export interface AuthContextValue {
   isLoading: boolean;
   login: (identifier: string, password: string, remember?: boolean) => Promise<AuthResponse>;
   register: (loginId: string, name: string, email: string, phone: string, password: string) => Promise<AuthResponse>;
+  registerWithVerification: {
+    sendCode: (loginId: string, name: string, email: string, phone: string, password: string) => Promise<void>;
+    verifyCode: (email: string, code: string) => Promise<AuthResponse>;
+    resendCode: (email: string) => Promise<void>;
+  };
   logout: () => Promise<void>;
   updateUser: (userData: Partial<User>) => void;
   checkAuth: () => Promise<void>;

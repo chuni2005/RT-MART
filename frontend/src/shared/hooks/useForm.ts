@@ -16,6 +16,7 @@ interface UseFormReturn<T> {
   errors: Record<string, string>;
   touched: Record<string, boolean>;
   isSubmitting: boolean;
+  isValid: boolean;
   handleChange: (
     e: ChangeEvent<HTMLInputElement | HTMLTextAreaElement>
   ) => void;
@@ -47,6 +48,12 @@ export const useForm = <T extends Record<string, any>>(
   const [errors, setErrors] = useState<Record<string, string>>({});
   const [touched, setTouched] = useState<Record<string, boolean>>({});
   const [isSubmitting, setIsSubmitting] = useState(false);
+
+  // Calculate if form is valid (no errors and all required fields filled)
+  const isValid = Object.keys(validationRules).every((fieldName) => {
+    const error = validationRules[fieldName](values[fieldName], values);
+    return !error;
+  });
 
   /**
    * 處理輸入變更
@@ -210,6 +217,7 @@ export const useForm = <T extends Record<string, any>>(
     errors,
     touched,
     isSubmitting,
+    isValid,
     handleChange,
     handleBlur,
     handleSubmit,

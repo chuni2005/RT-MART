@@ -68,7 +68,7 @@ const mapBackendStoreToAdminStore = (store: any): AdminStore => ({
   address: store.storeAddress || '',
   email: store.storeEmail || '',
   phone: store.storePhone || '',
-  rating: store.averageRating || 0,
+  rating: typeof store.averageRating === 'string' ? parseFloat(store.averageRating) : (store.averageRating || 0),
   total_ratings: store.totalRatings || 0,
   product_count: store.productCount || 0,
   created_at: store.createdAt,
@@ -104,7 +104,6 @@ const mapBackendDiscountToSystemDiscount = (discount: any): SystemDiscount => ({
  */
 const mapSystemDiscountToBackend = (data: Partial<SystemDiscount>): any => {
   const baseData: any = {
-    discountCode: data.discount_code,
     discountType: data.discount_type,
     name: data.name,
     description: data.description,
@@ -136,10 +135,25 @@ const mapSystemDiscountToBackend = (data: Partial<SystemDiscount>): any => {
 
 /**
  * 獲取 Dashboard 統計數據
- * GET /admin/dashboard/stats
+ * GET /admin/dashboard/stats?startDate=&endDate=
  */
-export const getDashboardStats = async (): Promise<DashboardStats> => {
-  const result = await get<DashboardStats>('/admin/dashboard/stats');
+export const getDashboardStats = async (filters?: {
+  startDate?: string;
+  endDate?: string;
+}): Promise<DashboardStats> => {
+  const queryParams = new URLSearchParams();
+
+  if (filters?.startDate) {
+    queryParams.append('startDate', filters.startDate);
+  }
+  if (filters?.endDate) {
+    queryParams.append('endDate', filters.endDate);
+  }
+
+  const queryString = queryParams.toString();
+  const url = queryString ? `/admin/dashboard/stats?${queryString}` : '/admin/dashboard/stats';
+
+  const result = await get<DashboardStats>(url);
   return result;
 };
 
@@ -152,6 +166,7 @@ export const getDashboardStats = async (): Promise<DashboardStats> => {
 export const getUsers = async (params?: {
   search?: string;
   role?: "buyer" | "seller" | "all";
+  includeSuspended?: boolean;
 }): Promise<{ users: AdminUser[]; total: number }> => {
   const queryParams = new URLSearchParams();
 
@@ -161,6 +176,11 @@ export const getUsers = async (params?: {
 
   if (params?.role && params.role !== "all") {
     queryParams.append('role', params.role);
+  }
+
+  // Include suspended users
+  if (params?.includeSuspended) {
+    queryParams.append('includeSuspended', 'true');
   }
 
   const result = await get<{ data: any[]; total: number }>(`/users?${queryParams.toString()}`);
@@ -173,13 +193,13 @@ export const getUsers = async (params?: {
 
 /**
  * 停權使用者（軟刪除）
- * DELETE /users/:userId
+ * POST /users/:userId/suspend
  */
 export const suspendUser = async (
   userId: string,
   _reason: string
 ): Promise<{ success: boolean; message: string }> => {
-  await del(`/users/${userId}`);
+  await post(`/users/${userId}/suspend`, {});
 
   return {
     success: true,
@@ -189,12 +209,12 @@ export const suspendUser = async (
 
 /**
  * 解除停權
- * POST /users/:userId/restore
+ * POST /users/:userId/restore-suspended
  */
 export const unsuspendUser = async (
   userId: string
 ): Promise<{ success: boolean; message: string }> => {
-  await post(`/users/${userId}/restore`);
+  await post(`/users/${userId}/restore-suspended`, {});
 
   return {
     success: true,
@@ -221,15 +241,21 @@ export const deleteUser = async (
 
 /**
  * 獲取商家列表
- * GET /stores?search=
+ * GET /stores?search=&includeSuspended=
  */
 export const getStores = async (params?: {
   search?: string;
+  includeSuspended?: boolean;
 }): Promise<{ stores: AdminStore[]; total: number }> => {
   const queryParams = new URLSearchParams();
 
   if (params?.search) {
     queryParams.append('search', params.search);
+  }
+
+  // Include suspended stores
+  if (params?.includeSuspended) {
+    queryParams.append('includeSuspended', 'true');
   }
 
   const result = await get<{ data: any[]; total: number }>(`/stores?${queryParams.toString()}`);
@@ -569,6 +595,11 @@ export const updateSystemDiscount = async (
   >
 ): Promise<SystemDiscount> => {
   const backendData = mapSystemDiscountToBackend(discountData);
+
+  // 移除不可更新的欄位（後端 UpdateDiscountDto 不允許更新這些欄位）
+  delete backendData.discountCode;
+  delete backendData.discountType;
+
   const result = await patch<any>(`/discounts/admin/${discountId}`, backendData);
   return mapBackendDiscountToSystemDiscount(result);
 };

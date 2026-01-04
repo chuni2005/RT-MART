@@ -1,0 +1,67 @@
+<h1>訂單取消通知</h1>
+
+<p>親愛的顧客，</p>
+
+<p>您的訂單已被取消。以下是訂單詳情：</p>
+
+<div class='warning-box'>
+  <p><strong>訂單編號：</strong>{{orderNumber}}</p>
+  <p><strong>取消原因：</strong>{{reason}}</p>
+</div>
+
+<h2>訂單資訊</h2>
+<div class='info-box'>
+  <p><strong>商店名稱：</strong>{{orderDetails.store.storeName}}</p>
+  <p><strong>訂單金額：</strong>NT$ {{orderDetails.totalAmount}}</p>
+  <p><strong>訂單狀態：</strong>已取消</p>
+</div>
+
+<h2>訂單商品</h2>
+{{#if orderDetails.items}}
+  <table style='width: 100%; border-collapse: collapse; margin: 20px 0;'>
+    <thead>
+      <tr style='background-color: #f8f9fa;'>
+        <th
+          style='padding: 10px; text-align: left; border-bottom: 2px solid #dee2e6;'
+        >商品名稱</th>
+        <th
+          style='padding: 10px; text-align: center; border-bottom: 2px solid #dee2e6;'
+        >數量</th>
+        <th
+          style='padding: 10px; text-align: right; border-bottom: 2px solid #dee2e6;'
+        >價格</th>
+      </tr>
+    </thead>
+    <tbody>
+      {{#each orderDetails.items}}
+        <tr>
+          <td
+            style='padding: 10px; border-bottom: 1px solid #dee2e6;'
+          >{{this.productName}}</td>
+          <td
+            style='padding: 10px; text-align: center; border-bottom: 1px solid #dee2e6;'
+          >{{this.quantity}}</td>
+          <td
+            style='padding: 10px; text-align: right; border-bottom: 1px solid #dee2e6;'
+          >NT$ {{this.subtotal}}</td>
+        </tr>
+      {{/each}}
+    </tbody>
+  </table>
+{{/if}}
+
+<h2>退款資訊</h2>
+<div class='info-box'>
+  <p>如果您已經完成付款，退款將在 5-7 個工作天內退回原付款帳戶。</p>
+  <p>退款金額：<strong>NT$ {{orderDetails.totalAmount}}</strong></p>
+</div>
+
+<h2>需要協助？</h2>
+<p>如果您對此次取消有任何疑問，請聯繫我們：</p>
+<ul>
+  <li>客服信箱：rtmartcsie@gmail.com</li>
+</ul>
+
+<p>感謝您選擇 RT-MART，期待再次為您服務！</p>
+
+<p>RT-MART 客服團隊</p>

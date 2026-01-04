@@ -1,0 +1,52 @@
+.timer {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 8px;
+  padding: 12px 16px;
+  border-radius: 8px;
+  background-color: rgba($primary-color, 0.05);
+  border: 1px solid rgba($primary-color, 0.2);
+  transition: all 0.3s ease;
+}
+
+.label {
+  font-size: 14px;
+  color: $text-secondary;
+}
+
+.time {
+  font-size: 16px;
+  font-weight: 600;
+  color: $primary-color;
+  font-variant-numeric: tabular-nums;
+  min-width: 48px;
+  text-align: center;
+}
+
+.expired {
+  background-color: rgba($error-color, 0.05);
+  border-color: rgba($error-color, 0.2);
+
+  .label {
+    color: $error-color;
+  }
+
+  .time {
+    color: $error-color;
+  }
+}
+
+@include mobile {
+  .timer {
+    padding: 10px 14px;
+  }
+
+  .label {
+    font-size: 13px;
+  }
+
+  .time {
+    font-size: 15px;
+  }
+}

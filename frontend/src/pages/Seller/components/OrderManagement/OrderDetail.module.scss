@@ -53,8 +53,52 @@
 }
 
 .status {
-  font-weight: 600;
-  font-size: $font-lg;
+  display: inline-block;
+  padding: $spacing-xs 0.75rem;
+  border-radius: $border-radius-xl;
+  font-size: $font-sm;
+  font-weight: 500;
+  white-space: nowrap;
+
+  &.pending_payment {
+    background: $order-pending-payment-bg;
+    color: $order-pending-payment-text;
+  }
+
+  &.payment_failed {
+    background: $order-payment-failed-bg;
+    color: $order-payment-failed-text;
+  }
+
+  &.paid {
+    background: $order-paid-bg;
+    color: $order-paid-text;
+  }
+
+  &.processing {
+    background: $order-processing-bg;
+    color: $order-processing-text;
+  }
+
+  &.shipped {
+    background: $order-shipped-bg;
+    color: $order-shipped-text;
+  }
+
+  &.delivered {
+    background: $order-delivered-bg;
+    color: $order-delivered-text;
+  }
+
+  &.completed {
+    background: $order-completed-bg;
+    color: $order-completed-text;
+  }
+
+  &.cancelled {
+    background: $order-cancelled-bg;
+    color: $order-cancelled-text;
+  }
 }
 
 .infoGrid {

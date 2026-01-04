@@ -29,4 +29,7 @@ export class UserResponseDto {
 
   @Expose()
   updatedAt: Date;
+
+  @Expose()
+  deletedAt: Date | null;
 }

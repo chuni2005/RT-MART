@@ -20,7 +20,7 @@ interface AlertState {
 
 const Auth = () => {
   const navigate = useNavigate();
-  const { login, register, isLoading: authLoading } = useAuth();
+  const { login, registerWithVerification, isLoading: authLoading } = useAuth();
   const { t } = useTranslation();
 
   const [activeTab, setActiveTab] = useState<"login" | "signup">("login");
@@ -65,20 +65,35 @@ const Auth = () => {
     }
   };
 
-  // 處理註冊
-  const handleRegister = async (formData: any) => {
-    try {
-      setIsLoading(true);
-      setAlert({ type: "", message: "" });
+  // 處理發送驗證碼（Step 1）
+  const handleSendCode = async (formData: any) => {
+    setIsLoading(true);
+    setAlert({ type: "", message: "" });
 
-      // 註冊時 formData.name = formData.loginId，後續可透過個人設定更改
-      await register(
+    try {
+      await registerWithVerification.sendCode(
         formData.loginId,
         formData.name,
         formData.email,
         formData.phone,
         formData.password
       );
+      // 成功後表單會自動切換到 Step 2
+    } catch (error) {
+      console.error("Send code failed:", error);
+      throw error; // 讓 SignUpForm 處理錯誤
+    } finally {
+      setIsLoading(false);
+    }
+  };
+
+  // 處理驗證碼驗證（Step 2）
+  const handleVerifyCode = async (email: string, code: string) => {
+    try {
+      setIsLoading(true);
+      setAlert({ type: "", message: "" });
+
+      await registerWithVerification.verifyCode(email, code);
 
       // 註冊成功（自動登入）
       setAlert({ type: "success", message: t('auth.alerts.signupSuccess')});
@@ -88,12 +103,21 @@ const Auth = () => {
         navigate("/");
       }, 1500);
     } catch (error) {
-      console.error("Register failed:", error);
-      setAlert({
-        type: "error",
-        message:
-          error instanceof Error ? error.message : t('auth.alerts.signupError'),
-      });
+      console.error("Verify code failed:", error);
+      throw error; // 讓 SignUpForm 處理錯誤
+    } finally {
+      setIsLoading(false);
+    }
+  };
+
+  // 處理重新發送驗證碼
+  const handleResendCode = async (email: string) => {
+    setIsLoading(true);
+    try {
+      await registerWithVerification.resendCode(email);
+    } catch (error) {
+      console.error("Resend code failed:", error);
+      throw error;
     } finally {
       setIsLoading(false);
     }
@@ -155,7 +179,12 @@ const Auth = () => {
             {activeTab === "login" ? (
               <LoginForm onSubmit={handleLogin} isLoading={loading} />
             ) : (
-              <SignUpForm onSubmit={handleRegister} isLoading={loading} />
+              <SignUpForm
+                onSendCode={handleSendCode}
+                onVerifyCode={handleVerifyCode}
+                onResendCode={handleResendCode}
+                isLoading={loading}
+              />
             )}
           </div>
 

@@ -1,0 +1,193 @@
+@use "sass:color";
+
+.discountCard {
+  background: $bg-secondary;
+  border-radius: $border-radius-lg;
+  padding: $spacing-lg;
+  transition: $transition-fast;
+
+  &:hover {
+    transform: translateY(-4px);
+    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
+  }
+}
+
+.cardHeader {
+  @include flex-between;
+  margin-bottom: $spacing-md;
+  gap: $spacing-sm;
+}
+
+.discountName {
+  font-size: $font-lg;
+  font-weight: 600;
+  color: $text-primary;
+  flex: 1;
+  min-width: 0;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+
+.status {
+  font-size: $font-sm;
+  font-weight: 600;
+  padding: $spacing-xs $spacing-sm;
+  border-radius: $border-radius-sm;
+  background: color.change($bg-secondary, $alpha: 0.1);
+  white-space: nowrap;
+}
+
+.discountCode {
+  @include flex-center;
+  gap: $spacing-sm;
+  padding: $spacing-md;
+  background: $bg-primary;
+  border: 2px dashed $border-color;
+  border-radius: $border-radius-md;
+  margin-bottom: $spacing-md;
+  position: relative;
+  cursor: pointer;
+  transition: all 0.2s;
+  user-select: none;
+
+  &:hover {
+    background: color.change($primary-color, $alpha: 0.05);
+    border-color: $primary-color;
+    transform: translateY(-2px);
+
+    .copyButton {
+      background-color: color.change($primary-color, $alpha: 0.1);
+      border-color: $primary-color;
+      color: $primary-color;
+      border-radius: $border-radius-md;
+    }
+  }
+
+  &:active {
+    transform: translateY(0);
+  }
+
+  &:focus-visible {
+    outline: 2px solid $primary-color;
+    outline-offset: 2px;
+  }
+
+  svg:first-child {
+    color: $primary-color;
+    font-size: $font-lg;
+  }
+
+  .code {
+    flex: 1;
+    font-family: monospace;
+    font-size: $font-lg;
+    font-weight: 600;
+    color: $text-primary;
+  }
+
+  .copyButton {
+    display: none;
+    align-items: center;
+    gap: $spacing-xs;
+    padding: $spacing-xs $spacing-sm;
+    background: transparent;
+    border: 1px solid $border-color;
+    border-radius: $border-radius-sm;
+    transition: all 0.2s;
+    font-size: $font-sm;
+    pointer-events: none;
+
+    .copiedText {
+      color: $primary-color;
+      font-weight: 500;
+    }
+  }
+
+  &:hover .copyButton,
+  &:focus-visible .copyButton,
+  &.copied .copyButton {
+    display: flex;
+  }
+}
+
+.discountInfo {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(100px, 1fr));
+  gap: $spacing-md;
+  margin-bottom: $spacing-md;
+}
+
+.infoItem {
+  display: flex;
+  flex-direction: column;
+  gap: $spacing-xs;
+}
+
+.label {
+  font-size: $font-xs;
+  color: $text-secondary;
+}
+
+.value {
+  font-size: $font-md;
+  font-weight: 600;
+  color: $primary-color;
+}
+
+.period {
+  @include flex-center;
+  gap: $spacing-sm;
+  padding: $spacing-md;
+  background: $bg-primary;
+  border-radius: $border-radius-md;
+  margin-bottom: $spacing-md;
+
+  svg {
+    color: $text-tertiary;
+  }
+}
+
+.periodText {
+  @include flex-center;
+  gap: $spacing-xs;
+  font-size: $font-sm;
+  color: $text-secondary;
+}
+
+.usage {
+  margin-bottom: $spacing-lg;
+}
+
+.usageBar {
+  height: 8px;
+  background: $bg-primary;
+  border-radius: $border-radius-sm;
+  overflow: hidden;
+  margin-bottom: $spacing-xs;
+}
+
+.usageProgress {
+  height: 100%;
+  background: linear-gradient(90deg, $primary-color, color.adjust($primary-color, $lightness: 10%));
+  transition: $transition-fast;
+}
+
+.usageText {
+  font-size: $font-xs;
+  color: $text-secondary;
+}
+
+.cardActions {
+  display: grid;
+  grid-template-columns: 1fr 1fr 1fr;
+  gap: $spacing-xs;
+  padding-top: $spacing-md;
+  border-top: 1px solid $border-color;
+
+  button {
+    font-size: $font-xs;
+    padding: $spacing-sm;
+    gap: $spacing-xs;
+  }
+}

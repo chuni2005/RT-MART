@@ -59,8 +59,17 @@ export class StoresService implements OnModuleInit {
       .take(limit)
       .orderBy('store.createdAt', 'DESC');
 
+    // Include suspended stores if requested (admin only)
+    if (queryDto.includeSuspended) {
+      queryBuilder.withDeleted();
+    } else {
+      queryBuilder.where('store.deletedAt IS NULL');
+    }
+
     if (queryDto.search) {
-      queryBuilder.andWhere('store.storeName LIKE :search', {
+      const searchCondition =
+        'store.storeName LIKE :search OR store.storeId LIKE :search OR seller.name LIKE :search OR user.name LIKE :search';
+      queryBuilder.andWhere(searchCondition, {
         search: `%${queryDto.search}%`,
       });
     }
@@ -106,11 +115,19 @@ export class StoresService implements OnModuleInit {
     return store;
   }
 
-  async findBySeller(sellerId: string): Promise<Store | null> {
+  async findBySeller(
+    sellerId: string,
+    includeDeleted: boolean = false,
+  ): Promise<Store | null> {
     const queryBuilder = this.storeRepository
       .createQueryBuilder('store')
       .where('store.sellerId = :sellerId', { sellerId })
       .orderBy('store.createdAt', 'DESC');
+
+    if (includeDeleted) {
+      queryBuilder.withDeleted();
+    }
+
     return await queryBuilder.getOne();
   }
 

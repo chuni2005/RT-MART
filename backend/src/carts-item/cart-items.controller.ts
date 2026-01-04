@@ -23,7 +23,8 @@ export class CartItemsController {
 
   @Get()
   async getCart(@Req() req: AuthRequest) {
-    return await this.cartsService.getCart(req.user.userId);
+    const items = await this.cartsService.getCart(req.user.userId);
+    return { items };
   }
 
   @Get('summary')
@@ -41,16 +42,16 @@ export class CartItemsController {
     return await this.cartsService.moveSelectedToHistory(req.user.userId);
   }
 
-  // @Patch('items/batch')
-  // async batchUpdateCartItems(
-  //   @Req() req: AuthRequest,
-  //   @Body() batchDto: BatchUpdateCartItemsDto,
-  // ) {
-  //   return await this.cartsService.batchUpdateCartItems(
-  //     req.user.userId,
-  //     batchDto,
-  //   );
-  // }
+  @Patch('items/batch')
+  async batchUpdateCartItems(
+    @Req() req: AuthRequest,
+    @Body() batchDto: BatchUpdateCartItemsDto,
+  ) {
+    return await this.cartsService.batchUpdateCartItems(
+      req.user.userId,
+      batchDto,
+    );
+  }
 
   @Patch('items/:cartItemId')
   async updateCartItem(

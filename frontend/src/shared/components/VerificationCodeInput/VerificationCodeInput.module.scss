@@ -1,0 +1,102 @@
+.container {
+  width: 100%;
+}
+
+.inputGroup {
+  display: flex;
+  gap: 8px;
+  justify-content: center;
+  margin-bottom: 8px;
+}
+
+.input {
+  width: 48px;
+  height: 56px;
+  font-size: 24px;
+  font-weight: 600;
+  text-align: center;
+  border: 2px solid $border-color;
+  border-radius: 8px;
+  background-color: $bg-primary;
+  color: $text-primary;
+  transition: all 0.2s ease;
+  outline: none;
+
+  &:focus {
+    border-color: $primary-color;
+    box-shadow: 0 0 0 3px rgba($primary-color, 0.1);
+  }
+
+  &:disabled {
+    background-color: $bg-secondary;
+    cursor: not-allowed;
+    opacity: 0.6;
+  }
+
+  &.error {
+    border-color: $error-color;
+    animation: shake 0.3s ease;
+  }
+
+  // Remove number input arrows
+  &::-webkit-outer-spin-button,
+  &::-webkit-inner-spin-button {
+    -webkit-appearance: none;
+    margin: 0;
+  }
+
+  &[type="number"] {
+    -moz-appearance: textfield;
+  }
+}
+
+.errorMessage {
+  color: $error-color;
+  font-size: 14px;
+  text-align: center;
+  margin-top: 8px;
+  animation: fadeIn 0.2s ease;
+}
+
+@keyframes shake {
+  0%,
+  100% {
+    transform: translateX(0);
+  }
+  10%,
+  30%,
+  50%,
+  70%,
+  90% {
+    transform: translateX(-4px);
+  }
+  20%,
+  40%,
+  60%,
+  80% {
+    transform: translateX(4px);
+  }
+}
+
+@keyframes fadeIn {
+  from {
+    opacity: 0;
+    transform: translateY(-4px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+@include mobile {
+  .input {
+    width: 40px;
+    height: 48px;
+    font-size: 20px;
+  }
+
+  .inputGroup {
+    gap: 6px;
+  }
+}
