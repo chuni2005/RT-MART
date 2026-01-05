@@ -68,7 +68,7 @@ export class StoresService implements OnModuleInit {
 
     if (queryDto.search) {
       const searchCondition =
-        'store.storeName LIKE :search OR store.storeId LIKE :search OR seller.name LIKE :search OR user.name LIKE :search';
+        '(store.storeName LIKE :search OR store.storeId LIKE :search OR user.name LIKE :search)';
       queryBuilder.andWhere(searchCondition, {
         search: `%${queryDto.search}%`,
       });
