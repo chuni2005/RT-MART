@@ -286,7 +286,7 @@ export class ProductsService {
     if (files && files.length > 0) {
       const images = await Promise.all(
         files.map(async (file, index) => {
-          const result = await this.cloudinaryService.uploadImage(file);
+          const result = await this.cloudinaryService.uploadImage(file, 'products');
           console.log('Cloudinary result:', result);
 
           if (!result.url || !result.publicId) {
@@ -435,7 +435,7 @@ export class ProductsService {
     if (files && files.length > 0) {
       const newImages = await Promise.all(
         files.map(async (file, index) => {
-          const result = await this.cloudinaryService.uploadImage(file);
+          const result = await this.cloudinaryService.uploadImage(file, 'products');
 
           return this.imageRepository.create({
             productId: product.productId,

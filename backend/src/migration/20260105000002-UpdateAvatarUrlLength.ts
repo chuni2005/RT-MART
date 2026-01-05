@@ -1,6 +1,6 @@
 import { MigrationInterface, QueryRunner } from 'typeorm';
 
-export class UpdateAvatarUrlLength20250105000000
+export class UpdateAvatarUrlLength20260105000002
   implements MigrationInterface
 {
   public async up(queryRunner: QueryRunner): Promise<void> {
