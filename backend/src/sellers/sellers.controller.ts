@@ -33,7 +33,7 @@ export class SellersController {
   @Roles(UserRole.BUYER)
   @UseGuards(JwtAccessGuard, RolesGuard)
   @Post()
-  async create(@Req() req, createSellerDto: CreateSellerDto) {
+  async create(@Req() req, @Body() createSellerDto: CreateSellerDto) {
     const userId = req.user.userId;
     return this.sellersService.create({
       ...createSellerDto,

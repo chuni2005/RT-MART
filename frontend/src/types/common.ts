@@ -287,6 +287,7 @@ export interface ProtectedRouteProps {
   children: React.ReactElement;
   requiredRole?: 'buyer' | 'seller' | 'admin';
   excludeRoles?: Array<'buyer' | 'seller' | 'admin'>;
+  allowGuests?: boolean; // 允許未登入的訪客訪問
 }
 
 // VerificationCodeInput types
