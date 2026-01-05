@@ -7,6 +7,7 @@ import type {
   SystemDiscount,
   AdminOrder,
   AdminOrderFilters,
+  DashboardFilters,
 } from "@/types/admin";
 
 /**
@@ -137,10 +138,7 @@ const mapSystemDiscountToBackend = (data: Partial<SystemDiscount>): any => {
  * 獲取 Dashboard 統計數據
  * GET /admin/dashboard/stats?startDate=&endDate=
  */
-export const getDashboardStats = async (filters?: {
-  startDate?: string;
-  endDate?: string;
-}): Promise<DashboardStats> => {
+export const getDashboardStats = async (filters?: DashboardFilters): Promise<DashboardStats> => {
   const queryParams = new URLSearchParams();
 
   if (filters?.startDate) {
@@ -148,6 +146,9 @@ export const getDashboardStats = async (filters?: {
   }
   if (filters?.endDate) {
     queryParams.append('endDate', filters.endDate);
+  }
+  if (filters?.period) {
+    queryParams.append('period', filters.period);
   }
 
   const queryString = queryParams.toString();

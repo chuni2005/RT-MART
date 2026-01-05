@@ -20,6 +20,7 @@ import { ProductType } from '../product-types/entities/product-type.entity';
 import { QuerySellerDashboardDto } from './dto/query-seller-dashboard.dto';
 import { SalesReportItemDto } from './dto/sales-report-item.dto';
 import { MailService } from '../mail/mail.service';
+import { DateRangeUtil } from '../common/utils/date-range.util';
 
 export interface DashboardData {
   revenue: number;
@@ -303,54 +304,20 @@ export class SellersService {
     }
 
     const storeId = store.storeId;
+    const period = filters.period || 'week';
 
-    // Calculate date range with priority: explicit dates > period > default
-    let startDate: Date;
-    let endDate: Date = new Date();
-    const period: 'day' | 'week' | 'month' | 'year' = filters.period || 'week';
-
-    if (filters.startDate && filters.endDate) {
-      // YYYY-MM-DD is parsed as UTC midnight by default in JS
-      // We explicitly set the range to cover the full duration of the specified days
-      startDate = new Date(filters.startDate);
-      startDate.setUTCHours(0, 0, 0, 0);
-
-      endDate = new Date(filters.endDate);
-      endDate.setUTCHours(23, 59, 59, 999);
-    } else if (filters.period) {
-      const now = new Date();
-      // Use UTC for internal calculations to avoid server timezone shifts
-      endDate = new Date(now);
-
-      switch (filters.period) {
-        case 'day':
-          startDate = new Date(now);
-          startDate.setUTCHours(0, 0, 0, 0);
-          break;
-        case 'week':
-          startDate = new Date(now);
-          startDate.setUTCDate(now.getUTCDate() - 7);
-          startDate.setUTCHours(0, 0, 0, 0);
-          break;
-        case 'month':
-          startDate = new Date(now);
-          startDate.setUTCDate(now.getUTCDate() - 30);
-          startDate.setUTCHours(0, 0, 0, 0);
-          break;
-        case 'year':
-          startDate = new Date(now);
-          startDate.setUTCDate(now.getUTCDate() - 365);
-          startDate.setUTCHours(0, 0, 0, 0);
-          break;
-      }
-    } else {
-      // Default: last 7 days in UTC
-      const now = new Date();
-      endDate = new Date(now);
-      startDate = new Date(now);
-      startDate.setUTCDate(now.getUTCDate() - 7);
-      startDate.setUTCHours(0, 0, 0, 0);
-    }
+    // 使用統一的解析工具處理時區與範圍
+    const { startDate, endDate } = DateRangeUtil.parseRange(
+      filters.startDate,
+      filters.endDate,
+      period === 'day'
+        ? 1
+        : period === 'week'
+          ? 7
+          : period === 'month'
+            ? 30
+            : 365,
+    );
 
     // Fetch all dashboard data in parallel
     const [

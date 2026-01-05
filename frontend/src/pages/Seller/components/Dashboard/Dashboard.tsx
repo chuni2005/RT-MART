@@ -9,6 +9,7 @@ import RecentOrdersList from "./components/RecentOrdersList";
 import { DateRangeFilter } from "@/shared/components/DateRangeFilter/DateRangeFilter";
 import Button from "@/shared/components/Button";
 import sellerService from "@/shared/services/sellerService";
+import { calculateDateRangeLocal } from "@/shared/utils/dateUtils";
 import {
   DashboardData,
   SalesPeriod,
@@ -86,7 +87,7 @@ function Dashboard() {
   };
 
   const handleQuickSelect = (period: "day" | "week" | "month" | "year") => {
-    const { startDate, endDate } = calculateDateRange(period);
+    const { startDate, endDate } = calculateDateRangeLocal(period);
     const newFilters = {
       ...filters,
       period: period as SalesPeriod,
@@ -96,34 +97,6 @@ function Dashboard() {
     setFilters(newFilters);
     setActiveQuickSelector(period);
     loadDashboardData(newFilters);
-  };
-
-  const calculateDateRange = (period: "day" | "week" | "month" | "year") => {
-    const now = new Date();
-    const formatDate = (date: Date) => {
-      const year = date.getFullYear();
-      const month = String(date.getMonth() + 1).padStart(2, "0");
-      const day = String(date.getDate()).padStart(2, "0");
-      return `${year}-${month}-${day}`;
-    };
-
-    const endDate = formatDate(now);
-    const start = new Date();
-    switch (period) {
-      case "day":
-        start.setDate(start.getDate() - 1);
-        break;
-      case "week":
-        start.setDate(start.getDate() - 7);
-        break;
-      case "month":
-        start.setDate(start.getDate() - 30);
-        break;
-      case "year":
-        start.setDate(start.getDate() - 365);
-        break;
-    }
-    return { startDate: formatDate(start), endDate };
   };
 
   const handleDownloadReport = async () => {

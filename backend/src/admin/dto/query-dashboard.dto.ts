@@ -14,4 +14,8 @@ export class QueryDashboardDto {
     message: 'endDate must be in YYYY-MM-DD format',
   })
   endDate?: string;
+
+  @IsOptional()
+  @IsString()
+  period?: 'day' | 'week' | 'month' | 'year';
 }
