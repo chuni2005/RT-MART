@@ -35,6 +35,16 @@ interface BackendStore {
   updatedAt: string;
   deletedAt: string | null;
   productCount?: number;
+  seller?: {
+    sellerId: string;
+    userId: string;
+    user?: {
+      userId: string;
+      name: string;
+      email: string;
+      avatarUrl: string | null;
+    };
+  };
 }
 
 /**
@@ -135,8 +145,8 @@ const transformStore = (backendStore: BackendStore): Store => {
       year: 'numeric', 
       month: '2-digit' 
     }).replace(/\//g, '/'),
-    // 處理 Avatar 空值
-    avatar: backendStore.avatar || 'https://i.pravatar.cc/150?img=1',
+    // 處理 Avatar 空值：優先使用賣家用戶頭像，再使用商店頭像，最後使用預設圖
+    avatar: backendStore.seller?.user?.avatarUrl || backendStore.avatar || 'https://i.pravatar.cc/150?img=1',
     // 處理 Product Count
     productCount: backendStore.productCount || 0, 
   };

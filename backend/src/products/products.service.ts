@@ -171,6 +171,8 @@ export class ProductsService {
     const products = await this.productRepository
       .createQueryBuilder('product')
       .leftJoinAndSelect('product.store', 'store')
+      .leftJoinAndSelect('store.seller', 'seller')
+      .leftJoinAndSelect('seller.user', 'user')
       .leftJoinAndSelect('product.productType', 'productType')
       .leftJoinAndSelect('product.images', 'images')
       .leftJoinAndSelect('product.inventory', 'inventory')
@@ -208,6 +210,8 @@ export class ProductsService {
     const product = await this.productRepository
       .createQueryBuilder('product')
       .leftJoinAndSelect('product.store', 'store')
+      .leftJoinAndSelect('store.seller', 'seller')
+      .leftJoinAndSelect('seller.user', 'user')
       .leftJoinAndSelect('product.productType', 'productType')
       .leftJoinAndSelect('product.images', 'images')
       .leftJoinAndSelect('product.inventory', 'inventory')
@@ -286,7 +290,10 @@ export class ProductsService {
     if (files && files.length > 0) {
       const images = await Promise.all(
         files.map(async (file, index) => {
-          const result = await this.cloudinaryService.uploadImage(file, 'products');
+          const result = await this.cloudinaryService.uploadImage(
+            file,
+            'products',
+          );
           console.log('Cloudinary result:', result);
 
           if (!result.url || !result.publicId) {
@@ -354,7 +361,14 @@ export class ProductsService {
       skip,
       take: limit,
       order: { [sortBy]: sortOrder },
-      relations: ['store', 'productType', 'images', 'inventory'],
+      relations: [
+        'store',
+        'store.seller',
+        'store.seller.user',
+        'productType',
+        'images',
+        'inventory',
+      ],
       withDeleted: withDeleted,
     });
 
@@ -374,7 +388,14 @@ export class ProductsService {
 
     const product = await this.productRepository.findOne({
       where: whereCondition,
-      relations: ['store', 'productType', 'images', 'inventory'],
+      relations: [
+        'store',
+        'store.seller',
+        'store.seller.user',
+        'productType',
+        'images',
+        'inventory',
+      ],
       withDeleted: withDeleted,
     });
 
@@ -435,7 +456,10 @@ export class ProductsService {
     if (files && files.length > 0) {
       const newImages = await Promise.all(
         files.map(async (file, index) => {
-          const result = await this.cloudinaryService.uploadImage(file, 'products');
+          const result = await this.cloudinaryService.uploadImage(
+            file,
+            'products',
+          );
 
           return this.imageRepository.create({
             productId: product.productId,
