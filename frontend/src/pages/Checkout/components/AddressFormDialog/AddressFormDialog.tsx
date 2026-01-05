@@ -10,6 +10,7 @@ import {
 } from "@/shared/utils/taiwanAddressData";
 import { validatePhone, validatePostalCode } from "@/shared/utils/validation";
 import styles from "./AddressFormDialog.module.scss";
+import { useTranslation } from 'react-i18next';
 
 export interface AddressFormData {
   recipientName: string;
@@ -47,6 +48,7 @@ function AddressFormDialog({
   initialData,
   mode = "add",
 }: AddressFormDialogProps) {
+  const { t } = useTranslation();
   const {
     values,
     errors,
@@ -75,7 +77,7 @@ function AddressFormDialog({
       recipientName: (value) => (!value.trim() ? "請輸入收件人姓名" : null),
       phone: (value) => {
         if (!value.trim()) return "請輸入聯絡電話";
-        return validatePhone(value);
+        return validatePhone(value, t);
       },
       city: (value) => (!value ? "請選擇城市" : null),
       district: (value) => (!value ? "請選擇區域" : null),
