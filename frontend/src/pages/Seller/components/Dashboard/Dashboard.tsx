@@ -76,7 +76,7 @@ function Dashboard() {
         newFilters.period = "year"; // 以「月」為單位顯示
       } else {
         // 這裡我們擴充一個 'all' 或沿用 'year'，但後端需要支援跨年
-        newFilters.period = "year"; 
+        newFilters.period = "year";
       }
     }
 

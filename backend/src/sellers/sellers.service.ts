@@ -314,14 +314,14 @@ export class SellersService {
       // We explicitly set the range to cover the full duration of the specified days
       startDate = new Date(filters.startDate);
       startDate.setUTCHours(0, 0, 0, 0);
-      
+
       endDate = new Date(filters.endDate);
       endDate.setUTCHours(23, 59, 59, 999);
     } else if (filters.period) {
       const now = new Date();
       // Use UTC for internal calculations to avoid server timezone shifts
       endDate = new Date(now);
-      
+
       switch (filters.period) {
         case 'day':
           startDate = new Date(now);
@@ -543,7 +543,9 @@ export class SellersService {
     } else if (diffDays <= 31) {
       // 週期在一個月內：按天顯示 (1/6, 1/7...)
       while (currentDate <= endDate) {
-        labels.push(`${currentDate.getUTCMonth() + 1}/${currentDate.getUTCDate()}`);
+        labels.push(
+          `${currentDate.getUTCMonth() + 1}/${currentDate.getUTCDate()}`,
+        );
         currentDate.setUTCDate(currentDate.getUTCDate() + 1);
       }
     } else if (diffDays <= 366) {
@@ -554,7 +556,7 @@ export class SellersService {
 
       const endTotalMonth = endYear * 12 + endDate.getUTCMonth();
       let currentTotalMonth = startYear * 12 + startDate.getUTCMonth();
-      
+
       while (currentTotalMonth <= endTotalMonth) {
         const y = Math.floor(currentTotalMonth / 12);
         const m = (currentTotalMonth % 12) + 1;
@@ -589,7 +591,8 @@ export class SellersService {
       } else if (diffDays <= 366) {
         const y = date.getUTCFullYear();
         const m = date.getUTCMonth() + 1;
-        const isCrossYear = startDate.getUTCFullYear() !== endDate.getUTCFullYear();
+        const isCrossYear =
+          startDate.getUTCFullYear() !== endDate.getUTCFullYear();
         label = isCrossYear ? `${y}/${m}` : `${m}月`;
       } else {
         label = `${date.getUTCFullYear()}年`;
@@ -662,17 +665,14 @@ export class SellersService {
       // 使用子查詢獲取第一張圖片，避免 Join 導致的重複計算
       .select('product.productId', 'id')
       .addSelect('product.productName', 'name')
-      .addSelect(
-        (subQuery) => {
-          return subQuery
-            .select('img.imageUrl')
-            .from('ProductImage', 'img')
-            .where('img.productId = product.productId')
-            .orderBy('img.displayOrder', 'ASC')
-            .limit(1);
-        },
-        'image',
-      )
+      .addSelect((subQuery) => {
+        return subQuery
+          .select('img.imageUrl')
+          .from('ProductImage', 'img')
+          .where('img.productId = product.productId')
+          .orderBy('img.displayOrder', 'ASC')
+          .limit(1);
+      }, 'image')
       .addSelect('SUM(item.quantity)', 'salesCount')
       .addSelect('SUM(item.unitPrice * item.quantity)', 'revenue')
       .where('order.storeId = :storeId', { storeId })
