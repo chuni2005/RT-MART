@@ -37,10 +37,11 @@ export class DiscountLoader extends BaseLoader<Discount> {
       discount.name = data.name;
       discount.description =
         typeof data.description === 'string' ? data.description : null;
-      discount.minPurchaseAmount =
+      discount.minPurchaseAmount = Math.round(
         typeof data.min_purchase_amount === 'number'
           ? data.min_purchase_amount
-          : Number(data.min_purchase_amount) || 0;
+          : Number(data.min_purchase_amount) || 0,
+      );
       const startDatetime = DataMapper.parseDate(
         typeof data.start_datetime === 'string' ? data.start_datetime : null,
       );

@@ -64,10 +64,10 @@ export class OrderLoader extends BaseLoader<Order> {
       order.userId = userId;
       order.storeId = storeId;
       order.orderStatus = data.order_status as OrderStatus;
-      order.subtotal = Number(data.subtotal);
-      order.shippingFee = Number(data.shipping_fee || 60);
-      order.totalDiscount = Number(data.total_discount || 0);
-      order.totalAmount = Number(data.total_amount);
+      order.subtotal = Math.round(Number(data.subtotal));
+      order.shippingFee = Math.round(Number(data.shipping_fee || 60));
+      order.totalDiscount = Math.round(Number(data.total_discount || 0));
+      order.totalAmount = Math.round(Number(data.total_amount));
       order.paymentMethod =
         typeof data.payment_method === 'string' ? data.payment_method : null;
       order.paymentReference =
