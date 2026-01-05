@@ -17,8 +17,8 @@ export default registerAs('mail', () => {
       },
       // Timeout settings
       connectionTimeout: 60000, // 60 seconds
-      greetingTimeout: 30000,   // 30 seconds
-      socketTimeout: 60000,     // 60 seconds
+      greetingTimeout: 30000, // 30 seconds
+      socketTimeout: 60000, // 60 seconds
       // Connection pool for better performance
       pool: true,
       maxConnections: 5,
@@ -36,7 +36,10 @@ export default registerAs('mail', () => {
         process.env.EMAIL_VERIFICATION_EXPIRY_MINUTES || '5',
         10,
       ),
-      codeLength: parseInt(process.env.EMAIL_VERIFICATION_CODE_LENGTH || '6', 10),
+      codeLength: parseInt(
+        process.env.EMAIL_VERIFICATION_CODE_LENGTH || '6',
+        10,
+      ),
       rateLimit: parseInt(process.env.EMAIL_VERIFICATION_RATE_LIMIT || '3', 10),
     },
   };

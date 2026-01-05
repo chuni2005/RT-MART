@@ -68,7 +68,7 @@ export class AuthController {
       );
       sendCodeDto.avatarUrl = uploadResult.url;
     }
-    
+
     return this.emailVerificationService.sendVerificationCode(sendCodeDto);
   }
 

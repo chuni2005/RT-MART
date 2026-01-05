@@ -6,6 +6,8 @@ export class VerifyCodeDto {
 
   @IsString()
   @Length(6, 6, { message: 'Verification code must be 6 digits' })
-  @Matches(/^[0-9]{6}$/, { message: 'Verification code must contain only digits' })
+  @Matches(/^[0-9]{6}$/, {
+    message: 'Verification code must contain only digits',
+  })
   code: string;
 }

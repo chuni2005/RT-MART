@@ -23,7 +23,12 @@ import { CloudinaryService } from '@/cloudinary/cloudinary.service';
     JwtModule.register({}),
   ],
   controllers: [AuthController],
-  providers: [AuthService, JwtAccessStrategy, JwtRefreshStrategy, CloudinaryService],
+  providers: [
+    AuthService,
+    JwtAccessStrategy,
+    JwtRefreshStrategy,
+    CloudinaryService,
+  ],
   exports: [AuthService],
 })
 export class AuthModule {}

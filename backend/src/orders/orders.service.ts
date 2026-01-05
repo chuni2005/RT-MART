@@ -359,7 +359,14 @@ export class OrdersService {
     // Fetch full order details with relations for email
     const order = await this.orderRepository.findOne({
       where: { orderId: id },
-      relations: ['items', 'items.product', 'user', 'store', 'store.seller', 'store.seller.user'],
+      relations: [
+        'items',
+        'items.product',
+        'user',
+        'store',
+        'store.seller',
+        'store.seller.user',
+      ],
     });
 
     // Send email notifications
@@ -583,7 +590,14 @@ export class OrdersService {
   async adminCancelOrder(id: string, reason?: string): Promise<any> {
     const order = await this.orderRepository.findOne({
       where: { orderId: id },
-      relations: ['items', 'items.product', 'user', 'store', 'store.seller', 'store.seller.user'],
+      relations: [
+        'items',
+        'items.product',
+        'user',
+        'store',
+        'store.seller',
+        'store.seller.user',
+      ],
     });
 
     if (!order) {

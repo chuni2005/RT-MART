@@ -178,10 +178,7 @@ export class AuditInterceptor implements NestInterceptor {
   /**
    * 清理敏感數據
    */
-  private sanitizeData(
-    data: any,
-    excludeFields: string[] = [],
-  ): object | null {
+  private sanitizeData(data: any, excludeFields: string[] = []): object | null {
     if (!data) return null;
 
     // 默認排除的敏感字段

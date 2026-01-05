@@ -723,7 +723,8 @@ export class SellersService {
           originalPrice: parseFloat(item.originalPrice.toString()),
           itemDiscount: parseFloat(item.itemDiscount.toString()),
           unitPrice: parseFloat(item.unitPrice.toString()),
-          itemSubtotal: parseFloat(item.originalPrice.toString()) * item.quantity,
+          itemSubtotal:
+            parseFloat(item.originalPrice.toString()) * item.quantity,
           subtotal: subtotalValue,
 
           // 財務計算

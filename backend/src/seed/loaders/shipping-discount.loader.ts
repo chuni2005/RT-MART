@@ -31,7 +31,9 @@ export class ShippingDiscountLoader extends BaseLoader<ShippingDiscount> {
 
       const shippingDiscount = new ShippingDiscount();
       shippingDiscount.discountId = discountId;
-      shippingDiscount.discountAmount = Math.round(Number(data.discount_amount));
+      shippingDiscount.discountAmount = Math.round(
+        Number(data.discount_amount),
+      );
 
       return Promise.resolve(shippingDiscount);
     } catch {
