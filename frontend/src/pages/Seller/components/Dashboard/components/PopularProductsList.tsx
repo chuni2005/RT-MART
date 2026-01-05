@@ -1,13 +1,16 @@
-import Icon from '@/shared/components/Icon';
-import { PopularProduct } from '@/types/seller';
-import styles from './PopularProductsList.module.scss';
+import Icon from "@/shared/components/Icon";
+import { PopularProduct } from "@/types/seller";
+import styles from "./PopularProductsList.module.scss";
 
 interface PopularProductsListProps {
   products: PopularProduct[];
   onProductClick: (productId: string) => void;
 }
 
-function PopularProductsList({ products, onProductClick }: PopularProductsListProps) {
+function PopularProductsList({
+  products,
+  onProductClick,
+}: PopularProductsListProps) {
   if (products.length === 0) {
     return (
       <div className={styles.empty}>
@@ -26,11 +29,19 @@ function PopularProductsList({ products, onProductClick }: PopularProductsListPr
           onClick={() => onProductClick(product.id)}
         >
           <div className={styles.rank}>#{index + 1}</div>
-          <img
-            src={product.image}
-            alt={product.name}
-            className={styles.productImage}
-          />
+          <div className={styles.productImageContainer}>
+            {product.image ? (
+              <img
+                src={product.image}
+                alt={product.name}
+                className={styles.productImage}
+              />
+            ) : (
+              <div className={styles.imagePlaceholder}>
+                <Icon icon="image" />
+              </div>
+            )}
+          </div>
           <div className={styles.productInfo}>
             <h4 className={styles.productName}>{product.name}</h4>
             <div className={styles.productStats}>

@@ -1,7 +1,7 @@
 import { OrderStatus } from "./order";
 
 // ========== Sales Period ==========
-export type SalesPeriod = "day" | "week" | "month";
+export type SalesPeriod = "day" | "week" | "month" | "year";
 
 // ========== Chart Type ==========
 export type ChartType = "line" | "bar" | "pie";
@@ -24,7 +24,7 @@ export interface ChartDataPoint {
 export interface PopularProduct {
   id: string;
   name: string;
-  image: string;
+  image?: string | null;
   salesCount: number;
   revenue: number;
 }

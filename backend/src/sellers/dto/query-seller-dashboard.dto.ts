@@ -2,8 +2,8 @@ import { IsOptional, IsString, IsIn, Matches } from 'class-validator';
 
 export class QuerySellerDashboardDto {
   @IsOptional()
-  @IsIn(['day', 'week', 'month'])
-  period?: 'day' | 'week' | 'month';
+  @IsIn(['day', 'week', 'month', 'year'])
+  period?: 'day' | 'week' | 'month' | 'year';
 
   @IsOptional()
   @IsString()

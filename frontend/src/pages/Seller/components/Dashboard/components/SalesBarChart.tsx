@@ -41,7 +41,7 @@ function SalesBarChart({ data, period }: SalesBarChartProps) {
         type: 'category',
         data: data.map(d => d.label),
         axisLabel: {
-          rotate: period === 'month' ? 45 : 0,
+          rotate: (period === 'month' || period === 'year') ? 45 : 0,
           fontSize: 12
         }
       },
