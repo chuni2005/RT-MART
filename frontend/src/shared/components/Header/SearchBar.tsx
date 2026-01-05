@@ -22,7 +22,7 @@ const SearchBar = ({
   type = "products",
   placeholder = "搜尋商品",
   onSearch,
-  formClassName
+  formClassName,
 }: SearchBarProps) => {
   const [searchKeyword, setSearchKeyword] = useState("");
   const navigate = useNavigate();
@@ -31,8 +31,6 @@ const SearchBar = ({
     e.preventDefault();
     const keyword = searchKeyword.trim();
 
-    if (!keyword) return;
-
     // 如果提供自定義處理函數，使用它
     if (onSearch) {
       onSearch(keyword, type);
@@ -40,11 +38,18 @@ const SearchBar = ({
     }
 
     // 預設行為：導航到搜尋頁面，帶上 type 和 keyword 參數
-    navigate(`/search?type=${encodeURIComponent(type)}&q=${encodeURIComponent(keyword)}`);
+    navigate(
+      `/search?type=${encodeURIComponent(type)}&q=${encodeURIComponent(
+        keyword
+      )}`
+    );
   };
 
   return (
-    <form onSubmit={handleSearch} className={formClassName || styles.searchForm}>
+    <form
+      onSubmit={handleSearch}
+      className={formClassName || styles.searchForm}
+    >
       <input
         id="search-input"
         name="search"
