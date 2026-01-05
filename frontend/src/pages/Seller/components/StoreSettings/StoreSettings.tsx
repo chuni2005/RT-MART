@@ -6,10 +6,12 @@ import sellerService from '@/shared/services/sellerService';
 import { useForm } from '@/shared/hooks/useForm';
 import { validatePhone, validateEmail, validateBankAccount } from '@/shared/utils/validation';
 import styles from './StoreSettings.module.scss';
+import { useTranslation } from 'react-i18next';
 
 function StoreSettings() {
   const [loading, setLoading] = useState(true);
   const [saveStatus, setSaveStatus] = useState<'idle' | 'saving' | 'success' | 'error'>('idle');
+  const { t } = useTranslation(); 
 
   const form = useForm(
     {
@@ -34,11 +36,11 @@ function StoreSettings() {
       },
       storePhone: (value) => {
         if (!value) return '請輸入聯絡電話';
-        return validatePhone(value);
+        return validatePhone(value, t);
       },
       storeEmail: (value) => {
         if (!value) return '請輸入 Email';
-        return validateEmail(value);
+        return validateEmail(value, t);
       },
       storeAddress: (value) => {
         if (!value) return '請輸入實體地址';
@@ -46,7 +48,7 @@ function StoreSettings() {
       },
       bankAccountReference: (value) => {
         if (!value) return '請輸入銀行帳戶';
-        return validateBankAccount(value);
+        return validateBankAccount(value, t);
       },
     }
   );

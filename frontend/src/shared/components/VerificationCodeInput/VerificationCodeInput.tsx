@@ -1,5 +1,6 @@
 import React, { useRef, useState, useEffect, KeyboardEvent, ClipboardEvent } from 'react';
 import styles from './VerificationCodeInput.module.scss';
+import { useTranslation } from 'node_modules/react-i18next';
 
 interface VerificationCodeInputProps {
   length?: number;
