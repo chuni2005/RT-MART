@@ -39,6 +39,7 @@ export class AuthService {
     name: string;
     email: string;
     phoneNumber?: string;
+    avatarUrl?: string;
   }) {
     // Create user directly with the hashed password from verification metadata
     const user = await this.usersService.createWithHash({
@@ -47,6 +48,7 @@ export class AuthService {
       name: metadata.name,
       email: metadata.email,
       phoneNumber: metadata.phoneNumber,
+      avatarUrl: metadata.avatarUrl,
       role: UserRole.BUYER,
     });
     return user;
@@ -113,8 +115,26 @@ export class AuthService {
   }
 
   async login(loginDto: LoginDto) {
-    // Include suspended users to check suspension status
-    const user = await this.usersService.findByLoginId(loginDto.loginId, true);
+    // Determine if identifier is email or loginId by checking for '@'
+    const isEmail = loginDto.identifier.includes('@');
+
+    let user: any = null;
+    if (isEmail) {
+      // Find by email (including suspended users)
+      user = await this.usersService.findByEmail(loginDto.identifier);
+      if (!user) {
+        // Try to find suspended user by email
+        const queryBuilder = this.usersService['userRepository']
+          .createQueryBuilder('user')
+          .where('user.email = :email', { email: loginDto.identifier })
+          .withDeleted();
+        user = await queryBuilder.getOne();
+      }
+    } else {
+      // Find by loginId (including suspended users)
+      user = await this.usersService.findByLoginId(loginDto.identifier, true);
+    }
+
     if (!user) {
       throw new UnauthorizedException('Invalid credentials');
     }

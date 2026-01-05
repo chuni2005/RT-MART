@@ -4,8 +4,9 @@ import Tab from "@/shared/components/Tab";
 import OrderCard from "../OrderCard";
 import EmptyState from "@/shared/components/EmptyState";
 import Dialog from "@/shared/components/Dialog";
+import ReviewDialog from "@/shared/components/ReviewDialog";
 import Alert from "@/shared/components/Alert";
-import { AlertType, OrderListItem, OrderStatus } from "@/types";
+import { AlertType, OrderListItem, OrderStatus, OrderItemDetail } from "@/types";
 import { OrderAction } from "@/types/userCenter";
 import {
   getOrders,
@@ -44,6 +45,15 @@ function OrderListPage() {
     type: AlertType;
     message: string;
   } | null>(null);
+  const [reviewDialog, setReviewDialog] = useState<{
+    isOpen: boolean;
+    products: OrderItemDetail[];
+    currentIndex: number;
+  }>({
+    isOpen: false,
+    products: [],
+    currentIndex: 0,
+  });
 
   const showAlert = (
     alertData: { type: AlertType; message: string } | null
@@ -144,6 +154,75 @@ function OrderListPage() {
     }
   };
 
+  // 處理評價
+  const handleReview = async (orderId: string) => {
+    try {
+      setIsProcessing(orderId);
+
+      // 獲取訂單詳情以取得商品列表
+      const order = await getOrderDetail(orderId);
+
+      if (!order.items || order.items.length === 0) {
+        throw new Error("此訂單沒有可評價的商品。");
+      }
+
+      // 打開評價對話框，顯示第一個商品
+      setReviewDialog({
+        isOpen: true,
+        products: order.items,
+        currentIndex: 0,
+      });
+    } catch (error) {
+      console.error("Failed to load order items:", error);
+      showAlert({
+        type: "error",
+        message:
+          error instanceof Error ? error.message : "載入商品失敗，請稍後再試。",
+      });
+    } finally {
+      setIsProcessing(null);
+    }
+  };
+
+  // 處理評價成功後的邏輯
+  const handleReviewSuccess = () => {
+    const { products, currentIndex } = reviewDialog;
+
+    // 如果還有下一個商品，顯示下一個
+    if (currentIndex + 1 < products.length) {
+      setReviewDialog({
+        ...reviewDialog,
+        currentIndex: currentIndex + 1,
+      });
+      showAlert({
+        type: "success",
+        message: `評價已提交！還有 ${products.length - currentIndex - 1} 個商品待評價`,
+      });
+    } else {
+      // 所有商品都評價完了，關閉對話框
+      setReviewDialog({
+        isOpen: false,
+        products: [],
+        currentIndex: 0,
+      });
+      showAlert({
+        type: "success",
+        message: "所有商品評價已提交完成！",
+      });
+      // 刷新訂單列表
+      fetchOrders();
+    }
+  };
+
+  // 關閉評價對話框
+  const handleCloseReviewDialog = () => {
+    setReviewDialog({
+      isOpen: false,
+      products: [],
+      currentIndex: 0,
+    });
+  };
+
   // 處理訂單操作
   const handleAction = (orderId: string, action: OrderAction) => {
     switch (action) {
@@ -178,10 +257,7 @@ function OrderListPage() {
         break;
 
       case "review":
-        showAlert({
-          type: "error",
-          message: "此功能尚未開放，敬請期待。",
-        });
+        handleReview(orderId);
         break;
       case "reorder":
         handleReorder(orderId);
@@ -290,6 +366,18 @@ function OrderListPage() {
           cancelText="取消"
           onConfirm={handleConfirmAction}
           onCancel={() => setConfirmDialog(null)}
+        />
+      )}
+
+      {/* 評價對話框 */}
+      {reviewDialog.isOpen && reviewDialog.products.length > 0 && (
+        <ReviewDialog
+          isOpen={reviewDialog.isOpen}
+          onClose={handleCloseReviewDialog}
+          productId={reviewDialog.products[reviewDialog.currentIndex].productId}
+          productName={reviewDialog.products[reviewDialog.currentIndex].productName}
+          productImage={reviewDialog.products[reviewDialog.currentIndex].productImage}
+          onSubmitSuccess={handleReviewSuccess}
         />
       )}
     </div>

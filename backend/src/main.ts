@@ -1,9 +1,12 @@
 import cookieParser from 'cookie-parser';
-import { NestFactory } from '@nestjs/core';
+import { NestFactory, Reflector } from '@nestjs/core';
 import { ValidationPipe } from '@nestjs/common';
 import { AppModule } from './app.module';
 import helmet from 'helmet';
 import { AllExceptionsFilter } from './common/filters/http-exception.filter';
+import { RequestContextInterceptor } from './common/interceptors/request-context.interceptor';
+import { AuditInterceptor } from './common/interceptors/audit.interceptor';
+import { AuditLogsService } from './audit-logs/audit-logs.service';
 
 async function bootstrap() {
   const app = await NestFactory.create(AppModule);
@@ -23,6 +26,12 @@ async function bootstrap() {
 
   // enable global exception filter for detailed error logging
   app.useGlobalFilters(new AllExceptionsFilter());
+
+  // enable global interceptors for request context and audit logging
+  app.useGlobalInterceptors(
+    new RequestContextInterceptor(),
+    new AuditInterceptor(app.get(Reflector), app.get(AuditLogsService)),
+  );
 
   // enable global validation pipe to automatically validate all incoming requests
   // whitelist: strip properties that don't have decorators

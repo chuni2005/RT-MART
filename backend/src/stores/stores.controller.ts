@@ -24,6 +24,7 @@ import { Roles } from '../auth/decorators/roles.decorator';
 import { UserRole } from '../users/entities/user.entity';
 import type { AuthRequest } from '../common/types';
 import { SellersService } from '../sellers/sellers.service';
+import { Audit } from '../common/decorators/audit.decorator';
 
 @Controller('stores')
 @UseInterceptors(ClassSerializerInterceptor)
@@ -86,6 +87,7 @@ export class StoresController {
   //   return await this.storesService.findBySeller(sellerId);
   // }
 
+  @Audit('Store')
   @Roles(UserRole.SELLER)
   @UseGuards(JwtAccessGuard, RolesGuard)
   @Patch()
@@ -101,6 +103,7 @@ export class StoresController {
     return await this.storesService.update(store.storeId, updateDto);
   }
 
+  @Audit('Store')
   @Roles(UserRole.ADMIN)
   @UseGuards(JwtAccessGuard, RolesGuard)
   @Post(':storeId/restore')
@@ -108,6 +111,7 @@ export class StoresController {
     return await this.storesService.restore(storeId);
   }
 
+  @Audit('Store')
   @Roles(UserRole.ADMIN)
   @UseGuards(JwtAccessGuard, RolesGuard)
   @Patch(':storeId')
@@ -118,6 +122,7 @@ export class StoresController {
     return await this.storesService.update(storeId, updateDto);
   }
 
+  @Audit('Store')
   @Roles(UserRole.SELLER)
   @UseGuards(JwtAccessGuard, RolesGuard)
   @Delete()
@@ -134,6 +139,7 @@ export class StoresController {
     return { message: 'Store deleted successfully' };
   }
 
+  @Audit('Store')
   @Roles(UserRole.ADMIN)
   @UseGuards(JwtAccessGuard, RolesGuard)
   @Delete(':storeId')
@@ -142,6 +148,7 @@ export class StoresController {
     return { message: 'Store deleted successfully' };
   }
 
+  @Audit('Store')
   @Roles(UserRole.ADMIN)
   @UseGuards(JwtAccessGuard, RolesGuard)
   @Delete(':storeId/permanent')

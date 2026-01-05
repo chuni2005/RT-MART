@@ -95,7 +95,8 @@ export const sendVerificationCode = async (
   name: string,
   email: string,
   phone: string,
-  password: string
+  password: string,
+  avatarUrl?: string | null
 ): Promise<{ success: boolean; message: string }> => {
   try {
     const result = await post<{ success: boolean; message: string }>(
@@ -106,6 +107,7 @@ export const sendVerificationCode = async (
         email,
         phoneNumber: phone,
         password,
+        avatarUrl: avatarUrl || undefined, // 如果没有传头像,就不传这个字段,让后端使用默认值
         purpose: 'registration',
       }
     );

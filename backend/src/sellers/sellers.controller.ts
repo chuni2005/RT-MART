@@ -25,11 +25,13 @@ import { UserRole } from '../users/entities/user.entity';
 import { UsersService } from '../users/users.service';
 import { QuerySellerDto } from './dto/query-seller.dto';
 import { QuerySellerDashboardDto } from './dto/query-seller-dashboard.dto';
+import { Audit } from '../common/decorators/audit.decorator';
 
 @Controller('sellers')
 export class SellersController {
   constructor(private readonly sellersService: SellersService) {}
 
+  @Audit('Seller', { excludeFields: ['bankAccountReference'] })
   @Roles(UserRole.BUYER)
   @UseGuards(JwtAccessGuard, RolesGuard)
   @Post()
@@ -95,6 +97,7 @@ export class SellersController {
     return await this.sellersService.findOne(sellerId);
   }
 
+  @Audit('Seller', { excludeFields: ['bankAccountReference'] })
   @UseGuards(JwtAccessGuard)
   @Patch()
   async update(@Req() req: any, @Body() updateSellerDto: UpdateSellerDto) {
@@ -106,6 +109,7 @@ export class SellersController {
     return await this.sellersService.update(seller.sellerId, updateSellerDto);
   }
 
+  @Audit('Seller')
   @Roles(UserRole.ADMIN)
   @UseGuards(JwtAccessGuard, RolesGuard)
   @Post(':sellerId/verify')
@@ -114,6 +118,7 @@ export class SellersController {
     return await this.sellersService.verify(sellerId, verifier);
   }
 
+  @Audit('Seller')
   @Roles(UserRole.ADMIN)
   @UseGuards(JwtAccessGuard, RolesGuard)
   @Post(':sellerId/reject')
@@ -124,6 +129,7 @@ export class SellersController {
     return await this.sellersService.reject(sellerId, rejectDto);
   }
 
+  @Audit('Seller')
   @Roles(UserRole.ADMIN)
   @UseGuards(JwtAccessGuard, RolesGuard)
   @Delete(':sellerId')

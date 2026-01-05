@@ -10,6 +10,7 @@ import VerificationCodeInput from "@/shared/components/VerificationCodeInput/Ver
 import CountdownTimer from "@/shared/components/CountdownTimer/CountdownTimer";
 import Button from "@/shared/components/Button";
 import Alert from "@/shared/components/Alert";
+import AvatarUpload from "@/shared/components/AvatarUpload";
 import { useForm } from "@/shared/hooks/useForm";
 import {
   validateUsername,
@@ -34,6 +35,7 @@ interface SignUpFormData {
   email: string;
   phone: string;
   password: string;
+  avatarUrl?: string | null;
 }
 
 interface FormData {
@@ -45,6 +47,16 @@ interface FormData {
   agreeTerms: boolean;
 }
 
+// 将文件转换为 base64
+const fileToBase64 = (file: File): Promise<string> => {
+  return new Promise((resolve, reject) => {
+    const reader = new FileReader();
+    reader.onloadend = () => resolve(reader.result as string);
+    reader.onerror = reject;
+    reader.readAsDataURL(file);
+  });
+};
+
 const VERIFICATION_TIMEOUT = 300; // 5 minutes in seconds
 
 const SignUpForm = ({ onSendCode, onVerifyCode, onResendCode, isLoading }: SignUpFormProps) => {
@@ -55,6 +67,7 @@ const SignUpForm = ({ onSendCode, onVerifyCode, onResendCode, isLoading }: SignU
   const [canResend, setCanResend] = useState(false);
   const [timerKey, setTimerKey] = useState(0);
   const [alertMessage, setAlertMessage] = useState<{ type: 'success' | 'error'; message: string } | null>(null);
+  const [avatarFile, setAvatarFile] = useState<File | null>(null);
 
   const { t } = useTranslation()
   const { values, errors, touched, handleChange, handleBlur, handleSubmit, isValid } =
@@ -70,12 +83,19 @@ const SignUpForm = ({ onSendCode, onVerifyCode, onResendCode, isLoading }: SignU
       async (formValues) => {
         // Step 1: 發送驗證碼
         try {
+          // 如果有头像文件，转换为 base64
+          let avatarUrl: string | null = null;
+          if (avatarFile) {
+            avatarUrl = await fileToBase64(avatarFile);
+          }
+
           await onSendCode({
             loginId: formValues.loginId,
             name: formValues.loginId,
             email: formValues.email,
             phone: formValues.phone,
             password: formValues.password,
+            avatarUrl,
           });
           setStep(2);
           setIsCodeExpired(false);
@@ -227,6 +247,12 @@ const SignUpForm = ({ onSendCode, onVerifyCode, onResendCode, isLoading }: SignU
           onClose={() => setAlertMessage(null)}
         />
       )}
+
+      <AvatarUpload
+        value={avatarFile || undefined}
+        onChange={setAvatarFile}
+        disabled={isLoading}
+      />
 
       <FormInput
         label={t('signUpForm.labels.loginId')}

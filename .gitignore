@@ -6,7 +6,7 @@ node_modules/
 .cursorrules
 
 .references/
-package-lock.json 
+package-lock.json
 
 backend/test/logs/
 

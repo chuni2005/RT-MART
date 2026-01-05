@@ -20,7 +20,7 @@ export default defineConfig({
     },
   },
   server: {
-    allowedHosts: [ 'd9c8225f9a7f.ngrok-free.app'], // Replace with your actual ngrok domain
+    allowedHosts: ["kqzrh7gh-5173.asse.devtunnels.ms"], // Replace with your actual ngrok domain
     host: "0.0.0.0",
     port: 5173,
     watch: {
@@ -28,18 +28,25 @@ export default defineConfig({
       // Reduce polling interval to save memory
       interval: 1000,
       // Ignore unnecessary directories
-      ignored: ['**/node_modules/**', '**/.git/**', '**/dist/**', '**/build/**']
+      ignored: [
+        "**/node_modules/**",
+        "**/.git/**",
+        "**/dist/**",
+        "**/build/**",
+      ],
     },
     hmr: {
-      protocol: 'ws',
-      host: 'localhost',
+      protocol: "ws",
+      host: "localhost",
       clientPort: 5173,
     },
     proxy: {
-      '/api': {
-        target: process.env.DOCKER_ENV ? 'http://backend:3000' : 'http://localhost:3000',
+      "/api": {
+        target: process.env.DOCKER_ENV
+          ? "http://backend:3000"
+          : "http://localhost:3000",
         changeOrigin: true,
-      }
-    }
-  }
+      },
+    },
+  },
 });

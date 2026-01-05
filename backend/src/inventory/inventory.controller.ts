@@ -15,6 +15,7 @@ import { RolesGuard } from '../auth/guards/roles.guard';
 import { Roles } from '../auth/decorators/roles.decorator';
 import { UserRole } from '../users/entities/user.entity';
 import type { AuthRequest } from '../common/types';
+import { Audit } from '../common/decorators/audit.decorator';
 
 @Controller('inventory')
 export class InventoryController {
@@ -31,6 +32,7 @@ export class InventoryController {
     return { productId, availableStock: quantity };
   }
 
+  @Audit('Inventory')
   @Roles(UserRole.SELLER)
   @UseGuards(JwtAccessGuard, RolesGuard)
   @Patch('product/:productId')

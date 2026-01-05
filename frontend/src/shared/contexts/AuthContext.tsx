@@ -143,14 +143,16 @@ export const AuthProvider = ({ children }: AuthProviderProps) => {
       name: string,
       email: string,
       phone: string,
-      password: string
+      password: string,
+      avatarUrl?: string | null
     ): Promise<void> => {
       await authService.sendVerificationCode(
         loginId,
         name,
         email,
         phone,
-        password
+        password,
+        avatarUrl
       );
     },
 

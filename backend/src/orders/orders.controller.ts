@@ -24,6 +24,7 @@ import { Roles } from '../auth/decorators/roles.decorator';
 import { UserRole } from '../users/entities/user.entity';
 import { SellersService } from '../sellers/sellers.service';
 import type { AuthRequest } from '../common/types';
+import { Audit } from '../common/decorators/audit.decorator';
 
 @Controller('orders')
 @UseGuards(JwtAccessGuard)
@@ -33,12 +34,14 @@ export class OrdersController {
     private readonly sellersService: SellersService,
   ) {}
 
+  @Audit('Order')
   @Post()
   async create(@Req() req: AuthRequest, @Body() createDto: CreateOrderDto) {
     const userId = req.user.userId;
     return await this.ordersService.create(userId, createDto);
   }
 
+  @Audit('Order')
   @Post('from-snapshot')
   async createFromSnapshot(
     @Req() req: AuthRequest,
@@ -66,6 +69,7 @@ export class OrdersController {
     return await this.ordersService.findOne(id, userId);
   }
 
+  @Audit('Order')
   @Patch(':id/status')
   async updateStatus(
     @Req() req: AuthRequest,
@@ -76,6 +80,7 @@ export class OrdersController {
     return await this.ordersService.updateStatus(id, userId, updateDto);
   }
 
+  @Audit('Order')
   @Post(':id/cancel')
   async cancelOrder(@Req() req: AuthRequest, @Param('id') id: string) {
     const userId = req.user.userId;
@@ -104,6 +109,7 @@ export class OrdersController {
     return await this.ordersService.findOneAdmin(id);
   }
 
+  @Audit('Order')
   @Roles(UserRole.ADMIN)
   @UseGuards(JwtAccessGuard, RolesGuard)
   @Post('admin/:id/cancel')
@@ -114,6 +120,7 @@ export class OrdersController {
     return await this.ordersService.adminCancelOrder(id, cancelDto.reason);
   }
 
+  @Audit('Order')
   @Roles(UserRole.ADMIN)
   @UseGuards(JwtAccessGuard, RolesGuard)
   @Patch('admin/:id/status')
@@ -174,6 +181,7 @@ export class OrdersController {
     return await this.ordersService.findSellerOrder(seller.sellerId, id);
   }
 
+  @Audit('Order')
   @Roles(UserRole.SELLER)
   @UseGuards(JwtAccessGuard, RolesGuard)
   @Patch('seller/orders/:id/status')

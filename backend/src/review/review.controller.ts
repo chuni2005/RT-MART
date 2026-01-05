@@ -20,12 +20,14 @@ import { QueryReviewDto } from './dto/query-review.dto';
 import { JwtAccessGuard } from '../auth/guards/jwt-auth.guard';
 import { FilesInterceptor } from '@nestjs/platform-express';
 import type { AuthRequest } from '../common/types';
+import { Audit } from '../common/decorators/audit.decorator';
 
 @Controller('review')
 @UseInterceptors(ClassSerializerInterceptor)
 export class ReviewController {
   constructor(private readonly reviewService: ReviewService) {}
 
+  @Audit('Review')
   @Post()
   @UseGuards(JwtAccessGuard)
   @UseInterceptors(FilesInterceptor('images'))
@@ -67,6 +69,7 @@ export class ReviewController {
     return await this.reviewService.findOne(id);
   }
 
+  @Audit('Review')
   @Patch(':id')
   @UseGuards(JwtAccessGuard)
   async update(
@@ -76,6 +79,7 @@ export class ReviewController {
     return await this.reviewService.update(id, updateReviewDto);
   }
 
+  @Audit('Review')
   @Delete(':id')
   @UseGuards(JwtAccessGuard)
   async remove(@Param('id') id: string) {
