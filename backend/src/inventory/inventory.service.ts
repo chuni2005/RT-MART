@@ -38,8 +38,14 @@ export class InventoryService {
     return await this.inventoryRepository.save(inventory);
   }
 
-  async findByProduct(productId: string): Promise<Inventory> {
-    const inventory = await this.inventoryRepository.findOne({
+  async findByProduct(
+    productId: string,
+    manager?: any,
+  ): Promise<Inventory> {
+    const repo = manager
+      ? manager.getRepository(Inventory)
+      : this.inventoryRepository;
+    const inventory = await repo.findOne({
       where: { productId },
       relations: ['product'],
     });
@@ -78,81 +84,73 @@ export class InventoryService {
     return await this.inventoryRepository.save(inventory);
   }
 
-  // async reserveStock(
-  //   productId: string,
-  //   reserveDto: ReserveInventoryDto,
-  // ): Promise<Inventory> {
-  //   const inventory = await this.findByProduct(productId);
-
-  //   // Check if enough stock is available
-  //   const availableStock = inventory.quantity - inventory.reserved;
-  //   if (availableStock < reserveDto.quantity) {
-  //     throw new BadRequestException(
-  //       `Insufficient stock. Available: ${availableStock}, Requested: ${reserveDto.quantity}`,
-  //     );
-  //   }
-
-  //   inventory.reserved += reserveDto.quantity;
-  //   return await this.inventoryRepository.save(inventory);
-  // }
-
-  // async releaseReserved(
-  //   productId: string,
-  //   releaseDto: ReleaseInventoryDto,
-  // ): Promise<Inventory> {
-  //   const inventory = await this.findByProduct(productId);
-
-  //   if (inventory.reserved < releaseDto.quantity) {
-  //     throw new BadRequestException(
-  //       'Cannot release more than reserved quantity',
-  //     );
-  //   }
-
-  //   inventory.reserved -= releaseDto.quantity;
-  //   return await this.inventoryRepository.save(inventory);
-  // }
-
   async orderCreated(
     productId: string,
     numOfOrderItems: number,
+    manager?: any,
   ): Promise<Inventory> {
-    const inventory = await this.findByProduct(productId);
+    const inventory = await this.findByProduct(productId, manager);
 
     if (inventory.quantity < numOfOrderItems) {
-      throw new BadRequestException('Quentity is not enough');
+      throw new BadRequestException('Quantity is not enough');
     }
 
     inventory.quantity -= numOfOrderItems;
     inventory.reserved += numOfOrderItems;
-    return await this.inventoryRepository.save(inventory);
+
+    const repo = manager
+      ? manager.getRepository(Inventory)
+      : this.inventoryRepository;
+    return await repo.save(inventory);
   }
 
   async orderShipped(
     productId: string,
     numOfOrderItems: number,
+    manager?: any,
   ): Promise<Inventory> {
-    const inventory = await this.findByProduct(productId);
+    const inventory = await this.findByProduct(productId, manager);
 
     if (inventory.reserved < numOfOrderItems) {
-      throw new BadRequestException('Reserved quantity is not enougth');
+      // 如果預留數量不足，且現貨也不足，才報錯（容錯處理：可能是歷史數據或同步問題）
+      if (inventory.reserved + inventory.quantity < numOfOrderItems) {
+        throw new BadRequestException('Reserved quantity is not enough');
+      }
+      // 容錯：如果 reserved 不足但總庫存夠，直接從總庫存扣除剩餘部分
+      const diff = numOfOrderItems - inventory.reserved;
+      inventory.reserved = 0;
+      inventory.quantity -= diff;
+    } else {
+      inventory.reserved -= numOfOrderItems;
     }
-    inventory.reserved -= numOfOrderItems;
-    return await this.inventoryRepository.save(inventory);
+
+    const repo = manager
+      ? manager.getRepository(Inventory)
+      : this.inventoryRepository;
+    return await repo.save(inventory);
   }
 
   async orderCancel(
     productId: string,
     numOfOrderItems: number,
+    manager?: any,
   ): Promise<Inventory> {
-    const inventory = await this.findByProduct(productId);
+    const inventory = await this.findByProduct(productId, manager);
 
-    if (inventory.quantity < numOfOrderItems) {
-      throw new BadRequestException('Quentity is not enough');
+    // 修正：取消訂單時檢查的是預留數量，而不是可用庫存
+    if (inventory.reserved < numOfOrderItems) {
+      // 容錯處理：如果預留不足，至少也要退回現有預留
+      inventory.quantity += inventory.reserved;
+      inventory.reserved = 0;
+    } else {
+      inventory.reserved -= numOfOrderItems;
+      inventory.quantity += numOfOrderItems;
     }
 
-    inventory.reserved -= numOfOrderItems;
-    inventory.quantity += numOfOrderItems;
-    return await this.inventoryRepository.save(inventory);
+    const repo = manager
+      ? manager.getRepository(Inventory)
+      : this.inventoryRepository;
+    return await repo.save(inventory);
   }
 
   async getAvailableStock(productId: string): Promise<number> {

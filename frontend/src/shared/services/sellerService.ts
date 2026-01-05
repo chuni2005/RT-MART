@@ -487,7 +487,7 @@ export const updateOrderStatus = async (id: string, status: string, note?: strin
     }
 
     // 5. 庫存保留數量不足
-    if (errorMessage.includes('Reserved quantity is not enougth') || errorMessage.includes('Reserved quantity')) {
+    if (errorMessage.includes('Reserved quantity is not enough') || errorMessage.includes('Reserved quantity')) {
       throw new Error('庫存保留數量不足，無法完成此操作。請聯繫技術支援。');
     }
 

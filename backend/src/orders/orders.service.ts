@@ -7,6 +7,7 @@ import { InjectRepository } from '@nestjs/typeorm';
 import { Repository, DataSource, LessThan, In } from 'typeorm';
 import { Order, OrderStatus } from './entities/order.entity';
 import { OrderItem } from './entities/order-item.entity';
+import { Inventory } from '../inventory/entities/inventory.entity';
 import { CreateOrderDto } from './dto/create-order.dto';
 import { CreateOrderFromSnapshotDto } from './dto/create-order-from-snapshot.dto';
 import { UpdateOrderStatusDto } from './dto/update-order-status.dto';
@@ -132,7 +133,6 @@ export class OrdersService {
         for (const item of storeItems) {
           const productId = item.productId || item.product?.productId;
 
-          // 庫存預扣
           if (productId) {
             const isAvailable =
               await this.inventoryService.checkStockAvailability(
@@ -146,7 +146,17 @@ export class OrdersService {
               );
             }
 
-            await this.inventoryService.orderCreated(productId, item.quantity);
+            const isCashOnDelivery = options.paymentMethod === 'cash_on_delivery';
+            if (isCashOnDelivery) {
+              // 貨到付款：直接扣除實體庫存，不進預留池
+              const inventory = await this.inventoryService.findByProduct(productId, manager);
+              inventory.quantity -= item.quantity;
+              const repo = manager.getRepository(Inventory);
+              await repo.save(inventory);
+            } else {
+              // 線上支付：進入預留池
+              await this.inventoryService.orderCreated(productId, item.quantity, manager);
+            }
           }
 
           subtotal +=
@@ -282,23 +292,28 @@ export class OrdersService {
     order: Order,
     newStatus: OrderStatus,
   ): Promise<void> {
+    const oldStatus = order.orderStatus;
     order.orderStatus = newStatus;
 
     switch (newStatus) {
       case OrderStatus.PAID:
         order.paidAt = new Date();
+        // 支付成功：從預留池正式扣除
+        if (oldStatus === OrderStatus.PENDING_PAYMENT) {
+          for (const item of order.items || []) {
+            if (item.productId) {
+              await this.inventoryService.orderShipped(
+                item.productId,
+                item.quantity,
+                manager,
+              );
+            }
+          }
+        }
         break;
       case OrderStatus.SHIPPED:
         order.shippedAt = new Date();
-        // 釋放預留庫存（實際出貨）
-        for (const item of order.items || []) {
-          if (item.productId) {
-            await this.inventoryService.orderShipped(
-              item.productId,
-              item.quantity,
-            );
-          }
-        }
+        // 按照使用者設計：支付時已扣除預留，出貨不再動庫存
         break;
       case OrderStatus.DELIVERED:
         order.deliveredAt = new Date();
@@ -308,13 +323,23 @@ export class OrdersService {
         break;
       case OrderStatus.CANCELLED:
         order.cancelledAt = new Date();
-        // 退回預留庫存
+        // 取消訂單：
         for (const item of order.items || []) {
           if (item.productId) {
-            await this.inventoryService.orderCancel(
-              item.productId,
-              item.quantity,
-            );
+            if (oldStatus === OrderStatus.PENDING_PAYMENT) {
+              // 1. 若尚未支付：還原庫存 (res--, qty++)
+              await this.inventoryService.orderCancel(
+                item.productId,
+                item.quantity,
+                manager,
+              );
+            } else {
+              // 2. 若已支付後取消：直接補回現貨 (qty++)
+              const inventory = await this.inventoryService.findByProduct(item.productId, manager);
+              inventory.quantity += item.quantity;
+              const repo = manager.getRepository(Inventory);
+              await repo.save(inventory);
+            }
           }
         }
         break;
