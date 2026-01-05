@@ -97,11 +97,11 @@ function AppContent() {
           <Route path="/" element={<RoleBasedHome />} />
           <Route path="/auth" element={<Auth />} />
 
-          {/* SECURITY: Public buyer/seller routes - exclude admin access */}
+          {/* Public Pages - Accessible to guests, buyers, and sellers (admin excluded) */}
           <Route
             path="/search"
             element={
-              <ProtectedRoute excludeRoles={["admin"]}>
+              <ProtectedRoute allowGuests={true} excludeRoles={["admin"]}>
                 <Search />
               </ProtectedRoute>
             }
@@ -109,7 +109,7 @@ function AppContent() {
           <Route
             path="/product/:product_id"
             element={
-              <ProtectedRoute excludeRoles={["admin"]}>
+              <ProtectedRoute allowGuests={true} excludeRoles={["admin"]}>
                 <ProductDetail />
               </ProtectedRoute>
             }
@@ -117,7 +117,7 @@ function AppContent() {
           <Route
             path="/store/:store_id"
             element={
-              <ProtectedRoute excludeRoles={["admin"]}>
+              <ProtectedRoute allowGuests={true} excludeRoles={["admin"]}>
                 <Store />
               </ProtectedRoute>
             }

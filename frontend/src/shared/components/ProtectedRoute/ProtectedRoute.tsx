@@ -9,8 +9,9 @@ import type { ProtectedRouteProps } from '@/types/common';
  * @param children - 受保護的子組件
  * @param requiredRole - 可選的必要角色，如果指定則只有該角色可訪問
  * @param excludeRoles - 排除的角色列表，這些角色無法訪問
+ * @param allowGuests - 允許未登入的訪客訪問（同時仍可排除特定角色如 admin）
  */
-function ProtectedRoute({ children, requiredRole, excludeRoles }: ProtectedRouteProps) {
+function ProtectedRoute({ children, requiredRole, excludeRoles, allowGuests = false }: ProtectedRouteProps) {
   const { isAuthenticated, isLoading, user } = useAuth();
   const location = useLocation();
 
@@ -30,7 +31,12 @@ function ProtectedRoute({ children, requiredRole, excludeRoles }: ProtectedRoute
     );
   }
 
-  // 未登入則導向登入頁面
+  // 如果允許訪客且用戶未登入，直接允許訪問
+  if (allowGuests && !isAuthenticated) {
+    return children;
+  }
+
+  // 未登入且不允許訪客則導向登入頁面
   if (!isAuthenticated) {
     return <Navigate to="/auth" state={{ from: location.pathname }} replace />;
   }
