@@ -1,4 +1,5 @@
-import { useState } from "react";
+import { useState, useEffect } from "react";
+import { useTranslation } from "react-i18next";
 import Select from "../Select/Select";
 import { LanguageMenuProps } from "@/types/common";
 import styles from "./LanguageMenu.module.scss";
@@ -6,7 +7,7 @@ import styles from "./LanguageMenu.module.scss";
 /**
  * LanguageMenu Component
  * 使用 Select 組件實作的語言選單
- * 支援繁體中文 (zh-TW) 和英文 (en)
+ * 支援繁體中文 (zh) 和英文 (en)
  *
  * @param variant - 外觀變體 ("default" | "topbar")
  */
@@ -15,18 +16,26 @@ const languages = [
   { value: "zh-TW", label: "繁體中文" },
   { value: "en", label: "English" },
 ];
-
 const LanguageMenu = ({
   variant = "default",
   className,
   classNames
 }: LanguageMenuProps) => {
+  const { i18n } = useTranslation();
   const [language, setLanguage] = useState("zh-TW");
+
+  useEffect(() => {
+    const savedLanguage = localStorage.getItem("language") || "zh-TW";
+    setLanguage(savedLanguage);
+    i18n.changeLanguage(savedLanguage);
+    document.documentElement.lang = savedLanguage;
+  }, []);
 
   const handleLanguageChange = (newLanguage: string) => {
     setLanguage(newLanguage);
-    // TODO: 實作 i18n 國際化切換
-    console.log("切換語言至:", newLanguage);
+    i18n.changeLanguage(newLanguage);
+    localStorage.setItem("language", newLanguage);
+    document.documentElement.lang = newLanguage;
   };
 
   return (
@@ -37,8 +46,9 @@ const LanguageMenu = ({
       variant={variant}
       icon="globe"
       ariaLabel="選擇語言"
+      className={className}
       classNames={{
-        prefixIcon: className || classNames?.icon || styles.icon,
+        prefixIcon: classNames?.icon || styles.icon,
         trigger: classNames?.trigger || styles.trigger,
         chevron: classNames?.chevron || styles.chevron,
         dropdown: classNames?.dropdown || styles.dropdown,

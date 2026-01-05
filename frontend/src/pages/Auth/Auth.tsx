@@ -11,6 +11,7 @@ import SignUpForm from "./components/SignUpForm";
 import Alert from "@/shared/components/Alert";
 import styles from "./Auth.module.scss";
 import { AlertType } from "@/types";
+import { useTranslation } from 'react-i18next';
 
 interface AlertState {
   type: AlertType | "";
@@ -20,6 +21,7 @@ interface AlertState {
 const Auth = () => {
   const navigate = useNavigate();
   const { login, registerWithVerification, isLoading: authLoading } = useAuth();
+  const { t } = useTranslation();
 
   const [activeTab, setActiveTab] = useState<"login" | "signup">("login");
   const [isLoading, setIsLoading] = useState(false);
@@ -45,7 +47,7 @@ const Auth = () => {
       );
 
       // 登入成功
-      setAlert({ type: "success", message: "登入成功！即將跳轉..." }); // TODO: i18n
+      setAlert({ type: "success", message: t('auth.alerts.loginSuccess')});
 
       // 延遲跳轉
       setTimeout(() => {
@@ -56,8 +58,8 @@ const Auth = () => {
       setAlert({
         type: "error",
         message:
-          error instanceof Error ? error.message : "登入失敗，請稍後再試",
-      }); // TODO: i18n
+          error instanceof Error ? error.message : t('auth.alerts.loginError'),
+      });
     } finally {
       setIsLoading(false);
     }
@@ -94,7 +96,7 @@ const Auth = () => {
       await registerWithVerification.verifyCode(email, code);
 
       // 註冊成功（自動登入）
-      setAlert({ type: "success", message: "註冊成功！即將跳轉..." });
+      setAlert({ type: "success", message: t('auth.alerts.signupSuccess')});
 
       // 延遲跳轉
       setTimeout(() => {
@@ -131,10 +133,9 @@ const Auth = () => {
           <div className={styles.logo}>
             <span className={styles.logoText}>RT-MART</span>
           </div>
-          <h1 className={styles.slogan}>您的線上購物首選平台</h1>
-          {/* TODO: i18n */}
+          <h1 className={styles.slogan}>{t('auth.brand.slogan')}</h1>
           <p className={styles.description}>
-            探索數萬種商品，享受便捷的購物體驗 {/* TODO: i18n */}
+            {t('auth.brand.description')}
           </p>
         </div>
       </div>
@@ -151,7 +152,7 @@ const Auth = () => {
               onClick={() => handleTabChange("login")}
               disabled={loading}
             >
-              登入 {/* TODO: i18n */}
+              {t('auth.tabs.login')}
             </button>
             <button
               className={`${styles.tab} ${
@@ -160,7 +161,7 @@ const Auth = () => {
               onClick={() => handleTabChange("signup")}
               disabled={loading}
             >
-              註冊 {/* TODO: i18n */}
+              {t('auth.tabs.signup')}
             </button>
           </div>
 
@@ -191,27 +192,25 @@ const Auth = () => {
           <div className={styles.footer}>
             {activeTab === "login" ? (
               <p>
-                還沒有帳號？
+                {t('auth.footer.noAccount')}
                 <button
                   className={styles.linkButton}
                   onClick={() => handleTabChange("signup")}
                   disabled={loading}
                 >
-                  立即註冊
+                  {t('auth.footer.signupNow')}
                 </button>
-                {/* TODO: i18n */}
               </p>
             ) : (
               <p>
-                已經有帳號了？
+                {t('auth.footer.hasAccount')}
                 <button
                   className={styles.linkButton}
                   onClick={() => handleTabChange("login")}
                   disabled={loading}
                 >
-                  立即登入
+                  {t('auth.footer.loginNow')}
                 </button>
-                {/* TODO: i18n */}
               </p>
             )}
           </div>

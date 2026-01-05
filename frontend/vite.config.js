@@ -20,6 +20,7 @@ export default defineConfig({
     },
   },
   server: {
+    allowedHosts: [ 'd9c8225f9a7f.ngrok-free.app'], // Replace with your actual ngrok domain
     host: "0.0.0.0",
     port: 5173,
     watch: {

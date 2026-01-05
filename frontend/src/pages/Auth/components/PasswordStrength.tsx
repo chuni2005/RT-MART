@@ -5,6 +5,7 @@
 
 import { calculatePasswordStrength } from '@/shared/utils/validation';
 import styles from './PasswordStrength.module.scss';
+import { useTranslation } from 'react-i18next';
 
 interface PasswordStrengthProps {
   password: string;
@@ -14,17 +15,18 @@ const PasswordStrength = ({ password }: PasswordStrengthProps) => {
   if (!password) return null;
 
   const { level, score } = calculatePasswordStrength(password);
+  const { t } = useTranslation();
 
   const levelText: Record<typeof level, string> = {
-    weak: '弱',
-    medium: '中',
-    strong: '強',
+    weak: t('passwordStrength.level.weak'),
+    medium: t('passwordStrength.level.medium'),
+    strong: t('passwordStrength.level.strong'),
   };
 
   const hints: Record<typeof level, string> = {
-    weak: '密碼太簡單，建議加強',
-    medium: '密碼強度適中',
-    strong: '密碼強度良好',
+    weak: t('passwordStrength.hint.weak'),
+    medium: t('passwordStrength.hint.medium'),
+    strong: t('passwordStrength.hint.strong'),
   };
 
   return (

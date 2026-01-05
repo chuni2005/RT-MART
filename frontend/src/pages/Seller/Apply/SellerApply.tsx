@@ -9,6 +9,7 @@ import { validateBankAccount } from "@/shared/utils/validation";
 import { AlertType } from "@/types";
 import type { SellerApplicationForm } from "@/types/seller";
 import styles from "./SellerApply.module.scss";
+import { useTranslation } from 'react-i18next';
 
 interface AlertState {
   type: AlertType | "";
@@ -23,6 +24,8 @@ interface AlertState {
 function SellerApply() {
   const navigate = useNavigate();
   const { user } = useAuth();
+  const { t } = useTranslation(); 
+  
 
   // 權限檢查：只有 buyer 可以申請
   if (!user || user.role !== "buyer") {
@@ -66,7 +69,7 @@ function SellerApply() {
         }
       },
       {
-        bank_account_reference: (value) => validateBankAccount(value),
+        bank_account_reference: (value) => validateBankAccount(value, t),
       }
     );
 
