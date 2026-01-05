@@ -27,8 +27,8 @@ export const applyToBeSeller = async (
 ): Promise<{ success: boolean; message: string }> => {
   try {
     // 調用後端 API
-    // userId 會從 JWT token 自動獲取
     await api.post('/sellers', {
+      userId: data.userId,
       bankAccountReference: data.bank_account_reference,
     });
 

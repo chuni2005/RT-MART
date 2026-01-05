@@ -148,6 +148,7 @@ export interface DiscountFormData {
 
 // ========== Seller Application Types ==========
 export interface SellerApplicationForm {
+  userId: string;
   bank_account_reference: string;
 }
 
