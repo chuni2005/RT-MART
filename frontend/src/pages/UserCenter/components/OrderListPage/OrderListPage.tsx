@@ -6,13 +6,19 @@ import EmptyState from "@/shared/components/EmptyState";
 import Dialog from "@/shared/components/Dialog";
 import ReviewDialog from "@/shared/components/ReviewDialog";
 import Alert from "@/shared/components/Alert";
-import { AlertType, OrderListItem, OrderStatus, OrderItemDetail } from "@/types";
+import {
+  AlertType,
+  OrderListItem,
+  OrderStatus,
+  OrderItemDetail,
+} from "@/types";
 import { OrderAction } from "@/types/userCenter";
 import {
   getOrders,
   cancelOrder,
   confirmDelivery,
   getOrderDetail,
+  payOrder,
 } from "@/shared/services/orderService";
 import cartService from "@/shared/services/cartService";
 import { useAuth } from "@/shared/contexts/AuthContext";
@@ -196,7 +202,9 @@ function OrderListPage() {
       });
       showAlert({
         type: "success",
-        message: `評價已提交！還有 ${products.length - currentIndex - 1} 個商品待評價`,
+        message: `評價已提交！還有 ${
+          products.length - currentIndex - 1
+        } 個商品待評價`,
       });
     } else {
       // 所有商品都評價完了，關閉對話框
@@ -224,7 +232,7 @@ function OrderListPage() {
   };
 
   // 處理訂單操作
-  const handleAction = (orderId: string, action: OrderAction) => {
+  const handleAction = async (orderId: string, action: OrderAction) => {
     switch (action) {
       case "confirm":
         // 確認收貨 - 顯示確認對話框
@@ -249,11 +257,26 @@ function OrderListPage() {
         break;
 
       case "pay":
-        // TODO: 後續跳出 dialog 讓用戶信用卡支付
-        showAlert({
-          type: "error",
-          message: "付款功能開發中，敬請期待。",
-        });
+        // 直接調用付款 API，修改訂單狀態為已付款
+        try {
+          setIsProcessing(orderId);
+          await payOrder(orderId);
+          showAlert({
+            type: "success",
+            message: "付款成功！訂單已更新為已付款。",
+          });
+          // 刷新訂單列表
+          await fetchOrders();
+        } catch (error) {
+          console.error("Payment failed:", error);
+          showAlert({
+            type: "error",
+            message:
+              error instanceof Error ? error.message : "付款失敗，請稍後再試。",
+          });
+        } finally {
+          setIsProcessing(null);
+        }
         break;
 
       case "review":
@@ -375,8 +398,12 @@ function OrderListPage() {
           isOpen={reviewDialog.isOpen}
           onClose={handleCloseReviewDialog}
           productId={reviewDialog.products[reviewDialog.currentIndex].productId}
-          productName={reviewDialog.products[reviewDialog.currentIndex].productName}
-          productImage={reviewDialog.products[reviewDialog.currentIndex].productImage}
+          productName={
+            reviewDialog.products[reviewDialog.currentIndex].productName
+          }
+          productImage={
+            reviewDialog.products[reviewDialog.currentIndex].productImage
+          }
           onSubmitSuccess={handleReviewSuccess}
         />
       )}

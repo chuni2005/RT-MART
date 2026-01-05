@@ -300,7 +300,12 @@ export const getOrders = async (params?: GetOrdersParams): Promise<GetOrdersResp
 
   let filteredOrders = [...mockOrdersData];
   if (params?.status) {
-    filteredOrders = mockOrdersData.filter((o) => o.status === params.status);
+    filteredOrders = mockOrdersData.filter((o) => {
+      if (params.status === "processing") {
+        return o.status === "processing" || o.status === "paid";
+      }
+      return o.status === params.status;
+    });
   }
 
   const page = params?.page || 1;
@@ -391,6 +396,28 @@ export const confirmDelivery = async (orderId: string): Promise<ApiResponse> => 
   return { success: true, message: '已確認收貨' };
 };
 
+/**
+ * 支付訂單
+ */
+export const payOrder = async (orderId: string): Promise<ApiResponse> => {
+  if (!USE_MOCK_API) {
+    try {
+      await patch(`/orders/${orderId}/status`, { status: 'paid' });
+      return { success: true, message: '付款成功' };
+    } catch (error) {
+      console.error('[API Error] payOrder:', error);
+      throw error;
+    }
+  }
+
+  console.log('[Mock API] Pay order:', orderId);
+  await delay(400);
+  const order = mockOrdersData.find((o) => o.orderId === orderId);
+  if (!order) throw new Error('訂單不存在');
+  order.status = 'paid';
+  return { success: true, message: '付款成功' };
+};
+
 export default {
   createOrder,
   createOrderApi,
@@ -398,4 +425,5 @@ export default {
   getOrderDetail,
   cancelOrder,
   confirmDelivery,
+  payOrder,
 };

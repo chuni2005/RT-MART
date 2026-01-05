@@ -216,7 +216,11 @@ export class OrdersService {
     const where: any = { userId };
 
     if (queryDto.status) {
-      where.orderStatus = queryDto.status;
+      if (queryDto.status === OrderStatus.PROCESSING) {
+        where.orderStatus = In([OrderStatus.PAID, OrderStatus.PROCESSING]);
+      } else {
+        where.orderStatus = queryDto.status;
+      }
     }
 
     if (queryDto.storeId) {
@@ -714,9 +718,15 @@ export class OrdersService {
 
     // Apply status filter if provided
     if (queryDto.status) {
-      query.andWhere('order.orderStatus = :status', {
-        status: queryDto.status,
-      });
+      if (queryDto.status === OrderStatus.PROCESSING) {
+        query.andWhere('order.orderStatus IN (:...statuses)', {
+          statuses: [OrderStatus.PAID, OrderStatus.PROCESSING],
+        });
+      } else {
+        query.andWhere('order.orderStatus = :status', {
+          status: queryDto.status,
+        });
+      }
     }
 
     // Apply store filter if provided (seller might have multiple stores in future)

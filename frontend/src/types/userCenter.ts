@@ -1,4 +1,4 @@
-import { OrderListItem, OrderStatus } from './order'; // Assuming order.ts is in the same directory
+import { OrderListItem, OrderStatus, PaymentMethod } from './order'; // Assuming order.ts is in the same directory
 
 // UserSidebar types
 export interface UserSidebarProps {
@@ -19,6 +19,7 @@ export interface NavItem {
 // OrderTimeline types
 export interface OrderTimelineProps {
   status: OrderStatus;
+  paymentMethod?: PaymentMethod;
   timestamps: {
     createdAt: string;
     paidAt?: string;
