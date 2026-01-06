@@ -146,16 +146,24 @@ export class OrdersService {
               );
             }
 
-            const isCashOnDelivery = options.paymentMethod === 'cash_on_delivery';
+            const isCashOnDelivery =
+              options.paymentMethod === 'cash_on_delivery';
             if (isCashOnDelivery) {
               // 貨到付款：直接扣除實體庫存，不進預留池
-              const inventory = await this.inventoryService.findByProduct(productId, manager);
+              const inventory = await this.inventoryService.findByProduct(
+                productId,
+                manager,
+              );
               inventory.quantity -= item.quantity;
               const repo = manager.getRepository(Inventory);
               await repo.save(inventory);
             } else {
               // 線上支付：進入預留池
-              await this.inventoryService.orderCreated(productId, item.quantity, manager);
+              await this.inventoryService.orderCreated(
+                productId,
+                item.quantity,
+                manager,
+              );
             }
           }
 
@@ -335,7 +343,10 @@ export class OrdersService {
               );
             } else {
               // 2. 若已支付後取消：直接補回現貨 (qty++)
-              const inventory = await this.inventoryService.findByProduct(item.productId, manager);
+              const inventory = await this.inventoryService.findByProduct(
+                item.productId,
+                manager,
+              );
               inventory.quantity += item.quantity;
               const repo = manager.getRepository(Inventory);
               await repo.save(inventory);

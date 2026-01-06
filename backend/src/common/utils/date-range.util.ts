@@ -25,7 +25,11 @@ export class DateRangeUtil {
    * 根據查詢參數解析日期範圍
    * 如果沒有提供日期，則使用預設範圍（例如最近 12 個月）
    */
-  static parseRange(startDateStr?: string, endDateStr?: string, defaultDays = 365) {
+  static parseRange(
+    startDateStr?: string,
+    endDateStr?: string,
+    defaultDays = 365,
+  ) {
     let endDate: Date;
     let startDate: Date;
 
@@ -38,11 +42,12 @@ export class DateRangeUtil {
     if (startDateStr) {
       startDate = this.getStartOfDay(startDateStr);
     } else {
-      startDate = new Date(endDate.getTime() - defaultDays * 24 * 60 * 60 * 1000);
+      startDate = new Date(
+        endDate.getTime() - defaultDays * 24 * 60 * 60 * 1000,
+      );
       startDate.setHours(0, 0, 0, 0);
     }
 
     return { startDate, endDate };
   }
 }
-

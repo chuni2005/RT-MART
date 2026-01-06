@@ -20,6 +20,7 @@ import { OrderLoader } from './loaders/order.loader';
 import { OrderItemLoader } from './loaders/order-item.loader';
 import { OrderDiscountLoader } from './loaders/order-discount.loader';
 import { CartHistoryLoader } from './loaders/cart-history.loader';
+import { DashboardTestDataLoader } from './loaders/dashboard-test-data.loader';
 import { UserTokenLoader } from './loaders/user-token.loader';
 import { AuditLogLoader } from './loaders/audit-log.loader';
 import { ReviewLoader } from './loaders/review.loader';
@@ -102,6 +103,27 @@ export class SeedService {
     }
 
     this.logger.log('Generating UserToken and AuditLog from seed data...');
+
+    const dashboardTestDataLoader = new DashboardTestDataLoader(
+      entityManager,
+      idMapping,
+      this.logger,
+    );
+    try {
+      const result = await dashboardTestDataLoader.load();
+      results.push({
+        loader: 'DashboardTestDataLoader',
+        success: result.success,
+        skipped: 0,
+        errors: result.errors.map((e) => ({ error: e })),
+      });
+      totalSuccess += result.success;
+    } catch (error) {
+      this.logger.error(
+        'Failed to load DashboardTestDataLoader',
+        error instanceof Error ? error.stack : String(error),
+      );
+    }
 
     const userTokenLoader = new UserTokenLoader(entityManager, this.logger);
     const auditLogLoader = new AuditLogLoader(entityManager, this.logger);

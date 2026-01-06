@@ -38,10 +38,7 @@ export class InventoryService {
     return await this.inventoryRepository.save(inventory);
   }
 
-  async findByProduct(
-    productId: string,
-    manager?: any,
-  ): Promise<Inventory> {
+  async findByProduct(productId: string, manager?: any): Promise<Inventory> {
     const repo = manager
       ? manager.getRepository(Inventory)
       : this.inventoryRepository;
