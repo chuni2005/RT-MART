@@ -57,3 +57,28 @@ export const getDefaultEndDate = (): string => {
   return formatDateLocal(new Date());
 };
 
+/**
+ * 將 Date 對象或 ISO 字串轉換為本地 datetime-local 格式 (YYYY-MM-DDTHH:mm)
+ */
+export const toDatetimeLocal = (dateInput: Date | string): string => {
+  const date = typeof dateInput === 'string' ? new Date(dateInput) : dateInput;
+  if (isNaN(date.getTime())) return '';
+  
+  const year = date.getFullYear();
+  const month = String(date.getMonth() + 1).padStart(2, '0');
+  const day = String(date.getDate()).padStart(2, '0');
+  const hours = String(date.getHours()).padStart(2, '0');
+  const minutes = String(date.getMinutes()).padStart(2, '0');
+  
+  return `${year}-${month}-${day}T${hours}:${minutes}`;
+};
+
+/**
+ * 將 datetime-local 格式的字串轉換為 UTC ISO 字串
+ */
+export const fromDatetimeLocal = (localString: string): string => {
+  if (!localString) return '';
+  const date = new Date(localString);
+  return isNaN(date.getTime()) ? '' : date.toISOString();
+};
+
