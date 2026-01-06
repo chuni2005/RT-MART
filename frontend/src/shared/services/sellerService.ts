@@ -106,14 +106,16 @@ export const getDashboardData = async (filters: {
 
 /**
  * 下載銷售報表
- * GET /sellers/sales-report?startDate=&endDate=&productName=
+ * GET /sellers/sales-report?period=&startDate=&endDate=&productName=
  */
 export const downloadSalesReport = async (filters: {
+  period?: SalesPeriod;
   startDate?: string;
   endDate?: string;
   productName?: string;
 }): Promise<void> => {
   const queryParams = new URLSearchParams();
+  if (filters.period) queryParams.append('period', filters.period);
   if (filters.startDate) queryParams.append('startDate', filters.startDate);
   if (filters.endDate) queryParams.append('endDate', filters.endDate);
   if (filters.productName) queryParams.append('productName', filters.productName);

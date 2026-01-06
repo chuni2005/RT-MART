@@ -103,6 +103,7 @@ function Dashboard() {
     setDownloading(true);
     try {
       await sellerService.downloadSalesReport({
+        period: filters.period,
         startDate: filters.startDate,
         endDate: filters.endDate,
         productName: filters.productName,
