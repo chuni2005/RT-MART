@@ -3,6 +3,9 @@ import { OrderStatus } from "./order";
 // ========== Sales Period ==========
 export type SalesPeriod = "day" | "week" | "month" | "year";
 
+// ========== Sales Granularity ==========
+export type SalesGranularity = "hour" | "day" | "week" | "month" | "year";
+
 // ========== Chart Type ==========
 export type ChartType = "line" | "bar" | "pie";
 
@@ -19,6 +22,7 @@ export interface DashboardData {
 export interface ChartDataPoint {
   label: string;
   value: number;
+  orderCount?: number;
 }
 
 export interface PopularProduct {
@@ -155,6 +159,7 @@ export interface SellerApplicationForm {
 // ========== Dashboard Filter Types ==========
 export interface SellerDashboardFilters {
   period?: SalesPeriod;
+  granularity?: SalesGranularity;
   startDate?: string;
   endDate?: string;
   productName?: string;

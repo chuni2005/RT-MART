@@ -1,6 +1,7 @@
 import { useState, useEffect } from "react";
 import { useNavigate } from "react-router-dom";
 import ChartTypeSelector from "./components/ChartTypeSelector";
+import GranularitySelector from "./components/GranularitySelector";
 import SalesChart from "./components/SalesChart";
 import SalesBarChart from "./components/SalesBarChart";
 import CategoryPieChart from "./components/CategoryPieChart";
@@ -32,6 +33,7 @@ function Dashboard() {
     startDate: "",
     endDate: "",
     productName: "",
+    granularity: undefined,
   });
   const [activeQuickSelector, setActiveQuickSelector] = useState<
     "day" | "week" | "month" | "year" | null
@@ -56,7 +58,7 @@ function Dashboard() {
 
   const handleFilterChange = (
     field: keyof SellerDashboardFilters,
-    value: string
+    value: any
   ) => {
     const newFilters = { ...filters, [field]: value };
 
@@ -79,10 +81,15 @@ function Dashboard() {
         // 這裡我們擴充一個 'all' 或沿用 'year'，但後端需要支援跨年
         newFilters.period = "year";
       }
+
+      // 當自定義日期變動時，重置細度為預設，讓後端重新決定最佳細度
+      newFilters.granularity = undefined;
     }
 
     setFilters(newFilters);
-    setActiveQuickSelector(null);
+    if (field !== "granularity") {
+      setActiveQuickSelector(null);
+    }
     loadDashboardData(newFilters);
   };
 
@@ -93,6 +100,7 @@ function Dashboard() {
       period: period as SalesPeriod,
       startDate,
       endDate,
+      granularity: undefined, // 快速選擇時重置細度
     };
     setFilters(newFilters);
     setActiveQuickSelector(period);
@@ -131,7 +139,16 @@ function Dashboard() {
       {/* Filters Section */}
       <div className={styles.filtersSection}>
         <div className={styles.topRow}>
-          <ChartTypeSelector value={chartType} onChange={setChartType} />
+          <div className={styles.selectors}>
+            <ChartTypeSelector value={chartType} onChange={setChartType} />
+            <GranularitySelector
+              value={filters.granularity}
+              onChange={(g) => handleFilterChange("granularity", g)}
+              startDate={filters.startDate}
+              endDate={filters.endDate}
+              period={filters.period}
+            />
+          </div>
           <Button
             variant="primary"
             icon="download"
@@ -176,12 +193,14 @@ function Dashboard() {
             <SalesChart
               data={dashboardData.chartData}
               period={filters.period || "week"}
+              granularity={filters.granularity}
             />
           )}
           {chartType === "bar" && (
             <SalesBarChart
               data={dashboardData.chartData}
               period={filters.period || "week"}
+              granularity={filters.granularity}
             />
           )}
           {chartType === "pie" && (

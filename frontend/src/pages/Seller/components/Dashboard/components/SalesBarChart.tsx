@@ -1,14 +1,15 @@
 import { useEffect, useRef } from "react";
 import * as echarts from "echarts";
-import { SalesPeriod, ChartDataPoint } from "@/types/seller";
+import { SalesPeriod, SalesGranularity, ChartDataPoint } from "@/types/seller";
 import styles from "./SalesChart.module.scss";
 
 interface SalesBarChartProps {
   data: ChartDataPoint[];
   period: SalesPeriod;
+  granularity?: SalesGranularity;
 }
 
-function SalesBarChart({ data, period }: SalesBarChartProps) {
+function SalesBarChart({ data, period, granularity }: SalesBarChartProps) {
   const chartRef = useRef<HTMLDivElement>(null);
   const chartInstanceRef = useRef<echarts.ECharts | null>(null);
 
@@ -34,16 +35,26 @@ function SalesBarChart({ data, period }: SalesBarChartProps) {
         trigger: "axis",
         formatter: (params: any) => {
           const param = params[0];
-          return `${
-            param.name
-          }<br/>營業額: NT$ ${param.value.toLocaleString()}`;
+          const dataPoint = data[param.dataIndex];
+          let tooltipHtml = `${param.name}<br/>`;
+          tooltipHtml += `營業額: NT$ ${param.value.toLocaleString()}`;
+          if (dataPoint && dataPoint.orderCount !== undefined) {
+            tooltipHtml += `<br/>訂單數: ${dataPoint.orderCount}`;
+          }
+          return tooltipHtml;
         },
       },
       xAxis: {
         type: "category",
         data: data.map((d) => d.label),
         axisLabel: {
-          rotate: period === "month" || period === "year" ? 45 : 0,
+          rotate:
+            period === "month" ||
+            period === "year" ||
+            granularity === "week" ||
+            data.length > 10
+              ? 45
+              : 0,
           fontSize: 12,
         },
       },

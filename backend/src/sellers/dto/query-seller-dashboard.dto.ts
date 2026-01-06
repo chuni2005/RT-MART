@@ -6,6 +6,10 @@ export class QuerySellerDashboardDto {
   period?: 'day' | 'week' | 'month' | 'year';
 
   @IsOptional()
+  @IsIn(['hour', 'day', 'week', 'month', 'year'])
+  granularity?: 'hour' | 'day' | 'week' | 'month' | 'year';
+
+  @IsOptional()
   @IsString()
   @Matches(/^\d{4}-\d{2}-\d{2}$/, {
     message: 'startDate must be in YYYY-MM-DD format',

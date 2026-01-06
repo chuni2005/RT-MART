@@ -2,10 +2,10 @@ import api from './api';
 import {
   DashboardData,
   SalesPeriod,
+  SalesGranularity,
   StoreInfo,
   SellerProduct,
   ProductFormData,
-  RecentOrder,
   Discount,
   DiscountFormData,
   SellerApplicationForm
@@ -55,10 +55,11 @@ export const applyToBeSeller = async (
 
 /**
  * 獲取 Dashboard 數據
- * GET /sellers/dashboard?period=&startDate=&endDate=&productName=
+ * GET /sellers/dashboard?period=&startDate=&endDate=&productName=&granularity=
  */
 export const getDashboardData = async (filters: {
   period?: SalesPeriod;
+  granularity?: SalesGranularity;
   startDate?: string;
   endDate?: string;
   productName?: string;
@@ -67,6 +68,9 @@ export const getDashboardData = async (filters: {
 
   if (filters.period) {
     queryParams.append('period', filters.period);
+  }
+  if (filters.granularity) {
+    queryParams.append('granularity', filters.granularity);
   }
   if (filters.startDate) {
     queryParams.append('startDate', filters.startDate);

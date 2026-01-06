@@ -34,6 +34,7 @@ export interface DashboardData {
 export interface ChartDataPoint {
   label: string;
   value: number;
+  orderCount: number;
 }
 
 export interface CategoryDataPoint {
@@ -282,12 +283,7 @@ export class SellersService {
 
   async getDashboardData(
     userId: string,
-    filters: {
-      period?: 'day' | 'week' | 'month' | 'year';
-      startDate?: string;
-      endDate?: string;
-      productName?: string;
-    },
+    filters: QuerySellerDashboardDto,
   ): Promise<DashboardData> {
     // Get seller's store
     const seller = await this.findByUserId(userId);
@@ -336,6 +332,7 @@ export class SellersService {
         endDate,
         period,
         filters.productName,
+        filters.granularity,
       ),
       this.getCategoryData(storeId, startDate, endDate, filters.productName),
       this.getPopularProducts(storeId, startDate, endDate, filters.productName),
@@ -438,10 +435,12 @@ export class SellersService {
     endDate: Date,
     period: 'day' | 'week' | 'month' | 'year',
     productName?: string,
+    granularity?: 'hour' | 'day' | 'week' | 'month' | 'year',
   ): Promise<ChartDataPoint[]> {
     const query = this.orderRepository
       .createQueryBuilder('order')
       .select('order.createdAt', 'createdAt')
+      .addSelect('order.orderId', 'orderId')
       .where('order.storeId = :storeId', { storeId })
       .andWhere('order.createdAt >= :startDate', { startDate })
       .andWhere('order.createdAt <= :endDate', { endDate })
@@ -473,53 +472,72 @@ export class SellersService {
 
     const orders = await query.getRawMany();
 
-    // Group by time period
-    const dataMap = new Map<string, number>();
-
-    orders.forEach((order) => {
-      const date = new Date(order.createdAt);
-      let label: string;
-
-      if (period === 'day') {
-        label = `${date.getUTCHours()}:00`;
-      } else if (period === 'week') {
-        const days = ['週日', '週一', '週二', '週三', '週四', '週五', '週六'];
-        label = days[date.getUTCDay()];
-      } else if (period === 'month') {
-        label = `${date.getUTCDate()}日`;
-      } else {
-        label = `${date.getUTCMonth() + 1}月`;
-      }
-
-      const current = dataMap.get(label) || 0;
-      dataMap.set(label, current + parseFloat(order.totalAmount));
-    });
-
-    // Generate labels based on actual date range
-    const labels: string[] = [];
-    const currentDate = new Date(startDate);
+    // Determine effective granularity
     const diffTime = Math.abs(endDate.getTime() - startDate.getTime());
     const diffDays = Math.ceil(diffTime / (1000 * 60 * 60 * 24));
 
-    if (period === 'day') {
-      for (let i = 0; i < 24; i++) {
-        labels.push(`${i}:00`);
+    let effectiveGranularity = granularity;
+    if (!effectiveGranularity) {
+      if (period === 'day') effectiveGranularity = 'hour';
+      else if (period === 'week') effectiveGranularity = 'day';
+      else if (diffDays <= 31) effectiveGranularity = 'day';
+      else if (diffDays <= 366) effectiveGranularity = 'month';
+      else effectiveGranularity = 'year';
+    }
+
+    // Generate labels based on effective granularity
+    const labels: string[] = [];
+    const currentDate = new Date(startDate);
+
+    if (effectiveGranularity === 'hour') {
+      if (diffDays <= 2) {
+        for (let i = 0; i < 24; i++) {
+          labels.push(`${i}:00`);
+        }
+      } else {
+        // diffDays is 3 to 7 (due to selector restriction)
+        const hourCursor = new Date(startDate);
+        while (hourCursor <= endDate) {
+          labels.push(
+            `${hourCursor.getUTCMonth() + 1}/${hourCursor.getUTCDate()} ${hourCursor.getUTCHours()}:00`,
+          );
+          hourCursor.setUTCHours(hourCursor.getUTCHours() + 1);
+        }
       }
-    } else if (period === 'week') {
-      labels.push('週一', '週二', '週三', '週四', '週五', '週六', '週日');
-    } else if (diffDays <= 31) {
-      // 週期在一個月內：按天顯示 (1/6, 1/7...)
-      while (currentDate <= endDate) {
-        labels.push(
-          `${currentDate.getUTCMonth() + 1}/${currentDate.getUTCDate()}`,
-        );
-        currentDate.setUTCDate(currentDate.getUTCDate() + 1);
+    } else if (effectiveGranularity === 'day') {
+      if (diffDays <= 2) {
+        // 只有 1 或 2 天時，可以用 週一、週二
+        const days = ['週日', '週一', '週二', '週三', '週四', '週五', '週六'];
+        const tempDate = new Date(startDate);
+        while (tempDate <= endDate) {
+          labels.push(days[tempDate.getUTCDay()]);
+          tempDate.setUTCDate(tempDate.getUTCDate() + 1);
+        }
+      } else {
+        // > 2 天，顯示 MM/DD
+        while (currentDate <= endDate) {
+          labels.push(
+            `${currentDate.getUTCMonth() + 1}/${currentDate.getUTCDate()}`,
+          );
+          currentDate.setUTCDate(currentDate.getUTCDate() + 1);
+        }
       }
-    } else if (diffDays <= 366) {
-      // 週期在一年內：按月顯示
+    } else if (effectiveGranularity === 'week') {
+      // 按週顯示：例如 "1/1-1/7"
+      const weekStart = new Date(startDate);
+      while (weekStart <= endDate) {
+        let weekEnd = new Date(weekStart);
+        weekEnd.setUTCDate(weekStart.getUTCDate() + 6);
+        if (weekEnd > endDate) weekEnd = new Date(endDate);
+
+        const label = `${weekStart.getUTCMonth() + 1}/${weekStart.getUTCDate()}-${weekEnd.getUTCMonth() + 1}/${weekEnd.getUTCDate()}`;
+        labels.push(label);
+        weekStart.setUTCDate(weekStart.getUTCDate() + 7);
+      }
+    } else if (effectiveGranularity === 'month') {
       const startYear = startDate.getUTCFullYear();
       const endYear = endDate.getUTCFullYear();
-      const isCrossYear = startYear !== endYear; // 判斷是否跨年
+      const isCrossYear = startYear !== endYear;
 
       const endTotalMonth = endYear * 12 + endDate.getUTCMonth();
       let currentTotalMonth = startYear * 12 + startDate.getUTCMonth();
@@ -527,12 +545,11 @@ export class SellersService {
       while (currentTotalMonth <= endTotalMonth) {
         const y = Math.floor(currentTotalMonth / 12);
         const m = (currentTotalMonth % 12) + 1;
-        // 如果跨年，標籤顯示 2025/11；如果沒跨年，顯示 11月
         labels.push(isCrossYear ? `${y}/${m}` : `${m}月`);
         currentTotalMonth++;
       }
     } else {
-      // 週期超過一年：按年顯示
+      // year
       for (
         let year = startDate.getUTCFullYear();
         year <= endDate.getUTCFullYear();
@@ -542,20 +559,40 @@ export class SellersService {
       }
     }
 
-    // Update data mapping to match new dynamic labels
-    const dynamicDataMap = new Map<string, number>();
+    // Data mapping logic
+    const dynamicDataMap = new Map<string, { revenue: number; orderIds: Set<string> }>();
     orders.forEach((order) => {
       const date = new Date(order.createdAt);
       let label: string;
 
-      if (period === 'day') {
-        label = `${date.getUTCHours()}:00`;
-      } else if (period === 'week') {
-        const days = ['週日', '週一', '週二', '週三', '週四', '週五', '週六'];
-        label = days[date.getUTCDay()];
-      } else if (diffDays <= 31) {
-        label = `${date.getUTCMonth() + 1}/${date.getUTCDate()}`;
-      } else if (diffDays <= 366) {
+      if (effectiveGranularity === 'hour') {
+        if (diffDays <= 2) {
+          label = `${date.getUTCHours()}:00`;
+        } else {
+          label = `${date.getUTCMonth() + 1}/${date.getUTCDate()} ${date.getUTCHours()}:00`;
+        }
+      } else if (effectiveGranularity === 'day') {
+        if (diffDays <= 2) {
+          const days = ['週日', '週一', '週二', '週三', '週四', '週五', '週六'];
+          label = days[date.getUTCDay()];
+        } else {
+          label = `${date.getUTCMonth() + 1}/${date.getUTCDate()}`;
+        }
+      } else if (effectiveGranularity === 'week') {
+        // Find which week this date belongs to
+        const diffFromStart = Math.floor(
+          (date.getTime() - startDate.getTime()) / (1000 * 60 * 60 * 24),
+        );
+        const weekIndex = Math.floor(diffFromStart / 7);
+        
+        const weekStart = new Date(startDate);
+        weekStart.setUTCDate(startDate.getUTCDate() + weekIndex * 7);
+        let weekEnd = new Date(weekStart);
+        weekEnd.setUTCDate(weekStart.getUTCDate() + 6);
+        if (weekEnd > endDate) weekEnd = new Date(endDate);
+        
+        label = `${weekStart.getUTCMonth() + 1}/${weekStart.getUTCDate()}-${weekEnd.getUTCMonth() + 1}/${weekEnd.getUTCDate()}`;
+      } else if (effectiveGranularity === 'month') {
         const y = date.getUTCFullYear();
         const m = date.getUTCMonth() + 1;
         const isCrossYear =
@@ -565,14 +602,23 @@ export class SellersService {
         label = `${date.getUTCFullYear()}年`;
       }
 
-      const current = dynamicDataMap.get(label) || 0;
-      dynamicDataMap.set(label, current + parseFloat(order.totalAmount));
+      if (!dynamicDataMap.has(label)) {
+        dynamicDataMap.set(label, { revenue: 0, orderIds: new Set() });
+      }
+      
+      const current = dynamicDataMap.get(label)!;
+      current.revenue += parseFloat(order.totalAmount);
+      current.orderIds.add(order.orderId);
     });
 
-    return labels.map((label) => ({
-      label,
-      value: dynamicDataMap.get(label) || 0,
-    }));
+    return labels.map((label) => {
+      const stats = dynamicDataMap.get(label);
+      return {
+        label,
+        value: stats?.revenue || 0,
+        orderCount: stats?.orderIds.size || 0,
+      };
+    });
   }
 
   private async getCategoryData(
@@ -720,22 +766,20 @@ export class SellersService {
     }
 
     const storeId = store.storeId;
+    const period = filters.period || 'week';
 
-    // Calculate date range (default: last 30 days)
-    let startDate: Date;
-    let endDate: Date;
-
-    if (filters.startDate && filters.endDate) {
-      startDate = new Date(filters.startDate);
-      startDate.setUTCHours(0, 0, 0, 0);
-      endDate = new Date(filters.endDate);
-      endDate.setUTCHours(23, 59, 59, 999);
-    } else {
-      endDate = new Date();
-      startDate = new Date(endDate.getTime() - 30 * 24 * 60 * 60 * 1000);
-      startDate.setUTCHours(0, 0, 0, 0);
-      endDate.setUTCHours(23, 59, 59, 999);
-    }
+    // 使用統一的解析工具處理時區與範圍
+    const { startDate, endDate } = DateRangeUtil.parseRange(
+      filters.startDate,
+      filters.endDate,
+      period === 'day'
+        ? 1
+        : period === 'week'
+          ? 7
+          : period === 'month'
+            ? 30
+            : 365,
+    );
 
     // Valid order statuses (exclude pending_payment, cancelled, payment_failed)
     const validStatuses = [
