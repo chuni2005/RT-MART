@@ -124,12 +124,14 @@ export class DiscountsController {
     return await this.discountsService.update(req.user.userId, id, updateDto);
   }
 
-  // @Roles(UserRole.SELLER)
-  // @UseGuards(JwtAccessGuard, RolesGuard)
-  // @Delete(':id')
-  // async sellerRemove(@Req() req: AuthRequest, @Param('id') id: string) {
-  //   return await this.discountsService.sellerRemove(req.user.userId, id);
-  // }
+  @Audit('Discount')
+  @Roles(UserRole.SELLER)
+  @UseGuards(JwtAccessGuard, RolesGuard)
+  @Delete(':id')
+  async sellerRemove(@Req() req: AuthRequest, @Param('id') id: string) {
+    await this.discountsService.remove(id);
+    return { message: 'Discount deleted successfully' };
+  }
 
   @Audit('Discount')
   @Roles(UserRole.ADMIN)
