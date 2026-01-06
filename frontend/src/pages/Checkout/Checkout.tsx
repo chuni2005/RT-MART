@@ -156,38 +156,38 @@ function Checkout() {
         const subtotal = storeGroups.reduce((sum, g) => sum + g.subtotal, 0);
         const storeIds = storeGroups.map((g) => g.storeId);
 
+        // 獲取所有可用折扣
+        const allDiscounts = await getAllAvailableDiscounts(subtotal, storeIds);
+
+        // 使用計算器自動套用商家折扣，並加入推薦的運費/季節折扣
         const recommendation = await getRecommendedDiscounts(
           subtotal,
           storeIds
         );
 
-        if (recommendation.totalSavings > 0) {
-          // 轉換為新格式（分離 seasonal 和 special）
-          const manualSelection: ManualDiscountSelection = {
-            shipping: recommendation.shipping,
-            seasonal:
-              recommendation.product?.type === "seasonal"
-                ? {
-                    code: recommendation.product.code,
-                    name: recommendation.product.name,
-                    amount: Math.floor(recommendation.product.amount),
-                  }
-                : null,
-            special:
-              recommendation.product?.type === "special"
-                ? {
-                    code: recommendation.product.code,
-                    name: recommendation.product.name,
-                    amount: Math.floor(recommendation.product.amount),
-                  }
-                : null,
-          };
+        const baseSelections = {
+          shipping: recommendation.shipping?.code || null,
+          product:
+            recommendation.product?.type === "seasonal"
+              ? recommendation.product.code
+              : null,
+        };
+
+        const manualSelection = calculateDiscountAmounts(
+          baseSelections,
+          allDiscounts,
+          subtotal
+        );
+
+        if (
+          manualSelection.shipping ||
+          manualSelection.seasonal ||
+          manualSelection.special
+        ) {
           setAppliedDiscounts(manualSelection);
-          // 不設置 hasUserInteractedWithDiscounts，因為這是自動推薦，不是用戶主動選擇
         }
       } catch (error) {
         console.error("Failed to load discount recommendations:", error);
-        // 靜默失敗 - 用戶仍可繼續結帳
       }
     };
 
@@ -295,9 +295,7 @@ function Checkout() {
         discountCodes: appliedDiscounts
           ? {
               shipping: appliedDiscounts.shipping?.code,
-              product:
-                appliedDiscounts.seasonal?.code ||
-                appliedDiscounts.special?.code,
+              product: appliedDiscounts.seasonal?.code,
             }
           : undefined,
       };

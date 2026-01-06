@@ -148,11 +148,8 @@ export const createOrderApi = async (
     };
 
     // 添加折扣碼（如果存在）
-    if (orderData.discountCodes?.shipping) {
-      payload.shippingDiscountCode = orderData.discountCodes.shipping;
-    }
-    if (orderData.discountCodes?.product) {
-      payload.productDiscountCode = orderData.discountCodes.product;
+    if (orderData.discountCodes) {
+      payload.discountCodes = orderData.discountCodes;
     }
 
     const response = await post<BackendOrder[]>('/orders', payload);

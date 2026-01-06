@@ -7,6 +7,7 @@ import { InjectRepository } from '@nestjs/typeorm';
 import { Repository, DataSource, LessThan, In } from 'typeorm';
 import { Order, OrderStatus } from './entities/order.entity';
 import { OrderItem } from './entities/order-item.entity';
+import { OrderDiscount } from './entities/order-discount.entity';
 import { Inventory } from '../inventory/entities/inventory.entity';
 import { CreateOrderDto } from './dto/create-order.dto';
 import { CreateOrderFromSnapshotDto } from './dto/create-order-from-snapshot.dto';
@@ -17,6 +18,8 @@ import { CartItemsService } from '../carts-item/cart-items.service';
 import { ShippingAddressesService } from '../shipping-addresses/shipping-addresses.service';
 import { InventoryService } from '../inventory/inventory.service';
 import { DiscountsService } from '../discounts/discounts.service';
+import { ProductTypesService } from '../product-types/product-types.service';
+import { DiscountType } from '../discounts/entities/discount.entity';
 import { SseService } from '../sse/sse.service';
 import { MailService } from '../mail/mail.service';
 
@@ -27,10 +30,13 @@ export class OrdersService {
     private readonly orderRepository: Repository<Order>,
     @InjectRepository(OrderItem)
     private readonly orderItemRepository: Repository<OrderItem>,
+    @InjectRepository(OrderDiscount)
+    private readonly orderDiscountRepository: Repository<OrderDiscount>,
     private readonly cartsService: CartItemsService,
     private readonly shippingAddressesService: ShippingAddressesService,
     private readonly inventoryService: InventoryService,
     private readonly discountsService: DiscountsService,
+    private readonly productTypesService: ProductTypesService,
     private readonly dataSource: DataSource,
     private readonly sseService: SseService,
     private readonly mailService: MailService,
@@ -125,54 +131,212 @@ export class OrdersService {
 
     const createdOrders: Order[] = [];
 
+    // Pre-fetch global discounts if codes are provided
+    let globalSeasonalDiscount: any = null;
+    let globalShippingDiscount: any = null;
+
+    if (options.discountCodes?.product) {
+      const discount = await this.discountsService.findByCode(
+        options.discountCodes.product,
+      );
+      if (
+        discount &&
+        discount.discountType === DiscountType.SEASONAL &&
+        discount.isActive
+      ) {
+        globalSeasonalDiscount = discount;
+      }
+    }
+
+    if (options.discountCodes?.shipping) {
+      const discount = await this.discountsService.findByCode(
+        options.discountCodes.shipping,
+      );
+      if (
+        discount &&
+        discount.discountType === DiscountType.SHIPPING &&
+        discount.isActive
+      ) {
+        globalShippingDiscount = discount;
+      }
+    }
+
     return await this.dataSource.transaction(async (manager) => {
       for (const [storeId, storeItems] of itemsByStore.entries()) {
-        let subtotal = 0;
+        let storeSubtotalBeforeDiscounts = 0;
 
-        // 庫存檢查與金額計算
+        // 1. Calculate special (seller) discounts per item
+        // Fetch all active special discounts for this store
+        const activeSpecialDiscounts =
+          await this.discountsService.findActiveSpecialDiscountsByStore(
+            storeId,
+            manager,
+          );
+
+        const itemsWithDiscounts: {
+          item: any;
+          originalPrice: number;
+          quantity: number;
+          itemDiscount: number;
+          unitPrice: number;
+          subtotal: number;
+          specialDiscountId?: string;
+        }[] = [];
+
         for (const item of storeItems) {
           const productId = item.productId || item.product?.productId;
+          if (!productId) continue;
 
-          if (productId) {
-            const isAvailable =
-              await this.inventoryService.checkStockAvailability(
-                productId,
-                item.quantity,
-              );
+          // Check stock
+          const isAvailable =
+            await this.inventoryService.checkStockAvailability(
+              productId,
+              item.quantity,
+              manager,
+            );
 
-            if (!isAvailable) {
-              throw new BadRequestException(
-                `Insufficient stock for product: ${item.product?.productName || item.product?.product_name || 'Unknown'}`,
-              );
+          if (!isAvailable) {
+            throw new BadRequestException(
+              `Insufficient stock for product: ${item.product?.productName || item.product?.product_name || 'Unknown'}`,
+            );
+          }
+
+          // Inventory reduction
+          const isCashOnDelivery = options.paymentMethod === 'cash_on_delivery';
+          if (isCashOnDelivery) {
+            const inventory = await this.inventoryService.findByProduct(
+              productId,
+              manager,
+            );
+            inventory.quantity -= item.quantity;
+            await manager.getRepository(Inventory).save(inventory);
+          } else {
+            await this.inventoryService.orderCreated(
+              productId,
+              item.quantity,
+              manager,
+            );
+          }
+
+          const originalPrice = Number(item.product?.price || 0);
+          const itemQuantity = Number(item.quantity || 1);
+          const itemOriginalSubtotal = originalPrice * itemQuantity;
+          storeSubtotalBeforeDiscounts += itemOriginalSubtotal;
+
+          // Find matching special discounts for this product
+          const productTypeId = item.product?.productTypeId;
+          let bestSpecialDiscount: any = null;
+          let maxSpecialAmount = 0;
+
+          if (productTypeId) {
+            // Get all ancestor types
+            const typeInfo = await this.productTypesService.findOne(
+              productTypeId,
+              manager,
+            );
+            const ancestorIds: string[] = [];
+            let curr: any = typeInfo;
+            while (curr) {
+              ancestorIds.push(curr.productTypeId);
+              curr = curr.parent;
             }
 
-            const isCashOnDelivery =
-              options.paymentMethod === 'cash_on_delivery';
-            if (isCashOnDelivery) {
-              // 貨到付款：直接扣除實體庫存，不進預留池
-              const inventory = await this.inventoryService.findByProduct(
-                productId,
-                manager,
-              );
-              inventory.quantity -= item.quantity;
-              const repo = manager.getRepository(Inventory);
-              await repo.save(inventory);
-            } else {
-              // 線上支付：進入預留池
-              await this.inventoryService.orderCreated(
-                productId,
-                item.quantity,
-                manager,
-              );
+            for (const discount of activeSpecialDiscounts) {
+              const spec = discount.specialDiscount;
+              // Matches if store matches (already filtered) AND (type is null OR type is in ancestors)
+              if (
+                spec &&
+                (!spec.productTypeId ||
+                  ancestorIds.includes(spec.productTypeId))
+              ) {
+                // Check min purchase for this specific discount
+                if (
+                  itemOriginalSubtotal >= Number(discount.minPurchaseAmount)
+                ) {
+                  const rate = Number(spec.discountRate || 0);
+                  const max = Number(spec.maxDiscountAmount || Infinity);
+                  const amount = Math.floor(
+                    Math.min(itemOriginalSubtotal * rate, max),
+                  );
+
+                  if (amount > maxSpecialAmount) {
+                    maxSpecialAmount = amount;
+                    bestSpecialDiscount = discount;
+                  }
+                }
+              }
             }
           }
 
-          subtotal +=
-            Number(item.product?.price || 0) * Number(item.quantity || 1);
+          itemsWithDiscounts.push({
+            item,
+            originalPrice,
+            quantity: itemQuantity,
+            itemDiscount: maxSpecialAmount,
+            unitPrice: (itemOriginalSubtotal - maxSpecialAmount) / itemQuantity,
+            subtotal: itemOriginalSubtotal - maxSpecialAmount,
+            specialDiscountId: bestSpecialDiscount?.discountId || undefined,
+          });
         }
 
-        const shippingFee = 60;
-        const totalAmount = subtotal + shippingFee;
+        const storeSubtotalAfterSpecial = itemsWithDiscounts.reduce(
+          (sum: number, i: { subtotal: number }) => sum + i.subtotal,
+          0,
+        );
+
+        // 2. Apply Seasonal (Admin) Discount to store subtotal
+        let seasonalDiscountAmount = 0;
+        let appliedSeasonalDiscount: any = null;
+
+        if (globalSeasonalDiscount) {
+          if (
+            storeSubtotalAfterSpecial >=
+            Number(globalSeasonalDiscount.minPurchaseAmount)
+          ) {
+            const rate = Number(
+              globalSeasonalDiscount.seasonalDiscount?.discountRate || 0,
+            );
+            const max = Number(
+              globalSeasonalDiscount.seasonalDiscount?.maxDiscountAmount ||
+                Infinity,
+            );
+            seasonalDiscountAmount = Math.floor(
+              Math.min(storeSubtotalAfterSpecial * rate, max),
+            );
+            appliedSeasonalDiscount = globalSeasonalDiscount;
+          }
+        }
+
+        // 3. Apply Shipping (Admin) Discount
+        const baseShippingFee = 60;
+        let shippingDiscountAmount = 0;
+        let appliedShippingDiscount: any = null;
+
+        if (globalShippingDiscount) {
+          if (
+            storeSubtotalAfterSpecial >=
+            Number(globalShippingDiscount.minPurchaseAmount)
+          ) {
+            shippingDiscountAmount = Math.floor(
+              Number(
+                globalShippingDiscount.shippingDiscount?.discountAmount || 0,
+              ),
+            );
+            appliedShippingDiscount = globalShippingDiscount;
+          }
+        }
+
+        const finalShippingFee = Math.max(
+          0,
+          baseShippingFee - shippingDiscountAmount,
+        );
+        const totalDiscount =
+          storeSubtotalBeforeDiscounts -
+          storeSubtotalAfterSpecial + // Sum of Special discounts
+          seasonalDiscountAmount;
+
+        const totalAmount =
+          storeSubtotalAfterSpecial - seasonalDiscountAmount + finalShippingFee;
         const orderNumber = this.generateOrderNumber();
 
         const isCashOnDelivery = options.paymentMethod === 'cash_on_delivery';
@@ -180,13 +344,14 @@ export class OrdersService {
           ? OrderStatus.PAID
           : OrderStatus.PENDING_PAYMENT;
 
+        // Create Order
         const order = manager.create(Order, {
           orderNumber,
           userId,
           storeId,
-          subtotal,
-          shippingFee,
-          totalDiscount: 0,
+          subtotal: storeSubtotalBeforeDiscounts,
+          shippingFee: baseShippingFee,
+          totalDiscount,
           totalAmount,
           paymentMethod: options.paymentMethod || 'credit_card',
           shippingAddressSnapshot: shippingAddress,
@@ -196,19 +361,81 @@ export class OrdersService {
 
         const savedOrder = await manager.save(Order, order);
 
-        for (const item of storeItems) {
+        // Create Order Items
+        for (const idata of itemsWithDiscounts) {
           const orderItem = manager.create(OrderItem, {
             orderId: savedOrder.orderId,
-            productId: item.productId || item.product?.productId,
-            productSnapshot: item.product,
-            quantity: item.quantity,
-            originalPrice: item.product?.price || 0,
-            itemDiscount: 0,
-            unitPrice: item.product?.price || 0,
-            subtotal:
-              Number(item.product?.price || 0) * Number(item.quantity || 1),
+            productId: idata.item.productId || idata.item.product?.productId,
+            productSnapshot: idata.item.product,
+            quantity: idata.quantity,
+            originalPrice: idata.originalPrice,
+            itemDiscount: idata.itemDiscount,
+            unitPrice: idata.unitPrice,
+            subtotal: idata.subtotal,
           });
           await manager.save(OrderItem, orderItem);
+
+          // Increment Special Discount usage
+          if (idata.specialDiscountId) {
+            await this.discountsService.incrementUsage(
+              idata.specialDiscountId,
+              manager,
+            );
+          }
+        }
+
+        // Create Order Discounts (Admin ones)
+        if (appliedSeasonalDiscount) {
+          const od = manager.create(OrderDiscount, {
+            orderId: savedOrder.orderId,
+            discountId: appliedSeasonalDiscount.discountId,
+            discountType: DiscountType.SEASONAL,
+            discountAmount: seasonalDiscountAmount,
+          });
+          await manager.save(OrderDiscount, od);
+          await this.discountsService.incrementUsage(
+            appliedSeasonalDiscount.discountId,
+            manager,
+          );
+        }
+
+        if (appliedShippingDiscount) {
+          const od = manager.create(OrderDiscount, {
+            orderId: savedOrder.orderId,
+            discountId: appliedShippingDiscount.discountId,
+            discountType: DiscountType.SHIPPING,
+            discountAmount: shippingDiscountAmount,
+          });
+          await manager.save(OrderDiscount, od);
+          await this.discountsService.incrementUsage(
+            appliedShippingDiscount.discountId,
+            manager,
+          );
+        }
+
+        // For SPECIAL discounts, we might have multiple per order (different items).
+        // Since we have a unique constraint, we'll only record the "primary" one (most impact) if needed,
+        // OR we can skip recording SPECIAL in OrderDiscount and rely on OrderItem.itemDiscount.
+        // However, let's record the one with most impact for tracking purposes.
+        const totalSpecialAmount = itemsWithDiscounts.reduce(
+          (sum: number, i: { itemDiscount: number }) => sum + i.itemDiscount,
+          0,
+        );
+        if (totalSpecialAmount > 0) {
+          const primarySpecial = itemsWithDiscounts
+            .filter((i) => i.specialDiscountId)
+            .sort((a, b) => b.itemDiscount - a.itemDiscount)[0];
+
+          if (primarySpecial && primarySpecial.specialDiscountId) {
+            const od = manager.create(OrderDiscount, {
+              orderId: savedOrder.orderId,
+              discountId: primarySpecial.specialDiscountId,
+              discountType: DiscountType.SPECIAL,
+              discountAmount: totalSpecialAmount,
+            });
+            await manager.save(OrderDiscount, od);
+            // Usage was already incremented above for EACH item's discount
+          }
         }
 
         createdOrders.push(savedOrder);
@@ -218,7 +445,7 @@ export class OrdersService {
       const orderIds = createdOrders.map((o) => o.orderId);
       return (await manager.find(Order, {
         where: { orderId: In(orderIds), userId },
-        relations: ['store', 'items', 'items.product'],
+        relations: ['store', 'items', 'items.product', 'orderDiscounts'],
       })) as Order[];
     });
   }

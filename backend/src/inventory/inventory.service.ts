@@ -7,7 +7,7 @@ import {
   forwardRef,
 } from '@nestjs/common';
 import { InjectRepository } from '@nestjs/typeorm';
-import { Repository } from 'typeorm';
+import { Repository, EntityManager } from 'typeorm';
 import { Inventory } from './entities/inventory.entity';
 import { UpdateInventoryDto } from './dto/update-inventory.dto';
 import { SellersService } from '../sellers/sellers.service';
@@ -150,16 +150,20 @@ export class InventoryService {
     return await repo.save(inventory);
   }
 
-  async getAvailableStock(productId: string): Promise<number> {
-    const inventory = await this.findByProduct(productId);
+  async getAvailableStock(
+    productId: string,
+    manager?: EntityManager,
+  ): Promise<number> {
+    const inventory = await this.findByProduct(productId, manager);
     return inventory.quantity;
   }
 
   async checkStockAvailability(
     productId: string,
     requestedQuantity: number,
+    manager?: EntityManager,
   ): Promise<boolean> {
-    const availableStock = await this.getAvailableStock(productId);
+    const availableStock = await this.getAvailableStock(productId, manager);
     return availableStock >= requestedQuantity;
   }
 }
