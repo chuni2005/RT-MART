@@ -21,6 +21,6 @@ export class QueryDashboardDto {
 
   @IsOptional()
   @IsString()
-  @IsIn(['day', 'week', 'month', 'year'])
-  granularity?: 'day' | 'week' | 'month' | 'year';
+  @IsIn(['hour', 'day', 'week', 'month', 'year'])
+  granularity?: 'hour' | 'day' | 'week' | 'month' | 'year';
 }

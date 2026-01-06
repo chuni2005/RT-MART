@@ -26,38 +26,36 @@ function GranularitySelector({
   endDate,
   period,
 }: GranularitySelectorProps) {
-  const { isLongPeriod, isMediumPeriod } = useMemo(() => {
-    let diffDays = 0;
+  const diffDays = useMemo(() => {
+    let days = 0;
     if (startDate && endDate) {
       const start = new Date(startDate);
       const end = new Date(endDate);
       const diffTime = Math.abs(end.getTime() - start.getTime());
-      diffDays = Math.ceil(diffTime / (1000 * 60 * 60 * 24));
+      days = Math.ceil(diffTime / (1000 * 60 * 60 * 24));
     } else if (period === "year") {
-      diffDays = 365;
+      days = 365;
     } else if (period === "month") {
-      diffDays = 30;
+      days = 30;
     } else if (period === "week") {
-      diffDays = 7;
+      days = 7;
     } else if (period === "day") {
-      diffDays = 1;
+      days = 1;
     }
-
-    return {
-      isLongPeriod: diffDays >= 365,
-      isMediumPeriod: diffDays > 7,
-    };
+    return days;
   }, [startDate, endDate, period]);
 
   const availableOptions = useMemo(() => {
-    let options = ALL_GRANULARITIES;
-    if (isLongPeriod) {
-      options = options.filter((g) => g.value !== "hour" && g.value !== "day");
-    } else if (isMediumPeriod) {
-      options = options.filter((g) => g.value !== "hour");
-    }
-    return options;
-  }, [isLongPeriod, isMediumPeriod]);
+    return ALL_GRANULARITIES.filter((g) => {
+      // 根據時間範圍長度過濾可用細度
+      if (g.value === "hour") return diffDays <= 7; // > 7天不提供按時
+      if (g.value === "day") return diffDays > 2 && diffDays <= 365; // > 365天不提供按日
+      if (g.value === "week") return diffDays > 7; // > 7天才提供按週
+      if (g.value === "month") return diffDays > 30; // > 30天才提供按月
+      if (g.value === "year") return diffDays > 365; // > 365天才提供按年
+      return true;
+    });
+  }, [diffDays]);
 
   const handleChange = (newValue: string) => {
     onChange(newValue as SalesGranularity);
@@ -78,4 +76,3 @@ function GranularitySelector({
 }
 
 export default GranularitySelector;
-

@@ -45,11 +45,7 @@ export class AdminService {
   async getDashboardStats(
     filters?: QueryDashboardDto,
   ): Promise<DashboardStats> {
-    const period = (filters?.period ?? 'month') as
-      | 'day'
-      | 'week'
-      | 'month'
-      | 'year';
+    const period = filters?.period ?? 'month';
 
     const granularity = filters?.granularity;
 
@@ -183,7 +179,7 @@ export class AdminService {
     startDate: Date,
     endDate: Date,
     period: 'day' | 'week' | 'month' | 'year',
-    granularity?: 'day' | 'week' | 'month' | 'year',
+    granularity?: 'hour' | 'day' | 'week' | 'month' | 'year',
   ): Promise<ChartDataPoint[]> {
     // Get revenue for the specified date range
     const query = this.orderRepository
@@ -214,7 +210,7 @@ export class AdminService {
     startDate: Date,
     endDate: Date,
     period: 'day' | 'week' | 'month' | 'year',
-    granularity?: 'day' | 'week' | 'month' | 'year',
+    granularity?: 'hour' | 'day' | 'week' | 'month' | 'year',
   ): Promise<ChartDataPoint[]> {
     // Get new users for the specified date range
     const query = this.userRepository
@@ -245,14 +241,14 @@ export class AdminService {
     endDate: Date,
     period: 'day' | 'week' | 'month' | 'year',
     valueField: string,
-    granularity?: 'day' | 'week' | 'month' | 'year',
+    granularity?: 'hour' | 'day' | 'week' | 'month' | 'year',
   ): ChartDataPoint[] {
     const diffTime = Math.abs(endDate.getTime() - startDate.getTime());
     const diffDays = Math.ceil(diffTime / (1000 * 60 * 60 * 24));
 
     let effectiveGranularity = granularity;
     if (!effectiveGranularity) {
-      if (period === 'day') effectiveGranularity = 'day'; // Admin doesn't have hour yet, keeping it simple
+      if (period === 'day') effectiveGranularity = 'hour';
       else if (period === 'week') effectiveGranularity = 'day';
       else if (diffDays <= 31) effectiveGranularity = 'day';
       else if (diffDays <= 366) effectiveGranularity = 'month';
@@ -263,34 +259,54 @@ export class AdminService {
     const labels: string[] = [];
     const currentDate = new Date(startDate);
 
-    if (effectiveGranularity === 'day') {
-      if (diffDays <= 7 && period === 'week') {
-        labels.push('週一', '週二', '週三', '週四', '週五', '週六', '週日');
+    if (effectiveGranularity === 'hour') {
+      if (diffDays <= 2) {
+        for (let i = 0; i < 24; i++) {
+          labels.push(`${i}:00`);
+        }
       } else {
-        while (currentDate <= endDate) {
+        // diffDays is 3 to 7 (due to selector restriction)
+        const hourCursor = new Date(startDate);
+        while (hourCursor <= endDate) {
           labels.push(
-            `${currentDate.getUTCMonth() + 1}/${currentDate.getUTCDate()}`,
+            `${hourCursor.getMonth() + 1}/${hourCursor.getDate()} ${hourCursor.getHours()}:00`,
           );
-          currentDate.setUTCDate(currentDate.getUTCDate() + 1);
+          hourCursor.setHours(hourCursor.getHours() + 1);
+        }
+      }
+    } else if (effectiveGranularity === 'day') {
+      if (diffDays <= 2) {
+        // 只有 1 或 2 天時，可以用 週一、週二
+        const days = ['週日', '週一', '週二', '週三', '週四', '週五', '週六'];
+        const tempDate = new Date(startDate);
+        while (tempDate <= endDate) {
+          labels.push(days[tempDate.getDay()]);
+          tempDate.setDate(tempDate.getDate() + 1);
+        }
+      } else {
+        // > 2 天，顯示 MM/DD
+        while (currentDate <= endDate) {
+          labels.push(`${currentDate.getMonth() + 1}/${currentDate.getDate()}`);
+          currentDate.setDate(currentDate.getDate() + 1);
         }
       }
     } else if (effectiveGranularity === 'week') {
       const weekStart = new Date(startDate);
       while (weekStart <= endDate) {
         let weekEnd = new Date(weekStart);
-        weekEnd.setUTCDate(weekStart.getUTCDate() + 6);
+        weekEnd.setDate(weekStart.getDate() + 6);
         if (weekEnd > endDate) weekEnd = new Date(endDate);
         labels.push(
-          `${weekStart.getUTCMonth() + 1}/${weekStart.getUTCDate()}-${weekEnd.getUTCMonth() + 1}/${weekEnd.getUTCDate()}`,
+          `${weekStart.getMonth() + 1}/${weekStart.getDate()}-${weekEnd.getMonth() + 1}/${weekEnd.getDate()}`,
         );
-        weekStart.setUTCDate(weekStart.getUTCDate() + 7);
+        weekStart.setDate(weekStart.getDate() + 7);
       }
     } else if (effectiveGranularity === 'month') {
-      const startYear = startDate.getUTCFullYear();
-      const endYear = endDate.getUTCFullYear();
+      const startYear = startDate.getFullYear();
+      const endYear = endDate.getFullYear();
       const isCrossYear = startYear !== endYear;
-      const endTotalMonth = endYear * 12 + endDate.getUTCMonth();
-      let currentTotalMonth = startYear * 12 + startDate.getUTCMonth();
+      const endTotalMonth = endYear * 12 + endDate.getMonth();
+      let currentTotalMonth = startYear * 12 + startDate.getMonth();
 
       while (currentTotalMonth <= endTotalMonth) {
         const y = Math.floor(currentTotalMonth / 12);
@@ -300,8 +316,8 @@ export class AdminService {
       }
     } else {
       for (
-        let year = startDate.getUTCFullYear();
-        year <= endDate.getUTCFullYear();
+        let year = startDate.getFullYear();
+        year <= endDate.getFullYear();
         year++
       ) {
         labels.push(`${year}年`);
@@ -313,12 +329,18 @@ export class AdminService {
       const date = new Date(item.createdAt);
       let label: string;
 
-      if (effectiveGranularity === 'day') {
-        if (diffDays <= 7 && period === 'week') {
-          const days = ['週日', '週一', '週二', '週三', '週四', '週五', '週六'];
-          label = days[date.getUTCDay()];
+      if (effectiveGranularity === 'hour') {
+        if (diffDays <= 2) {
+          label = `${date.getHours()}:00`;
         } else {
-          label = `${date.getUTCMonth() + 1}/${date.getUTCDate()}`;
+          label = `${date.getMonth() + 1}/${date.getDate()} ${date.getHours()}:00`;
+        }
+      } else if (effectiveGranularity === 'day') {
+        if (diffDays <= 2) {
+          const days = ['週日', '週一', '週二', '週三', '週四', '週五', '週六'];
+          label = days[date.getDay()];
+        } else {
+          label = `${date.getMonth() + 1}/${date.getDate()}`;
         }
       } else if (effectiveGranularity === 'week') {
         const diffFromStart = Math.floor(
@@ -326,19 +348,18 @@ export class AdminService {
         );
         const weekNum = Math.floor(diffFromStart / 7);
         const weekStart = new Date(startDate);
-        weekStart.setUTCDate(startDate.getUTCDate() + weekNum * 7);
+        weekStart.setDate(startDate.getDate() + weekNum * 7);
         let weekEnd = new Date(weekStart);
-        weekEnd.setUTCDate(weekStart.getUTCDate() + 6);
+        weekEnd.setDate(weekStart.getDate() + 6);
         if (weekEnd > endDate) weekEnd = new Date(endDate);
-        label = `${weekStart.getUTCMonth() + 1}/${weekStart.getUTCDate()}-${weekEnd.getUTCMonth() + 1}/${weekEnd.getUTCDate()}`;
+        label = `${weekStart.getMonth() + 1}/${weekStart.getDate()}-${weekEnd.getMonth() + 1}/${weekEnd.getDate()}`;
       } else if (effectiveGranularity === 'month') {
-        const y = date.getUTCFullYear();
-        const m = date.getUTCMonth() + 1;
-        const isCrossYear =
-          startDate.getUTCFullYear() !== endDate.getUTCFullYear();
+        const y = date.getFullYear();
+        const m = date.getMonth() + 1;
+        const isCrossYear = startDate.getFullYear() !== endDate.getFullYear();
         label = isCrossYear ? `${y}/${m}` : `${m}月`;
       } else {
-        label = `${date.getUTCFullYear()}年`;
+        label = `${date.getFullYear()}年`;
       }
 
       const val = parseFloat(item[valueField] || '0');

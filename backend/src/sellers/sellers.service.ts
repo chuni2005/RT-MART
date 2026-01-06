@@ -499,9 +499,9 @@ export class SellersService {
         const hourCursor = new Date(startDate);
         while (hourCursor <= endDate) {
           labels.push(
-            `${hourCursor.getUTCMonth() + 1}/${hourCursor.getUTCDate()} ${hourCursor.getUTCHours()}:00`,
+            `${hourCursor.getMonth() + 1}/${hourCursor.getDate()} ${hourCursor.getHours()}:00`,
           );
-          hourCursor.setUTCHours(hourCursor.getUTCHours() + 1);
+          hourCursor.setHours(hourCursor.getHours() + 1);
         }
       }
     } else if (effectiveGranularity === 'day') {
@@ -510,16 +510,14 @@ export class SellersService {
         const days = ['週日', '週一', '週二', '週三', '週四', '週五', '週六'];
         const tempDate = new Date(startDate);
         while (tempDate <= endDate) {
-          labels.push(days[tempDate.getUTCDay()]);
-          tempDate.setUTCDate(tempDate.getUTCDate() + 1);
+          labels.push(days[tempDate.getDay()]);
+          tempDate.setDate(tempDate.getDate() + 1);
         }
       } else {
         // > 2 天，顯示 MM/DD
         while (currentDate <= endDate) {
-          labels.push(
-            `${currentDate.getUTCMonth() + 1}/${currentDate.getUTCDate()}`,
-          );
-          currentDate.setUTCDate(currentDate.getUTCDate() + 1);
+          labels.push(`${currentDate.getMonth() + 1}/${currentDate.getDate()}`);
+          currentDate.setDate(currentDate.getDate() + 1);
         }
       }
     } else if (effectiveGranularity === 'week') {
@@ -527,20 +525,20 @@ export class SellersService {
       const weekStart = new Date(startDate);
       while (weekStart <= endDate) {
         let weekEnd = new Date(weekStart);
-        weekEnd.setUTCDate(weekStart.getUTCDate() + 6);
+        weekEnd.setDate(weekStart.getDate() + 6);
         if (weekEnd > endDate) weekEnd = new Date(endDate);
 
-        const label = `${weekStart.getUTCMonth() + 1}/${weekStart.getUTCDate()}-${weekEnd.getUTCMonth() + 1}/${weekEnd.getUTCDate()}`;
+        const label = `${weekStart.getMonth() + 1}/${weekStart.getDate()}-${weekEnd.getMonth() + 1}/${weekEnd.getDate()}`;
         labels.push(label);
-        weekStart.setUTCDate(weekStart.getUTCDate() + 7);
+        weekStart.setDate(weekStart.getDate() + 7);
       }
     } else if (effectiveGranularity === 'month') {
-      const startYear = startDate.getUTCFullYear();
-      const endYear = endDate.getUTCFullYear();
+      const startYear = startDate.getFullYear();
+      const endYear = endDate.getFullYear();
       const isCrossYear = startYear !== endYear;
 
-      const endTotalMonth = endYear * 12 + endDate.getUTCMonth();
-      let currentTotalMonth = startYear * 12 + startDate.getUTCMonth();
+      const endTotalMonth = endYear * 12 + endDate.getMonth();
+      let currentTotalMonth = startYear * 12 + startDate.getMonth();
 
       while (currentTotalMonth <= endTotalMonth) {
         const y = Math.floor(currentTotalMonth / 12);
@@ -551,8 +549,8 @@ export class SellersService {
     } else {
       // year
       for (
-        let year = startDate.getUTCFullYear();
-        year <= endDate.getUTCFullYear();
+        let year = startDate.getFullYear();
+        year <= endDate.getFullYear();
         year++
       ) {
         labels.push(`${year}年`);
@@ -560,23 +558,26 @@ export class SellersService {
     }
 
     // Data mapping logic
-    const dynamicDataMap = new Map<string, { revenue: number; orderIds: Set<string> }>();
+    const dynamicDataMap = new Map<
+      string,
+      { revenue: number; orderIds: Set<string> }
+    >();
     orders.forEach((order) => {
       const date = new Date(order.createdAt);
       let label: string;
 
       if (effectiveGranularity === 'hour') {
         if (diffDays <= 2) {
-          label = `${date.getUTCHours()}:00`;
+          label = `${date.getHours()}:00`;
         } else {
-          label = `${date.getUTCMonth() + 1}/${date.getUTCDate()} ${date.getUTCHours()}:00`;
+          label = `${date.getMonth() + 1}/${date.getDate()} ${date.getHours()}:00`;
         }
       } else if (effectiveGranularity === 'day') {
         if (diffDays <= 2) {
           const days = ['週日', '週一', '週二', '週三', '週四', '週五', '週六'];
-          label = days[date.getUTCDay()];
+          label = days[date.getDay()];
         } else {
-          label = `${date.getUTCMonth() + 1}/${date.getUTCDate()}`;
+          label = `${date.getMonth() + 1}/${date.getDate()}`;
         }
       } else if (effectiveGranularity === 'week') {
         // Find which week this date belongs to
@@ -584,28 +585,27 @@ export class SellersService {
           (date.getTime() - startDate.getTime()) / (1000 * 60 * 60 * 24),
         );
         const weekIndex = Math.floor(diffFromStart / 7);
-        
+
         const weekStart = new Date(startDate);
-        weekStart.setUTCDate(startDate.getUTCDate() + weekIndex * 7);
+        weekStart.setDate(startDate.getDate() + weekIndex * 7);
         let weekEnd = new Date(weekStart);
-        weekEnd.setUTCDate(weekStart.getUTCDate() + 6);
+        weekEnd.setDate(weekStart.getDate() + 6);
         if (weekEnd > endDate) weekEnd = new Date(endDate);
-        
-        label = `${weekStart.getUTCMonth() + 1}/${weekStart.getUTCDate()}-${weekEnd.getUTCMonth() + 1}/${weekEnd.getUTCDate()}`;
+
+        label = `${weekStart.getMonth() + 1}/${weekStart.getDate()}-${weekEnd.getMonth() + 1}/${weekEnd.getDate()}`;
       } else if (effectiveGranularity === 'month') {
-        const y = date.getUTCFullYear();
-        const m = date.getUTCMonth() + 1;
-        const isCrossYear =
-          startDate.getUTCFullYear() !== endDate.getUTCFullYear();
+        const y = date.getFullYear();
+        const m = date.getMonth() + 1;
+        const isCrossYear = startDate.getFullYear() !== endDate.getFullYear();
         label = isCrossYear ? `${y}/${m}` : `${m}月`;
       } else {
-        label = `${date.getUTCFullYear()}年`;
+        label = `${date.getFullYear()}年`;
       }
 
       if (!dynamicDataMap.has(label)) {
         dynamicDataMap.set(label, { revenue: 0, orderIds: new Set() });
       }
-      
+
       const current = dynamicDataMap.get(label)!;
       current.revenue += parseFloat(order.totalAmount);
       current.orderIds.add(order.orderId);

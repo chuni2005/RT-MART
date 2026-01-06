@@ -21,6 +21,7 @@ import { OrderItemLoader } from './loaders/order-item.loader';
 import { OrderDiscountLoader } from './loaders/order-discount.loader';
 import { CartHistoryLoader } from './loaders/cart-history.loader';
 import { DashboardTestDataLoader } from './loaders/dashboard-test-data.loader';
+import { UserGrowthTestDataLoader } from './loaders/user-growth-test-data.loader';
 import { UserTokenLoader } from './loaders/user-token.loader';
 import { AuditLogLoader } from './loaders/audit-log.loader';
 import { ReviewLoader } from './loaders/review.loader';
@@ -121,6 +122,26 @@ export class SeedService {
     } catch (error) {
       this.logger.error(
         'Failed to load DashboardTestDataLoader',
+        error instanceof Error ? error.stack : String(error),
+      );
+    }
+
+    const userGrowthTestDataLoader = new UserGrowthTestDataLoader(
+      entityManager,
+      this.logger,
+    );
+    try {
+      const result = await userGrowthTestDataLoader.load();
+      results.push({
+        loader: 'UserGrowthTestDataLoader',
+        success: result.success,
+        skipped: 0,
+        errors: result.errors.map((e) => ({ error: e })),
+      });
+      totalSuccess += result.success;
+    } catch (error) {
+      this.logger.error(
+        'Failed to load UserGrowthTestDataLoader',
         error instanceof Error ? error.stack : String(error),
       );
     }

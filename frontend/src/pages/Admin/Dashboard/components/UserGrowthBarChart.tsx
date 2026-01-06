@@ -1,7 +1,7 @@
-import { useEffect, useRef } from 'react';
-import * as echarts from 'echarts';
-import { ChartDataPoint } from '@/types/admin';
-import styles from './Charts.module.scss';
+import { useEffect, useRef } from "react";
+import * as echarts from "echarts";
+import { ChartDataPoint } from "@/types/admin";
+import styles from "./Charts.module.scss";
 
 interface UserGrowthBarChartProps {
   data: ChartDataPoint[];
@@ -22,31 +22,33 @@ function UserGrowthBarChart({ data }: UserGrowthBarChartProps) {
 
     const option: echarts.EChartsOption = {
       title: {
-        text: '平台用戶增長趨勢',
-        left: 'center',
+        text: "平台用戶增長趨勢",
+        left: "center",
         textStyle: {
           fontSize: 18,
           fontWeight: 600,
         },
       },
       tooltip: {
-        trigger: 'axis',
+        trigger: "axis",
         formatter: (params: any) => {
           const param = params[0];
-          return `${param.name}<br/>新增用戶: ${param.value.toLocaleString()} 人`;
+          return `${
+            param.name
+          }<br/>新增用戶: ${param.value.toLocaleString()} 人`;
         },
       },
       xAxis: {
-        type: 'category',
+        type: "category",
         data: data.map((d) => d.label),
         axisLabel: {
-          rotate: 45,
+          rotate: data.length > 10 ? 45 : 0,
           fontSize: 12,
         },
       },
       yAxis: {
-        type: 'value',
-        name: '新增用戶數',
+        type: "value",
+        name: "新增用戶數",
         nameTextStyle: {
           fontSize: 12,
         },
@@ -57,36 +59,36 @@ function UserGrowthBarChart({ data }: UserGrowthBarChartProps) {
       },
       series: [
         {
-          name: '新增用戶',
-          type: 'bar',
+          name: "新增用戶",
+          type: "bar",
           data: data.map((d) => d.value),
           itemStyle: {
             color: new echarts.graphic.LinearGradient(0, 0, 0, 1, [
-              { offset: 0, color: '#10b981' },
-              { offset: 1, color: '#34d399' },
+              { offset: 0, color: "#10b981" },
+              { offset: 1, color: "#34d399" },
             ]),
           },
-          barWidth: '60%',
+          barWidth: "60%",
         },
       ],
       grid: {
-        left: '3%',
-        right: '4%',
-        bottom: '15%',
+        left: "3%",
+        right: "4%",
+        bottom: "15%",
         containLabel: true,
       },
       dataZoom: [
         {
-          type: 'inside',
+          type: "inside",
           start: 0,
           end: 100,
         },
         {
-          type: 'slider',
+          type: "slider",
           start: 0,
           end: 100,
           height: 20,
-          bottom: '5%',
+          bottom: "5%",
         },
       ],
     };
@@ -96,10 +98,10 @@ function UserGrowthBarChart({ data }: UserGrowthBarChartProps) {
     const handleResize = () => {
       chart.resize();
     };
-    window.addEventListener('resize', handleResize);
+    window.addEventListener("resize", handleResize);
 
     return () => {
-      window.removeEventListener('resize', handleResize);
+      window.removeEventListener("resize", handleResize);
     };
   }, [data]);
 
