@@ -1,4 +1,4 @@
-import { IsOptional, IsString, Matches } from 'class-validator';
+import { IsOptional, IsString, Matches, IsIn } from 'class-validator';
 
 export class QueryDashboardDto {
   @IsOptional()
@@ -18,4 +18,9 @@ export class QueryDashboardDto {
   @IsOptional()
   @IsString()
   period?: 'day' | 'week' | 'month' | 'year';
+
+  @IsOptional()
+  @IsString()
+  @IsIn(['day', 'week', 'month', 'year'])
+  granularity?: 'day' | 'week' | 'month' | 'year';
 }

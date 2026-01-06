@@ -1,7 +1,7 @@
 import { useState, useEffect } from "react";
 import { useNavigate } from "react-router-dom";
-import ChartTypeSelector from "./components/ChartTypeSelector";
-import GranularitySelector from "./components/GranularitySelector";
+import ChartTypeSelector from "@/shared/components/DashboardSelectors/ChartTypeSelector";
+import GranularitySelector from "@/shared/components/DashboardSelectors/GranularitySelector";
 import SalesChart from "./components/SalesChart";
 import SalesBarChart from "./components/SalesBarChart";
 import CategoryPieChart from "./components/CategoryPieChart";
@@ -124,6 +124,12 @@ function Dashboard() {
     }
   };
 
+  const sellerChartOptions = [
+    { value: "line" as const, label: "營業額趨勢" },
+    { value: "bar" as const, label: "銷售細節分析" },
+    { value: "pie" as const, label: "類別銷售佔比" },
+  ];
+
   if (loading) {
     return <div className={styles.loading}>載入中...</div>;
   }
@@ -140,14 +146,20 @@ function Dashboard() {
       <div className={styles.filtersSection}>
         <div className={styles.topRow}>
           <div className={styles.selectors}>
-            <ChartTypeSelector value={chartType} onChange={setChartType} />
-            <GranularitySelector
-              value={filters.granularity}
-              onChange={(g) => handleFilterChange("granularity", g)}
-              startDate={filters.startDate}
-              endDate={filters.endDate}
-              period={filters.period}
+            <ChartTypeSelector
+              value={chartType}
+              onChange={setChartType}
+              options={sellerChartOptions}
             />
+            {chartType !== "pie" && (
+              <GranularitySelector
+                value={filters.granularity}
+                onChange={(g) => handleFilterChange("granularity", g)}
+                startDate={filters.startDate}
+                endDate={filters.endDate}
+                period={filters.period}
+              />
+            )}
           </div>
           <Button
             variant="primary"

@@ -1,7 +1,9 @@
-import { useEffect, useRef } from 'react';
-import * as echarts from 'echarts';
-import { ChartDataPoint } from '@/types/admin';
-import styles from './Charts.module.scss';
+import { useEffect, useRef } from "react";
+import * as echarts from "echarts";
+import { ChartDataPoint } from "@/types/admin";
+import { getOrderStatusText } from "@/shared/utils/orderUtils";
+import { OrderStatus } from "@/types/order";
+import styles from "./Charts.module.scss";
 
 interface OrderStatusPieChartProps {
   data: ChartDataPoint[];
@@ -22,59 +24,73 @@ function OrderStatusPieChart({ data }: OrderStatusPieChartProps) {
 
     const option: echarts.EChartsOption = {
       title: {
-        text: '訂單狀態分布',
-        left: 'center',
+        text: "訂單狀態分布",
+        left: "center",
         textStyle: {
           fontSize: 18,
           fontWeight: 600,
         },
       },
       tooltip: {
-        trigger: 'item',
+        trigger: "item",
         formatter: (params: any) => {
-          return `${params.name}<br/>數量: ${params.value.toLocaleString()} 筆<br/>佔比: ${params.percent}%`;
+          return `${
+            params.name
+          }<br/>數量: ${params.value.toLocaleString()} 筆<br/>佔比: ${
+            params.percent
+          }%`;
         },
       },
       legend: {
-        orient: 'vertical',
-        left: 'left',
-        top: 'middle',
+        orient: "vertical",
+        left: "left",
+        top: "middle",
         textStyle: {
           fontSize: 12,
         },
       },
       series: [
         {
-          name: '訂單狀態',
-          type: 'pie',
-          radius: ['40%', '70%'],
+          name: "訂單狀態",
+          type: "pie",
+          radius: ["40%", "70%"],
           avoidLabelOverlap: false,
           itemStyle: {
-            borderColor: '#fff',
+            borderColor: "#fff",
             borderWidth: 2,
           },
           label: {
             show: true,
-            formatter: '{b}: {d}%',
+            formatter: "{b}: {d}%",
             fontSize: 12,
           },
           emphasis: {
             label: {
               show: true,
               fontSize: 14,
-              fontWeight: 'bold',
+              fontWeight: "bold",
             },
           },
           labelLine: {
             show: true,
           },
           data: data.map((d) => ({
-            name: d.label,
+            // 如果 label 是有效的訂單狀態 key，則轉換為中文標籤
+            name: getOrderStatusText(d.label as OrderStatus),
             value: d.value,
           })),
         },
       ],
-      color: ['#10b981', '#3b82f6', '#f59e0b', '#ef4444', '#8b5cf6'],
+      color: [
+        "#10b981",
+        "#3b82f6",
+        "#f59e0b",
+        "#ef4444",
+        "#8b5cf6",
+        "#6366f1",
+        "#f43f5e",
+        "#8b5cf6",
+      ],
     };
 
     chart.setOption(option);
@@ -82,10 +98,10 @@ function OrderStatusPieChart({ data }: OrderStatusPieChartProps) {
     const handleResize = () => {
       chart.resize();
     };
-    window.addEventListener('resize', handleResize);
+    window.addEventListener("resize", handleResize);
 
     return () => {
-      window.removeEventListener('resize', handleResize);
+      window.removeEventListener("resize", handleResize);
     };
   }, [data]);
 

@@ -1,7 +1,7 @@
 import { useMemo } from "react";
 import Select from "@/shared/components/Select";
 import { SalesGranularity } from "@/types/seller";
-import styles from "./ChartTypeSelector.module.scss"; // Reuse styles or create new ones
+import styles from "./ChartTypeSelector.module.scss";
 
 interface GranularitySelectorProps {
   value: SalesGranularity | undefined;
@@ -52,10 +52,8 @@ function GranularitySelector({
   const availableOptions = useMemo(() => {
     let options = ALL_GRANULARITIES;
     if (isLongPeriod) {
-      // 365天及以上不提供按時和按天
       options = options.filter((g) => g.value !== "hour" && g.value !== "day");
     } else if (isMediumPeriod) {
-      // > 7天不提供按時
       options = options.filter((g) => g.value !== "hour");
     }
     return options;
@@ -80,3 +78,4 @@ function GranularitySelector({
 }
 
 export default GranularitySelector;
+

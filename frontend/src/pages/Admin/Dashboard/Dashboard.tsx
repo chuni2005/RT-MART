@@ -3,11 +3,14 @@ import Icon from "@/shared/components/Icon";
 import adminService from "@/shared/services/adminService.index";
 import type { DashboardStats, DashboardFilters } from "../../../types/admin";
 import { DateRangeFilter } from "@/shared/components/DateRangeFilter/DateRangeFilter";
+import ChartTypeSelector from "@/shared/components/DashboardSelectors/ChartTypeSelector";
+import GranularitySelector from "@/shared/components/DashboardSelectors/GranularitySelector";
 import {
   calculateDateRangeLocal,
   getDefaultStartDate,
   getDefaultEndDate,
 } from "@/shared/utils/dateUtils";
+import { ChartType } from "@/types/seller";
 import RevenueLineChart from "./components/RevenueLineChart";
 import UserGrowthBarChart from "./components/UserGrowthBarChart";
 import OrderStatusPieChart from "./components/OrderStatusPieChart";
@@ -16,11 +19,13 @@ import styles from "./Dashboard.module.scss";
 function Dashboard() {
   const [stats, setStats] = useState<DashboardStats | null>(null);
   const [loading, setLoading] = useState(true);
+  const [chartType, setChartType] = useState<ChartType>("line");
 
   const [filters, setFilters] = useState<DashboardFilters>({
     startDate: getDefaultStartDate(),
     endDate: getDefaultEndDate(),
     period: "month",
+    granularity: undefined,
   });
   const [activeQuickSelector, setActiveQuickSelector] = useState<
     "day" | "week" | "month" | "year" | null
@@ -43,7 +48,7 @@ function Dashboard() {
     }
   };
 
-  const handleFilterChange = (field: keyof DashboardFilters, value: string) => {
+  const handleFilterChange = (field: keyof DashboardFilters, value: any) => {
     const newFilters = { ...filters, [field]: value };
 
     // 如果開始或結束日期有變動，自動計算最適合的 period
@@ -66,16 +71,27 @@ function Dashboard() {
       } else {
         newFilters.period = "year";
       }
+
+      // 當自定義日期變動時，重置細度為預設
+      newFilters.granularity = undefined;
     }
 
     setFilters(newFilters);
-    setActiveQuickSelector(null); // Clear quick selector when manually changing dates
+    if (field !== "granularity") {
+      setActiveQuickSelector(null); // Clear quick selector when manually changing dates
+    }
     loadDashboardData(newFilters);
   };
 
   const handleQuickSelect = (period: "day" | "week" | "month" | "year") => {
     const { startDate, endDate } = calculateDateRangeLocal(period);
-    const newFilters = { ...filters, startDate, endDate, period };
+    const newFilters = {
+      ...filters,
+      startDate,
+      endDate,
+      period,
+      granularity: undefined,
+    };
     setFilters(newFilters);
     setActiveQuickSelector(period);
     loadDashboardData(newFilters);
@@ -99,12 +115,37 @@ function Dashboard() {
     return <div className={styles.error}>載入失敗</div>;
   }
 
+  const adminChartOptions = [
+    { value: "line" as const, label: "平台交易額趨勢" },
+    { value: "bar" as const, label: "平台用戶增長趨勢" },
+    { value: "pie" as const, label: "訂單狀態分布" },
+  ];
+
   return (
     <div className={styles.dashboard}>
       <h1 className={styles.pageTitle}>管理員首頁</h1>
 
       {/* Filters Section */}
       <div className={styles.filtersSection}>
+        <div className={styles.topRow}>
+          <div className={styles.selectors}>
+            <ChartTypeSelector
+              value={chartType}
+              onChange={setChartType}
+              options={adminChartOptions}
+            />
+            {chartType !== "pie" && (
+              <GranularitySelector
+                value={filters.granularity}
+                onChange={(g) => handleFilterChange("granularity", g)}
+                startDate={filters.startDate}
+                endDate={filters.endDate}
+                period={filters.period}
+              />
+            )}
+          </div>
+        </div>
+
         <DateRangeFilter
           startDate={filters.startDate || ""}
           endDate={filters.endDate || ""}
@@ -172,20 +213,23 @@ function Dashboard() {
         <h2 className={styles.sectionTitle}>平台數據趨勢</h2>
 
         <div className={styles.chartsGrid}>
-          {/* Revenue Line Chart */}
-          <div className={styles.chartCard}>
-            <RevenueLineChart data={stats.revenueChartData} />
-          </div>
+          {chartType === "line" && (
+            <div className={styles.chartCard}>
+              <RevenueLineChart data={stats.revenueChartData} />
+            </div>
+          )}
 
-          {/* User Growth Bar Chart */}
-          <div className={styles.chartCard}>
-            <UserGrowthBarChart data={stats.userGrowthChartData} />
-          </div>
+          {chartType === "bar" && (
+            <div className={styles.chartCard}>
+              <UserGrowthBarChart data={stats.userGrowthChartData} />
+            </div>
+          )}
 
-          {/* Order Status Pie Chart */}
-          <div className={styles.chartCard}>
-            <OrderStatusPieChart data={stats.orderStatusChartData} />
-          </div>
+          {chartType === "pie" && (
+            <div className={styles.chartCard}>
+              <OrderStatusPieChart data={stats.orderStatusChartData} />
+            </div>
+          )}
         </div>
       </div>
 

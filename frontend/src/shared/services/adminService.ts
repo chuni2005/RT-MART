@@ -150,6 +150,9 @@ export const getDashboardStats = async (filters?: DashboardFilters): Promise<Das
   if (filters?.period) {
     queryParams.append('period', filters.period);
   }
+  if (filters?.granularity) {
+    queryParams.append('granularity', filters.granularity);
+  }
 
   const queryString = queryParams.toString();
   const url = queryString ? `/admin/dashboard/stats?${queryString}` : '/admin/dashboard/stats';

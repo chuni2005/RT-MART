@@ -145,4 +145,5 @@ export type DashboardFilters = {
   startDate?: string;
   endDate?: string;
   period?: "day" | "week" | "month" | "year";
+  granularity?: "hour" | "day" | "week" | "month" | "year";
 };
