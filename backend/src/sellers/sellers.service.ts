@@ -650,7 +650,8 @@ export class SellersService {
 
     if (productName) {
       query.andWhere(
-        "JSON_UNQUOTE(JSON_EXTRACT(item.product_snapshot, '$.product_name')) LIKE :productName",
+        "(JSON_UNQUOTE(JSON_EXTRACT(item.product_snapshot, '$.product_name')) LIKE :productName OR " +
+          "JSON_UNQUOTE(JSON_EXTRACT(item.product_snapshot, '$.productName')) LIKE :productName)",
         {
           productName: `%${productName}%`,
         },
@@ -706,7 +707,8 @@ export class SellersService {
 
     if (productName) {
       query.andWhere(
-        "JSON_UNQUOTE(JSON_EXTRACT(item.product_snapshot, '$.product_name')) LIKE :productName",
+        "(JSON_UNQUOTE(JSON_EXTRACT(item.product_snapshot, '$.product_name')) LIKE :productName OR " +
+          "JSON_UNQUOTE(JSON_EXTRACT(item.product_snapshot, '$.productName')) LIKE :productName)",
         {
           productName: `%${productName}%`,
         },
@@ -807,7 +809,8 @@ export class SellersService {
     // Add product name filter if provided
     if (filters.productName) {
       queryBuilder.andWhere(
-        "JSON_UNQUOTE(JSON_EXTRACT(item.product_snapshot, '$.product_name')) LIKE :productName",
+        "(JSON_UNQUOTE(JSON_EXTRACT(item.product_snapshot, '$.product_name')) LIKE :productName OR " +
+          "JSON_UNQUOTE(JSON_EXTRACT(item.product_snapshot, '$.productName')) LIKE :productName)",
         { productName: `%${filters.productName}%` },
       );
     }
@@ -823,7 +826,10 @@ export class SellersService {
 
       order.items.forEach((item) => {
         const productSnapshot = item.productSnapshot as any;
-        const productName = productSnapshot?.product_name || 'Unknown';
+        const productName =
+          productSnapshot?.product_name ||
+          productSnapshot?.productName ||
+          'Unknown';
 
         const subtotalValue = parseFloat(item.subtotal.toString());
         const paymentFee = parseFloat((subtotalValue * 0.01).toFixed(2));

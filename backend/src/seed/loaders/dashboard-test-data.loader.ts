@@ -153,8 +153,8 @@ export class DashboardTestDataLoader {
         const item = new OrderItem();
         item.productId = product.productId;
         item.productSnapshot = {
-          productId: product.productId,
-          productName: product.productName,
+          product_id: product.productId,
+          product_name: product.productName,
           price: product.price,
         };
         item.quantity = quantity;
