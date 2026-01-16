@@ -1,14 +1,14 @@
-import { useState, useEffect, useCallback } from 'react';
-import { useParams, useNavigate, Navigate } from 'react-router-dom';
-import { getOrderDetail } from '@/shared/services/orderService';
-import type { Order, OrderStatus, PaymentMethod } from '@/types/order';
-import Button from '@/shared/components/Button';
-import OrderTimeline from '@/pages/UserCenter/components/OrderTimeline';
-import ItemListCard from '@/shared/components/ItemListCard';
-import AddressCard from '@/pages/Checkout/components/AddressCard';
-import { useSSE } from '@/shared/hooks/useSSE';
-import { useAuth } from '@/shared/contexts/AuthContext';
-import styles from './OrderDetailPage.module.scss';
+import { useState, useEffect, useCallback } from "react";
+import { useParams, useNavigate, Navigate } from "react-router-dom";
+import { getOrderDetail } from "@/shared/services/orderService";
+import type { Order, OrderStatus, PaymentMethod } from "@/types/order";
+import Button from "@/shared/components/Button";
+import OrderTimeline from "@/pages/UserCenter/components/OrderTimeline";
+import ItemListCard from "@/shared/components/ItemListCard";
+import AddressCard from "@/pages/Checkout/components/AddressCard";
+import { useSSE } from "@/shared/hooks/useSSE";
+import { useAuth } from "@/shared/contexts/AuthContext";
+import styles from "./OrderDetailPage.module.scss";
 
 /**
  * 訂單詳情頁面
@@ -31,7 +31,7 @@ function OrderDetailPage() {
   // ========== 2. 副作用 ==========
   useEffect(() => {
     if (!order_id) {
-      navigate('/user/orders');
+      navigate("/user/orders");
       return;
     }
     fetchOrderDetail();
@@ -45,8 +45,8 @@ function OrderDetailPage() {
       const data = await getOrderDetail(order_id!);
       setOrder(data);
     } catch (err) {
-      console.error('Failed to fetch order detail:', err);
-      setError(err instanceof Error ? err.message : '載入失敗');
+      console.error("Failed to fetch order detail:", err);
+      setError(err instanceof Error ? err.message : "載入失敗");
     } finally {
       setIsLoading(false);
     }
@@ -54,54 +54,57 @@ function OrderDetailPage() {
 
   // ========== SSE Real-time Updates ==========
   useSSE({
-    'order:updated': useCallback((data: { orderId: string; status: OrderStatus }) => {
-      // Only update if this is the current order
-      if (data.orderId === order_id) {
-        console.log('Order updated via SSE, refreshing...');
-        fetchOrderDetail();
-      }
-    }, [order_id, fetchOrderDetail]),
+    "order:updated": useCallback(
+      (data: { orderId: string; status: OrderStatus }) => {
+        // Only update if this is the current order
+        if (data.orderId === order_id) {
+          console.log("Order updated via SSE, refreshing...");
+          fetchOrderDetail();
+        }
+      },
+      [order_id, fetchOrderDetail]
+    ),
   });
 
   // ========== 4. 輔助函數 ==========
   const getStatusLabel = (status: OrderStatus): string => {
     const labels: Record<OrderStatus, string> = {
-      pending_payment: '待付款',
-      payment_failed: '付款失敗',
-      paid: '已付款',
-      processing: '處理中',
-      shipped: '已出貨',
-      delivered: '已送達',
-      completed: '已完成',
-      cancelled: '已取消',
+      pending_payment: "待付款",
+      payment_failed: "付款失敗",
+      paid: "已付款",
+      processing: "處理中",
+      shipped: "已出貨",
+      delivered: "已送達",
+      completed: "已完成",
+      cancelled: "已取消",
     };
-    return labels[status] || '未知狀態';
+    return labels[status] || "未知狀態";
   };
 
   const getPaymentMethodLabel = (method: PaymentMethod): string => {
     const labels: Record<PaymentMethod, string> = {
-      credit_card: '信用卡',
-      cash_on_delivery: '貨到付款',
-      debit_card: '金融卡',
-      bank_transfer: '銀行轉帳',
+      credit_card: "信用卡",
+      cash_on_delivery: "貨到付款",
+      debit_card: "金融卡",
+      bank_transfer: "銀行轉帳",
     };
-    return labels[method] || '未知付款方式';
+    return labels[method] || "未知付款方式";
   };
 
   const formatDate = (dateString: string): string => {
-    return new Date(dateString).toLocaleString('zh-TW', {
-      year: 'numeric',
-      month: '2-digit',
-      day: '2-digit',
-      hour: '2-digit',
-      minute: '2-digit',
-      second: '2-digit',
+    return new Date(dateString).toLocaleString("zh-TW", {
+      year: "numeric",
+      month: "2-digit",
+      day: "2-digit",
+      hour: "2-digit",
+      minute: "2-digit",
+      second: "2-digit",
       hour12: true,
     });
   };
 
   const formatCurrency = (amount: number): string => {
-    return amount.toLocaleString('zh-TW');
+    return amount.toLocaleString("zh-TW");
   };
 
   // ========== 5. 渲染邏輯 ==========
@@ -122,8 +125,8 @@ function OrderDetailPage() {
     return (
       <div className={styles.orderDetailPage}>
         <div className={styles.error}>
-          <p>{error || '訂單不存在'}</p>
-          <Button variant="primary" onClick={() => navigate('/user/orders')}>
+          <p>{error || "訂單不存在"}</p>
+          <Button variant="primary" onClick={() => navigate("/user/orders")}>
             返回訂單列表
           </Button>
         </div>
@@ -138,7 +141,7 @@ function OrderDetailPage() {
       <Button
         variant="ghost"
         icon="arrow-left"
-        onClick={() => navigate('/user/orders')}
+        onClick={() => navigate("/user/orders")}
         className={styles.backButton}
       >
         返回訂單列表
@@ -148,8 +151,12 @@ function OrderDetailPage() {
       <section className={styles.section}>
         <div className={styles.orderHeader}>
           <div>
-            <h2 className={styles.orderNumber}>訂單編號: {order.orderNumber}</h2>
-            <p className={styles.orderDate}>下單時間: {formatDate(order.createdAt)}</p>
+            <h2 className={styles.orderNumber}>
+              訂單編號: {order.orderNumber}
+            </h2>
+            <p className={styles.orderDate}>
+              下單時間: {formatDate(order.createdAt)}
+            </p>
           </div>
           <span className={`${styles.statusBadge} ${styles[order.status]}`}>
             {getStatusLabel(order.status)}
@@ -162,6 +169,7 @@ function OrderDetailPage() {
         <h3 className={styles.sectionTitle}>訂單狀態</h3>
         <OrderTimeline
           status={order.status}
+          paymentMethod={order.paymentMethod}
           timestamps={{
             createdAt: order.createdAt,
             paidAt: order.paidAt,
@@ -215,12 +223,16 @@ function OrderDetailPage() {
           {order.discount > 0 && (
             <div className={styles.amountRow}>
               <span>折扣</span>
-              <span className={styles.discount}>- $ {formatCurrency(order.discount)}</span>
+              <span className={styles.discount}>
+                - $ {formatCurrency(order.discount)}
+              </span>
             </div>
           )}
           <div className={`${styles.amountRow} ${styles.total}`}>
             <span>應付金額</span>
-            <span className={styles.totalAmount}>$ {formatCurrency(order.totalAmount)}</span>
+            <span className={styles.totalAmount}>
+              $ {formatCurrency(order.totalAmount)}
+            </span>
           </div>
         </div>
       </section>

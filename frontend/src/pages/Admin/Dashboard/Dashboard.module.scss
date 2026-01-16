@@ -17,6 +17,21 @@
   padding: $spacing-lg;
   margin-bottom: $spacing-xl;
   box-shadow: $shadow-sm;
+
+  .topRow {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin-bottom: $spacing-lg;
+    flex-wrap: wrap;
+    gap: $spacing-md;
+
+    .selectors {
+      display: flex;
+      gap: $spacing-lg;
+      flex-wrap: wrap;
+    }
+  }
 }
 
 .loading,

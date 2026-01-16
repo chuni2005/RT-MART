@@ -4,7 +4,7 @@ import {
   ConflictException,
 } from '@nestjs/common';
 import { InjectRepository } from '@nestjs/typeorm';
-import { Repository } from 'typeorm';
+import { Repository, EntityManager } from 'typeorm';
 import { ProductType } from './entities/product-type.entity';
 import { CreateProductTypeDto } from './dto/create-product-type.dto';
 import { UpdateProductTypeDto } from './dto/update-product-type.dto';
@@ -82,11 +82,14 @@ export class ProductTypesService {
   /**
    * 取得單一分類，並遞迴取得所有父級分類 (疊代實現以防止堆疊溢出)
    */
-  async findOne(id: string): Promise<ProductType> {
+  async findOne(id: string, manager?: EntityManager): Promise<ProductType> {
     const MAX_DEPTH = 10;
     const visited = new Set<string>([id]);
+    const repo = manager
+      ? manager.getRepository(ProductType)
+      : this.productTypeRepository;
 
-    const productType = await this.productTypeRepository.findOne({
+    const productType = await repo.findOne({
       where: { productTypeId: id, isActive: true },
       relations: ['parent'],
     });
@@ -108,7 +111,7 @@ export class ProductTypesService {
       }
       visited.add(parentId);
 
-      const parent = await this.productTypeRepository.findOne({
+      const parent = await repo.findOne({
         where: { productTypeId: parentId, isActive: true },
         relations: ['parent'],
       });

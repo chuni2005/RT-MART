@@ -6,6 +6,7 @@ import { User } from './entities/user.entity';
 import { StoresModule } from '../stores/stores.module';
 import { OrdersModule } from '../orders/orders.module';
 import { SellersModule } from '../sellers/sellers.module';
+import { CloudinaryModule } from '../cloudinary/cloudinary.module';
 
 @Module({
   imports: [
@@ -13,6 +14,7 @@ import { SellersModule } from '../sellers/sellers.module';
     forwardRef(() => StoresModule),
     forwardRef(() => OrdersModule),
     forwardRef(() => SellersModule),
+    CloudinaryModule,
   ],
   controllers: [UsersController],
   providers: [UsersService],

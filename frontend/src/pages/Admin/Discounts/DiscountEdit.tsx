@@ -7,6 +7,7 @@ import Alert from '@/shared/components/Alert';
 import adminService from '@/shared/services/adminService.index';
 import { AlertType } from '@/types';
 import { useForm } from '@/shared/hooks/useForm';
+import { toDatetimeLocal, fromDatetimeLocal } from '@/shared/utils/dateUtils';
 import styles from './DiscountEdit.module.scss';
 
 interface DiscountFormValues {
@@ -160,8 +161,8 @@ function DiscountEdit() {
       setValue('name', discount.name);
       setValue('description', discount.description || '');
       setValue('minPurchaseAmount', discount.min_purchase_amount.toString());
-      setValue('startDatetime', discount.start_datetime.slice(0, 16));
-      setValue('endDatetime', discount.end_datetime.slice(0, 16));
+      setValue('startDatetime', toDatetimeLocal(discount.start_datetime));
+      setValue('endDatetime', toDatetimeLocal(discount.end_datetime));
       setValue('isActive', discount.is_active);
 
       if (discount.discount_type === 'seasonal') {
@@ -196,8 +197,8 @@ function DiscountEdit() {
         name: values.name,
         description: values.description || '',
         min_purchase_amount: Number(values.minPurchaseAmount),
-        start_datetime: values.startDatetime,
-        end_datetime: values.endDatetime,
+        start_datetime: fromDatetimeLocal(values.startDatetime),
+        end_datetime: fromDatetimeLocal(values.endDatetime),
         is_active: values.isActive,
         usage_limit: null,
       };

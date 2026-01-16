@@ -1,4 +1,4 @@
-import { IsOptional, IsString, Matches } from 'class-validator';
+import { IsOptional, IsString, Matches, IsIn } from 'class-validator';
 
 export class QueryDashboardDto {
   @IsOptional()
@@ -14,4 +14,13 @@ export class QueryDashboardDto {
     message: 'endDate must be in YYYY-MM-DD format',
   })
   endDate?: string;
+
+  @IsOptional()
+  @IsString()
+  period?: 'day' | 'week' | 'month' | 'year';
+
+  @IsOptional()
+  @IsString()
+  @IsIn(['hour', 'day', 'week', 'month', 'year'])
+  granularity?: 'hour' | 'day' | 'week' | 'month' | 'year';
 }

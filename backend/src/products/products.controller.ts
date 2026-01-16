@@ -29,11 +29,13 @@ import {
   SortImagesDto,
   UpdateSortedImagesDto,
 } from './dto/upate-sortedImages.dto';
+import { Audit } from '../common/decorators/audit.decorator';
 
 @Controller('products')
 export class ProductsController {
   constructor(private readonly productsService: ProductsService) {}
 
+  @Audit('Product')
   @Roles(UserRole.SELLER)
   @UseGuards(JwtAccessGuard, RolesGuard)
   @UseInterceptors(FilesInterceptor('images'))
@@ -130,6 +132,7 @@ export class ProductsController {
     return await this.productsService.findOne(id, true, true);
   }
 
+  @Audit('Product')
   @Roles(UserRole.SELLER)
   @UseGuards(JwtAccessGuard, RolesGuard)
   @Patch(':id')
@@ -141,6 +144,7 @@ export class ProductsController {
     return await this.productsService.update(req.user.userId, id, updateDto);
   }
 
+  @Audit('ProductImage')
   @Roles(UserRole.SELLER)
   @UseGuards(JwtAccessGuard, RolesGuard)
   @UseInterceptors(FilesInterceptor('images'))
@@ -153,6 +157,7 @@ export class ProductsController {
     return await this.productsService.addImages(req.user.userId, id, files);
   }
 
+  @Audit('ProductImage')
   @Roles(UserRole.SELLER)
   @UseGuards(JwtAccessGuard, RolesGuard)
   @Patch(':id/images/sort')
@@ -168,6 +173,7 @@ export class ProductsController {
     );
   }
 
+  @Audit('ProductImage')
   @Roles(UserRole.SELLER)
   @UseGuards(JwtAccessGuard, RolesGuard)
   @Delete(':id/images/:imageId')
@@ -179,6 +185,7 @@ export class ProductsController {
     return await this.productsService.deleteImage(req.user.userId, id, imageId);
   }
 
+  @Audit('Product')
   @Roles(UserRole.SELLER)
   @UseGuards(JwtAccessGuard, RolesGuard)
   @Delete(':id')
@@ -187,6 +194,7 @@ export class ProductsController {
     return { message: 'Product deleted successfully' };
   }
 
+  @Audit('Product')
   @Roles(UserRole.ADMIN)
   @UseGuards(JwtAccessGuard, RolesGuard)
   @Delete(':id')

@@ -9,7 +9,7 @@ import { validateBankAccount } from "@/shared/utils/validation";
 import { AlertType } from "@/types";
 import type { SellerApplicationForm } from "@/types/seller";
 import styles from "./SellerApply.module.scss";
-import { useTranslation } from 'react-i18next';
+import { useTranslation } from "react-i18next";
 
 interface AlertState {
   type: AlertType | "";
@@ -24,8 +24,7 @@ interface AlertState {
 function SellerApply() {
   const navigate = useNavigate();
   const { user } = useAuth();
-  const { t } = useTranslation(); 
-  
+  const { t } = useTranslation();
 
   // 權限檢查：只有 buyer 可以申請
   if (!user || user.role !== "buyer") {
@@ -35,43 +34,51 @@ function SellerApply() {
 
   const [alert, setAlert] = useState<AlertState>({ type: "", message: "" });
 
-  const { values, errors, touched, handleChange, handleBlur, handleSubmit, isSubmitting } =
-    useForm<SellerApplicationForm>(
-      {
-        bank_account_reference: "",
-      },
-      async (formValues) => {
-        setAlert({ type: "", message: "" });
+  const {
+    values,
+    errors,
+    touched,
+    handleChange,
+    handleBlur,
+    handleSubmit,
+    isSubmitting,
+  } = useForm<SellerApplicationForm>(
+    {
+      userId: user.userId,
+      bank_account_reference: "",
+    },
+    async (formValues) => {
+      setAlert({ type: "", message: "" });
 
-        try {
-          const response = await sellerService.applyToBeSeller(formValues);
+      try {
+        const response = await sellerService.applyToBeSeller(formValues);
 
-          if (response.success) {
-            setAlert({
-              type: "success",
-              message: response.message,
-            });
+        if (response.success) {
+          setAlert({
+            type: "success",
+            message: response.message,
+          });
 
-            setTimeout(() => {
-              navigate("/");
-            }, 2000);
-          } else {
-            setAlert({
-              type: "error",
-              message: "申請提交失敗，請稍後再試",
-            });
-          }
-        } catch (error: any) {
+          setTimeout(() => {
+            navigate("/");
+          }, 2000);
+        } else {
           setAlert({
             type: "error",
-            message: error?.message || "申請提交失敗，請檢查網路連接後重試",
+            message: "申請提交失敗，請稍後再試",
           });
         }
-      },
-      {
-        bank_account_reference: (value) => validateBankAccount(value, t),
+      } catch (error: any) {
+        setAlert({
+          type: "error",
+          message: error?.message || "申請提交失敗，請檢查網路連接後重試",
+        });
       }
-    );
+    },
+    {
+      bank_account_reference: (value) => validateBankAccount(value, t),
+    }
+  );
 
   return (
     <div className={styles.sellerApply}>

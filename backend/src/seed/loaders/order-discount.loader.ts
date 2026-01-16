@@ -41,7 +41,7 @@ export class OrderDiscountLoader extends BaseLoader<OrderDiscount> {
       orderDiscount.orderId = orderId;
       orderDiscount.discountId = discountId;
       orderDiscount.discountType = data.discount_type as DiscountType;
-      orderDiscount.discountAmount = Number(data.discount_amount);
+      orderDiscount.discountAmount = Math.round(Number(data.discount_amount));
 
       return Promise.resolve(orderDiscount);
     } catch {

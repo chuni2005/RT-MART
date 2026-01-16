@@ -307,3 +307,13 @@ export interface CountdownTimerProps {
   onExpire?: () => void;
   className?: string;
 }
+
+// ReviewDialog types
+export interface ReviewDialogProps {
+  isOpen: boolean;
+  onClose: () => void;
+  productId: string;
+  productName: string;
+  productImage?: string;
+  onSubmitSuccess?: () => void;
+}

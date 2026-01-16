@@ -8,6 +8,7 @@
 
 import { useState, useEffect, ChangeEvent } from "react";
 import { useNavigate } from "react-router-dom";
+import { useTranslation } from "react-i18next";
 import { useAuth } from "@/shared/hooks/useAuth";
 import { useForm } from "@/shared/hooks/useForm";
 import FormInput from "@/shared/components/FormInput";
@@ -15,6 +16,7 @@ import Button from "@/shared/components/Button";
 import Icon from "@/shared/components/Icon";
 import Alert from "@/shared/components/Alert";
 import Dialog from "@/shared/components/Dialog";
+import AvatarUpload from "@/shared/components/AvatarUpload";
 import {
   validateName,
   validateEmail,
@@ -36,6 +38,7 @@ interface ProfileFormData {
   name: string;
   email: string;
   phone: string;
+  avatar?: string | File;
 }
 
 interface PasswordFormData {
@@ -64,6 +67,7 @@ interface SuccessDialogState {
 function ProfilePage() {
   const { user, updateUser, checkAuth, logout } = useAuth();
   const navigate = useNavigate();
+  const { t } = useTranslation();
 
   const [profileAlert, setProfileAlert] = useState<AlertState>({ type: "", message: "" });
   const [passwordAlert, setPasswordAlert] = useState<AlertState>({ type: "", message: "" });
@@ -74,6 +78,7 @@ function ProfilePage() {
       name: user?.name || "",
       email: user?.email || "",
       phone: user?.phone || "",
+      avatar: user?.avatar || "",
     },
     async (formValues) => {
       setProfileAlert({ type: "", message: "" });
@@ -100,9 +105,9 @@ function ProfilePage() {
       }
     },
     {
-      name: (value) => validateName(value),
-      email: (value) => validateEmail(value),
-      phone: (value) => validatePhone(value),
+      name: (value) => validateName(value, t),
+      email: (value) => validateEmail(value, t),
+      phone: (value) => validatePhone(value, t),
     }
   );
 
@@ -143,10 +148,10 @@ function ProfilePage() {
       }
     },
     {
-      currentPassword: (value) => validatePassword(value),
-      newPassword: (value) => validatePasswordStrength(value),
+      currentPassword: (value) => validatePassword(value, t),
+      newPassword: (value) => validatePasswordStrength(value, t),
       confirmPassword: (value, allValues) =>
-        validateConfirmPassword(allValues.newPassword, value),
+        validateConfirmPassword(allValues.newPassword, value, t),
     }
   );
 
@@ -156,9 +161,15 @@ function ProfilePage() {
       profileForm.setValue("name", user.name || "");
       profileForm.setValue("email", user.email || "");
       profileForm.setValue("phone", user.phone || "");
+      profileForm.setValue("avatar", user.avatar || "");
     }
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [user]);
+
+  // Handle avatar change
+  const handleAvatarChange = (file: File | null) => {
+    profileForm.setValue("avatar", file || "");
+  };
 
   // Delete Dialog State
   const [deleteDialog, setDeleteDialog] = useState<DeleteDialogState>({
@@ -298,6 +309,13 @@ function ProfilePage() {
         )}
 
         <form onSubmit={profileForm.handleSubmit} className={styles.form}>
+          {/* Avatar Upload */}
+          <AvatarUpload
+            value={profileForm.values.avatar}
+            onChange={handleAvatarChange}
+            disabled={profileForm.isSubmitting}
+          />
+
           <FormInput
             label="姓名"
             type="text"

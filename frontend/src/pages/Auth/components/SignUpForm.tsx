@@ -10,6 +10,7 @@ import VerificationCodeInput from "@/shared/components/VerificationCodeInput/Ver
 import CountdownTimer from "@/shared/components/CountdownTimer/CountdownTimer";
 import Button from "@/shared/components/Button";
 import Alert from "@/shared/components/Alert";
+import AvatarUpload from "@/shared/components/AvatarUpload";
 import { useForm } from "@/shared/hooks/useForm";
 import {
   validateUsername,
@@ -34,6 +35,7 @@ interface SignUpFormData {
   email: string;
   phone: string;
   password: string;
+  avatarFile?: File | null;
 }
 
 interface FormData {
@@ -45,8 +47,6 @@ interface FormData {
   agreeTerms: boolean;
 }
 
-const VERIFICATION_TIMEOUT = 300; // 5 minutes in seconds
-
 const SignUpForm = ({ onSendCode, onVerifyCode, onResendCode, isLoading }: SignUpFormProps) => {
   const [step, setStep] = useState<1 | 2>(1);
   const [verificationCode, setVerificationCode] = useState('');
@@ -55,7 +55,9 @@ const SignUpForm = ({ onSendCode, onVerifyCode, onResendCode, isLoading }: SignU
   const [canResend, setCanResend] = useState(false);
   const [timerKey, setTimerKey] = useState(0);
   const [alertMessage, setAlertMessage] = useState<{ type: 'success' | 'error'; message: string } | null>(null);
-
+  const [avatarFile, setAvatarFile] = useState<File | null>(null);
+  const VERIFICATION_TIMEOUT = 300;
+  
   const { t } = useTranslation()
   const { values, errors, touched, handleChange, handleBlur, handleSubmit, isValid } =
     useForm<FormData>(
@@ -76,6 +78,7 @@ const SignUpForm = ({ onSendCode, onVerifyCode, onResendCode, isLoading }: SignU
             email: formValues.email,
             phone: formValues.phone,
             password: formValues.password,
+            avatarFile: avatarFile || undefined,
           });
           setStep(2);
           setIsCodeExpired(false);
@@ -227,6 +230,12 @@ const SignUpForm = ({ onSendCode, onVerifyCode, onResendCode, isLoading }: SignU
           onClose={() => setAlertMessage(null)}
         />
       )}
+
+      <AvatarUpload
+        value={avatarFile || undefined}
+        onChange={setAvatarFile}
+        disabled={isLoading}
+      />
 
       <FormInput
         label={t('signUpForm.labels.loginId')}

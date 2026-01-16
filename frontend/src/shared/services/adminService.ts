@@ -7,6 +7,7 @@ import type {
   SystemDiscount,
   AdminOrder,
   AdminOrderFilters,
+  DashboardFilters,
 } from "@/types/admin";
 
 /**
@@ -62,8 +63,8 @@ const mapBackendStoreToAdminStore = (store: any): AdminStore => ({
   store_id: store.storeId,
   store_name: store.storeName,
   seller_id: store.sellerId,
-  seller_name: store.seller?.name || '',
-  seller_email: store.seller?.email || '',
+  seller_name: store.seller?.user?.name || '',
+  seller_email: store.seller?.user?.email || '',
   description: store.storeDescription || '',
   address: store.storeAddress || '',
   email: store.storeEmail || '',
@@ -137,10 +138,7 @@ const mapSystemDiscountToBackend = (data: Partial<SystemDiscount>): any => {
  * 獲取 Dashboard 統計數據
  * GET /admin/dashboard/stats?startDate=&endDate=
  */
-export const getDashboardStats = async (filters?: {
-  startDate?: string;
-  endDate?: string;
-}): Promise<DashboardStats> => {
+export const getDashboardStats = async (filters?: DashboardFilters): Promise<DashboardStats> => {
   const queryParams = new URLSearchParams();
 
   if (filters?.startDate) {
@@ -148,6 +146,12 @@ export const getDashboardStats = async (filters?: {
   }
   if (filters?.endDate) {
     queryParams.append('endDate', filters.endDate);
+  }
+  if (filters?.period) {
+    queryParams.append('period', filters.period);
+  }
+  if (filters?.granularity) {
+    queryParams.append('granularity', filters.granularity);
   }
 
   const queryString = queryParams.toString();

@@ -2,10 +2,10 @@ import api from './api';
 import {
   DashboardData,
   SalesPeriod,
+  SalesGranularity,
   StoreInfo,
   SellerProduct,
   ProductFormData,
-  RecentOrder,
   Discount,
   DiscountFormData,
   SellerApplicationForm
@@ -27,8 +27,8 @@ export const applyToBeSeller = async (
 ): Promise<{ success: boolean; message: string }> => {
   try {
     // 調用後端 API
-    // userId 會從 JWT token 自動獲取
     await api.post('/sellers', {
+      userId: data.userId,
       bankAccountReference: data.bank_account_reference,
     });
 
@@ -55,10 +55,11 @@ export const applyToBeSeller = async (
 
 /**
  * 獲取 Dashboard 數據
- * GET /sellers/dashboard?period=&startDate=&endDate=&productName=
+ * GET /sellers/dashboard?period=&startDate=&endDate=&productName=&granularity=
  */
 export const getDashboardData = async (filters: {
   period?: SalesPeriod;
+  granularity?: SalesGranularity;
   startDate?: string;
   endDate?: string;
   productName?: string;
@@ -67,6 +68,9 @@ export const getDashboardData = async (filters: {
 
   if (filters.period) {
     queryParams.append('period', filters.period);
+  }
+  if (filters.granularity) {
+    queryParams.append('granularity', filters.granularity);
   }
   if (filters.startDate) {
     queryParams.append('startDate', filters.startDate);
@@ -106,14 +110,16 @@ export const getDashboardData = async (filters: {
 
 /**
  * 下載銷售報表
- * GET /sellers/sales-report?startDate=&endDate=&productName=
+ * GET /sellers/sales-report?period=&startDate=&endDate=&productName=
  */
 export const downloadSalesReport = async (filters: {
+  period?: SalesPeriod;
   startDate?: string;
   endDate?: string;
   productName?: string;
 }): Promise<void> => {
   const queryParams = new URLSearchParams();
+  if (filters.period) queryParams.append('period', filters.period);
   if (filters.startDate) queryParams.append('startDate', filters.startDate);
   if (filters.endDate) queryParams.append('endDate', filters.endDate);
   if (filters.productName) queryParams.append('productName', filters.productName);
@@ -487,7 +493,7 @@ export const updateOrderStatus = async (id: string, status: string, note?: strin
     }
 
     // 5. 庫存保留數量不足
-    if (errorMessage.includes('Reserved quantity is not enougth') || errorMessage.includes('Reserved quantity')) {
+    if (errorMessage.includes('Reserved quantity is not enough') || errorMessage.includes('Reserved quantity')) {
       throw new Error('庫存保留數量不足，無法完成此操作。請聯繫技術支援。');
     }
 

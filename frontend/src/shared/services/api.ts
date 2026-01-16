@@ -167,7 +167,7 @@ export const put = <T = any>(endpoint: string, data?: any, options: RequestOptio
 export const patch = <T = any>(endpoint: string, data?: any, options: RequestOptions = {}): Promise<T> => {
   return apiRequest<T>(endpoint, {
     method: 'PATCH',
-    body: JSON.stringify(data),
+    body: data instanceof FormData ? data : JSON.stringify(data),
     ...options,
   });
 };

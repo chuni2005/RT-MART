@@ -40,7 +40,10 @@ export class ReviewService {
     if (files && files.length > 0) {
       const images = await Promise.all(
         files.map(async (file, index) => {
-          const result = await this.cloudinaryService.uploadImage(file);
+          const result = await this.cloudinaryService.uploadImage(
+            file,
+            'reviews',
+          );
           if (!result.url || !result.publicId) {
             throw new BadRequestException('Cloudinary upload failed');
           }

@@ -14,6 +14,7 @@ import { CreateShippingAddressDto } from './dto/create-shipping-address.dto';
 import { UpdateShippingAddressDto } from './dto/update-shipping-address.dto';
 import { JwtAccessGuard } from '../auth/guards/jwt-auth.guard';
 import type { AuthRequest } from '../common/types';
+import { Audit } from '../common/decorators/audit.decorator';
 
 @Controller('shipping-addresses')
 @UseGuards(JwtAccessGuard)
@@ -22,6 +23,7 @@ export class ShippingAddressesController {
     private readonly shippingAddressesService: ShippingAddressesService,
   ) {}
 
+  @Audit('ShippingAddress')
   @Post()
   async create(
     @Req() req: AuthRequest,
@@ -50,6 +52,7 @@ export class ShippingAddressesController {
     return await this.shippingAddressesService.findOne(id, req.user.userId);
   }
 
+  @Audit('ShippingAddress')
   @Patch(':id')
   async update(
     @Req() req: AuthRequest,
@@ -63,6 +66,7 @@ export class ShippingAddressesController {
     );
   }
 
+  @Audit('ShippingAddress')
   @Post(':id/set-default')
   async setAsDefault(@Req() req: AuthRequest, @Param('id') id: string) {
     return await this.shippingAddressesService.setAsDefault(
@@ -71,6 +75,7 @@ export class ShippingAddressesController {
     );
   }
 
+  @Audit('ShippingAddress')
   @Delete(':id')
   async remove(@Req() req: AuthRequest, @Param('id') id: string) {
     await this.shippingAddressesService.remove(id, req.user.userId);

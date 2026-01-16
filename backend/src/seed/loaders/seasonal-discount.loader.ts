@@ -33,7 +33,7 @@ export class SeasonalDiscountLoader extends BaseLoader<SeasonalDiscount> {
       seasonalDiscount.discountId = discountId;
       seasonalDiscount.discountRate = Number(data.discount_rate);
       seasonalDiscount.maxDiscountAmount = data.max_discount_amount
-        ? Number(data.max_discount_amount)
+        ? Math.round(Number(data.max_discount_amount))
         : null;
 
       return Promise.resolve(seasonalDiscount);

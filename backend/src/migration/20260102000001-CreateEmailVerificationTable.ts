@@ -1,8 +1,6 @@
 import { MigrationInterface, QueryRunner, Table, TableIndex } from 'typeorm';
 
-export class CreateEmailVerificationTable20260102000001
-  implements MigrationInterface
-{
+export class CreateEmailVerificationTable20260102000001 implements MigrationInterface {
   public async up(queryRunner: QueryRunner): Promise<void> {
     await queryRunner.createTable(
       new Table({

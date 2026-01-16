@@ -1,15 +1,16 @@
-import { useState, useEffect } from 'react';
-import { useNavigate, useParams } from 'react-router-dom';
-import FormInput from '@/shared/components/FormInput';
-import Select from '@/shared/components/Select';
-import Button from '@/shared/components/Button';
-import Icon from '@/shared/components/Icon';
-import sellerService from '@/shared/services/sellerService';
-import productService from '@/shared/services/productService';
-import { DiscountFormData } from '@/types/seller';
-import { ProductType } from '@/types/product';
-import { useForm } from '@/shared/hooks/useForm';
-import styles from './DiscountEdit.module.scss';
+import { useState, useEffect } from "react";
+import { useNavigate, useParams } from "react-router-dom";
+import FormInput from "@/shared/components/FormInput";
+import Select from "@/shared/components/Select";
+import Button from "@/shared/components/Button";
+import Icon from "@/shared/components/Icon";
+import sellerService from "@/shared/services/sellerService";
+import productService from "@/shared/services/productService";
+import { DiscountFormData } from "@/types/seller";
+import { ProductType } from "@/types/product";
+import { useForm } from "@/shared/hooks/useForm";
+import { toDatetimeLocal, fromDatetimeLocal } from "@/shared/utils/dateUtils";
+import styles from "./DiscountEdit.module.scss";
 
 function DiscountEdit() {
   const navigate = useNavigate();
@@ -23,54 +24,54 @@ function DiscountEdit() {
 
   const form = useForm(
     {
-      discountCode: '',
-      name: '',
-      description: '',
-      minPurchaseAmount: '',
-      startDatetime: '',
-      endDatetime: '',
-      usageLimit: '',
-      productTypeId: '',
-      discountRate: '',
-      maxDiscountAmount: '',
+      discountCode: "",
+      name: "",
+      description: "",
+      minPurchaseAmount: "",
+      startDatetime: "",
+      endDatetime: "",
+      usageLimit: "",
+      productTypeId: "",
+      discountRate: "",
+      maxDiscountAmount: "",
     },
     async () => {},
     {
       name: (value) => {
-        if (!value) return '請輸入折扣名稱';
-        if (value.length < 2) return '折扣名稱至少需要 2 個字元';
-        if (value.length > 50) return '折扣名稱不可超過 50 個字元';
+        if (!value) return "請輸入折扣名稱";
+        if (value.length < 2) return "折扣名稱至少需要 2 個字元";
+        if (value.length > 50) return "折扣名稱不可超過 50 個字元";
         return null;
       },
       description: (value) => {
-        if (value && value.length > 200) return '描述不可超過 200 個字元';
+        if (value && value.length > 200) return "描述不可超過 200 個字元";
         return null;
       },
       minPurchaseAmount: (value) => {
-        if (!value) return '請輸入最低消費金額';
-        if (Number(value) < 0) return '最低消費金額不可為負數';
+        if (!value) return "請輸入最低消費金額";
+        if (Number(value) < 0) return "最低消費金額不可為負數";
         return null;
       },
       startDatetime: (value) => {
-        if (!value) return '請選擇開始時間';
+        if (!value) return "請選擇開始時間";
         return null;
       },
       endDatetime: (value) => {
-        if (!value) return '請選擇結束時間';
+        if (!value) return "請選擇結束時間";
         return null;
       },
       usageLimit: (value) => {
-        if (value && Number(value) < 1) return '使用次數上限至少為 1';
+        if (value && Number(value) < 1) return "使用次數上限至少為 1";
         return null;
       },
       discountRate: (value) => {
-        if (!value) return '請輸入折扣率';
-        if (Number(value) < 0.01) return '折扣率至少為 0.01';
-        if (Number(value) > 1) return '折扣率不可超過 1';
+        if (!value) return "請輸入折扣率";
+        if (Number(value) < 0.01) return "折扣率至少為 0.01";
+        if (Number(value) > 1) return "折扣率不可超過 1";
         return null;
       },
       maxDiscountAmount: (value) => {
-        if (value && Number(value) < 0) return '最高折抵金額不可為負數';
+        if (value && Number(value) < 0) return "最高折抵金額不可為負數";
         return null;
       },
     }
@@ -80,10 +81,12 @@ function DiscountEdit() {
 
   // 包裝 handleChange 以支持直接傳值的方式
   const handleChange = (
-    nameOrEvent: string | React.ChangeEvent<HTMLInputElement | HTMLTextAreaElement>,
+    nameOrEvent:
+      | string
+      | React.ChangeEvent<HTMLInputElement | HTMLTextAreaElement>,
     value?: string
   ) => {
-    if (typeof nameOrEvent === 'string') {
+    if (typeof nameOrEvent === "string") {
       // 直接傳遞字段名和值
       const name = nameOrEvent;
       setValue(name as any, value);
@@ -97,8 +100,12 @@ function DiscountEdit() {
   };
 
   // 包裝 handleBlur 以支持直接傳字段名的方式
-  const handleBlur = (nameOrEvent: string | React.FocusEvent<HTMLInputElement | HTMLTextAreaElement>) => {
-    if (typeof nameOrEvent === 'string') {
+  const handleBlur = (
+    nameOrEvent:
+      | string
+      | React.FocusEvent<HTMLInputElement | HTMLTextAreaElement>
+  ) => {
+    if (typeof nameOrEvent === "string") {
       // 直接傳遞字段名 - 創建模擬事件對象
       const name = nameOrEvent;
       const mockEvent = {
@@ -126,7 +133,7 @@ function DiscountEdit() {
       const types = await productService.getProductTypes();
       setProductTypes(types);
     } catch (error) {
-      console.error('載入商品類型失敗:', error);
+      console.error("載入商品類型失敗:", error);
     }
   };
 
@@ -134,21 +141,21 @@ function DiscountEdit() {
     setLoading(true);
     try {
       const discount = await sellerService.getDiscount(id);
-      setValue('discountCode', discount.discountCode); // Keep for display only
-      setValue('name', discount.name);
-      setValue('description', discount.description || '');
-      setValue('minPurchaseAmount', discount.minPurchaseAmount.toString());
-      setValue('startDatetime', discount.startDatetime.slice(0, 16));
-      setValue('endDatetime', discount.endDatetime.slice(0, 16));
-      setValue('usageLimit', discount.usageLimit?.toString() || '');
-      setValue('productTypeId', discount.productTypeId || '');
-      setValue('discountRate', discount.discountRate.toString());
+      setValue("discountCode", discount.discountCode); // Keep for display only
+      setValue("name", discount.name);
+      setValue("description", discount.description || "");
+      setValue("minPurchaseAmount", discount.minPurchaseAmount.toString());
+      setValue("startDatetime", toDatetimeLocal(discount.startDatetime));
+      setValue("endDatetime", toDatetimeLocal(discount.endDatetime));
+      setValue("usageLimit", discount.usageLimit?.toString() || "");
+      setValue("productTypeId", discount.productTypeId || "");
+      setValue("discountRate", discount.discountRate.toString());
       setValue(
-        'maxDiscountAmount',
-        discount.maxDiscountAmount?.toString() || ''
+        "maxDiscountAmount",
+        discount.maxDiscountAmount?.toString() || ""
       );
     } catch (error) {
-      console.error('載入折扣失敗:', error);
+      console.error("載入折扣失敗:", error);
     } finally {
       setLoading(false);
     }
@@ -160,7 +167,7 @@ function DiscountEdit() {
       setCopied(true);
       setTimeout(() => setCopied(false), 2000);
     } catch (err) {
-      console.error('複製失敗:', err);
+      console.error("複製失敗:", err);
     }
   };
 
@@ -171,7 +178,7 @@ function DiscountEdit() {
 
     // 驗證結束時間必須晚於開始時間
     if (new Date(values.endDatetime) <= new Date(values.startDatetime)) {
-      alert('結束時間必須晚於開始時間');
+      alert("結束時間必須晚於開始時間");
       return;
     }
 
@@ -182,8 +189,8 @@ function DiscountEdit() {
         name: values.name,
         description: values.description || undefined,
         minPurchaseAmount: Number(values.minPurchaseAmount),
-        startDatetime: values.startDatetime,
-        endDatetime: values.endDatetime,
+        startDatetime: fromDatetimeLocal(values.startDatetime),
+        endDatetime: fromDatetimeLocal(values.endDatetime),
         usageLimit: values.usageLimit ? Number(values.usageLimit) : undefined,
         productTypeId: values.productTypeId || null,
         discountRate: Number(values.discountRate),
@@ -194,16 +201,16 @@ function DiscountEdit() {
 
       if (isEditMode && discountId) {
         await sellerService.updateDiscount(discountId, formData);
-        alert('折扣已更新');
+        alert("折扣已更新");
       } else {
         const createdDiscount = await sellerService.createDiscount(formData);
         alert(`折扣已創建！折扣碼：${createdDiscount.discountCode}`);
       }
 
-      navigate('/seller/discounts');
+      navigate("/seller/discounts");
     } catch (error) {
-      console.error('儲存折扣失敗:', error);
-      alert('儲存失敗，請稍後再試');
+      console.error("儲存折扣失敗:", error);
+      alert("儲存失敗，請稍後再試");
     } finally {
       setSaving(false);
     }
@@ -216,12 +223,16 @@ function DiscountEdit() {
   return (
     <div className={styles.discountEdit}>
       <div className={styles.header}>
-        <Button variant="ghost" onClick={() => navigate('/seller/discounts')} className={styles.backButton}>
+        <Button
+          variant="ghost"
+          onClick={() => navigate("/seller/discounts")}
+          className={styles.backButton}
+        >
           <Icon icon="arrow-left" />
           返回列表
         </Button>
         <h1 className={styles.pageTitle}>
-          {isEditMode ? '編輯折扣' : '新增折扣'}
+          {isEditMode ? "編輯折扣" : "新增折扣"}
         </h1>
       </div>
 
@@ -264,8 +275,8 @@ function DiscountEdit() {
             <textarea
               name="description"
               value={values.description}
-              onChange={(e) => handleChange('description', e.target.value)}
-              onBlur={() => handleBlur('description')}
+              onChange={(e) => handleChange("description", e.target.value)}
+              onBlur={() => handleBlur("description")}
               className={styles.textarea}
               rows={3}
               placeholder="請輸入折扣活動描述"
@@ -281,13 +292,14 @@ function DiscountEdit() {
 
           <div className={styles.formGroup}>
             <label className={styles.label}>
-              適用類型 <span className={styles.optional}>(選填，不選則全館適用)</span>
+              適用類型{" "}
+              <span className={styles.optional}>(選填，不選則全館適用)</span>
             </label>
             <Select
               value={values.productTypeId}
-              onChange={(value) => handleChange('productTypeId', value)}
+              onChange={(value) => handleChange("productTypeId", value)}
               options={[
-                { value: '', label: '全館適用' },
+                { value: "", label: "全館適用" },
                 ...productTypes.map((type) => ({
                   value: type.productTypeId,
                   label: type.typeName,
@@ -383,11 +395,14 @@ function DiscountEdit() {
         </section>
 
         <div className={styles.actions}>
-          <Button variant="outline" onClick={() => navigate('/seller/discounts')}>
+          <Button
+            variant="outline"
+            onClick={() => navigate("/seller/discounts")}
+          >
             取消
           </Button>
           <Button onClick={handleSave} disabled={saving}>
-            {saving ? '儲存中...' : '儲存折扣'}
+            {saving ? "儲存中..." : "儲存折扣"}
           </Button>
         </div>
       </div>

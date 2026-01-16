@@ -1,13 +1,13 @@
-import { useState, useEffect } from 'react';
-import { useNavigate } from 'react-router-dom';
-import Button from '@/shared/components/Button';
-import Icon from '@/shared/components/Icon';
-import Dialog from '@/shared/components/Dialog';
-import EmptyState from '@/shared/components/EmptyState';
-import DiscountCard from '@/shared/components/DiscountCard';
-import sellerService from '@/shared/services/sellerService';
-import { Discount } from '@/types/seller';
-import styles from './DiscountList.module.scss';
+import { useState, useEffect } from "react";
+import { useNavigate } from "react-router-dom";
+import Button from "@/shared/components/Button";
+import Icon from "@/shared/components/Icon";
+import Dialog from "@/shared/components/Dialog";
+import EmptyState from "@/shared/components/EmptyState";
+import DiscountCard from "@/shared/components/DiscountCard";
+import sellerService from "@/shared/services/sellerService";
+import { Discount } from "@/types/seller";
+import styles from "./DiscountList.module.scss";
 
 function DiscountList() {
   const navigate = useNavigate();
@@ -18,7 +18,7 @@ function DiscountList() {
     isSubmitting: boolean;
     discountId: string;
     discountName: string;
-  }>({ isOpen: false, isSubmitting: false, discountId: '', discountName: '' });
+  }>({ isOpen: false, isSubmitting: false, discountId: "", discountName: "" });
 
   useEffect(() => {
     loadDiscounts();
@@ -30,7 +30,7 @@ function DiscountList() {
       const data = await sellerService.getDiscounts();
       setDiscounts(data);
     } catch (error) {
-      console.error('載入折扣失敗:', error);
+      console.error("載入折扣失敗:", error);
     } finally {
       setLoading(false);
     }
@@ -45,17 +45,29 @@ function DiscountList() {
         )
       );
     } catch (error) {
-      console.error('更新折扣狀態失敗:', error);
+      console.error("更新折扣狀態失敗:", error);
+      alert("更新折扣狀態失敗，請稍後再試");
     }
   };
 
   const handleDelete = async () => {
+    setDeleteDialog((prev) => ({ ...prev, isSubmitting: true }));
     try {
       await sellerService.deleteDiscount(deleteDialog.discountId);
-      setDiscounts(discounts.filter((d) => d.discountId !== deleteDialog.discountId));
-      setDeleteDialog({ isOpen: false, isSubmitting: false, discountId: '', discountName: '' });
+      setDiscounts(
+        discounts.filter((d) => d.discountId !== deleteDialog.discountId)
+      );
+      setDeleteDialog({
+        isOpen: false,
+        isSubmitting: false,
+        discountId: "",
+        discountName: "",
+      });
+      alert("折扣已刪除");
     } catch (error) {
-      console.error('刪除折扣失敗:', error);
+      console.error("刪除折扣失敗:", error);
+      alert("刪除折扣失敗，請稍後再試");
+      setDeleteDialog((prev) => ({ ...prev, isSubmitting: false }));
     }
   };
 
@@ -67,7 +79,7 @@ function DiscountList() {
     <div className={styles.discountList}>
       <div className={styles.header}>
         <h1 className={styles.pageTitle}>折扣管理</h1>
-        <Button onClick={() => navigate('/seller/discount/new')}>
+        <Button onClick={() => navigate("/seller/discount/new")}>
           <Icon icon="plus" />
           新增折扣
         </Button>
@@ -88,7 +100,7 @@ function DiscountList() {
                 discountId: discount.discountId,
                 discountCode: discount.discountCode,
                 name: discount.name,
-                discountType: 'special',
+                discountType: "special",
                 discountRate: discount.discountRate,
                 discountAmount: undefined,
                 minPurchaseAmount: discount.minPurchaseAmount,
@@ -121,32 +133,18 @@ function DiscountList() {
           !deleteDialog.isSubmitting &&
           setDeleteDialog({
             isOpen: false,
-            discountId: '',
-            discountName: '',
+            discountId: "",
+            discountName: "",
             isSubmitting: false,
           })
         }
         onConfirm={handleDelete}
-        variant="warning"
-        message={`確定要刪除折扣「${deleteDialog.discountName}」嗎？`}
+        variant="danger"
         title="確認刪除"
-      >
-        <div className={styles.deleteDialog}>
-          <p>確定要刪除折扣「{deleteDialog.discountName}」嗎？</p>
-          <p className={styles.warning}>此操作無法復原。</p>
-          {/* <div className={styles.dialogActions}>
-            <Button
-              variant="outline"
-              onClick={() =>
-                setDeleteDialog({ isOpen: false, discountId: '', discountName: '' })
-              }
-            >
-              取消
-            </Button>
-            <Button onClick={handleDelete}>確認刪除</Button>
-          </div> */}
-        </div>
-      </Dialog>
+        message={`確定要刪除折扣「${deleteDialog.discountName}」嗎？此操作無法復原。`}
+        confirmText={deleteDialog.isSubmitting ? "刪除中..." : "確認刪除"}
+        cancelText="取消"
+      />
     </div>
   );
 }

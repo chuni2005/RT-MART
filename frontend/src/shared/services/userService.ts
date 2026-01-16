@@ -28,22 +28,36 @@ interface BackendUser {
  */
 export const updateProfile = async (data: UpdateProfileRequest): Promise<User> => {
   try {
-    // 後端接收 UpdateUserDto，屬性名稱為 phoneNumber
-    const backendUser = await patch<BackendUser>('/users/me', {
-      name: data.name,
-      email: data.email,
-      phoneNumber: data.phone, // 映射前端 phone 到底層 phoneNumber
-      avatarUrl: data.avatar,
-    });
-    
+    let backendUser: BackendUser;
+
+    // 如果有 File 對象，使用 FormData
+    if (data.avatar instanceof File) {
+      const formData = new FormData();
+      if (data.name) formData.append('name', data.name);
+      if (data.email) formData.append('email', data.email);
+      if (data.phone) formData.append('phoneNumber', data.phone);
+      formData.append('avatar', data.avatar);
+
+      // 使用 patch 並傳遞 FormData
+      backendUser = await patch<BackendUser>('/users/me', formData);
+    } else {
+      // 否則使用 JSON
+      backendUser = await patch<BackendUser>('/users/me', {
+        name: data.name,
+        email: data.email,
+        phoneNumber: data.phone, // 映射前端 phone 到底層 phoneNumber
+        avatarUrl: typeof data.avatar === 'string' ? data.avatar : undefined,
+      });
+    }
+
     const updatedUser = mapUserResponseToUser(backendUser);
-    
+
     // 同步更新 localStorage 中的使用者資訊（如果存在）
     const userStr = localStorage.getItem('user');
     if (userStr) {
       localStorage.setItem('user', JSON.stringify(updatedUser));
     }
-    
+
     return updatedUser;
   } catch (error) {
     console.error('[API Error] updateProfile:', error);

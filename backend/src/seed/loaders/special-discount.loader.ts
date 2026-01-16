@@ -47,7 +47,7 @@ export class SpecialDiscountLoader extends BaseLoader<SpecialDiscount> {
         ? Number(data.discount_rate)
         : null;
       specialDiscount.maxDiscountAmount = data.max_discount_amount
-        ? Number(data.max_discount_amount)
+        ? Math.round(Number(data.max_discount_amount))
         : null;
 
       return Promise.resolve(specialDiscount);

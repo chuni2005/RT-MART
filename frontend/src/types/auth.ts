@@ -40,7 +40,7 @@ export interface AuthContextValue {
   login: (identifier: string, password: string, remember?: boolean) => Promise<AuthResponse>;
   register: (loginId: string, name: string, email: string, phone: string, password: string) => Promise<AuthResponse>;
   registerWithVerification: {
-    sendCode: (loginId: string, name: string, email: string, phone: string, password: string) => Promise<void>;
+    sendCode: (loginId: string, name: string, email: string, phone: string, password: string, avatarFile?: File | null) => Promise<void>;
     verifyCode: (email: string, code: string) => Promise<AuthResponse>;
     resendCode: (email: string) => Promise<void>;
   };

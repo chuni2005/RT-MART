@@ -1,6 +1,6 @@
-import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
-import { IconProp, SizeProp } from '@fortawesome/fontawesome-svg-core';
-import { iconMap } from '@/shared/lib/iconMap';
+import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
+import { IconProp, SizeProp } from "@fortawesome/fontawesome-svg-core";
+import { iconMap } from "@/shared/lib/iconMap";
 
 /**
  * Icon Component - Wrapper for FontAwesome icons
@@ -20,7 +20,7 @@ interface IconProps {
 function Icon({
   icon,
   size,
-  className = '',
+  className = "",
   onClick,
   color,
   spin = false,
@@ -28,9 +28,8 @@ function Icon({
   ...rest
 }: IconProps) {
   // Convert string icon name to IconProp
-  const resolvedIcon: IconProp = typeof icon === 'string'
-    ? (iconMap[icon] || icon as IconProp)
-    : icon;
+  const resolvedIcon: IconProp =
+    typeof icon === "string" ? iconMap[icon] || (icon as IconProp) : icon;
 
   return (
     <FontAwesomeIcon

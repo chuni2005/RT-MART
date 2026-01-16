@@ -76,7 +76,8 @@ const Auth = () => {
         formData.name,
         formData.email,
         formData.phone,
-        formData.password
+        formData.password,
+        formData.avatarFile
       );
       // 成功後表單會自動切換到 Step 2
     } catch (error) {

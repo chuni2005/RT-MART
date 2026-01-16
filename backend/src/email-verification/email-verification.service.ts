@@ -46,11 +46,13 @@ export class EmailVerificationService {
   async sendVerificationCode(
     sendCodeDto: SendVerificationCodeDto,
   ): Promise<{ message: string }> {
-    const { email, loginId, password, name, phoneNumber, purpose } = sendCodeDto;
+    const { email, loginId, password, name, phoneNumber, avatarUrl, purpose } =
+      sendCodeDto;
 
     // Check if email or loginId already exists in the User table
     const existingUserByEmail = await this.usersService.findByEmail(email);
-    const existingUserByLoginId = await this.usersService.findByLoginId(loginId);
+    const existingUserByLoginId =
+      await this.usersService.findByLoginId(loginId);
 
     if (existingUserByEmail || existingUserByLoginId) {
       if (existingUserByLoginId) {
@@ -97,6 +99,7 @@ export class EmailVerificationService {
         passwordHash, // Store hashed password, not plaintext
         name,
         phoneNumber,
+        avatarUrl, // Include avatar URL if provided
       },
       expiresAt,
       isUsed: false,
@@ -177,7 +180,9 @@ export class EmailVerificationService {
       });
 
       if (result.affected && result.affected > 0) {
-        this.logger.log(`Cleaned up ${result.affected} expired verification codes`);
+        this.logger.log(
+          `Cleaned up ${result.affected} expired verification codes`,
+        );
       }
     } catch (error) {
       this.logger.error(
@@ -218,6 +223,7 @@ export class EmailVerificationService {
       password: latestVerification.metadata.password,
       name: latestVerification.metadata.name,
       phoneNumber: latestVerification.metadata.phoneNumber,
+      avatarUrl: latestVerification.metadata.avatarUrl,
       purpose: latestVerification.purpose,
     };
 

@@ -60,10 +60,10 @@ export class OrderItemLoader extends BaseLoader<OrderItem> {
         typeof data.quantity === 'number'
           ? data.quantity
           : Number(data.quantity);
-      orderItem.originalPrice = Number(data.original_price);
-      orderItem.itemDiscount = Number(data.item_discount || 0);
-      orderItem.unitPrice = Number(data.unit_price);
-      orderItem.subtotal = Number(data.subtotal);
+      orderItem.originalPrice = Math.round(Number(data.original_price));
+      orderItem.itemDiscount = Math.round(Number(data.item_discount || 0));
+      orderItem.unitPrice = Math.round(Number(data.unit_price));
+      orderItem.subtotal = Math.round(Number(data.subtotal));
 
       return Promise.resolve(orderItem);
     } catch {

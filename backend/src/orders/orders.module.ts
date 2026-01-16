@@ -10,6 +10,7 @@ import { ShippingAddressesModule } from '../shipping-addresses/shipping-addresse
 import { InventoryModule } from '../inventory/inventory.module';
 import { DiscountsModule } from '../discounts/discounts.module';
 import { SellersModule } from '../sellers/sellers.module';
+import { ProductTypesModule } from '../product-types/product-types.module';
 
 @Module({
   imports: [
@@ -19,6 +20,7 @@ import { SellersModule } from '../sellers/sellers.module';
     InventoryModule,
     DiscountsModule,
     SellersModule,
+    ProductTypesModule,
   ],
   controllers: [OrdersController],
   providers: [OrdersService],

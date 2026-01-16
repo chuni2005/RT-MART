@@ -5,6 +5,7 @@ import { Order, OrderStatus } from '../orders/entities/order.entity';
 import { User } from '../users/entities/user.entity';
 import { Seller } from '../sellers/entities/seller.entity';
 import { QueryDashboardDto } from './dto/query-dashboard.dto';
+import { DateRangeUtil } from '../common/utils/date-range.util';
 
 interface ChartDataPoint {
   label: string;
@@ -44,11 +45,22 @@ export class AdminService {
   async getDashboardStats(
     filters?: QueryDashboardDto,
   ): Promise<DashboardStats> {
-    // Set default date range if not provided (last 12 months)
-    const endDate = filters?.endDate ? new Date(filters.endDate) : new Date();
-    const startDate = filters?.startDate
-      ? new Date(filters.startDate)
-      : new Date(endDate.getTime() - 365 * 24 * 60 * 60 * 1000);
+    const period = filters?.period ?? 'month';
+
+    const granularity = filters?.granularity;
+
+    // 使用統一的解析工具處理時區與範圍
+    const { startDate, endDate } = DateRangeUtil.parseRange(
+      filters?.startDate,
+      filters?.endDate,
+      period === 'day'
+        ? 1
+        : period === 'week'
+          ? 7
+          : period === 'month'
+            ? 30
+            : 365,
+    );
 
     // Get basic statistics
     const [
@@ -66,8 +78,8 @@ export class AdminService {
       this.getActiveSellers(),
       this.getPendingReviews(),
       this.getRecentActivities(),
-      this.getRevenueChartData(startDate, endDate),
-      this.getUserGrowthChartData(startDate, endDate),
+      this.getRevenueChartData(startDate, endDate, period, granularity),
+      this.getUserGrowthChartData(startDate, endDate, period, granularity),
       this.getOrderStatusChartData(startDate, endDate),
     ]);
 
@@ -93,7 +105,7 @@ export class AdminService {
       .where('order.orderStatus = :status', { status: OrderStatus.COMPLETED })
       .andWhere('order.createdAt >= :startDate', { startDate })
       .andWhere('order.createdAt <= :endDate', { endDate })
-      .getRawOne();
+      .getRawOne<{ total: string | null }>();
 
     return parseFloat(result?.total || '0');
   }
@@ -166,43 +178,197 @@ export class AdminService {
   private async getRevenueChartData(
     startDate: Date,
     endDate: Date,
+    period: 'day' | 'week' | 'month' | 'year',
+    granularity?: 'hour' | 'day' | 'week' | 'month' | 'year',
   ): Promise<ChartDataPoint[]> {
     // Get revenue for the specified date range
-    const result = await this.orderRepository
+    const query = this.orderRepository
       .createQueryBuilder('order')
-      .select("DATE_FORMAT(order.createdAt, '%Y-%m')", 'month')
-      .addSelect('SUM(order.totalAmount)', 'revenue')
+      .select('order.createdAt', 'createdAt')
+      .addSelect('order.totalAmount', 'totalAmount')
       .where('order.orderStatus = :status', { status: OrderStatus.COMPLETED })
       .andWhere('order.createdAt >= :startDate', { startDate })
       .andWhere('order.createdAt <= :endDate', { endDate })
-      .groupBy('month')
-      .orderBy('month', 'ASC')
-      .getRawMany();
+      .orderBy('order.createdAt', 'ASC');
 
-    return result.map((row) => ({
-      label: row.month,
-      value: parseFloat(row.revenue || '0'),
-    }));
+    const orders = await query.getRawMany<{
+      createdAt: Date;
+      totalAmount: string;
+    }>();
+
+    return this.groupDataByPeriod(
+      orders,
+      startDate,
+      endDate,
+      period,
+      'totalAmount',
+      granularity,
+    );
   }
 
   private async getUserGrowthChartData(
     startDate: Date,
     endDate: Date,
+    period: 'day' | 'week' | 'month' | 'year',
+    granularity?: 'hour' | 'day' | 'week' | 'month' | 'year',
   ): Promise<ChartDataPoint[]> {
     // Get new users for the specified date range
-    const result = await this.userRepository
+    const query = this.userRepository
       .createQueryBuilder('user')
-      .select("DATE_FORMAT(user.createdAt, '%Y-%m')", 'month')
-      .addSelect('COUNT(*)', 'count')
-      .andWhere('user.createdAt >= :startDate', { startDate })
+      .select('user.createdAt', 'createdAt')
+      .where('user.createdAt >= :startDate', { startDate })
       .andWhere('user.createdAt <= :endDate', { endDate })
-      .groupBy('month')
-      .orderBy('month', 'ASC')
-      .getRawMany();
+      .orderBy('user.createdAt', 'ASC');
 
-    return result.map((row) => ({
-      label: row.month,
-      value: parseInt(row.count || '0', 10),
+    const users = await query.getRawMany<{ createdAt: Date }>();
+
+    // Add a virtual field 'count' with value 1 for each user to use groupDataByPeriod
+    const userData = users.map((u) => ({ ...u, count: 1 }));
+
+    return this.groupDataByPeriod(
+      userData,
+      startDate,
+      endDate,
+      period,
+      'count',
+      granularity,
+    );
+  }
+
+  private groupDataByPeriod(
+    data: any[],
+    startDate: Date,
+    endDate: Date,
+    period: 'day' | 'week' | 'month' | 'year',
+    valueField: string,
+    granularity?: 'hour' | 'day' | 'week' | 'month' | 'year',
+  ): ChartDataPoint[] {
+    const diffTime = Math.abs(endDate.getTime() - startDate.getTime());
+    const diffDays = Math.ceil(diffTime / (1000 * 60 * 60 * 24));
+
+    let effectiveGranularity = granularity;
+    if (!effectiveGranularity) {
+      if (period === 'day') effectiveGranularity = 'hour';
+      else if (period === 'week') effectiveGranularity = 'day';
+      else if (diffDays <= 31) effectiveGranularity = 'day';
+      else if (diffDays <= 366) effectiveGranularity = 'month';
+      else effectiveGranularity = 'year';
+    }
+
+    // Generate labels and mapping based on effectiveGranularity
+    const labels: string[] = [];
+    const currentDate = new Date(startDate);
+
+    if (effectiveGranularity === 'hour') {
+      if (diffDays <= 2) {
+        for (let i = 0; i < 24; i++) {
+          labels.push(`${i}:00`);
+        }
+      } else {
+        // diffDays is 3 to 7 (due to selector restriction)
+        const hourCursor = new Date(startDate);
+        while (hourCursor <= endDate) {
+          labels.push(
+            `${hourCursor.getMonth() + 1}/${hourCursor.getDate()} ${hourCursor.getHours()}:00`,
+          );
+          hourCursor.setHours(hourCursor.getHours() + 1);
+        }
+      }
+    } else if (effectiveGranularity === 'day') {
+      if (diffDays <= 2) {
+        // 只有 1 或 2 天時，可以用 週一、週二
+        const days = ['週日', '週一', '週二', '週三', '週四', '週五', '週六'];
+        const tempDate = new Date(startDate);
+        while (tempDate <= endDate) {
+          labels.push(days[tempDate.getDay()]);
+          tempDate.setDate(tempDate.getDate() + 1);
+        }
+      } else {
+        // > 2 天，顯示 MM/DD
+        while (currentDate <= endDate) {
+          labels.push(`${currentDate.getMonth() + 1}/${currentDate.getDate()}`);
+          currentDate.setDate(currentDate.getDate() + 1);
+        }
+      }
+    } else if (effectiveGranularity === 'week') {
+      const weekStart = new Date(startDate);
+      while (weekStart <= endDate) {
+        let weekEnd = new Date(weekStart);
+        weekEnd.setDate(weekStart.getDate() + 6);
+        if (weekEnd > endDate) weekEnd = new Date(endDate);
+        labels.push(
+          `${weekStart.getMonth() + 1}/${weekStart.getDate()}-${weekEnd.getMonth() + 1}/${weekEnd.getDate()}`,
+        );
+        weekStart.setDate(weekStart.getDate() + 7);
+      }
+    } else if (effectiveGranularity === 'month') {
+      const startYear = startDate.getFullYear();
+      const endYear = endDate.getFullYear();
+      const isCrossYear = startYear !== endYear;
+      const endTotalMonth = endYear * 12 + endDate.getMonth();
+      let currentTotalMonth = startYear * 12 + startDate.getMonth();
+
+      while (currentTotalMonth <= endTotalMonth) {
+        const y = Math.floor(currentTotalMonth / 12);
+        const m = (currentTotalMonth % 12) + 1;
+        labels.push(isCrossYear ? `${y}/${m}` : `${m}月`);
+        currentTotalMonth++;
+      }
+    } else {
+      for (
+        let year = startDate.getFullYear();
+        year <= endDate.getFullYear();
+        year++
+      ) {
+        labels.push(`${year}年`);
+      }
+    }
+
+    const dataMap = new Map<string, number>();
+    data.forEach((item) => {
+      const date = new Date(item.createdAt);
+      let label: string;
+
+      if (effectiveGranularity === 'hour') {
+        if (diffDays <= 2) {
+          label = `${date.getHours()}:00`;
+        } else {
+          label = `${date.getMonth() + 1}/${date.getDate()} ${date.getHours()}:00`;
+        }
+      } else if (effectiveGranularity === 'day') {
+        if (diffDays <= 2) {
+          const days = ['週日', '週一', '週二', '週三', '週四', '週五', '週六'];
+          label = days[date.getDay()];
+        } else {
+          label = `${date.getMonth() + 1}/${date.getDate()}`;
+        }
+      } else if (effectiveGranularity === 'week') {
+        const diffFromStart = Math.floor(
+          (date.getTime() - startDate.getTime()) / (1000 * 60 * 60 * 24),
+        );
+        const weekNum = Math.floor(diffFromStart / 7);
+        const weekStart = new Date(startDate);
+        weekStart.setDate(startDate.getDate() + weekNum * 7);
+        let weekEnd = new Date(weekStart);
+        weekEnd.setDate(weekStart.getDate() + 6);
+        if (weekEnd > endDate) weekEnd = new Date(endDate);
+        label = `${weekStart.getMonth() + 1}/${weekStart.getDate()}-${weekEnd.getMonth() + 1}/${weekEnd.getDate()}`;
+      } else if (effectiveGranularity === 'month') {
+        const y = date.getFullYear();
+        const m = date.getMonth() + 1;
+        const isCrossYear = startDate.getFullYear() !== endDate.getFullYear();
+        label = isCrossYear ? `${y}/${m}` : `${m}月`;
+      } else {
+        label = `${date.getFullYear()}年`;
+      }
+
+      const val = parseFloat(item[valueField] || '0');
+      dataMap.set(label, (dataMap.get(label) || 0) + val);
+    });
+
+    return labels.map((label) => ({
+      label,
+      value: dataMap.get(label) || 0,
     }));
   }
 
@@ -217,7 +383,7 @@ export class AdminService {
       .where('order.createdAt >= :startDate', { startDate })
       .andWhere('order.createdAt <= :endDate', { endDate })
       .groupBy('order.orderStatus')
-      .getRawMany();
+      .getRawMany<{ status: string; count: string }>();
 
     // Map status to Chinese labels
     const statusLabelMap: Partial<Record<OrderStatus, string>> = {

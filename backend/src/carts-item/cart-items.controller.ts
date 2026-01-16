@@ -15,6 +15,7 @@ import { UpdateCartItemDto } from './dto/update-cart-item.dto';
 import { BatchUpdateCartItemsDto } from './dto/batch-update-cart-items.dto';
 import { JwtAccessGuard } from '../auth/guards/jwt-auth.guard';
 import type { AuthRequest } from '../common/types';
+import { Audit } from '../common/decorators/audit.decorator';
 
 @Controller('carts')
 @UseGuards(JwtAccessGuard)
@@ -32,16 +33,19 @@ export class CartItemsController {
     return await this.cartsService.getCartSummary(req.user.userId);
   }
 
+  @Audit('CartItem')
   @Post('items')
   async addToCart(@Req() req: AuthRequest, @Body() addToCartDto: AddToCartDto) {
     return await this.cartsService.addToCart(req.user.userId, addToCartDto);
   }
 
+  @Audit('CartItem')
   @Post('items/to-history')
   async moveSelectedToHistory(@Req() req: AuthRequest) {
     return await this.cartsService.moveSelectedToHistory(req.user.userId);
   }
 
+  @Audit('CartItem')
   @Patch('items/batch')
   async batchUpdateCartItems(
     @Req() req: AuthRequest,
@@ -53,6 +57,7 @@ export class CartItemsController {
     );
   }
 
+  @Audit('CartItem')
   @Patch('items/:cartItemId')
   async updateCartItem(
     @Req() req: AuthRequest,
@@ -66,6 +71,7 @@ export class CartItemsController {
     );
   }
 
+  @Audit('CartItem')
   @Delete('items/:cartItemId')
   async removeFromCart(
     @Req() req: AuthRequest,
@@ -74,12 +80,14 @@ export class CartItemsController {
     return await this.cartsService.removeFromCart(req.user.userId, cartItemId);
   }
 
+  @Audit('CartItem')
   @Delete('selected')
   async removeSelectedItems(@Req() req: AuthRequest) {
     await this.cartsService.removeSelectedItems(req.user.userId);
     return { message: 'Selected items removed successfully' };
   }
 
+  @Audit('CartItem')
   @Delete()
   async clearCart(@Req() req: AuthRequest) {
     await this.cartsService.clearCart(req.user.userId);

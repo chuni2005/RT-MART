@@ -1,16 +1,53 @@
-import Icon from '@/shared/components/Icon';
-import styles from './OrderTimeline.module.scss';
+import Icon from "@/shared/components/Icon";
+import styles from "./OrderTimeline.module.scss";
 
-import { OrderTimelineProps, TimelineStep } from '@/types/userCenter';
+import { OrderTimelineProps, TimelineStep } from "@/types/userCenter";
 
-function OrderTimeline({ timestamps }: OrderTimelineProps) {
+function OrderTimeline({
+  status,
+  paymentMethod,
+  timestamps,
+}: OrderTimelineProps) {
   // 定義時間軸步驟
   const steps: TimelineStep[] = [
-    { label: '訂單成立', key: 'createdAt', isCompleted: true, timestamp: timestamps.createdAt },
-    { label: '付款完成', key: 'paidAt', isCompleted: !!timestamps.paidAt, timestamp: timestamps.paidAt },
-    { label: '商品出貨', key: 'shippedAt', isCompleted: !!timestamps.shippedAt, timestamp: timestamps.shippedAt },
-    { label: '商品送達', key: 'deliveredAt', isCompleted: !!timestamps.deliveredAt, timestamp: timestamps.deliveredAt },     
-    { label: '交易完成', key: 'completedAt', isCompleted: !!timestamps.completedAt, timestamp: timestamps.completedAt },   
+    {
+      label: "訂單成立",
+      key: "createdAt",
+      isCompleted: true,
+      timestamp: timestamps.createdAt,
+    },
+    {
+      label: "付款完成",
+      key: "paidAt",
+      isCompleted:
+        !!timestamps.paidAt ||
+        (paymentMethod === "cash_on_delivery" &&
+          (status === "delivered" || status === "completed")),
+      timestamp:
+        timestamps.paidAt ||
+        (paymentMethod === "cash_on_delivery" &&
+        (status === "delivered" || status === "completed")
+          ? timestamps.deliveredAt || timestamps.completedAt
+          : undefined),
+    },
+    {
+      label: "商品出貨",
+      key: "shippedAt",
+      isCompleted: !!timestamps.shippedAt,
+      timestamp: timestamps.shippedAt,
+    },
+    {
+      label: "商品送達",
+      key: "deliveredAt",
+      isCompleted: !!timestamps.deliveredAt,
+      timestamp: timestamps.deliveredAt,
+    },
+    {
+      label: "交易完成",
+      key: "completedAt",
+      isCompleted: !!timestamps.completedAt,
+      timestamp: timestamps.completedAt,
+    },
   ];
 
   return (
@@ -19,7 +56,7 @@ function OrderTimeline({ timestamps }: OrderTimelineProps) {
         <div
           key={step.key}
           className={`${styles.timelineItem} ${
-            step.isCompleted ? styles.completed : ''
+            step.isCompleted ? styles.completed : ""
           }`}
         >
           {/* 圓點 */}
@@ -28,16 +65,14 @@ function OrderTimeline({ timestamps }: OrderTimelineProps) {
           </div>
 
           {/* 連接線 */}
-          {index < steps.length - 1 && (
-            <div className={styles.line} />
-          )}
+          {index < steps.length - 1 && <div className={styles.line} />}
 
           {/* 標籤與時間 */}
           <div className={styles.content}>
             <p className={styles.label}>{step.label}</p>
             {step.timestamp && (
               <p className={styles.timestamp}>
-                {new Date(step.timestamp).toLocaleString('zh-TW')}
+                {new Date(step.timestamp).toLocaleString("zh-TW")}
               </p>
             )}
           </div>

@@ -44,14 +44,6 @@ function Search() {
     Product[]
   >([]);
 
-  // 無關鍵字且無分類時重定向至首頁
-  useEffect(() => {
-    if ((!keyword || keyword.trim() === "") && !categoryId) {
-      navigate("/");
-      return;
-    }
-  }, [keyword, categoryId, navigate]);
-
   // 載入所有分類
   useEffect(() => {
     const fetchProductTypes = async () => {
@@ -81,9 +73,6 @@ function Search() {
 
   // 載入商品資料
   const fetchProducts = async () => {
-    // 必須有關鍵字或分類才能搜尋
-    if (!keyword && !categoryId) return;
-
     setIsLoading(true);
     setError(null);
 
@@ -129,15 +118,11 @@ function Search() {
 
   // 篩選條件變更時，重置到第 1 頁並重新載入
   useEffect(() => {
-    // 必須有關鍵字或分類
-    if (!keyword && !categoryId) return;
     setCurrentPage(1);
   }, [keyword, minPrice, maxPrice, rating, sortBy, categoryId]);
 
   // 分頁變更或初次載入時，重新載入商品
   useEffect(() => {
-    // 必須有關鍵字或分類
-    if (!keyword && !categoryId) return;
     fetchProducts();
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [keyword, currentPage, minPrice, maxPrice, rating, sortBy, categoryId]);
@@ -407,8 +392,7 @@ function Search() {
                   ariaLabel="關閉篩選"
                   icon="times"
                   iconOnly
-                >
-                </Button>
+                ></Button>
               </div>
               <div className={styles.drawerContent}>
                 <FilterSidebar

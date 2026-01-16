@@ -239,17 +239,35 @@ export const getReviewsByProductId = async (
   // Real API Mode
   if (!USE_MOCK_API) {
     try {
-      const queryParams = new URLSearchParams({
-        ...params,
-        productId: String(productId)
-      } as any).toString();
-      
-      const response = await get<GetReviewsResponse>(`/review?${queryParams}`);
-      
-      // 注意：後端回傳的可能是 BackendReview[]，需要轉換
+      // 構建查詢參數 - 後端需要 productId 在 query string 中
+      const queryParams: Record<string, string> = {
+        productId: String(productId),
+      };
+
+      // 添加可選參數
+      if (params.minRating !== undefined) {
+        queryParams.minRating = String(params.minRating);
+      }
+      if (params.page !== undefined) {
+        queryParams.page = String(params.page);
+      }
+      if (params.limit !== undefined) {
+        queryParams.limit = String(params.limit);
+      }
+      if (params.sortBy) {
+        queryParams.sortBy = params.sortBy;
+      }
+      if (params.order) {
+        queryParams.order = params.order.toUpperCase(); // 後端接受 ASC/DESC
+      }
+
+      const queryString = new URLSearchParams(queryParams).toString();
+      const response = await get<GetReviewsResponse>(`/review?${queryString}`);
+
+      // 轉換後端 Review Entity 為前端 Review 介面
       return {
         ...response,
-        reviews: (response.reviews as any).map(transformReview)
+        reviews: (response.reviews as any[]).map(transformReview)
       };
     } catch (error) {
       console.error('[API Error] getReviewsByProductId:', error);
@@ -324,13 +342,25 @@ export const getReviewStatistics = async (
 
 /**
  * 提交評價
- * @param data - 評價數據與圖片
+ * @param formData - 包含評價數據的 FormData (productId, rating, comment, images)
+ * @returns 提交結果
+ *
+ * 注意：FormData 應包含以下欄位：
+ * - productId: string
+ * - rating: number (1-5)
+ * - comment: string
+ * - images: File[] (可選，多張圖片)
  */
 export const createReview = async (formData: FormData): Promise<{ success: boolean; message: string }> => {
   if (!USE_MOCK_API) {
     try {
-      await post('/review', formData);
-      return { success: true, message: '評價提交成功' };
+      // 後端需要 JWT token，會自動由 api.ts 中的 post 方法處理
+      // FormData 中應包含: productId, rating, comment, images (可選)
+      const response = await post<{ success?: boolean; message?: string }>('/review', formData);
+      return {
+        success: true,
+        message: response.message || '評價提交成功'
+      };
     } catch (error) {
       console.error('[API Error] createReview:', error);
       throw error;

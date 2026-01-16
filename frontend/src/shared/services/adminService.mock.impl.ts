@@ -6,6 +6,7 @@ import type {
   SystemDiscount,
   AdminOrder,
   AdminOrderFilters,
+  DashboardFilters,
 } from "@/types/admin";
 import { mockDashboardStats, mockAdminOrders, delay } from './adminService.mock';
 
@@ -15,9 +16,9 @@ import { mockDashboardStats, mockAdminOrders, delay } from './adminService.mock'
  */
 
 // ========== Dashboard ==========
-
-export const getDashboardStats = async (): Promise<DashboardStats> => {
+export const getDashboardStats = async (filters?: DashboardFilters): Promise<DashboardStats> => {
   await delay(500);
+  console.log('[MOCK] getDashboardStats called with filters:', filters);
   return { ...mockDashboardStats };
 };
 

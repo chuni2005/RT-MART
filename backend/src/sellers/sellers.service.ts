@@ -9,18 +9,18 @@ import { Repository } from 'typeorm';
 import { Seller } from './entities/seller.entity';
 import { CreateSellerDto } from './dto/create-seller.dto';
 import { UpdateSellerDto } from './dto/update-seller.dto';
-import { VerifySellerDto } from './dto/verify-seller.dto';
 import { RejectSellerDto } from './dto/reject-seller.dto';
 import { UsersService } from '../users/users.service';
 import { User, UserRole } from '../users/entities/user.entity';
 import { Store } from '../stores/entities/store.entity';
-import { QuerySellerDto } from './dto/query-seller.dto';
+import { QuerySellerDto, SellerStatus } from './dto/query-seller.dto';
 import { Order, OrderStatus } from '../orders/entities/order.entity';
 import { Product } from '../products/entities/product.entity';
 import { ProductType } from '../product-types/entities/product-type.entity';
 import { QuerySellerDashboardDto } from './dto/query-seller-dashboard.dto';
 import { SalesReportItemDto } from './dto/sales-report-item.dto';
 import { MailService } from '../mail/mail.service';
+import { DateRangeUtil } from '../common/utils/date-range.util';
 
 export interface DashboardData {
   revenue: number;
@@ -34,6 +34,7 @@ export interface DashboardData {
 export interface ChartDataPoint {
   label: string;
   value: number;
+  orderCount: number;
 }
 
 export interface CategoryDataPoint {
@@ -154,12 +155,12 @@ export class SellersService {
 
     // Filter by status
     if (queryDto.status) {
-      if (queryDto.status === 'pending') {
+      if (queryDto.status === SellerStatus.PENDING) {
         query.andWhere('seller.verified = :verified', { verified: false });
         query.andWhere('seller.rejectedAt IS NULL');
-      } else if (queryDto.status === 'approved') {
+      } else if (queryDto.status === SellerStatus.APPROVED) {
         query.andWhere('seller.verified = :verified', { verified: true });
-      } else if (queryDto.status === 'rejected') {
+      } else if (queryDto.status === SellerStatus.REJECTED) {
         query.andWhere('seller.rejectedAt IS NOT NULL');
       }
     }
@@ -282,12 +283,7 @@ export class SellersService {
 
   async getDashboardData(
     userId: string,
-    filters: {
-      period?: 'day' | 'week' | 'month';
-      startDate?: string;
-      endDate?: string;
-      productName?: string;
-    },
+    filters: QuerySellerDashboardDto,
   ): Promise<DashboardData> {
     // Get seller's store
     const seller = await this.findByUserId(userId);
@@ -304,39 +300,20 @@ export class SellersService {
     }
 
     const storeId = store.storeId;
+    const period = filters.period || 'week';
 
-    // Calculate date range with priority: explicit dates > period > default
-    let startDate: Date;
-    let endDate: Date = new Date();
-    let period: 'day' | 'week' | 'month' = filters.period || 'week';
-
-    if (filters.startDate && filters.endDate) {
-      startDate = new Date(filters.startDate);
-      endDate = new Date(filters.endDate);
-    } else if (filters.period) {
-      const now = new Date();
-      switch (filters.period) {
-        case 'day':
-          startDate = new Date(now);
-          startDate.setHours(0, 0, 0, 0);
-          break;
-        case 'week':
-          startDate = new Date(now);
-          startDate.setDate(now.getDate() - 7);
-          startDate.setHours(0, 0, 0, 0);
-          break;
-        case 'month':
-          startDate = new Date(now);
-          startDate.setDate(now.getDate() - 30);
-          startDate.setHours(0, 0, 0, 0);
-          break;
-      }
-    } else {
-      // Default: last 7 days
-      startDate = new Date();
-      startDate.setDate(startDate.getDate() - 7);
-      startDate.setHours(0, 0, 0, 0);
-    }
+    // 使用統一的解析工具處理時區與範圍
+    const { startDate, endDate } = DateRangeUtil.parseRange(
+      filters.startDate,
+      filters.endDate,
+      period === 'day'
+        ? 1
+        : period === 'week'
+          ? 7
+          : period === 'month'
+            ? 30
+            : 365,
+    );
 
     // Fetch all dashboard data in parallel
     const [
@@ -355,6 +332,7 @@ export class SellersService {
         endDate,
         period,
         filters.productName,
+        filters.granularity,
       ),
       this.getCategoryData(storeId, startDate, endDate, filters.productName),
       this.getPopularProducts(storeId, startDate, endDate, filters.productName),
@@ -379,7 +357,6 @@ export class SellersService {
   ): Promise<number> {
     const query = this.orderRepository
       .createQueryBuilder('order')
-      .select('SUM(order.totalAmount)', 'total')
       .where('order.storeId = :storeId', { storeId })
       .andWhere('order.createdAt >= :startDate', { startDate })
       .andWhere('order.createdAt <= :endDate', { endDate })
@@ -394,14 +371,19 @@ export class SellersService {
       });
 
     if (productName) {
+      // 如果有商品名稱過濾，計算該商品的營收 (單價 * 數量)
       query
         .leftJoin('order.items', 'item')
+        .select('SUM(item.unitPrice * item.quantity)', 'total')
         .andWhere(
           "JSON_UNQUOTE(JSON_EXTRACT(item.product_snapshot, '$.product_name')) LIKE :productName",
           {
             productName: `%${productName}%`,
           },
         );
+    } else {
+      // 否則計算訂單總額
+      query.select('SUM(order.totalAmount)', 'total');
     }
 
     const result = await query.getRawOne();
@@ -430,14 +412,18 @@ export class SellersService {
       });
 
     if (productName) {
+      // 如果有商品名稱過濾，計算包含該商品的「不重複」訂單數
       query
         .leftJoin('order.items', 'item')
+        .select('COUNT(DISTINCT order.orderId)', 'count')
         .andWhere(
           "JSON_UNQUOTE(JSON_EXTRACT(item.product_snapshot, '$.product_name')) LIKE :productName",
           {
             productName: `%${productName}%`,
           },
         );
+      const result = await query.getRawOne();
+      return parseInt(result?.count || '0');
     }
 
     return await query.getCount();
@@ -447,13 +433,14 @@ export class SellersService {
     storeId: string,
     startDate: Date,
     endDate: Date,
-    period: 'day' | 'week' | 'month',
+    period: 'day' | 'week' | 'month' | 'year',
     productName?: string,
+    granularity?: 'hour' | 'day' | 'week' | 'month' | 'year',
   ): Promise<ChartDataPoint[]> {
     const query = this.orderRepository
       .createQueryBuilder('order')
       .select('order.createdAt', 'createdAt')
-      .addSelect('order.totalAmount', 'totalAmount')
+      .addSelect('order.orderId', 'orderId')
       .where('order.storeId = :storeId', { storeId })
       .andWhere('order.createdAt >= :startDate', { startDate })
       .andWhere('order.createdAt <= :endDate', { endDate })
@@ -468,52 +455,170 @@ export class SellersService {
       });
 
     if (productName) {
+      // 如果有商品過濾，圖表數值顯示該商品的銷售額 (單價 * 數量)
       query
         .leftJoin('order.items', 'item')
+        .addSelect('item.unitPrice * item.quantity', 'totalAmount')
         .andWhere(
           "JSON_UNQUOTE(JSON_EXTRACT(item.product_snapshot, '$.product_name')) LIKE :productName",
           {
             productName: `%${productName}%`,
           },
         );
+    } else {
+      // 否則顯示訂單總額
+      query.addSelect('order.totalAmount', 'totalAmount');
     }
 
     const orders = await query.getRawMany();
 
-    // Group by time period
-    const dataMap = new Map<string, number>();
+    // Determine effective granularity
+    const diffTime = Math.abs(endDate.getTime() - startDate.getTime());
+    const diffDays = Math.ceil(diffTime / (1000 * 60 * 60 * 24));
 
+    let effectiveGranularity = granularity;
+    if (!effectiveGranularity) {
+      if (period === 'day') effectiveGranularity = 'hour';
+      else if (period === 'week') effectiveGranularity = 'day';
+      else if (diffDays <= 31) effectiveGranularity = 'day';
+      else if (diffDays <= 366) effectiveGranularity = 'month';
+      else effectiveGranularity = 'year';
+    }
+
+    // Generate labels based on effective granularity
+    const labels: string[] = [];
+    const currentDate = new Date(startDate);
+
+    if (effectiveGranularity === 'hour') {
+      if (diffDays <= 2) {
+        for (let i = 0; i < 24; i++) {
+          labels.push(`${i}:00`);
+        }
+      } else {
+        // diffDays is 3 to 7 (due to selector restriction)
+        const hourCursor = new Date(startDate);
+        while (hourCursor <= endDate) {
+          labels.push(
+            `${hourCursor.getMonth() + 1}/${hourCursor.getDate()} ${hourCursor.getHours()}:00`,
+          );
+          hourCursor.setHours(hourCursor.getHours() + 1);
+        }
+      }
+    } else if (effectiveGranularity === 'day') {
+      if (diffDays <= 2) {
+        // 只有 1 或 2 天時，可以用 週一、週二
+        const days = ['週日', '週一', '週二', '週三', '週四', '週五', '週六'];
+        const tempDate = new Date(startDate);
+        while (tempDate <= endDate) {
+          labels.push(days[tempDate.getDay()]);
+          tempDate.setDate(tempDate.getDate() + 1);
+        }
+      } else {
+        // > 2 天，顯示 MM/DD
+        while (currentDate <= endDate) {
+          labels.push(`${currentDate.getMonth() + 1}/${currentDate.getDate()}`);
+          currentDate.setDate(currentDate.getDate() + 1);
+        }
+      }
+    } else if (effectiveGranularity === 'week') {
+      // 按週顯示：例如 "1/1-1/7"
+      const weekStart = new Date(startDate);
+      while (weekStart <= endDate) {
+        let weekEnd = new Date(weekStart);
+        weekEnd.setDate(weekStart.getDate() + 6);
+        if (weekEnd > endDate) weekEnd = new Date(endDate);
+
+        const label = `${weekStart.getMonth() + 1}/${weekStart.getDate()}-${weekEnd.getMonth() + 1}/${weekEnd.getDate()}`;
+        labels.push(label);
+        weekStart.setDate(weekStart.getDate() + 7);
+      }
+    } else if (effectiveGranularity === 'month') {
+      const startYear = startDate.getFullYear();
+      const endYear = endDate.getFullYear();
+      const isCrossYear = startYear !== endYear;
+
+      const endTotalMonth = endYear * 12 + endDate.getMonth();
+      let currentTotalMonth = startYear * 12 + startDate.getMonth();
+
+      while (currentTotalMonth <= endTotalMonth) {
+        const y = Math.floor(currentTotalMonth / 12);
+        const m = (currentTotalMonth % 12) + 1;
+        labels.push(isCrossYear ? `${y}/${m}` : `${m}月`);
+        currentTotalMonth++;
+      }
+    } else {
+      // year
+      for (
+        let year = startDate.getFullYear();
+        year <= endDate.getFullYear();
+        year++
+      ) {
+        labels.push(`${year}年`);
+      }
+    }
+
+    // Data mapping logic
+    const dynamicDataMap = new Map<
+      string,
+      { revenue: number; orderIds: Set<string> }
+    >();
     orders.forEach((order) => {
       const date = new Date(order.createdAt);
       let label: string;
 
-      if (period === 'day') {
-        label = `${date.getHours()}:00`;
-      } else if (period === 'week') {
-        const days = ['週日', '週一', '週二', '週三', '週四', '週五', '週六'];
-        label = days[date.getDay()];
+      if (effectiveGranularity === 'hour') {
+        if (diffDays <= 2) {
+          label = `${date.getHours()}:00`;
+        } else {
+          label = `${date.getMonth() + 1}/${date.getDate()} ${date.getHours()}:00`;
+        }
+      } else if (effectiveGranularity === 'day') {
+        if (diffDays <= 2) {
+          const days = ['週日', '週一', '週二', '週三', '週四', '週五', '週六'];
+          label = days[date.getDay()];
+        } else {
+          label = `${date.getMonth() + 1}/${date.getDate()}`;
+        }
+      } else if (effectiveGranularity === 'week') {
+        // Find which week this date belongs to
+        const diffFromStart = Math.floor(
+          (date.getTime() - startDate.getTime()) / (1000 * 60 * 60 * 24),
+        );
+        const weekIndex = Math.floor(diffFromStart / 7);
+
+        const weekStart = new Date(startDate);
+        weekStart.setDate(startDate.getDate() + weekIndex * 7);
+        let weekEnd = new Date(weekStart);
+        weekEnd.setDate(weekStart.getDate() + 6);
+        if (weekEnd > endDate) weekEnd = new Date(endDate);
+
+        label = `${weekStart.getMonth() + 1}/${weekStart.getDate()}-${weekEnd.getMonth() + 1}/${weekEnd.getDate()}`;
+      } else if (effectiveGranularity === 'month') {
+        const y = date.getFullYear();
+        const m = date.getMonth() + 1;
+        const isCrossYear = startDate.getFullYear() !== endDate.getFullYear();
+        label = isCrossYear ? `${y}/${m}` : `${m}月`;
       } else {
-        label = `${date.getDate()}日`;
+        label = `${date.getFullYear()}年`;
       }
 
-      const current = dataMap.get(label) || 0;
-      dataMap.set(label, current + parseFloat(order.totalAmount));
+      if (!dynamicDataMap.has(label)) {
+        dynamicDataMap.set(label, { revenue: 0, orderIds: new Set() });
+      }
+
+      const current = dynamicDataMap.get(label)!;
+      current.revenue += parseFloat(order.totalAmount);
+      current.orderIds.add(order.orderId);
     });
 
-    // Generate labels based on period
-    let labels: string[] = [];
-    if (period === 'day') {
-      labels = Array.from({ length: 24 }, (_, i) => `${i}:00`);
-    } else if (period === 'week') {
-      labels = ['週一', '週二', '週三', '週四', '週五', '週六', '週日'];
-    } else {
-      labels = Array.from({ length: 30 }, (_, i) => `${i + 1}日`);
-    }
-
-    return labels.map((label) => ({
-      label,
-      value: dataMap.get(label) || 0,
-    }));
+    return labels.map((label) => {
+      const stats = dynamicDataMap.get(label);
+      return {
+        label,
+        value: stats?.revenue || 0,
+        orderCount: stats?.orderIds.size || 0,
+      };
+    });
   }
 
   private async getCategoryData(
@@ -545,7 +650,8 @@ export class SellersService {
 
     if (productName) {
       query.andWhere(
-        "item.productSnapshot->>'product_name' LIKE :productName",
+        "(JSON_UNQUOTE(JSON_EXTRACT(item.product_snapshot, '$.product_name')) LIKE :productName OR " +
+          "JSON_UNQUOTE(JSON_EXTRACT(item.product_snapshot, '$.productName')) LIKE :productName)",
         {
           productName: `%${productName}%`,
         },
@@ -570,10 +676,17 @@ export class SellersService {
       .createQueryBuilder('order')
       .leftJoin('order.items', 'item')
       .leftJoin('item.product', 'product')
-      .leftJoin('product.images', 'image')
+      // 使用子查詢獲取第一張圖片，避免 Join 導致的重複計算
       .select('product.productId', 'id')
       .addSelect('product.productName', 'name')
-      .addSelect('MIN(image.imageUrl)', 'image')
+      .addSelect((subQuery) => {
+        return subQuery
+          .select('img.imageUrl')
+          .from('ProductImage', 'img')
+          .where('img.productId = product.productId')
+          .orderBy('img.displayOrder', 'ASC')
+          .limit(1);
+      }, 'image')
       .addSelect('SUM(item.quantity)', 'salesCount')
       .addSelect('SUM(item.unitPrice * item.quantity)', 'revenue')
       .where('order.storeId = :storeId', { storeId })
@@ -594,7 +707,8 @@ export class SellersService {
 
     if (productName) {
       query.andWhere(
-        "item.productSnapshot->>'product_name' LIKE :productName",
+        "(JSON_UNQUOTE(JSON_EXTRACT(item.product_snapshot, '$.product_name')) LIKE :productName OR " +
+          "JSON_UNQUOTE(JSON_EXTRACT(item.product_snapshot, '$.productName')) LIKE :productName)",
         {
           productName: `%${productName}%`,
         },
@@ -654,12 +768,20 @@ export class SellersService {
     }
 
     const storeId = store.storeId;
+    const period = filters.period || 'week';
 
-    // Calculate date range (default: last 30 days)
-    const endDate = filters.endDate ? new Date(filters.endDate) : new Date();
-    const startDate = filters.startDate
-      ? new Date(filters.startDate)
-      : new Date(endDate.getTime() - 30 * 24 * 60 * 60 * 1000);
+    // 使用統一的解析工具處理時區與範圍
+    const { startDate, endDate } = DateRangeUtil.parseRange(
+      filters.startDate,
+      filters.endDate,
+      period === 'day'
+        ? 1
+        : period === 'week'
+          ? 7
+          : period === 'month'
+            ? 30
+            : 365,
+    );
 
     // Valid order statuses (exclude pending_payment, cancelled, payment_failed)
     const validStatuses = [
@@ -687,7 +809,8 @@ export class SellersService {
     // Add product name filter if provided
     if (filters.productName) {
       queryBuilder.andWhere(
-        "item.productSnapshot->>'product_name' LIKE :productName",
+        "(JSON_UNQUOTE(JSON_EXTRACT(item.product_snapshot, '$.product_name')) LIKE :productName OR " +
+          "JSON_UNQUOTE(JSON_EXTRACT(item.product_snapshot, '$.productName')) LIKE :productName)",
         { productName: `%${filters.productName}%` },
       );
     }
@@ -703,7 +826,10 @@ export class SellersService {
 
       order.items.forEach((item) => {
         const productSnapshot = item.productSnapshot as any;
-        const productName = productSnapshot?.product_name || 'Unknown';
+        const productName =
+          productSnapshot?.product_name ||
+          productSnapshot?.productName ||
+          'Unknown';
 
         const subtotalValue = parseFloat(item.subtotal.toString());
         const paymentFee = parseFloat((subtotalValue * 0.01).toFixed(2));
@@ -723,7 +849,8 @@ export class SellersService {
           originalPrice: parseFloat(item.originalPrice.toString()),
           itemDiscount: parseFloat(item.itemDiscount.toString()),
           unitPrice: parseFloat(item.unitPrice.toString()),
-          itemSubtotal: parseFloat(item.originalPrice.toString()) * item.quantity,
+          itemSubtotal:
+            parseFloat(item.originalPrice.toString()) * item.quantity,
           subtotal: subtotalValue,
 
           // 財務計算

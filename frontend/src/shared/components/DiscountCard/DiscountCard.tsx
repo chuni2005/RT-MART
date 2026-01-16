@@ -1,14 +1,14 @@
-import { useState } from 'react';
-import Icon from '@/shared/components/Icon';
-import Button from '@/shared/components/Button';
-import styles from './DiscountCard.module.scss';
+import { useState } from "react";
+import Icon from "@/shared/components/Icon";
+import Button from "@/shared/components/Button";
+import styles from "./DiscountCard.module.scss";
 
 interface DiscountCardProps {
   discount: {
     discountId: string;
     discountCode: string;
     name: string;
-    discountType?: 'seasonal' | 'shipping' | 'special';
+    discountType?: "seasonal" | "shipping" | "special";
     discountRate?: number;
     discountAmount?: number;
     minPurchaseAmount: number;
@@ -38,7 +38,7 @@ function DiscountCard({
       setCopied(true);
       setTimeout(() => setCopied(false), 2000);
     } catch (err) {
-      console.error('複製失敗:', err);
+      console.error("複製失敗:", err);
     }
   };
 
@@ -47,20 +47,25 @@ function DiscountCard({
     const start = new Date(discount.startDatetime);
     const end = new Date(discount.endDatetime);
 
-    if (!discount.isActive) return '已停用';
-    if (now < start) return '未開始';
-    if (now > end) return '已結束';
-    return '進行中';
+    if (!discount.isActive) return "已停用";
+
+    // 考慮到網路延遲或伺服器與客戶端時鐘微小誤差
+    // 如果現在時間與開始時間差距在 1 分鐘內，我們視為「進行中」
+    const isJustAboutToStart = start.getTime() - now.getTime() < 60000;
+
+    if (now < start && !isJustAboutToStart) return "未開始";
+    if (now > end) return "已結束";
+    return "進行中";
   };
 
   const getStatusColor = (status: string) => {
     const colorMap: Record<string, string> = {
-      進行中: '#28a745',
-      未開始: '#ffc107',
-      已結束: '#6c757d',
-      已停用: '#dc3545',
+      進行中: "#28a745",
+      未開始: "#ffc107",
+      已結束: "#6c757d",
+      已停用: "#dc3545",
     };
-    return colorMap[status] || '#6c757d';
+    return colorMap[status] || "#6c757d";
   };
 
   const status = getDiscountStatus();
@@ -80,12 +85,12 @@ function DiscountCard({
 
       {/* 折扣碼 - 可點擊複製 */}
       <div
-        className={`${styles.discountCode} ${copied ? styles.copied : ''}`}
+        className={`${styles.discountCode} ${copied ? styles.copied : ""}`}
         onClick={handleCopyCode}
         role="button"
         tabIndex={0}
         onKeyDown={(e) => {
-          if (e.key === 'Enter' || e.key === ' ') {
+          if (e.key === "Enter" || e.key === " ") {
             e.preventDefault();
             handleCopyCode();
           }
@@ -138,9 +143,13 @@ function DiscountCard({
       <div className={styles.period}>
         <Icon icon="calendar" />
         <div className={styles.periodText}>
-          <div>{new Date(discount.startDatetime).toLocaleDateString('zh-TW')}</div>
+          <div>
+            {new Date(discount.startDatetime).toLocaleDateString("zh-TW")}
+          </div>
           <div>~</div>
-          <div>{new Date(discount.endDatetime).toLocaleDateString('zh-TW')}</div>
+          <div>
+            {new Date(discount.endDatetime).toLocaleDateString("zh-TW")}
+          </div>
         </div>
       </div>
 
@@ -152,7 +161,7 @@ function DiscountCard({
             style={{
               width: discount.usageLimit
                 ? `${(discount.usageCount / discount.usageLimit) * 100}%`
-                : '0%',
+                : "0%",
             }}
           />
         </div>
@@ -173,10 +182,12 @@ function DiscountCard({
         {onToggleStatus && (
           <Button
             variant="outline"
-            onClick={() => onToggleStatus(discount.discountId, discount.isActive)}
+            onClick={() =>
+              onToggleStatus(discount.discountId, discount.isActive)
+            }
           >
-            <Icon icon={discount.isActive ? 'toggle-on' : 'toggle-off'} />
-            {discount.isActive ? '停用' : '啟用'}
+            <Icon icon={discount.isActive ? "toggle-on" : "toggle-off"} />
+            {discount.isActive ? "停用" : "啟用"}
           </Button>
         )}
         {onDelete && (

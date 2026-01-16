@@ -52,14 +52,12 @@ function DiscountSelectionDialog({
     try {
       const discounts = await getAllAvailableDiscounts(subtotal, storeIds);
 
-      // 分離運費折扣和商品折扣
+      // 分離運費折扣和商品折扣 (僅保留 seasonal，不顯示 special)
       setShippingDiscounts(
         discounts.filter(d => d.discountType === 'shipping')
       );
       setProductDiscounts(
-        discounts.filter(d =>
-          d.discountType === 'seasonal' || d.discountType === 'special'
-        )
+        discounts.filter(d => d.discountType === 'seasonal')
       );
     } catch (err) {
       setError('載入折扣失敗，請稍後再試');
@@ -187,7 +185,6 @@ function DiscountSelectionDialog({
                       <th style={{ width: '60px' }}>選擇</th>
                       <th>折扣名稱</th>
                       <th>折扣碼</th>
-                      <th>折扣類型</th>
                       <th>折扣率</th>
                       <th>上限金額</th>
                       <th>最低消費</th>
@@ -206,15 +203,15 @@ function DiscountSelectionDialog({
                           onChange={() => setSelectedProduct(null)}
                         />
                       </td>
-                      <td colSpan={7} className={styles.noDiscountOption}>
+                      <td colSpan={6} className={styles.noDiscountOption}>
                         不使用商品折扣
                       </td>
                     </tr>
 
                     {/* 可用折扣列表 */}
                     {productDiscounts.map(discount => {
-                      const rate = discount.seasonalDiscount?.discountRate || discount.specialDiscount?.discountRate || 0;
-                      const maxAmount = discount.seasonalDiscount?.maxDiscountAmount || discount.specialDiscount?.maxDiscountAmount;
+                      const rate = discount.seasonalDiscount?.discountRate || 0;
+                      const maxAmount = discount.seasonalDiscount?.maxDiscountAmount;
 
                       return (
                         <tr key={discount.discountId}>
@@ -229,11 +226,6 @@ function DiscountSelectionDialog({
                           </td>
                           <td>{discount.name}</td>
                           <td><code>{discount.discountCode}</code></td>
-                          <td>
-                            <span className={styles.discountType}>
-                              {getDiscountTypeLabel(discount.discountType)}
-                            </span>
-                          </td>
                           <td>{(rate * 100).toFixed(1)}%</td>
                           <td>
                             {maxAmount ? `$${maxAmount}` : '無上限'}
@@ -248,7 +240,7 @@ function DiscountSelectionDialog({
 
                     {productDiscounts.length === 0 && (
                       <tr>
-                        <td colSpan={8} className={styles.emptyMessage}>
+                        <td colSpan={7} className={styles.emptyMessage}>
                           目前沒有可用的商品折扣
                         </td>
                       </tr>

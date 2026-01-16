@@ -65,6 +65,7 @@ export class UsersService {
     name: string;
     email: string;
     phoneNumber?: string;
+    avatarUrl?: string;
     role: UserRole;
   }): Promise<User> {
     // No duplicate check here - validation already done in email verification flow

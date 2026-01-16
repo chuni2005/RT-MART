@@ -35,6 +35,10 @@ export class SendVerificationCodeDto {
   @Matches(/^\+?[0-9\s\-()]+$/, { message: 'Invalid phone number format' })
   phoneNumber?: string;
 
+  @IsString()
+  @IsOptional()
+  avatarUrl?: string;
+
   @IsOptional()
   @IsEnum(VerificationPurpose)
   purpose?: VerificationPurpose;

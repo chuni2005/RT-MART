@@ -5,7 +5,7 @@ export interface UpdateProfileRequest {
   name?: string;
   email?: string;
   phone?: string;
-  avatar?: string;
+  avatar?: string | File;
 }
 
 // Update Password Request

@@ -44,7 +44,7 @@ export class ProductLoader extends BaseLoader<Product> {
       product.productName = data.product_name;
       product.description =
         typeof data.description === 'string' ? data.description : null;
-      product.price = Number(data.price);
+      product.price = Math.round(Number(data.price));
       product.soldCount =
         typeof data.sold_count === 'number'
           ? data.sold_count

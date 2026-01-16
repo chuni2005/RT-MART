@@ -50,7 +50,7 @@ export class User {
   @Column({ type: 'varchar', length: 100, unique: true })
   email: string;
 
-  @Column({ name: 'avatar_url', type: 'varchar', length: 255, nullable: true })
+  @Column({ name: 'avatar_url', type: 'varchar', length: 500, nullable: true })
   avatarUrl: string | null;
 
   @Column({ name: 'phone_number', type: 'varchar', length: 20, nullable: true })

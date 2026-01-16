@@ -16,8 +16,8 @@ function DiscountItem({ type, discount }: DiscountItemProps) {
 
   const typeLabels = {
     shipping: '運費折扣',
-    seasonal: '季節折扣',
-    special: '特別活動折扣',
+    seasonal: '商品折扣',
+    special: '商品折扣',
   };
 
   return (
@@ -123,13 +123,13 @@ function CheckoutSummary(props: Props) {
         {/* 分開顯示不同類型的折扣 */}
         {seasonalDiscountAmount > 0 && (
           <div className={styles.row}>
-            <span>季節折扣</span>
+            <span>商品折扣</span>
             <span className={styles.discount}>-$ {seasonalDiscountAmount}</span>
           </div>
         )}
         {specialDiscountAmount > 0 && (
           <div className={styles.row}>
-            <span>特別活動折扣</span>
+            <span>商品折扣</span>
             <span className={styles.discount}>-$ {specialDiscountAmount}</span>
           </div>
         )}

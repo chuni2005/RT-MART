@@ -1,4 +1,15 @@
-import { IsNotEmpty, IsOptional, IsString, IsObject } from 'class-validator';
+import { IsNotEmpty, IsOptional, IsString, IsObject, ValidateNested } from 'class-validator';
+import { Type } from 'class-transformer';
+
+class DiscountCodesDto {
+  @IsString()
+  @IsOptional()
+  shipping?: string;
+
+  @IsString()
+  @IsOptional()
+  product?: string;
+}
 
 export class CreateOrderFromSnapshotDto {
   @IsObject()
@@ -17,11 +28,9 @@ export class CreateOrderFromSnapshotDto {
   @IsOptional()
   paymentMethod?: string;
 
-  @IsString()
   @IsOptional()
-  shippingDiscountCode?: string;
-
-  @IsString()
-  @IsOptional()
-  productDiscountCode?: string;
+  @IsObject()
+  @ValidateNested()
+  @Type(() => DiscountCodesDto)
+  discountCodes?: DiscountCodesDto;
 }

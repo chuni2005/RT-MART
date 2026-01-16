@@ -57,9 +57,11 @@ const fetchFullUser = async (): Promise<User> => {
 
 /**
  * 登入：呼叫 /auth/login，cookies 內會寫入 token，然後再查完整用戶資料
+ * @param identifier - 可以是 loginId 或 email
+ * @param password - 密碼
  */
 export const login = async (
-  loginId: string, 
+  identifier: string, 
   password: string
 ): Promise<AuthResponse> => {
   try {
@@ -69,7 +71,7 @@ export const login = async (
       refreshToken: string;
     }>(
       '/auth/login', 
-      { loginId, password }
+      { identifier, password }
     );
 
     // 2) 再拿用戶資料
@@ -95,19 +97,25 @@ export const sendVerificationCode = async (
   name: string,
   email: string,
   phone: string,
-  password: string
+  password: string,
+  avatarFile?: File | null
 ): Promise<{ success: boolean; message: string }> => {
   try {
+    const formData = new FormData();
+    formData.append('loginId', loginId);
+    formData.append('name', name);
+    formData.append('email', email);
+    formData.append('phoneNumber', phone);
+    formData.append('password', password);
+    formData.append('purpose', 'registration');
+    
+    if (avatarFile) {
+      formData.append('avatar', avatarFile);
+    }
+    
     const result = await post<{ success: boolean; message: string }>(
       '/auth/register/send-code',
-      {
-        loginId,
-        name,
-        email,
-        phoneNumber: phone,
-        password,
-        purpose: 'registration',
-      }
+      formData
     );
     return result;
   } catch (error: any) {

@@ -14,8 +14,11 @@ import {
   Inject,
   forwardRef,
   Logger,
+  UploadedFile,
 } from '@nestjs/common';
+import { FileInterceptor } from '@nestjs/platform-express';
 import { UsersService } from './users.service';
+import { CloudinaryService } from '../cloudinary/cloudinary.service';
 import { CreateUserDto } from './dto/create-user.dto';
 import { UpdateUserDto } from './dto/update-user.dto';
 import { QueryUserDto } from './dto/query-user.dto';
@@ -33,6 +36,7 @@ import { StoresService } from '../stores/stores.service';
 import { OrdersService } from '../orders/orders.service';
 import { SellersService } from '../sellers/sellers.service';
 import { OrderStatus } from '../orders/entities/order.entity';
+import { Audit } from '../common/decorators/audit.decorator';
 
 @Controller('users')
 @UseInterceptors(ClassSerializerInterceptor)
@@ -41,6 +45,7 @@ export class UsersController {
 
   constructor(
     private readonly usersService: UsersService,
+    private readonly cloudinaryService: CloudinaryService,
     @Inject(forwardRef(() => StoresService))
     private readonly storesService: StoresService,
     @Inject(forwardRef(() => OrdersService))
@@ -50,6 +55,7 @@ export class UsersController {
   ) {}
 
   //Create user: create with loginId, name, password, email (phone, role optional)
+  @Audit('User', { excludeFields: ['password'] })
   @Roles(UserRole.ADMIN)
   @UseGuards(JwtAccessGuard, RolesGuard)
   @Post()
@@ -94,15 +100,44 @@ export class UsersController {
   }
 
   // Update own data: User updates their own data
+  @Audit('User', { excludeFields: ['password', 'currentPassword'] })
   @UseGuards(JwtAccessGuard)
+  @UseInterceptors(
+    FileInterceptor('avatar', {
+      fileFilter: (req, file, cb) => {
+        if (!file.mimetype.match(/\/(jpg|jpeg|png|gif)$/)) {
+          return cb(new Error('Only image files are allowed!'), false);
+        }
+        cb(null, true);
+      },
+      limits: {
+        fileSize: 2 * 1024 * 1024, // 2MB
+      },
+    }),
+  )
   @Patch('me')
-  async updateMe(@Req() req, @Body() updateUserDto: UpdateUserDto) {
+  async updateMe(
+    @Req() req,
+    @Body() updateUserDto: UpdateUserDto,
+    @UploadedFile() file?: Express.Multer.File,
+  ) {
     const userId = (req.user as { userId: string }).userId;
+
+    // If file is uploaded, upload to Cloudinary and get the URL
+    if (file) {
+      const uploadResult = await this.cloudinaryService.uploadImage(
+        file,
+        'avatars',
+      );
+      updateUserDto.avatarUrl = uploadResult.url;
+    }
+
     const user = await this.usersService.update(userId, updateUserDto);
     return plainToInstance(UserResponseDto, user);
   }
 
   //Update user data: Update by ID
+  @Audit('User', { excludeFields: ['password', 'currentPassword'] })
   @Roles(UserRole.ADMIN)
   @UseGuards(JwtAccessGuard, RolesGuard)
   @Patch(':id')
@@ -112,6 +147,7 @@ export class UsersController {
   }
 
   //Delete own account: User deletes their own account
+  @Audit('User')
   @UseGuards(JwtAccessGuard)
   @Delete('me')
   async removeMe(@Req() req, @Body() deleteAccountDto: DeleteAccountDto) {
@@ -121,6 +157,7 @@ export class UsersController {
   }
 
   //Delete user: Delete by ID
+  @Audit('User')
   @Roles(UserRole.ADMIN)
   @UseGuards(JwtAccessGuard, RolesGuard)
   @Delete(':id')
@@ -130,6 +167,7 @@ export class UsersController {
   }
 
   //Restore user: Restore a soft-deleted user by ID
+  @Audit('User')
   @Roles(UserRole.ADMIN)
   @UseGuards(JwtAccessGuard, RolesGuard)
   @Post(':id/restore')
@@ -144,6 +182,7 @@ export class UsersController {
   //2. If seller, suspend their store
   //3. Cancel all pending orders (as buyer)
   //4. Cancel all pending orders (from their store as seller)
+  @Audit('User')
   @Roles(UserRole.ADMIN)
   @UseGuards(JwtAccessGuard, RolesGuard)
   @Post(':id/suspend')
@@ -204,6 +243,7 @@ export class UsersController {
   }
 
   //Restore suspended user: Restore a suspended user account (admin only)
+  @Audit('User')
   @Roles(UserRole.ADMIN)
   @UseGuards(JwtAccessGuard, RolesGuard)
   @Post(':id/restore-suspended')
@@ -270,6 +310,7 @@ export class UsersController {
   }
 
   //Permanently delete user: Permanently delete by ID
+  @Audit('User')
   @Roles(UserRole.ADMIN)
   @UseGuards(JwtAccessGuard, RolesGuard)
   @Delete(':id/permanent')

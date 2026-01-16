@@ -46,6 +46,11 @@ interface BackendStorefrontProduct {
     createdAt: string;
     avatar?: string;
     productCount?: number;
+    seller?: {
+      user?: {
+        avatarUrl: string | null;
+      };
+    };
   };
   productType: {
     productTypeId: string;
@@ -294,7 +299,8 @@ export const getProductById = async (
         store: {
           id: p.store.storeId,
           name: p.store.storeName,
-          avatar: p.store.avatar || "https://i.pravatar.cc/150?img=10",
+          // 優先使用賣家用戶頭像
+          avatar: p.store.seller?.user?.avatarUrl || p.store.avatar || "https://i.pravatar.cc/150?img=10",
           rating: Number(p.store.averageRating) || 0,
           productCount: p.store.productCount || 0,
           totalRatings: p.store.totalRatings || 0,
@@ -389,8 +395,8 @@ export const getProducts = async (
           store: {
             id: p.store.storeId,
             name: p.store.storeName,
-            // TODO: 後端 Storefront API 目前可能未回傳以下欄位，暫時使用預設值或從 Store 物件中取值
-            avatar: "https://i.pravatar.cc/150?img=10", // Placeholder
+            // 優先使用賣家用戶頭像
+            avatar: p.store.seller?.user?.avatarUrl || p.store.avatar || "https://i.pravatar.cc/150?img=10",
             rating: Number(p.store.averageRating) || 0,
           productCount: p.store.productCount || 0,
           totalRatings: p.store.totalRatings || 0,

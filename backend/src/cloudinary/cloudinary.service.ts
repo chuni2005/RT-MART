@@ -13,10 +13,11 @@ import * as streamifier from 'streamifier';
 export class CloudinaryService {
   uploadImage(
     file: Express.Multer.File,
+    folder: string = 'products',
   ): Promise<{ url: string; publicId: string }> {
     return new Promise((resolve, reject) => {
       const uploadStream = cloudinary.uploader.upload_stream(
-        { folder: 'products' },
+        { folder },
         (error, result) => {
           if (error) return reject(error);
           if (!result)

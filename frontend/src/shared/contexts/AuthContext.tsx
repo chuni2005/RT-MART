@@ -54,7 +54,7 @@ export const AuthProvider = ({ children }: AuthProviderProps) => {
 
   /**
    * 登入
-   * @param identifier - 現在當作 loginId 使用（後端目前只支援 loginId）
+   * @param identifier - 可以是 loginId 或 email
    * @param password
    * @param remember - 是否記住登入狀態（可選：你可以自己決定要不要把 user 存到 localStorage）
    */
@@ -66,7 +66,7 @@ export const AuthProvider = ({ children }: AuthProviderProps) => {
     try {
       setIsLoading(true);
 
-      // identifier 在這邊當作 loginId 傳給後端
+      // identifier 可以是 loginId 或 email，後端會自動判斷
       const response = await authService.login(identifier, password);
 
       if (response.success) {
@@ -143,14 +143,16 @@ export const AuthProvider = ({ children }: AuthProviderProps) => {
       name: string,
       email: string,
       phone: string,
-      password: string
+      password: string,
+      avatarFile?: File | null
     ): Promise<void> => {
       await authService.sendVerificationCode(
         loginId,
         name,
         email,
         phone,
-        password
+        password,
+        avatarFile
       );
     },
 

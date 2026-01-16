@@ -19,11 +19,13 @@ import { RolesGuard } from '../auth/guards/roles.guard';
 import { Roles } from '../auth/decorators/roles.decorator';
 import { UserRole } from '../users/entities/user.entity';
 import type { AuthRequest } from '../common/types';
+import { Audit } from '../common/decorators/audit.decorator';
 
 @Controller('discounts')
 export class DiscountsController {
   constructor(private readonly discountsService: DiscountsService) {}
 
+  @Audit('Discount')
   @Roles(UserRole.SELLER)
   @UseGuards(JwtAccessGuard, RolesGuard)
   @Post()
@@ -34,6 +36,7 @@ export class DiscountsController {
     return await this.discountsService.sellerCreate(createDto, req.user.userId);
   }
 
+  @Audit('Discount')
   @Roles(UserRole.ADMIN)
   @UseGuards(JwtAccessGuard, RolesGuard)
   @Post('admin')
@@ -100,6 +103,7 @@ export class DiscountsController {
     return await this.discountsService.findByCode(code);
   }
 
+  @Audit('Discount')
   @Post('validate/:code')
   async validateDiscount(
     @Param('code') code: string,
@@ -108,6 +112,7 @@ export class DiscountsController {
     return await this.discountsService.validateDiscount(code, body.orderAmount);
   }
 
+  @Audit('Discount')
   @Roles(UserRole.SELLER)
   @UseGuards(JwtAccessGuard, RolesGuard)
   @Patch(':id')
@@ -119,13 +124,16 @@ export class DiscountsController {
     return await this.discountsService.update(req.user.userId, id, updateDto);
   }
 
-  // @Roles(UserRole.SELLER)
-  // @UseGuards(JwtAccessGuard, RolesGuard)
-  // @Delete(':id')
-  // async sellerRemove(@Req() req: AuthRequest, @Param('id') id: string) {
-  //   return await this.discountsService.sellerRemove(req.user.userId, id);
-  // }
+  @Audit('Discount')
+  @Roles(UserRole.SELLER)
+  @UseGuards(JwtAccessGuard, RolesGuard)
+  @Delete(':id')
+  async sellerRemove(@Req() req: AuthRequest, @Param('id') id: string) {
+    await this.discountsService.remove(id);
+    return { message: 'Discount deleted successfully' };
+  }
 
+  @Audit('Discount')
   @Roles(UserRole.ADMIN)
   @UseGuards(JwtAccessGuard, RolesGuard)
   @Patch('admin/:id')
@@ -136,6 +144,7 @@ export class DiscountsController {
     return await this.discountsService.adminUpdate(id, updateDto);
   }
 
+  @Audit('Discount')
   @Roles(UserRole.ADMIN)
   @UseGuards(JwtAccessGuard, RolesGuard)
   @Delete(':id')

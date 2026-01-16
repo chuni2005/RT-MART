@@ -11,6 +11,7 @@ import {
   LessThanOrEqual,
   MoreThan,
   FindOptionsWhere,
+  EntityManager,
 } from 'typeorm';
 import {
   Discount,
@@ -431,12 +432,34 @@ export class DiscountsService {
     await this.discountRepository.remove(discount);
   }
 
-  async incrementUsage(id: string): Promise<void> {
-    await this.discountRepository.increment(
-      { discountId: id },
-      'usageCount',
-      1,
-    );
+  /**
+   * Get all active special discounts for a specific store
+   */
+  async findActiveSpecialDiscountsByStore(
+    storeId: string,
+    manager?: EntityManager,
+  ): Promise<Discount[]> {
+    const repo = manager
+      ? manager.getRepository(Discount)
+      : this.discountRepository;
+    const now = new Date();
+    return await repo.find({
+      where: {
+        discountType: DiscountType.SPECIAL,
+        isActive: true,
+        startDatetime: LessThanOrEqual(now),
+        endDatetime: MoreThan(now),
+        specialDiscount: { storeId },
+      },
+      relations: ['specialDiscount', 'specialDiscount.productType'],
+    });
+  }
+
+  async incrementUsage(id: string, manager?: EntityManager): Promise<void> {
+    const repo = manager
+      ? manager.getRepository(Discount)
+      : this.discountRepository;
+    await repo.increment({ discountId: id }, 'usageCount', 1);
   }
 
   async validateDiscount(
